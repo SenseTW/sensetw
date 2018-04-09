@@ -5,7 +5,9 @@
   "dependencies": {
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
-    "react-scripts-ts": "2.14.0"
+    "react-redux": "^5.0.7",
+    "react-scripts-ts": "2.14.0",
+    "redux": "^3.7.2"
   },
   "scripts": {
     "start": "react-scripts-ts start",
@@ -18,6 +20,7 @@
     "@types/node": "^9.6.1",
     "@types/react": "^16.3.1",
     "@types/react-dom": "^16.0.4",
+    "@types/react-redux": "^5.0.15",
     "typescript": "^2.8.1"
   }
 }
