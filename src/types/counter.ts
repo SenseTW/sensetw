@@ -1,12 +1,10 @@
 const INCREASE = 'INCREASE';
-type IncreaseAction = { type: typeof INCREASE };
-const increase = (): IncreaseAction => ({ type: INCREASE });
+const increase = () => ({ type: INCREASE as typeof INCREASE });
+type IncreaseAction = ReturnType<typeof increase>;
 
 const DECREASE = 'DECREASE';
-type DecreaseAction = { type: typeof DECREASE };
-const decrease = (): DecreaseAction => ({ type: DECREASE });
-
-export type Action = IncreaseAction | DecreaseAction;
+const decrease = () => ({ type: DECREASE as typeof DECREASE });
+type DecreaseAction = ReturnType<typeof decrease>;
 
 export type State = {
   counter: number
@@ -14,6 +12,10 @@ export type State = {
 export const initial: State = {
   counter: 0
 };
+
+type Action
+  = IncreaseAction
+  | DecreaseAction;
 
 export const actions = { increase, decrease };
 
