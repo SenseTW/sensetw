@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Button } from 'semantic-ui-react';
 import * as T from '../../types';
 
 interface StateFromProps {
@@ -20,11 +21,11 @@ class Counter extends React.PureComponent<Props> {
     const { actions, counter } = this.props;
 
     return (
-      <div>
-        <button onClick={actions.increase}>+</button>
-        {counter}
-        <button onClick={actions.decrease}>-</button>
-      </div>
+      <Button.Group>
+        <Button onClick={actions.increase}>+</Button>
+        <Button>{counter}</Button>
+        <Button onClick={actions.decrease}>-</Button>
+      </Button.Group>
     );
   }
 }
