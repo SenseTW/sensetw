@@ -7,15 +7,21 @@ type PositionInMap = [number, number];
 type PositionInBox = [number, number];
 type ZoomLevel = number;
 
-enum CardType {
+export enum CardType {
   User,
   IBM
 }
 
-type CardData = {
+export type CardData = {
   type: CardType,
   title: string,
   description: string
+};
+
+export const emptyCardData = {
+  type: CardType.User,
+  title: '',
+  description: ''
 };
 
 const CREATE_CARD = 'CREATE_CARD';
@@ -101,3 +107,26 @@ const addObjectToSelection = (id: ObjectID): AddObjectToSelectionAction => ({ ty
 const CLEAR_SELECTION = 'CLEAR_SELECTION';
 type ClearSelectionAction = { type: typeof CLEAR_SELECTION };
 const clearSelection = (): ClearSelectionAction => ({ type: CLEAR_SELECTION });
+
+export const actions = {
+  createCard,
+  willEditCard,
+  didEditCard,
+  cancelEditCard,
+  changeCardTitle,
+  changeCardDescription,
+  createBox,
+  deleteObject,
+  moveObject,
+  addCardToBox,
+  removeCardFromBox,
+  moveCardInBox,
+  openBox,
+  closeBox,
+  createEdge,
+  deleteEdge,
+  panViewport,
+  zoomViewport,
+  addObjectToSelection,
+  clearSelection
+};
