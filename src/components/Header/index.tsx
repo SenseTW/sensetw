@@ -25,6 +25,14 @@ class Header extends React.PureComponent<RouteComponentProps<any>> {
         >
           counter
         </Menu.Item>
+        <Menu.Item
+          as={Link}
+          to="/components"
+          name="components"
+          active={location.pathname === '/components'}
+        >
+          components
+        </Menu.Item>
       </Menu>
     );
   }
