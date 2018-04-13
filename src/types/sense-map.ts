@@ -28,27 +28,9 @@ const CREATE_CARD = 'CREATE_CARD';
 type CreateCardAction = { type: typeof CREATE_CARD };
 const createCard = (d: CardData, pos: PositionInMap): CreateCardAction => ({ type: CREATE_CARD });
 
-const WILL_EDIT_CARD = 'WILL_EDIT_CARD';
-type WillEditCardAction = { type: typeof WILL_EDIT_CARD, id: CardID };
-const willEditCard = (id: CardID): WillEditCardAction => ({ type: WILL_EDIT_CARD, id });
-
-const DID_EDIT_CARD = 'DID_EDIT_CARD';
-type DidEditCardAction = { type: typeof DID_EDIT_CARD, id: CardID };
-const didEditCard = (id: CardID): DidEditCardAction => ({ type: DID_EDIT_CARD, id });
-
-const CANCEL_EDIT_CARD = 'CANCEL_EDIT_CARD';
-type CancelEditCardAction = { type: typeof CANCEL_EDIT_CARD, id: CardID };
-const cancelEditCard = (id: CardID): CancelEditCardAction => ({ type: CANCEL_EDIT_CARD, id });
-
-const CHANGE_CARD_TITLE = 'CHANGE_CARD_TITLE';
-type ChangeCardTitleAction = { type: typeof CHANGE_CARD_TITLE, id: CardID, title: string };
-const changeCardTitle = (id: CardID, title: string): ChangeCardTitleAction =>
-  ({ type: CHANGE_CARD_TITLE, id, title });
-
-const CHANGE_CARD_DESCRIPTION = 'CHANGE_CARD_DESCRIPTION';
-type ChangeCardDescriptionAction = { type: typeof CHANGE_CARD_DESCRIPTION, id: CardID, description: string };
-const changeCardDescription = (id: CardID, description: string): ChangeCardDescriptionAction =>
-  ({ type: CHANGE_CARD_DESCRIPTION, id, description });
+const UPDATE_CARD = 'UPDATE_CARD';
+type UpdateCardAction = { type: typeof UPDATE_CARD, id: CardID, d: CardData };
+const updateCard = (id: CardID, d: CardData): UpdateCardAction => ({ type: UPDATE_CARD, id, d });
 
 const CREATE_BOX = 'CREATE_BOX';
 type CreateBoxAction = { type: typeof CREATE_BOX };
@@ -110,11 +92,7 @@ const clearSelection = (): ClearSelectionAction => ({ type: CLEAR_SELECTION });
 
 export const actions = {
   createCard,
-  willEditCard,
-  didEditCard,
-  cancelEditCard,
-  changeCardTitle,
-  changeCardDescription,
+  updateCard,
   createBox,
   deleteObject,
   moveObject,

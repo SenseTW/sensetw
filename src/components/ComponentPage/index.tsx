@@ -22,6 +22,10 @@ class ComponentPage extends React.Component<Props, State> {
     };
   }
 
+  handleCardChange = (card: SM.CardData) => {
+    this.setState({ cards: [card] });
+  }
+
   render() {
     const { cards } = this.state;
 
@@ -30,7 +34,10 @@ class ComponentPage extends React.Component<Props, State> {
         This page list components.
         <Divider />
         <h2>Card</h2>
-        <SenseCard data={cards[0]} />
+        <SenseCard
+          data={cards[0]}
+          onChange={this.handleCardChange}
+        />
       </Container>
     );
   }
