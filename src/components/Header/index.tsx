@@ -33,6 +33,14 @@ class Header extends React.PureComponent<RouteComponentProps<any>> {
         >
           components
         </Menu.Item>
+        <Menu.Item
+          as={Link}
+          to="/map"
+          name="map"
+          active={location.pathname === '/map'}
+        >
+          map
+        </Menu.Item>
       </Menu>
     );
   }

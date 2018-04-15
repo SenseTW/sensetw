@@ -4249,6 +4249,10 @@ klaw@^1.0.0:
   optionalDependencies:
     graceful-fs "^4.1.9"
 
+konva@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/konva/-/konva-2.0.2.tgz#e9b22f18c5fe3fb0012cd6ef234bf602818a60e1"
+
 latest-version@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-3.1.0.tgz#a205383fea322b33b5ae3b18abee0dc2f356ee15"
@@ -5718,6 +5722,22 @@ react-dom@^16.3.0:
 react-error-overlay@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-3.0.0.tgz#c2bc8f4d91f1375b3dad6d75265d51cd5eeaf655"
+
+react-konva@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/react-konva/-/react-konva-1.7.2.tgz#55f640acfbea723139198274e18aa951d7937fff"
+  dependencies:
+    fbjs "^0.8.16"
+    react-reconciler "^0.9.0"
+
+react-reconciler@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/react-reconciler/-/react-reconciler-0.9.0.tgz#759d39f2ecd2fcb58e5fe0015ecb1c2da642f8a1"
+  dependencies:
+    fbjs "^0.8.16"
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.0"
 
 react-redux@^5.0.7:
   version "5.0.7"
