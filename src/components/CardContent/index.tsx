@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
-import { Card, Button, Input } from 'semantic-ui-react';
+import { Divider, Button, Input } from 'semantic-ui-react';
 import * as SM from '../../types/sense-map';
+import './index.css';
 
 interface Props {
   data: SM.CardData;
@@ -14,7 +15,7 @@ interface State {
   description: string;
 }
 
-class SenseCard extends React.Component<Props, State> {
+class CardContent extends React.Component<Props, State> {
   static defaultProps = {
     data: SM.emptyCardData
   };
@@ -97,46 +98,53 @@ class SenseCard extends React.Component<Props, State> {
     const { title, description } = this.props.data;
 
     return (
-      <Card onKeyUp={isEditing && this.handleKey}>
-        <Card.Content>
-          <Card.Header>{
+      <div className="card-content">
+        <div className="card-content__content">
+          <h1 className="card-content__header">{
             isEditing
               ? (
                 <Input
+                  fluid
+                  transparent
                   ref={e => this.titleInput = e}
                   placeholder={title}
                   value={newTitle}
+                  onKeyUp={this.handleKey}
                   onChange={this.handleTitleChange}
                 />
               )
               : title
-          }</Card.Header>
-          <Card.Description>{
+          }</h1>
+          <div className="card-content__description">{
             isEditing
               ? (
                 <Input
+                  fluid
+                  transparent
                   placeholder={description}
                   value={newDescription}
+                  onKeyUp={this.handleKey}
                   onChange={this.handleDescriptionChange}
                 />
               )
               : description
-          }</Card.Description>
-        </Card.Content>
-        <Card.Content extra>{
+          }</div>
+        </div>
+        <Divider />
+        <div className="card-content__actions">{
           isEditing
-            ? <Button.Group floated="right">
+            ? <Button.Group>
                 <Button onClick={this.handleCancel}>取消</Button>
                 <Button.Or />
                 <Button positive onClick={this.handleSave}>完成</Button>
               </Button.Group>
-            : <Button primary floated="right" onClick={this.handleEdit}>
+            : <Button primary onClick={this.handleEdit}>
                 編輯
               </Button>
-        }</Card.Content>
-      </Card>
+        }</div>
+      </div>
     );
   }
 }
 
-export default SenseCard;
+export default CardContent;

@@ -1,3 +1,11 @@
+.App {
+  height: 100%;
+}
+
 .ui.text.container {
   padding-top: 64px;
+}
+
+.ui.sidebar {
+  padding-top: 40px;
 }

@@ -1,4 +1,4 @@
-type CardID = string;
+export type CardID = string;
 type BoxID = string;
 type ObjectID = CardID | BoxID;
 type EdgeID = string;
