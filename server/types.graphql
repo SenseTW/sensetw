@@ -17,6 +17,26 @@ type User @model {
 
 type Map @model {
   id: ID! @isUnique
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  viewport: Viewport @relation(name: "MapViewport")
+  cards: [Card!]! @relation(name: "MapCards")
+}
+
+type Viewport @model {
+  id: ID! @isUnique
+  canvasMap: Map! @relation(name: "MapViewport")
+  top: Float!
+  left: Float!
+  width: Float!
+  height: Float!
+}
+
+type Card @model {
+  id: ID! @isUnique
+  map: Map! @relation(name: "MapCards")
+  x: Float!
+  y: Float!
+  width: Float!
+  height: Float!
+  zIndex: Float!
+  text: String! @migrationValue(value: "")
 }
