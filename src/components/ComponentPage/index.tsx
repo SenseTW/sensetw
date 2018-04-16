@@ -20,14 +20,22 @@ class ComponentPage extends React.Component<Props, State> {
       currentCardId: '0',
       cards: {
         '0': {
-          type: SM.CardType.User,
+          type: SM.CardType.Question,
           title: '這是一張卡',
-          description: '這是卡片的內容'
+          description: '這是卡片的內容',
+          question: '這是卡片問題'
         },
         '1': {
-          type: SM.CardType.IBM,
+          type: SM.CardType.Answer,
           title: '這是另外一張卡',
-          description: '這是另外一張卡的內容'
+          description: '這是另外一張卡的內容',
+          answer: '這是卡片答案'
+        },
+        '2': {
+          type: SM.CardType.Box,
+          title: '這是一個 Box',
+          description: '這是 Box 的內容',
+          cards: []
         }
       }
     };
@@ -67,10 +75,13 @@ class ComponentPage extends React.Component<Props, State> {
             <Divider />
             <h2>Card</h2>
             <Button onClick={() => this.toggleCard('0')}>
-              show a card content
+              show the question card
             </Button>
             <Button onClick={() => this.toggleCard('1')}>
-              show another card content
+              show the answer card
+            </Button>
+            <Button onClick={() => this.toggleCard('2')}>
+              show the box card
             </Button>
           </Container>
         </Sidebar.Pusher>

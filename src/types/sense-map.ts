@@ -8,18 +8,46 @@ type PositionInBox = [number, number];
 type ZoomLevel = number;
 
 export enum CardType {
-  User,
-  IBM
+  Empty,
+  User, // deprecated
+  IBM, // deprecated
+  Question,
+  Answer,
+  Box
 }
 
-export type CardData = {
-  type: CardType,
-  title: string,
-  description: string
-};
+interface CoreCardData {
+  title: string;
+  description: string;
+}
 
-export const emptyCardData = {
-  type: CardType.User,
+interface EmptyCardData extends CoreCardData {
+  type: CardType.Empty;
+}
+
+export interface QuestionCardData extends CoreCardData {
+  type: CardType.Question;
+  question: string;
+}
+
+export interface AnswerCardData extends CoreCardData {
+  type: CardType.Answer;
+  answer: string;
+}
+
+export interface BoxCardData extends CoreCardData {
+  type: CardType.Box;
+  cards: CardID[];
+}
+
+export type CardData
+  = EmptyCardData
+  | QuestionCardData
+  | AnswerCardData
+  | BoxCardData;
+
+export const emptyCardData: EmptyCardData = {
+  type: CardType.Empty,
   title: '',
   description: ''
 };

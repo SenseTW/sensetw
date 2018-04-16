@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
-import { Divider, Button, Input } from 'semantic-ui-react';
+import { Header, Divider, Button, Input } from 'semantic-ui-react';
 import * as SM from '../../types/sense-map';
 import './index.css';
 
@@ -11,9 +11,22 @@ interface Props {
 
 interface State {
   isEditing: boolean;
-  title: string;
-  description: string;
+  data: SM.CardData;
 }
+
+const showCardType = (type: SM.CardType): string => {
+  switch (type) {
+    case SM.CardType.Question:
+      return 'Question';
+    case SM.CardType.Answer:
+      return 'Answer';
+    case SM.CardType.Box:
+      return 'Box';
+    case SM.CardType.Empty:
+    default:
+      return 'Unknown';
+  }
+};
 
 class CardContent extends React.Component<Props, State> {
   static defaultProps = {
@@ -29,14 +42,19 @@ class CardContent extends React.Component<Props, State> {
 
     this.state = {
       isEditing: false,
-      title: '',
-      description: ''
+      data: { ...props.data }
     };
   }
 
-  handleEdit = () => {
-    const { title, description } = this.props.data;
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.data !== nextProps.data) {
+      this.setState({
+        data: { ...nextProps.data }
+      });
+    }
+  }
 
+  handleEdit = () => {
     setImmediate(() => {
       if (this.titleInput) {
         this.titleInput.focus();
@@ -44,19 +62,19 @@ class CardContent extends React.Component<Props, State> {
     });
 
     this.setState({
-      isEditing: true,
-      title,
-      description
+      isEditing: true
     });
   }
 
-  handleTitleChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.setState({ title: e.currentTarget.value });
-  }
-
-  handleDescriptionChange = (e: React.FormEvent<HTMLInputElement>) => {
-    this.setState({ description: e.currentTarget.value });
-  }
+  handleValueChange =
+    (key: string) => (e: React.FormEvent<HTMLInputElement>) => {
+      this.setState({
+        data: {
+          ...this.state.data,
+          [key]: e.currentTarget.value
+        }
+      });
+    }
 
   handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.keyCode) {
@@ -71,64 +89,107 @@ class CardContent extends React.Component<Props, State> {
   }
 
   handleSave = () => {
-    const { data, onChange } = this.props;
-    const { title, description } = this.state;
+    const { onChange } = this.props;
 
     if (onChange) {
-      onChange({ ...data, title, description });
+      onChange(this.state.data);
     }
 
     this.setState({
-      isEditing: false,
-      title: '',
-      description: ''
+      isEditing: false
     });
   }
 
   handleCancel = () => {
     this.setState({
       isEditing: false,
-      title: '',
-      description: ''
+      data: { ...this.props.data }
     });
   }
 
   render() {
-    const { isEditing, title: newTitle, description: newDescription } = this.state;
     const { title, description } = this.props.data;
+    const { isEditing, data } = this.state;
+
+    let titleSection =
+      isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            ref={e => this.titleInput = e}
+            placeholder={title}
+            value={data.title}
+            onKeyUp={this.handleKey}
+            onChange={this.handleValueChange('title')}
+          />
+        )
+        : title;
+
+    let descriptionSection =
+      isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            placeholder={description}
+            value={data.description}
+            onKeyUp={this.handleKey}
+            onChange={this.handleValueChange('description')}
+          />
+        )
+        : description;
+
+    let questionSection;
+    if (data.type === SM.CardType.Question) {
+      const { question } = this.props.data as SM.QuestionCardData;
+      questionSection = isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            placeholder={question}
+            value={data.question}
+            onKeyUp={this.handleKey}
+            onChange={this.handleValueChange('question')}
+          />
+        )
+        : question;
+    }
+
+    let answerSection;
+    if (data.type === SM.CardType.Answer) {
+      const { answer } = this.props.data as SM.AnswerCardData;
+      questionSection = isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            placeholder={answer}
+            value={data.answer}
+            onKeyUp={this.handleKey}
+            onChange={this.handleValueChange('answer')}
+          />
+        )
+        : answer;
+    }
 
     return (
       <div className="card-content">
         <div className="card-content__content">
-          <h1 className="card-content__header">{
-            isEditing
-              ? (
-                <Input
-                  fluid
-                  transparent
-                  ref={e => this.titleInput = e}
-                  placeholder={title}
-                  value={newTitle}
-                  onKeyUp={this.handleKey}
-                  onChange={this.handleTitleChange}
-                />
-              )
-              : title
-          }</h1>
-          <div className="card-content__description">{
-            isEditing
-              ? (
-                <Input
-                  fluid
-                  transparent
-                  placeholder={description}
-                  value={newDescription}
-                  onKeyUp={this.handleKey}
-                  onChange={this.handleDescriptionChange}
-                />
-              )
-              : description
-          }</div>
+          <Header as="h1" className="card-content__header">
+            {titleSection}
+            <Header.Subheader>{showCardType(this.props.data.type)}</Header.Subheader>
+          </Header>
+          <div className="card-content__section">
+            {descriptionSection}
+          </div>
+          <div className="card-content__section">
+            {questionSection}
+          </div>
+          <div className="card-content__section">
+            {answerSection}
+          </div>
         </div>
         <Divider />
         <div className="card-content__actions">{
