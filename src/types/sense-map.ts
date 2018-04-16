@@ -1,10 +1,11 @@
+import { ActionUnion } from './index';
+
 export type CardID = string;
 type BoxID = string;
 type ObjectID = CardID | BoxID;
 type EdgeID = string;
 
-type PositionInMap = [number, number];
-type PositionInBox = [number, number];
+export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
 export enum CardType {
@@ -46,6 +47,16 @@ export type CardData
   | AnswerCardData
   | BoxCardData;
 
+export type BoxData = {
+  title: string,
+  description: string
+};
+
+export type CanvasObject = {
+  position: PositionInMap,
+  data: CardData | BoxData
+};
+
 export const emptyCardData: EmptyCardData = {
   type: CardType.Empty,
   title: '',
@@ -53,8 +64,10 @@ export const emptyCardData: EmptyCardData = {
 };
 
 const CREATE_CARD = 'CREATE_CARD';
-type CreateCardAction = { type: typeof CREATE_CARD };
-const createCard = (d: CardData, pos: PositionInMap): CreateCardAction => ({ type: CREATE_CARD });
+const createCard = (data: CardData, position: PositionInMap) => ({
+  type: CREATE_CARD as typeof CREATE_CARD,
+  payload: { position, data } as CanvasObject
+});
 
 const UPDATE_CARD = 'UPDATE_CARD';
 type UpdateCardAction = { type: typeof UPDATE_CARD, id: CardID, d: CardData };
@@ -69,8 +82,13 @@ type DeleteObjectAction = { type: typeof DELETE_OBJECT };
 const deleteObject = (id: ObjectID): DeleteObjectAction => ({ type: DELETE_OBJECT });
 
 const MOVE_OBJECT = 'MOVE_OBJECT';
-type MoveObjectAction = { type: typeof MOVE_OBJECT };
-const moveObject = (id: ObjectID, pos: PositionInMap): MoveObjectAction => ({ type: MOVE_OBJECT });
+const moveObject = (id: ObjectID, position: PositionInMap) => ({
+  type: MOVE_OBJECT as typeof MOVE_OBJECT,
+  payload: {
+    id,
+    position
+  }
+});
 
 const ADD_CARD_TO_BOX = 'ADD_CARD_TO_BOX';
 type AddCardToBoxAction = { type: typeof ADD_CARD_TO_BOX };
@@ -79,12 +97,6 @@ const addCardToBox = (cardID: CardID, boxID: BoxID): AddCardToBoxAction => ({ ty
 const REMOVE_CARD_FROM_BOX = 'REMOVE_CARD_FROM_BOX';
 type RemoveCardFromBoxAction = { type: typeof REMOVE_CARD_FROM_BOX };
 const removeCardFromBox = (cardID: CardID, boxID: BoxID): RemoveCardFromBoxAction => ({ type: REMOVE_CARD_FROM_BOX });
-
-const MOVE_CARD_IN_BOX = 'MOVE_CARD_IN_BOX';
-type MoveCardInBoxAction = { type: typeof MOVE_CARD_IN_BOX };
-const moveCardInBox =
-  (cardID: CardID, boxID: BoxID, pos: PositionInBox): MoveCardInBoxAction =>
-  ({ type: MOVE_CARD_IN_BOX });
 
 const OPEN_BOX = 'OPEN_BOX';
 type OpenBoxAction = { type: typeof OPEN_BOX };
@@ -126,7 +138,6 @@ export const actions = {
   moveObject,
   addCardToBox,
   removeCardFromBox,
-  moveCardInBox,
   openBox,
   closeBox,
   createEdge,
@@ -135,4 +146,25 @@ export const actions = {
   zoomViewport,
   addObjectToSelection,
   clearSelection
+};
+
+export type State = {
+  cards: CanvasObject[]
+};
+
+export const initial: State = {
+  cards: []
+};
+
+export const reducer = (state: State = initial, action: ActionUnion<typeof actions>): State => {
+  switch (action.type) {
+    case CREATE_CARD:
+      return Object.assign({}, state, {
+        cards: [...state.cards, action.payload]
+      });
+    case MOVE_OBJECT:
+      return state;
+    default:
+      return state;
+  }
 };
