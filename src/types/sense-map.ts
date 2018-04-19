@@ -1,4 +1,4 @@
-import { ActionUnion } from './index';
+import { Dispatch as ReduxDispatch  } from 'redux';
 
 export type CardID = string;
 export type BoxID = string;
@@ -68,11 +68,16 @@ export const emptyCardData: EmptyCardData = {
   description: ''
 };
 
-const CREATE_CARD = 'CREATE_CARD';
-const createCard = (data: CardData, position: PositionInMap) => ({
-  type: CREATE_CARD as typeof CREATE_CARD,
-  payload: { position, data }
+const ADD_CARDS = 'ADD_CARDS';
+const addCards = (cards: CanvasObject[]) => ({
+  type: ADD_CARDS as typeof ADD_CARDS,
+  payload: { cards }
 });
+
+const createCard = (data: CardData, position: PositionInMap) => (dispatch: ReduxDispatch<State>) => {
+  const id = objectId();
+  return dispatch(addCards([{ id, position, data }]));
+};
 
 const UPDATE_CARD = 'UPDATE_CARD';
 type UpdateCardAction = { type: typeof UPDATE_CARD, id: CardID, d: CardData };
@@ -128,6 +133,7 @@ type ClearSelectionAction = { type: typeof CLEAR_SELECTION };
 const clearSelection = (): ClearSelectionAction => ({ type: CLEAR_SELECTION });
 
 export const actions = {
+  addCards,
   createCard,
   updateCard,
   createBox,
@@ -151,11 +157,12 @@ export const initial: State = {
   cards: []
 };
 
-export const reducer = (state: State = initial, action: ActionUnion<typeof actions>): State => {
+// tslint:disable-next-line:no-any
+export const reducer = (state: State = initial, action: any): State => {
   switch (action.type) {
-    case CREATE_CARD:
+    case ADD_CARDS:
       return Object.assign({}, state, {
-        cards: [...state.cards, Object.assign({ id: objectId() }, action.payload)]
+        cards: [...state.cards, ...action.payload.cards]
       });
     case MOVE_OBJECT:
       return state;
