@@ -1,5 +1,8 @@
-import { Dispatch as ReduxDispatch  } from 'redux';
+import { Dispatch as ReduxDispatch } from 'redux';
 
+const graphQLEndpoint = 'https://api.graph.cool/simple/v1/cjfrvn5xl1sov0196mxmdg0gs';
+
+export type MapID = string;
 export type CardID = string;
 export type BoxID = string;
 export type ObjectID
@@ -79,6 +82,29 @@ const createCard = (data: CardData, position: PositionInMap) => (dispatch: Redux
   return dispatch(addCards([{ id, position, data }]));
 };
 
+const loadCards = (mapId: MapID) => (dispatch: ReduxDispatch<State>) => {
+  const query = `
+    query AllCards($mapId: ID!) {
+      allCards(filter: { map: { id: $mapId } }) {
+        id, x, y
+      }
+    }`;
+  const variables = { mapId };
+  return fetch(graphQLEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables })
+    }).then(response => response.json())
+      .then(({ data }) => {
+// tslint:disable-next-line:no-any
+        return dispatch(addCards(data.allCards.map((d: any) => ({
+          id: d.id,
+          position: [d.x, d.y],
+          data: emptyCardData
+        }))));
+      });
+};
+
 const UPDATE_CARD = 'UPDATE_CARD';
 type UpdateCardAction = { type: typeof UPDATE_CARD, id: CardID, d: CardData };
 const updateCard = (id: CardID, d: CardData): UpdateCardAction => ({ type: UPDATE_CARD, id, d });
@@ -134,6 +160,7 @@ const clearSelection = (): ClearSelectionAction => ({ type: CLEAR_SELECTION });
 
 export const actions = {
   addCards,
+  loadCards,
   createCard,
   updateCard,
   createBox,

@@ -13,7 +13,9 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    createCard: (data: SM.CardData, position: SM.PositionInMap) => T.Action
+    createCard: (data: SM.CardData, position: SM.PositionInMap) => T.Action,
+// tslint:disable-next-line:no-any
+    loadCards: (mapId: SM.MapID) => any
   };
 }
 
@@ -23,6 +25,10 @@ class Map extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
     this.handleDblClick = this.handleDblClick.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.actions.loadCards('cjfrxpxuzdw1k01790lvp0edn');
   }
 
   // tslint:disable-next-line:no-any
@@ -59,7 +65,9 @@ export default connect<StateFromProps, DispatchFromProps>(
   (dispatch: T.Dispatch) => ({
     actions: {
       createCard: (data: SM.CardData, position: SM.PositionInMap) =>
-        dispatch(T.actions.senseMap.createCard(data, position))
+        dispatch(T.actions.senseMap.createCard(data, position)),
+      loadCards: (mapId: SM.MapID) =>
+        dispatch(T.actions.senseMap.loadCards(mapId))
     }
   })
 )(Map);
