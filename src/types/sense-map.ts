@@ -2,11 +2,9 @@ import { ActionUnion } from './index';
 
 export type CardID = string;
 export type BoxID = string;
-export type EdgeID = string;
 export type ObjectID
   = CardID
-  | BoxID
-  | EdgeID;
+  | BoxID;
 
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
@@ -23,8 +21,6 @@ type ZoomLevel = number;
 
 export enum CardType {
   Empty,
-  User, // deprecated
-  IBM, // deprecated
   Question,
   Answer,
   Box
@@ -60,15 +56,10 @@ export type CardData
   | AnswerCardData
   | BoxCardData;
 
-export type BoxData = {
-  title: string,
-  description: string
-};
-
 export type CanvasObject = {
   id: ObjectID,
   position: PositionInMap,
-  data: CardData | BoxData
+  data: CardData,
 };
 
 export const emptyCardData: EmptyCardData = {
@@ -120,14 +111,6 @@ const CLOSE_BOX = 'CLOSE_BOX';
 type CloseBoxAction = { type: typeof CLOSE_BOX };
 const closeBox = (boxID: BoxID): CloseBoxAction => ({ type: CLOSE_BOX });
 
-const CREATE_EDGE = 'CREATE_EDGE';
-type CreateEdgeAction = { type: typeof CREATE_EDGE };
-const createEdge = (from: ObjectID, to: ObjectID): CreateEdgeAction => ({ type: CREATE_EDGE });
-
-const DELETE_EDGE = 'DELETE_EDGE';
-type DeleteEdgeAction = { type: typeof DELETE_EDGE };
-const deleteEdge = (id: EdgeID): DeleteEdgeAction => ({ type: DELETE_EDGE });
-
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 type PanViewportAction = { type: typeof PAN_VIEWPORT };
 const panViewport = (pos: PositionInMap): PanViewportAction => ({ type: PAN_VIEWPORT });
@@ -154,8 +137,6 @@ export const actions = {
   removeCardFromBox,
   openBox,
   closeBox,
-  createEdge,
-  deleteEdge,
   panViewport,
   zoomViewport,
   addObjectToSelection,
