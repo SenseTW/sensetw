@@ -8,6 +8,8 @@ export type BoxID = string;
 export type ObjectID
   = CardID
   | BoxID;
+export type UserID = string;
+export type TimeStamp = number;
 
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
@@ -24,28 +26,51 @@ type ZoomLevel = number;
 
 export enum CardType {
   Empty,
-  Question,
-  Answer,
+  Common,
   Box
 }
 
+interface UserData {
+  id: UserID;
+}
+
+export const emptyUser: UserData = {
+  id: '0'
+};
+
+interface Article {
+  title: string;
+  url: URL;
+  quote: string;
+}
+
+export const emptyArticle: Article = {
+  title: '',
+  url: new URL('http://example.com'),
+  quote: ''
+};
+
 interface CoreCardData {
+  id: CardID;
   title: string;
   description: string;
+  color: string;
+  created_by: UserID;
+  created_at: TimeStamp;
 }
 
 interface EmptyCardData extends CoreCardData {
   type: CardType.Empty;
 }
 
-export interface QuestionCardData extends CoreCardData {
-  type: CardType.Question;
-  question: string;
-}
-
-export interface AnswerCardData extends CoreCardData {
-  type: CardType.Answer;
-  answer: string;
+interface CommonCardData extends CoreCardData {
+  type: CardType.Common;
+  quote: string;
+  said_by: UserID;
+  referred_to: UserID;
+  tags: string;
+  parent: CardID | null;
+  metadata: Article;
 }
 
 export interface BoxCardData extends CoreCardData {
@@ -55,8 +80,7 @@ export interface BoxCardData extends CoreCardData {
 
 export type CardData
   = EmptyCardData
-  | QuestionCardData
-  | AnswerCardData
+  | CommonCardData
   | BoxCardData;
 
 export type CanvasObject = {
@@ -67,9 +91,71 @@ export type CanvasObject = {
 
 export const emptyCardData: EmptyCardData = {
   type: CardType.Empty,
+  id: '0',
   title: '',
-  description: ''
+  description: '',
+  color: '#f00',
+  created_by: '0',
+  created_at: 0
 };
+
+export const sampleCardList: CardData[] = [{
+  id: objectId(),
+  type: CardType.Common,
+  title: '這是一張卡',
+  description: '這是卡片的內容',
+  color: '#f00',
+  created_by: '0',
+  created_at: 0,
+  quote: '這是引言',
+  said_by: '0',
+  referred_to: '0',
+  tags: '',
+  parent: null,
+  metadata: emptyArticle
+}, {
+  id: objectId(),
+  type: CardType.Common,
+  title: '這是另外一張卡',
+  description: '這是另外一張卡的內容',
+  color: '#00f',
+  created_by: '0',
+  created_at: 0,
+  quote: '這是另外一段引言',
+  said_by: '0',
+  referred_to: '0',
+  tags: '',
+  parent: null,
+  metadata: emptyArticle
+}, {
+  id: objectId(),
+  type: CardType.Box,
+  title: '這是一個 Box',
+  description: '這是 Box 的內容',
+  color: '#fff',
+  created_by: '0',
+  created_at: 0,
+  cards: []
+}];
+const now = +Date.now();
+let card;
+card = sampleCardList[0] as CommonCardData;
+card.created_by = emptyUser.id;
+card.created_at = now;
+card.referred_to = emptyUser.id;
+card.said_by = emptyUser.id;
+card = sampleCardList[1] as CommonCardData;
+card.created_by = emptyUser.id;
+card.created_at = now;
+card.referred_to = emptyUser.id;
+card.said_by = emptyUser.id;
+card.parent = sampleCardList[2].id;
+card = sampleCardList[2] as BoxCardData;
+card.created_by = emptyUser.id;
+card.created_at = now;
+card.cards = [sampleCardList[2].id];
+export const sampleCardMap = {};
+sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
 
 const ADD_CARDS = 'ADD_CARDS';
 const addCards = (cards: CanvasObject[]) => ({

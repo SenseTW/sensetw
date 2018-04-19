@@ -34,11 +34,7 @@ class Map extends React.Component<Props> {
   // tslint:disable-next-line:no-any
   handleDblClick(e: any) {
     this.props.actions.createCard(
-      {
-        type: SM.CardType.Empty,
-        title: 'Yo',
-        description: 'Yooo'
-      },
+      SM.sampleCardList[0],
       [e.evt.layerX, e.evt.layerY]
     );
   }

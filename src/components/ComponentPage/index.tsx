@@ -18,26 +18,7 @@ class ComponentPage extends React.Component<Props, State> {
     this.state = {
       isCardVisible: false,
       currentCardId: '0',
-      cards: {
-        '0': {
-          type: SM.CardType.Question,
-          title: '這是一張卡',
-          description: '這是卡片的內容',
-          question: '這是卡片問題'
-        },
-        '1': {
-          type: SM.CardType.Answer,
-          title: '這是另外一張卡',
-          description: '這是另外一張卡的內容',
-          answer: '這是卡片答案'
-        },
-        '2': {
-          type: SM.CardType.Box,
-          title: '這是一個 Box',
-          description: '這是 Box 的內容',
-          cards: []
-        }
-      }
+      cards: SM.sampleCardMap
     };
   }
 
@@ -74,13 +55,13 @@ class ComponentPage extends React.Component<Props, State> {
             This page list some components.
             <Divider />
             <h2>Card</h2>
-            <Button onClick={() => this.toggleCard('0')}>
+            <Button onClick={() => this.toggleCard(SM.sampleCardList[0].id)}>
               show the question card
             </Button>
-            <Button onClick={() => this.toggleCard('1')}>
+            <Button onClick={() => this.toggleCard(SM.sampleCardList[1].id)}>
               show the answer card
             </Button>
-            <Button onClick={() => this.toggleCard('2')}>
+            <Button onClick={() => this.toggleCard(SM.sampleCardList[2].id)}>
               show the box card
             </Button>
           </Container>

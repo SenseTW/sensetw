@@ -16,10 +16,8 @@ interface State {
 
 const showCardType = (type: SM.CardType): string => {
   switch (type) {
-    case SM.CardType.Question:
-      return 'Question';
-    case SM.CardType.Answer:
-      return 'Answer';
+    case SM.CardType.Common:
+      return 'Card';
     case SM.CardType.Box:
       return 'Box';
     case SM.CardType.Empty:
@@ -140,40 +138,6 @@ class CardContent extends React.Component<Props, State> {
         )
         : description;
 
-    let questionSection;
-    if (data.type === SM.CardType.Question) {
-      const { question } = this.props.data as SM.QuestionCardData;
-      questionSection = isEditing
-        ? (
-          <Input
-            fluid
-            transparent
-            placeholder={question}
-            value={data.question}
-            onKeyUp={this.handleKey}
-            onChange={this.handleValueChange('question')}
-          />
-        )
-        : question;
-    }
-
-    let answerSection;
-    if (data.type === SM.CardType.Answer) {
-      const { answer } = this.props.data as SM.AnswerCardData;
-      questionSection = isEditing
-        ? (
-          <Input
-            fluid
-            transparent
-            placeholder={answer}
-            value={data.answer}
-            onKeyUp={this.handleKey}
-            onChange={this.handleValueChange('answer')}
-          />
-        )
-        : answer;
-    }
-
     return (
       <div className="card-content">
         <div className="card-content__content">
@@ -183,12 +147,6 @@ class CardContent extends React.Component<Props, State> {
           </Header>
           <div className="card-content__section">
             {descriptionSection}
-          </div>
-          <div className="card-content__section">
-            {questionSection}
-          </div>
-          <div className="card-content__section">
-            {answerSection}
           </div>
         </div>
         <Divider />
