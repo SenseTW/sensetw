@@ -38,7 +38,7 @@ class Map extends React.Component<Props> {
 
   render() {
     const cards = this.props.cards.map(card => (
-      <CanvasCard x={card.position[0]} y={card.position[1]} />
+      <CanvasCard x={card.position[0]} y={card.position[1]} key={card.id} />
     ));
     return (
       <Stage width={960} height={600} onDblClick={this.handleDblClick}>

@@ -1,9 +1,22 @@
 import { ActionUnion } from './index';
 
 export type CardID = string;
-type BoxID = string;
-type ObjectID = CardID | BoxID;
-type EdgeID = string;
+export type BoxID = string;
+export type EdgeID = string;
+export type ObjectID
+  = CardID
+  | BoxID
+  | EdgeID;
+
+/**
+ * Cryptographically unsafe ID generator.  Only used for experimenting.
+ */
+function objectId() {
+  const idLength = 32;
+  const chars = 'abcedfghijklmnopqrstuvwxyz0123456789';
+  const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
+  return Array(idLength).fill(0).map(randomChar).join('');
+}
 
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
@@ -53,6 +66,7 @@ export type BoxData = {
 };
 
 export type CanvasObject = {
+  id: ObjectID,
   position: PositionInMap,
   data: CardData | BoxData
 };
@@ -66,7 +80,7 @@ export const emptyCardData: EmptyCardData = {
 const CREATE_CARD = 'CREATE_CARD';
 const createCard = (data: CardData, position: PositionInMap) => ({
   type: CREATE_CARD as typeof CREATE_CARD,
-  payload: { position, data } as CanvasObject
+  payload: { position, data }
 });
 
 const UPDATE_CARD = 'UPDATE_CARD';
@@ -160,7 +174,7 @@ export const reducer = (state: State = initial, action: ActionUnion<typeof actio
   switch (action.type) {
     case CREATE_CARD:
       return Object.assign({}, state, {
-        cards: [...state.cards, action.payload]
+        cards: [...state.cards, Object.assign({ id: objectId() }, action.payload)]
       });
     case MOVE_OBJECT:
       return state;
