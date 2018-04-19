@@ -13,4 +13,14 @@ permissions:
 - operation: Map.create
 - operation: Map.update
 - operation: Map.delete
+- operation: Card.read
+- operation: Card.create
+- operation: Card.update
+- operation: Card.delete
+- operation: Card.delete
+- operation: MapCards.connect
+- operation: Viewport.read
+- operation: Viewport.create
+- operation: Viewport.update
+- operation: Viewport.delete
 rootTokens: []
