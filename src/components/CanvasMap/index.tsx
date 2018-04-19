@@ -33,7 +33,8 @@ class Map extends React.Component<Props> {
         title: 'Yo',
         description: 'Yooo'
       },
-      [e.evt.layerX, e.evt.layerY]);
+      [e.evt.layerX, e.evt.layerY]
+    );
   }
 
   render() {
