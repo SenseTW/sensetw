@@ -12,6 +12,7 @@
     "react-scripts-ts": "2.14.0",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0",
     "semantic-ui-css": "^2.3.1",
     "semantic-ui-react": "^0.79.1",
     "ts-keycode-enum": "^1.0.4"
@@ -30,6 +31,7 @@
     "@types/react-redux": "^5.0.15",
     "@types/react-router-dom": "^4.2.6",
     "@types/redux-logger": "^3.0.5",
+    "@types/redux-thunk": "^2.1.0",
     "typescript": "^2.8.1"
   }
 }
