@@ -1,7 +1,9 @@
 import * as SU from './sense-user';
 import * as SA from './sense-article';
+import { ActionUnion, emptyAction } from './index';
 import { TimeStamp, objectId } from './utils';
 
+// sense card data
 export type CardID = string;
 export type BoxID = string; // TODO: discuss
 
@@ -10,6 +12,18 @@ export enum CardType {
   Common,
   Box
 }
+
+export const typeToString = (type: CardType) => {
+  switch (type) {
+    case CardType.Common:
+      return 'Card';
+    case CardType.Box:
+      return 'Box';
+    case CardType.Empty:
+    default:
+      return 'Unknown';
+  }
+};
 
 interface CoreCardData {
   id: CardID;
@@ -112,3 +126,43 @@ card.cards = [sampleCardList[2].id];
 
 export const sampleCardMap = {};
 sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
+
+// sense card actions
+const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';
+export const updateTitle = (title: string) =>
+  ({ type: UPDATE_CARD_TITLE as typeof UPDATE_CARD_TITLE, title });
+
+const UPDATE_CARD_DESCRIPTION = 'UPDATE_CARD_DESCRIPTION';
+export const updateDescription = (description: string) =>
+  ({ type: UPDATE_CARD_DESCRIPTION as typeof UPDATE_CARD_DESCRIPTION, description });
+
+const UPDATE_CARD_COLOR = 'UPDATE_CARD_COLOR';
+export const updateColor = (color: string) =>
+  ({ type: UPDATE_CARD_COLOR as typeof UPDATE_CARD_COLOR, color });
+
+export const actions = {
+  updateTitle,
+  updateDescription,
+  updateColor
+};
+
+export type Action = ActionUnion<typeof actions>;
+
+export const reducer = (state: CardData, action: Action = emptyAction) => {
+  switch (action.type) {
+    case UPDATE_CARD_TITLE: {
+      const { title } = action;
+      return { ...state, title };
+    }
+    case UPDATE_CARD_DESCRIPTION: {
+      const { description } = action;
+      return { ...state, description };
+    }
+    case UPDATE_CARD_COLOR: {
+      const { color } = action;
+      return { ...state, color };
+    }
+    default:
+      return state;
+  }
+};

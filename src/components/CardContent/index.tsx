@@ -14,18 +14,6 @@ interface State {
   data: SC.CardData;
 }
 
-const showCardType = (type: SC.CardType): string => {
-  switch (type) {
-    case SC.CardType.Common:
-      return 'Card';
-    case SC.CardType.Box:
-      return 'Box';
-    case SC.CardType.Empty:
-    default:
-      return 'Unknown';
-  }
-};
-
 class CardContent extends React.Component<Props, State> {
   static defaultProps = {
     data: SC.emptyCardData
@@ -40,14 +28,14 @@ class CardContent extends React.Component<Props, State> {
 
     this.state = {
       isEditing: false,
-      data: { ...props.data }
+      data: SC.reducer(this.props.data)
     };
   }
 
   componentWillReceiveProps(nextProps: Props) {
     if (this.props.data !== nextProps.data) {
       this.setState({
-        data: { ...nextProps.data }
+        data: SC.reducer(nextProps.data)
       });
     }
   }
@@ -64,15 +52,10 @@ class CardContent extends React.Component<Props, State> {
     });
   }
 
-  handleValueChange =
-    (key: string) => (e: React.FormEvent<HTMLInputElement>) => {
-      this.setState({
-        data: {
-          ...this.state.data,
-          [key]: e.currentTarget.value
-        }
-      });
-    }
+  handleChange = (action: SC.Action) => {
+    const { data } = this.state;
+    this.setState({ data: SC.reducer(data, action) });
+  }
 
   handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.keyCode) {
@@ -101,7 +84,7 @@ class CardContent extends React.Component<Props, State> {
   handleCancel = () => {
     this.setState({
       isEditing: false,
-      data: { ...this.props.data }
+      data: SC.reducer(this.props.data)
     });
   }
 
@@ -119,7 +102,7 @@ class CardContent extends React.Component<Props, State> {
             placeholder={title}
             value={data.title}
             onKeyUp={this.handleKey}
-            onChange={this.handleValueChange('title')}
+            onChange={e => this.handleChange(SC.updateTitle(e.currentTarget.value))}
           />
         )
         : title;
@@ -133,7 +116,7 @@ class CardContent extends React.Component<Props, State> {
             placeholder={description}
             value={data.description}
             onKeyUp={this.handleKey}
-            onChange={this.handleValueChange('description')}
+            onChange={e => this.handleChange(SC.updateDescription(e.currentTarget.value))}
           />
         )
         : description;
@@ -143,7 +126,7 @@ class CardContent extends React.Component<Props, State> {
         <div className="card-content__content">
           <Header as="h1" className="card-content__header">
             {titleSection}
-            <Header.Subheader>{showCardType(this.props.data.type)}</Header.Subheader>
+            <Header.Subheader>{SC.typeToString(this.props.data.type)}</Header.Subheader>
           </Header>
           <div className="card-content__section">
             {descriptionSection}
