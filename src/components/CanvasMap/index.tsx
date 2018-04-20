@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Stage, Layer } from 'react-konva';
 import CanvasBox from '../CanvasBox';
 import CanvasCard from '../CanvasCard';
+import * as SC from '../../types/sense-card';
 import * as SM from '../../types/sense-map';
 import * as T from '../../types';
 
@@ -13,7 +14,7 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    createCard: (data: SM.CardData, position: SM.PositionInMap) => T.Action,
+    createCard: (data: SC.CardData, position: SM.PositionInMap) => T.Action,
 // tslint:disable-next-line:no-any
     loadCards: (mapId: SM.MapID) => any
   };
@@ -34,7 +35,7 @@ class Map extends React.Component<Props> {
   // tslint:disable-next-line:no-any
   handleDblClick(e: any) {
     this.props.actions.createCard(
-      SM.sampleCardList[0],
+      SC.sampleCardList[0],
       [e.evt.layerX, e.evt.layerY]
     );
   }
@@ -60,7 +61,7 @@ export default connect<StateFromProps, DispatchFromProps>(
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      createCard: (data: SM.CardData, position: SM.PositionInMap) =>
+      createCard: (data: SC.CardData, position: SM.PositionInMap) =>
         dispatch(T.actions.senseMap.createCard(data, position)),
       loadCards: (mapId: SM.MapID) =>
         dispatch(T.actions.senseMap.loadCards(mapId))

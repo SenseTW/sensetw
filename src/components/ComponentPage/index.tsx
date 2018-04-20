@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { Sidebar, Container, Divider, Button } from 'semantic-ui-react';
-import * as SM from '../../types/sense-map';
+import * as SC from '../../types/sense-card';
 import CardContent from '../CardContent';
 
 interface Props {}
 
 interface State {
   isCardVisible: boolean;
-  currentCardId: SM.CardID;
-  cards: { [key: string]: SM.CardData };
+  currentCardId: SC.CardID;
+  cards: { [key: string]: SC.CardData };
 }
 
 class ComponentPage extends React.Component<Props, State> {
@@ -18,11 +18,11 @@ class ComponentPage extends React.Component<Props, State> {
     this.state = {
       isCardVisible: false,
       currentCardId: '0',
-      cards: SM.sampleCardMap
+      cards: SC.sampleCardMap
     };
   }
 
-  handleCardChange = (id: SM.CardID, card: SM.CardData) => {
+  handleCardChange = (id: SC.CardID, card: SC.CardData) => {
     this.setState({
       cards: {
         ...this.state.cards,
@@ -31,7 +31,7 @@ class ComponentPage extends React.Component<Props, State> {
     });
   }
 
-  toggleCard = (currentCardId: SM.CardID) => {
+  toggleCard = (currentCardId: SC.CardID) => {
     const isCardVisible =
       currentCardId === this.state.currentCardId
         ? !this.state.isCardVisible
@@ -55,13 +55,13 @@ class ComponentPage extends React.Component<Props, State> {
             This page list some components.
             <Divider />
             <h2>Card</h2>
-            <Button onClick={() => this.toggleCard(SM.sampleCardList[0].id)}>
+            <Button onClick={() => this.toggleCard(SC.sampleCardList[0].id)}>
               show the question card
             </Button>
-            <Button onClick={() => this.toggleCard(SM.sampleCardList[1].id)}>
+            <Button onClick={() => this.toggleCard(SC.sampleCardList[1].id)}>
               show the answer card
             </Button>
-            <Button onClick={() => this.toggleCard(SM.sampleCardList[2].id)}>
+            <Button onClick={() => this.toggleCard(SC.sampleCardList[2].id)}>
               show the box card
             </Button>
           </Container>

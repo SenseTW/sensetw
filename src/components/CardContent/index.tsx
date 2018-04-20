@@ -1,26 +1,26 @@
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
 import { Header, Divider, Button, Input } from 'semantic-ui-react';
-import * as SM from '../../types/sense-map';
+import * as SC from '../../types/sense-card';
 import './index.css';
 
 interface Props {
-  data: SM.CardData;
-  onChange? (value: SM.CardData): void;
+  data: SC.CardData;
+  onChange? (value: SC.CardData): void;
 }
 
 interface State {
   isEditing: boolean;
-  data: SM.CardData;
+  data: SC.CardData;
 }
 
-const showCardType = (type: SM.CardType): string => {
+const showCardType = (type: SC.CardType): string => {
   switch (type) {
-    case SM.CardType.Common:
+    case SC.CardType.Common:
       return 'Card';
-    case SM.CardType.Box:
+    case SC.CardType.Box:
       return 'Box';
-    case SM.CardType.Empty:
+    case SC.CardType.Empty:
     default:
       return 'Unknown';
   }
@@ -28,7 +28,7 @@ const showCardType = (type: SM.CardType): string => {
 
 class CardContent extends React.Component<Props, State> {
   static defaultProps = {
-    data: SM.emptyCardData
+    data: SC.emptyCardData
   };
 
   titleInput: Input | null;
