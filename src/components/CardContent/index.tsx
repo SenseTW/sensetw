@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
-import { Header, Divider, Button, Input } from 'semantic-ui-react';
+import { Divider, Button, Input } from 'semantic-ui-react';
+import CoreCard from '../CoreCard';
+import CommonCard from '../CommonCard';
 import * as SC from '../../types/sense-card';
 import './index.css';
 
@@ -89,49 +91,26 @@ class CardContent extends React.Component<Props, State> {
   }
 
   render() {
-    const { title, description } = this.props.data;
     const { isEditing, data } = this.state;
 
-    let titleSection =
-      isEditing
-        ? (
-          <Input
-            fluid
-            transparent
-            ref={e => this.titleInput = e}
-            placeholder={title}
-            value={data.title}
-            onKeyUp={this.handleKey}
-            onChange={e => this.handleChange(SC.updateTitle(e.currentTarget.value))}
-          />
-        )
-        : title;
-
-    let descriptionSection =
-      isEditing
-        ? (
-          <Input
-            fluid
-            transparent
-            placeholder={description}
-            value={data.description}
-            onKeyUp={this.handleKey}
-            onChange={e => this.handleChange(SC.updateDescription(e.currentTarget.value))}
-          />
-        )
-        : description;
+    let Card;
+    switch (data.type) {
+      case SC.CardType.Common:
+        Card = CommonCard;
+        break;
+      default:
+        Card = CoreCard;
+        break;
+    }
 
     return (
       <div className="card-content">
-        <div className="card-content__content">
-          <Header as="h1" className="card-content__header">
-            {titleSection}
-            <Header.Subheader>{SC.typeToString(this.props.data.type)}</Header.Subheader>
-          </Header>
-          <div className="card-content__section">
-            {descriptionSection}
-          </div>
-        </div>
+        <Card
+          data={data}
+          isEditing={isEditing}
+          onKeyUp={this.handleKey}
+          onChange={action => this.handleChange(action)}
+        />
         <Divider />
         <div className="card-content__actions">{
           isEditing

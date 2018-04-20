@@ -38,7 +38,7 @@ interface EmptyCardData extends CoreCardData {
   type: CardType.Empty;
 }
 
-interface CommonCardData extends CoreCardData {
+export interface CommonCardData extends CoreCardData {
   type: CardType.Common;
   quote: string;
   said_by: SU.UserID;
@@ -47,6 +47,8 @@ interface CommonCardData extends CoreCardData {
   parent: CardID | null;
   metadata: SA.Article;
 }
+
+export const splitTags = (str: string): string[] => str.split(/,\s*/);
 
 export interface BoxCardData extends CoreCardData {
   type: CardType.Box;
@@ -140,10 +142,20 @@ const UPDATE_CARD_COLOR = 'UPDATE_CARD_COLOR';
 export const updateColor = (color: string) =>
   ({ type: UPDATE_CARD_COLOR as typeof UPDATE_CARD_COLOR, color });
 
+const UPDATE_CARD_QUOTE = 'UPDATE_CARD_QUOTE';
+export const updateQuote = (quote: string) =>
+  ({ type: UPDATE_CARD_QUOTE as typeof UPDATE_CARD_QUOTE, quote });
+
+const UPDATE_CARD_TAGS = 'UPDATE_CARD_TAGS';
+export const updateTags = (tags: string) =>
+  ({ type: UPDATE_CARD_TAGS as typeof UPDATE_CARD_TAGS, tags });
+
 export const actions = {
   updateTitle,
   updateDescription,
-  updateColor
+  updateColor,
+  updateQuote,
+  updateTags
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -161,6 +173,22 @@ export const reducer = (state: CardData, action: Action = emptyAction) => {
     case UPDATE_CARD_COLOR: {
       const { color } = action;
       return { ...state, color };
+    }
+    case UPDATE_CARD_QUOTE: {
+      if (state.type !== CardType.Common) {
+        return state;
+      }
+
+      const { quote } = action;
+      return { ...state, quote };
+    }
+    case UPDATE_CARD_TAGS: {
+      if (state.type !== CardType.Common) {
+        return state;
+      }
+
+      const { tags } = action;
+      return { ...state, tags };
     }
     default:
       return state;
