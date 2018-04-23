@@ -7,7 +7,7 @@ interface Props {
   y: number;
 }
 
-class Box extends React.Component<Props> {
+class MapBox extends React.Component<Props> {
   render() {
     const {x, y} = this.props;
     const text = "阿....不會吧???嘿!你今天買報紙了沒?快拿出你預藏的安全小剪刀，這個副教授~~~還有臉為人師表嗎?"; // tslint:disable-line
@@ -22,4 +22,4 @@ class Box extends React.Component<Props> {
   }
 }
 
-export default Box;
+export default MapBox;

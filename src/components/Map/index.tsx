@@ -2,14 +2,14 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Stage, Layer } from 'react-konva';
-import CanvasBox from '../CanvasBox';
-import CanvasCard from '../CanvasCard';
+import MapBox from '../MapBox';
+import MapCard from '../MapCard';
 import * as SC from '../../types/sense-card';
 import * as SM from '../../types/sense-map';
 import * as T from '../../types';
 
 interface StateFromProps {
-  cards: SM.CanvasObject[];
+  cards: SM.MapObject[];
 }
 
 interface DispatchFromProps {
@@ -42,12 +42,12 @@ class Map extends React.Component<Props> {
 
   render() {
     const cards = this.props.cards.map(card => (
-      <CanvasCard x={card.position[0]} y={card.position[1]} key={card.id} />
+      <MapCard x={card.position[0]} y={card.position[1]} key={card.id} />
     ));
     return (
       <Stage width={960} height={600} onDblClick={this.handleDblClick}>
         <Layer>
-          <CanvasBox x={130} y={30} />
+          <MapBox x={130} y={30} />
           {cards}
         </Layer>
       </Stage>

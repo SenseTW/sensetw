@@ -11,14 +11,14 @@ export type MapID = string;
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
-export type CanvasObject = {
+export type MapObject = {
   id: ObjectID,
   position: PositionInMap,
   data: CardData,
 };
 
 const ADD_CARDS = 'ADD_CARDS';
-const addCards = (cards: CanvasObject[]) => ({
+const addCards = (cards: MapObject[]) => ({
   type: ADD_CARDS as typeof ADD_CARDS,
   payload: { cards }
 });
@@ -124,7 +124,7 @@ export const actions = {
 };
 
 export type State = {
-  cards: CanvasObject[]
+  cards: MapObject[]
 };
 
 export const initial: State = {

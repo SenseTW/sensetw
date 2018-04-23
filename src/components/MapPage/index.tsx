@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Container } from 'semantic-ui-react';
-import CanvasMap from '../CanvasMap';
+import Map from '../Map';
 
 class MapPage extends React.Component {
   render() {
     return (
       <Container text>
-        <CanvasMap />
+        <Map />
       </Container>
     );
   }

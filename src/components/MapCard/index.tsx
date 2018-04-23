@@ -7,7 +7,7 @@ interface Props {
   y: number;
 }
 
-class Card extends React.Component<Props> {
+class MapCard extends React.Component<Props> {
   render() {
     const {x, y} = this.props;
     const width = 120;
@@ -22,4 +22,4 @@ class Card extends React.Component<Props> {
   }
 }
 
-export default Card;
+export default MapCard;
