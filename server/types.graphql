@@ -17,28 +17,17 @@ enum CardType {
   NOTE
 }
 
-enum Color {
-  RED
-  ORANGE
-  YELLOW
-  GREEN
-  BLUE
-  PURPLE
-  GREY
-}
-
 type Object @model {
   id: ID! @isUnique
   createdAt: DateTime!
   updatedAt: DateTime!
-  title: String! @migrationValue(value: "")
   x: Float!
   y: Float!
   width: Float!
   height: Float!
   zIndex: Float!
   map: Map! @relation(name: "MapObjects")
-  objecType: ObjectType!
+  objectType: ObjectType!
   card: Card @relation(name: "ObjectCard")
   box: Box @relation(name: "ObjectBox")
   belongsTo: Box @relation(name: "ContainCards")
@@ -49,11 +38,10 @@ type Card @model {
   createdAt: DateTime!
   updatedAt: DateTime!
   title: String
-  description: String
+  summary: String
   saidBy: String
   stakeholder: String
   url: String
-  color: Color! @migrationValue(value: GREY)
   cardType: CardType @migrationValue(value: NORMAL)
   objects: [Object!]! @relation(name: "ObjectCard")
 }
@@ -63,7 +51,7 @@ type Box @model {
   createdAt: DateTime!
   updatedAt: DateTime!
   title: String
-  color: Color! @migrationValue(value: GREY)
+  summary: String
   objects: [Object!]! @relation(name: "ObjectBox")
   contains: [Object!]! @relation(name: "ContainCards")
 }

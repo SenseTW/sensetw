@@ -13,4 +13,24 @@ permissions:
 - operation: Map.create
 - operation: Map.update
 - operation: Map.delete
+- operation: Card.read
+- operation: Card.create
+- operation: Card.update
+- operation: Card.delete
+- operation: Box.read
+- operation: Box.create
+- operation: Box.update
+- operation: Box.delete
+- operation: Object.read
+- operation: Object.create
+- operation: Object.update
+- operation: Object.delete
+- operation: MapObjects.connect
+- operation: MapObjects.disconnect
+- operation: ObjectCard.connect
+- operation: ObjectCard.disconnect
+- operation: ObjectBox.connect
+- operation: ObjectBox.disconnect
+- operation: ContainCards.connect
+- operation: ContainCards.disconnect
 rootTokens: []
