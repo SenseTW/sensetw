@@ -2,7 +2,7 @@ import { Dispatch as ReduxDispatch } from 'redux';
 import { ObjectID } from './sense-object';
 import { CardID, CardData, emptyCardData } from './sense-card';
 import { BoxID } from './sense-box';
-import { objectId } from './utils';
+import * as SC from './sense-card';
 
 const graphQLEndpoint = 'https://api.graph.cool/simple/v1/cjfrvn5xl1sov0196mxmdg0gs';
 
@@ -13,8 +13,17 @@ type ZoomLevel = number;
 
 export type MapObject = {
   id: ObjectID,
+  mapId: MapID,
   position: PositionInMap,
-  data: CardData,
+  bbox: Rect,
+  data: SC.CardData,
+};
+
+export type Rect = {
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
 };
 
 const ADD_CARDS = 'ADD_CARDS';
@@ -23,10 +32,9 @@ const addCards = (cards: MapObject[]) => ({
   payload: { cards }
 });
 
-const createCard = (data: CardData, position: PositionInMap) => (dispatch: ReduxDispatch<State>) => {
-  const id = objectId();
-  return dispatch(addCards([{ id, position, data }]));
-};
+const createCard = (data: CardData, position: PositionInMap) => ({
+  type: ADD_CARDS as typeof ADD_CARDS,
+});
 
 const loadCards = (mapId: MapID) => (dispatch: ReduxDispatch<State>) => {
   const query = `

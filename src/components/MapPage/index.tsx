@@ -6,7 +6,9 @@ class MapPage extends React.Component {
   render() {
     return (
       <Container text>
-        <Map />
+        <Map
+          objects={[]}
+        />
       </Container>
     );
   }
