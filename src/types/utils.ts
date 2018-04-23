@@ -1,5 +1,7 @@
 export type TimeStamp = number;
 
+export type Color = string;
+
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
  */

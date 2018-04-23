@@ -1,13 +1,12 @@
 import { Dispatch as ReduxDispatch } from 'redux';
-import * as SC from './sense-card';
+import { ObjectID } from './sense-object';
+import { CardID, CardData, emptyCardData } from './sense-card';
+import { BoxID } from './sense-box';
 import { objectId } from './utils';
 
 const graphQLEndpoint = 'https://api.graph.cool/simple/v1/cjfrvn5xl1sov0196mxmdg0gs';
 
 export type MapID = string;
-export type ObjectID
-  = SC.CardID
-  | SC.BoxID;
 
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
@@ -15,7 +14,7 @@ type ZoomLevel = number;
 export type CanvasObject = {
   id: ObjectID,
   position: PositionInMap,
-  data: SC.CardData,
+  data: CardData,
 };
 
 const ADD_CARDS = 'ADD_CARDS';
@@ -24,7 +23,7 @@ const addCards = (cards: CanvasObject[]) => ({
   payload: { cards }
 });
 
-const createCard = (data: SC.CardData, position: PositionInMap) => (dispatch: ReduxDispatch<State>) => {
+const createCard = (data: CardData, position: PositionInMap) => (dispatch: ReduxDispatch<State>) => {
   const id = objectId();
   return dispatch(addCards([{ id, position, data }]));
 };
@@ -47,14 +46,14 @@ const loadCards = (mapId: MapID) => (dispatch: ReduxDispatch<State>) => {
         return dispatch(addCards(data.allCards.map((d: any) => ({
           id: d.id,
           position: [d.x, d.y],
-          data: SC.emptyCardData
+          data: emptyCardData
         }))));
       });
 };
 
 const UPDATE_CARD = 'UPDATE_CARD';
-type UpdateCardAction = { type: typeof UPDATE_CARD, id: SC.CardID, d: SC.CardData };
-const updateCard = (id: SC.CardID, d: SC.CardData): UpdateCardAction => ({ type: UPDATE_CARD, id, d });
+type UpdateCardAction = { type: typeof UPDATE_CARD, id: CardID, d: CardData };
+const updateCard = (id: CardID, d: CardData): UpdateCardAction => ({ type: UPDATE_CARD, id, d });
 
 const CREATE_BOX = 'CREATE_BOX';
 type CreateBoxAction = { type: typeof CREATE_BOX };
@@ -75,20 +74,20 @@ const moveObject = (id: ObjectID, position: PositionInMap) => ({
 
 const ADD_CARD_TO_BOX = 'ADD_CARD_TO_BOX';
 type AddCardToBoxAction = { type: typeof ADD_CARD_TO_BOX };
-const addCardToBox = (cardID: SC.CardID, boxID: SC.BoxID): AddCardToBoxAction => ({ type: ADD_CARD_TO_BOX });
+const addCardToBox = (cardID: CardID, boxID: BoxID): AddCardToBoxAction => ({ type: ADD_CARD_TO_BOX });
 
 const REMOVE_CARD_FROM_BOX = 'REMOVE_CARD_FROM_BOX';
 type RemoveCardFromBoxAction = { type: typeof REMOVE_CARD_FROM_BOX };
-const removeCardFromBox = (cardID: SC.CardID, boxID: SC.BoxID): RemoveCardFromBoxAction =>
+const removeCardFromBox = (cardID: CardID, boxID: BoxID): RemoveCardFromBoxAction =>
   ({ type: REMOVE_CARD_FROM_BOX });
 
 const OPEN_BOX = 'OPEN_BOX';
 type OpenBoxAction = { type: typeof OPEN_BOX };
-const openBox = (boxID: SC.BoxID): OpenBoxAction => ({ type: OPEN_BOX });
+const openBox = (boxID: BoxID): OpenBoxAction => ({ type: OPEN_BOX });
 
 const CLOSE_BOX = 'CLOSE_BOX';
 type CloseBoxAction = { type: typeof CLOSE_BOX };
-const closeBox = (boxID: SC.BoxID): CloseBoxAction => ({ type: CLOSE_BOX });
+const closeBox = (boxID: BoxID): CloseBoxAction => ({ type: CLOSE_BOX });
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 type PanViewportAction = { type: typeof PAN_VIEWPORT };

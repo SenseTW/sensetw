@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Sidebar, Container, Divider, Button } from 'semantic-ui-react';
 import * as SC from '../../types/sense-card';
-import CardContent from '../CardContent';
+import ObjectContent from '../ObjectContent';
 
 interface Props {}
 
@@ -45,7 +45,7 @@ class ComponentPage extends React.Component<Props, State> {
     return (
       <Sidebar.Pushable className="sense--page">
         <Sidebar visible={isCardVisible} animation="overlay" width="wide">
-          <CardContent
+          <ObjectContent
             data={cards[currentCardId]}
             onChange={(card) => this.handleCardChange(currentCardId, card)}
           />
@@ -62,7 +62,7 @@ class ComponentPage extends React.Component<Props, State> {
               show the answer card
             </Button>
             <Button onClick={() => this.toggleCard(SC.sampleCardList[2].id)}>
-              show the box card
+              show the note card
             </Button>
           </Container>
         </Sidebar.Pusher>

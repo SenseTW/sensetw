@@ -1,24 +1,18 @@
 import * as React from 'react';
-import { Key } from 'ts-keycode-enum';
-import { Divider, Button, Input } from 'semantic-ui-react';
-import CoreCard from '../CoreCard';
-import CommonCard from '../CommonCard';
+import { Header, Input } from 'semantic-ui-react';
 import * as SC from '../../types/sense-card';
-import './index.css';
 
 interface Props {
   data: SC.CardData;
-  onChange? (value: SC.CardData): void;
-}
-
-interface State {
   isEditing: boolean;
-  data: SC.CardData;
+  onKeyUp? (e: React.KeyboardEvent<HTMLInputElement>): void;
+  onChange? (action: SC.Action): void;
 }
 
-class CardContent extends React.Component<Props, State> {
+class CardContent extends React.PureComponent<Props> {
   static defaultProps = {
-    data: SC.emptyCardData
+    data: SC.emptyCardData,
+    isEditing: false
   };
 
   titleInput: Input | null;
@@ -27,102 +21,97 @@ class CardContent extends React.Component<Props, State> {
     super(props);
 
     this.titleInput = null;
-
-    this.state = {
-      isEditing: false,
-      data: SC.reducer(this.props.data)
-    };
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    if (this.props.data !== nextProps.data) {
-      this.setState({
-        data: SC.reducer(nextProps.data)
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.isEditing === false && this.props.isEditing === true) {
+      setImmediate(() => {
+        if (this.titleInput) {
+          this.titleInput.focus();
+        }
       });
     }
   }
 
-  handleEdit = () => {
-    setImmediate(() => {
-      if (this.titleInput) {
-        this.titleInput.focus();
-      }
-    });
-
-    this.setState({
-      isEditing: true
-    });
-  }
-
-  handleChange = (action: SC.Action) => {
-    const { data } = this.state;
-    this.setState({ data: SC.reducer(data, action) });
-  }
-
-  handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    switch (e.keyCode) {
-      case Key.Enter:
-        this.handleSave();
-        break;
-      case Key.Escape:
-        this.handleCancel();
-        break;
-      default:
-    }
-  }
-
-  handleSave = () => {
-    const { onChange } = this.props;
-
-    if (onChange) {
-      onChange(this.state.data);
-    }
-
-    this.setState({
-      isEditing: false
-    });
-  }
-
-  handleCancel = () => {
-    this.setState({
-      isEditing: false,
-      data: SC.reducer(this.props.data)
-    });
-  }
-
   render() {
-    const { isEditing, data } = this.state;
+    const { children, data, isEditing, onKeyUp, onChange } = this.props;
+    const { title, description, saidBy, stakeholder, cardType } = data;
 
-    let Card;
-    switch (data.type) {
-      case SC.CardType.Common:
-        Card = CommonCard;
-        break;
-      default:
-        Card = CoreCard;
-        break;
-    }
+    const titleSection =
+      isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            ref={e => this.titleInput = e}
+            placeholder="卡片標題"
+            value={title}
+            onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SC.updateTitle(e.currentTarget.value))}
+          />
+        )
+        : title;
+
+    const descriptionSection =
+      isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            placeholder="卡片描述"
+            value={description}
+            onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SC.updateDescription(e.currentTarget.value))}
+          />
+        )
+        : description;
+
+    const saidBySection =
+      isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            placeholder="發言人"
+            value={saidBy}
+            onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SC.updateSaidBy(e.currentTarget.value))}
+          />
+        )
+        : saidBy;
+
+    const stakeholderSection =
+      isEditing
+        ? (
+          <Input
+            fluid
+            transparent
+            placeholder="利害關係人"
+            value={stakeholder}
+            onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SC.updateStakeholder(e.currentTarget.value))}
+          />
+        )
+        : stakeholder;
 
     return (
-      <div className="card-content">
-        <Card
-          data={data}
-          isEditing={isEditing}
-          onKeyUp={this.handleKey}
-          onChange={action => this.handleChange(action)}
-        />
-        <Divider />
-        <div className="card-content__actions">{
-          isEditing
-            ? <Button.Group>
-                <Button onClick={this.handleCancel}>取消</Button>
-                <Button.Or />
-                <Button positive onClick={this.handleSave}>完成</Button>
-              </Button.Group>
-            : <Button primary onClick={this.handleEdit}>
-                編輯
-              </Button>
-        }</div>
+      <div className="core-card">
+        <Header as="h1" className="core-card__header">
+          {titleSection}
+          <Header.Subheader>{SC.typeToString(cardType)}</Header.Subheader>
+        </Header>
+        <div className="core-card__description">
+          {descriptionSection}
+        </div>
+        <div className="core-card__said-by">
+          <Header as="h3">發言人</Header>
+          {saidBySection}
+        </div>
+        <div className="core-card__stakeholder">
+          <Header as="h3">利害關係人</Header>
+          {stakeholderSection}
+        </div>
+        {children}
       </div>
     );
   }
