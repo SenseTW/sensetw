@@ -1,25 +1,40 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
+import * as SM from '../../types/sense-map';
 
 interface Props {
-  x: number;
-  y: number;
+  mapObject: SM.MapObject;
 }
 
-class MapBox extends React.Component<Props> {
-  render() {
-    const {x, y} = this.props;
-    const text = "阿....不會吧???嘿!你今天買報紙了沒?快拿出你預藏的安全小剪刀，這個副教授~~~還有臉為人師表嗎?"; // tslint:disable-line
-    const width = 100;
-    const height = 100;
-    return (
-      <Group x={x} y={y} draggable={true}>
-        <Rect fill="#efefef" width={width} height={height} stroke="#339999" strokeWidth={3} dash={[10, 10]} />
-        <Text width={width} height={height} padding={5} text={text} />
-      </Group>
-    );
-  }
+const borderColor = '#21ffc7';
+const borderWidth = 6;
+const bgColor = '#ffffff';
+const titleFontFamily = 'sans-serif';
+const titleColor = '#000000';
+const titleFontSize = 28;
+const titlePadding = 5;
+
+function MapBox(props: Props) {
+  const {id, x, y, width, height} = props.mapObject;
+  const {title} = props.mapObject.data;
+  return (
+    <Group x={x} y={y} draggable={true} key={id}>
+      <Rect fill={bgColor} width={width} height={height} stroke={borderColor} strokeWidth={borderWidth} />
+      <Text
+        y={(height - titleFontSize) / 2}
+        align="center"
+        width={width}
+        height={height}
+        stroke={titleColor}
+        strokeWidth={1}
+        fontFamily={titleFontFamily}
+        fontSize={titleFontSize}
+        padding={titlePadding}
+        text={title}
+      />
+    </Group>
+  );
 }
 
 export default MapBox;

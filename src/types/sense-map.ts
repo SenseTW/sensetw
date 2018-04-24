@@ -18,10 +18,15 @@ export interface Geometry {
   zIndex: number;
 }
 
+export enum ObjectType {
+  CARD,
+  BOX
+}
+
 export interface MapObject extends Geometry {
   id: ObjectID;
   mapId: MapID;
-  objectType: string;
+  objectType: ObjectType;
   // tslint:disable-next-line:no-any
   data: any;
   belongsTo: BoxID | null;

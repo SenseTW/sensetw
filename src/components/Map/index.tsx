@@ -25,41 +25,35 @@ type Props = StateFromProps & DispatchFromProps;
 */
 
 interface Props {
+  width: number;
+  height: number;
   objects: SM.MapObject[];
 }
 
-class Map extends React.Component<Props> {
-  constructor(props: Props) {
-    super(props);
-    // this.handleDblClick = this.handleDblClick.bind(this);
-  }
+function renderCard(o: SM.MapObject) {
+  return <MapCard mapObject={o} />;
+}
 
-  /*
-  componentDidMount() {
-    this.props.actions.loadCards('cjfrxpxuzdw1k01790lvp0edn');
-  }
- */
+function renderBox(o: SM.MapObject) {
+  return <MapBox mapObject={o} />;
+}
 
-  // tslint:disable-next-line:no-any
-  /*
-  handleDblClick(e: any) {
-    this.props.actions.createCard(
-      SC.sampleCardList[0],
-      [e.evt.layerX, e.evt.layerY]
-    );
-  }
- */
-
-  render() {
-    return (
-      <Stage width={960} height={600}>
-        <Layer>
-          <MapBox x={130} y={30} />
-          <MapCard x={0} y={100} />
-        </Layer>
-      </Stage>
-    );
-  }
+function Map(props: Props) {
+  const objects = props.objects.map(
+    o => {
+      switch (o.objectType) {
+        case SM.ObjectType.CARD: return renderCard(o);
+        case SM.ObjectType.BOX: return renderBox(o);
+        default: throw Error('This never happens.');
+      }
+    });
+  return (
+    <Stage width={props.width} height={props.height}>
+      <Layer>
+        {objects}
+      </Layer>
+    </Stage>
+  );
 }
 
 export default Map;

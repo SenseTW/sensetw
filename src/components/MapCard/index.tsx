@@ -1,25 +1,56 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
+import * as SM from '../../types/sense-map';
 
 interface Props {
-  x: number;
-  y: number;
+  mapObject: SM.MapObject;
 }
 
-class MapCard extends React.Component<Props> {
-  render() {
-    const {x, y} = this.props;
-    const width = 120;
-    const height = 120;
-    const text = "缺乏基礎研發人才沒有紮實的底層知識／掌握關鍵技術。有瘦肉精，尼克大勝12分，節目抹黑我國臺灣鯛形象，泰美女總理盈拉，自家賣熱狗麵包，AV版《神鬼奇航》，裸少年抓青蛙雕像被嫌礙眼，我相信我此生都不會跟他們有交集的...一定不會有的，....你知道事情的嚴重性嗎?"; // tslint:disable-line
-    return (
-      <Group draggable={true} x={x} y={y}>
-        <Rect width={width} height={height} fill="#ff6666" />
-        <Text padding={5} width={width} height={height} align="center" text={text} />
-      </Group>
-    );
-  }
+const titlePadding = 14;
+const titleFontFamily = 'sans-serif';
+const titleFontSize = 14;
+const bgColors = {
+  'NORMAL': '#ffffff',
+  'NOTE': '#ffffff',
+  'QUESTION': '#ff9999',
+  'ANSWER': '#a7ccf2',
+};
+const shadowBlur = 5;
+const shadowColor = '#999';
+const shadowOffsetX = (shadowBlur) / 4;
+const shadowOffsetY = shadowBlur;
+
+function MapCard(props: Props) {
+  const {id, x, y, width, height} = props.mapObject;
+  const {title, cardType} = props.mapObject.data;
+  const bgColor = bgColors[cardType];
+  return (
+    <Group draggable={true} x={x} y={y} key={id}>
+      <Rect
+        width={width}
+        height={height}
+        shadowBlur={shadowBlur}
+        shadowOffsetX={shadowOffsetX}
+        shadowOffsetY={shadowOffsetY}
+        shadowColor={shadowColor}
+        fill={bgColor}
+      />
+      <Rect
+        width={width}
+        height={height}
+        fill={bgColor}
+      />
+      <Text
+        width={width}
+        height={height}
+        padding={titlePadding}
+        fontSize={titleFontSize}
+        fontFamily={titleFontFamily}
+        text={title}
+      />
+    </Group>
+  );
 }
 
 export default MapCard;
