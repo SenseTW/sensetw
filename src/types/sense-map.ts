@@ -2,7 +2,6 @@ import { Dispatch as ReduxDispatch } from 'redux';
 import { ObjectID } from './sense-object';
 import { CardID, CardData, emptyCardData } from './sense-card';
 import { BoxID } from './sense-box';
-import * as SC from './sense-card';
 
 const graphQLEndpoint = 'https://api.graph.cool/simple/v1/cjfrvn5xl1sov0196mxmdg0gs';
 
@@ -11,13 +10,22 @@ export type MapID = string;
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
-export type MapObject = {
-  id: ObjectID,
-  mapId: MapID,
-  position: PositionInMap,
-  bbox: Rect,
-  data: SC.CardData,
-};
+export interface Geometry {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  zIndex: number;
+}
+
+export interface MapObject extends Geometry {
+  id: ObjectID;
+  mapId: MapID;
+  objectType: string;
+  // tslint:disable-next-line:no-any
+  data: any;
+  belongsTo: BoxID | null;
+}
 
 export type Rect = {
   left: number,
