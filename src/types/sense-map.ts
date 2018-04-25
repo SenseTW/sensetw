@@ -118,14 +118,6 @@ const ZOOM_VIEWPORT = 'ZOOM_VIEWPORT';
 type ZoomViewportAction = { type: typeof ZOOM_VIEWPORT };
 const zoomViewport = (level: ZoomLevel): ZoomViewportAction => ({ type: ZOOM_VIEWPORT });
 
-const ADD_OBJECT_TO_SELECTION = 'ADD_OBJECT_TO_SELECTION';
-type AddObjectToSelectionAction = { type: typeof ADD_OBJECT_TO_SELECTION };
-const addObjectToSelection = (id: ObjectID): AddObjectToSelectionAction => ({ type: ADD_OBJECT_TO_SELECTION });
-
-const CLEAR_SELECTION = 'CLEAR_SELECTION';
-type ClearSelectionAction = { type: typeof CLEAR_SELECTION };
-const clearSelection = (): ClearSelectionAction => ({ type: CLEAR_SELECTION });
-
 export const actions = {
   addCards,
   loadCards,
@@ -140,8 +132,6 @@ export const actions = {
   closeBox,
   panViewport,
   zoomViewport,
-  addObjectToSelection,
-  clearSelection
 };
 
 export type State = {

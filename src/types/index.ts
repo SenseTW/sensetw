@@ -2,6 +2,7 @@ import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } f
 import * as C from './counter';
 import * as SM from './sense-map';
 import * as SC from './sense-card';
+import * as SL from './selection';
 
 export const emptyAction = { type: null };
 // tslint:disable-next-line:no-any
@@ -11,22 +12,26 @@ export type ActionUnion<A extends ActionCreatorsMap> = typeof emptyAction | Retu
 
 export type State = {
   counter: C.State,
-  senseMap: SM.State
+  senseMap: SM.State,
+  selection: SL.State,
 };
 
 export const initial: State = {
   counter: C.initial,
-  senseMap: SM.initial
+  senseMap: SM.initial,
+  selection: SL.initial,
 };
 
 export type Action
   = ActionUnion<typeof C.actions>
   | ActionUnion<typeof SM.actions>
-  | ActionUnion<typeof SC.actions>;
+  | ActionUnion<typeof SC.actions>
+  | ActionUnion<typeof SL.actions>;
 
 export const actions = {
   counter: C.actions,
-  senseMap: SM.actions
+  senseMap: SM.actions,
+  selection: SL.actions,
 };
 
 export type Dispatch = ReduxDispatch<Action>;
@@ -35,5 +40,6 @@ export type Reducer = ReduxReducer<State>;
 
 export const reducer = combineReducers({
   counter: C.reducer,
-  senseMap: SM.reducer
+  senseMap: SM.reducer,
+  selection: SL.reducer,
 });
