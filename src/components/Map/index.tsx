@@ -30,23 +30,22 @@ interface Props {
   objects: SO.ObjectData[];
 }
 
-function renderCard(o: SO.ObjectData) {
-  return <MapCard mapObject={o} />;
-}
-
-function renderBox(o: SO.ObjectData) {
-  return <MapBox mapObject={o} />;
+function renderObject(o: SO.ObjectData) {
+  switch (o.objectType) {
+    case SO.ObjectType.Card: {
+      return <MapCard mapObject={o as SO.CardObjectData} />;
+    }
+    case SO.ObjectType.Box: {
+      return <MapBox mapObject={o as SO.BoxObjectData} />;
+    }
+    default: {
+      throw Error(`Unknown ObjectData ${typeof o}`);
+    }
+  }
 }
 
 function Map(props: Props) {
-  const objects = props.objects.map(
-    o => {
-      switch (o.objectType) {
-        case SO.ObjectType.Card: return renderCard(o);
-        case SO.ObjectType.Box: return renderBox(o);
-        default: throw Error('This never happens.');
-      }
-    });
+  const objects = props.objects.map(o => renderObject(o));
   return (
     <Stage width={props.width} height={props.height}>
       <Layer>

@@ -4,7 +4,7 @@ import { Group, Rect, Text } from 'react-konva';
 import * as SO from '../../types/sense-object';
 
 interface Props {
-  mapObject: SO.ObjectData;
+  mapObject: SO.BoxObjectData;
 }
 
 const borderColor = '#21ffc7';
@@ -16,7 +16,7 @@ const titleFontSize = 28;
 const titlePadding = 5;
 
 function MapBox(props: Props) {
-  const {id, x, y, width, height, title} = props.mapObject as SO.BoxObjectData;
+  const {id, x, y, width, height, title} = props.mapObject;
   return (
     <Group x={x} y={y} draggable={true} key={id}>
       <Rect fill={bgColor} width={width} height={height} stroke={borderColor} strokeWidth={borderWidth} />
