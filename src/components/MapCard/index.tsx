@@ -2,14 +2,19 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import * as SO from '../../types/sense-object';
+import { noop } from '../../types/utils';
 
 interface Props {
   mapObject: SO.CardObjectData;
+  selected?: Boolean;
+  toggleSelection?(id: SO.ObjectID): void;
 }
 
 const titlePadding = 14;
 const titleFontFamily = 'sans-serif';
 const titleFontSize = 14;
+const borderColor = '#999';
+const borderColorSelected = '#9999ff';
 const bgColors = {
   'NORMAL': '#ffffff',
   'NOTE': '#ffffff',
@@ -23,9 +28,10 @@ const shadowOffsetY = shadowBlur;
 
 function MapCard(props: Props) {
   const {id, x, y, width, height, title, cardType} = props.mapObject;
+  const toggleSelection = props.toggleSelection || noop;
   const bgColor = bgColors[cardType];
   return (
-    <Group draggable={true} x={x} y={y} key={id}>
+    <Group draggable={true} x={x} y={y} key={id} onClick={() => toggleSelection(id)}>
       <Rect
         width={width}
         height={height}
@@ -39,6 +45,7 @@ function MapCard(props: Props) {
         width={width}
         height={height}
         fill={bgColor}
+        stroke={props.selected ? borderColorSelected : borderColor}
       />
       <Text
         width={width}

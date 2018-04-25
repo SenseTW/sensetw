@@ -1,42 +1,49 @@
 
 import * as React from 'react';
-// import { connect } from 'react-redux';
 import { Stage, Layer } from 'react-konva';
 import MapBox from '../MapBox';
 import MapCard from '../MapCard';
-// import * as SC from '../../types/sense-card';
 import * as SO from '../../types/sense-object';
-// import * as T from '../../types';
+import * as SL from '../../types/selection';
+import { connect } from 'react-redux';
+import * as T from '../../types';
 
-/*
 interface StateFromProps {
-  cards: SO.ObjectData[];
+  selection: SO.ObjectID[];
 }
 
 interface DispatchFromProps {
   actions: {
-    createCard: (data: SC.CardData, position: SM.PositionInMap) => T.Action,
-// tslint:disable-next-line:no-any
-    loadCards: (mapId: SM.MapID) => any
+    toggleObjectSelection(id: SO.ObjectID): T.Action
   };
 }
 
-type Props = StateFromProps & DispatchFromProps;
-*/
-
-interface Props {
+interface PropsFromParent {
   width: number;
   height: number;
   objects: SO.ObjectData[];
 }
 
-function renderObject(o: SO.ObjectData) {
+type Props = StateFromProps & DispatchFromProps & PropsFromParent;
+
+function renderObject(o: SO.ObjectData, props: Props) {
+  const toggleSelection = props.actions.toggleObjectSelection;
   switch (o.objectType) {
     case SO.ObjectType.Card: {
-      return <MapCard mapObject={o as SO.CardObjectData} />;
+      return (
+        <MapCard
+          mapObject={o as SO.CardObjectData}
+          selected={SL.contains(props.selection, o.id)}
+          toggleSelection={toggleSelection}
+        />);
     }
     case SO.ObjectType.Box: {
-      return <MapBox mapObject={o as SO.BoxObjectData} />;
+      return (
+        <MapBox
+          mapObject={o as SO.BoxObjectData}
+          selected={SL.contains(props.selection, o.id)}
+          toggleSelection={toggleSelection}
+        />);
     }
     default: {
       throw Error(`Unknown ObjectData ${typeof o}`);
@@ -45,7 +52,7 @@ function renderObject(o: SO.ObjectData) {
 }
 
 function Map(props: Props) {
-  const objects = props.objects.map(o => renderObject(o));
+  const objects = props.objects.map(o => renderObject(o, props));
   return (
     <Stage width={props.width} height={props.height}>
       <Layer>
@@ -55,20 +62,14 @@ function Map(props: Props) {
   );
 }
 
-export default Map;
-
-/*
-export default connect<StateFromProps, DispatchFromProps>(
+export default connect<StateFromProps, DispatchFromProps, PropsFromParent>(
   (state: T.State) => ({
-    cards: state.senseMap.cards
+    selection: state.selection
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      createCard: (data: SC.CardData, position: SM.PositionInMap) =>
-        dispatch(T.actions.senseMap.createCard(data, position)),
-      loadCards: (mapId: SM.MapID) =>
-        dispatch(T.actions.senseMap.loadCards(mapId))
+      toggleObjectSelection: (id: SO.ObjectID) =>
+        dispatch(T.actions.selection.toggleObjectSelection(id)),
     }
   })
 )(Map);
-*/

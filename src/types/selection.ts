@@ -34,6 +34,9 @@ export const actions = {
 export type State = ObjectID[];
 export const initial: State = [];
 
+export const contains = (selection: State, id: ObjectID): Boolean =>
+  selection.indexOf(id) >= 0;
+
 export const reducer = (state: State = initial, action: ActionUnion<typeof actions>): State => {
   switch (action.type) {
     case ADD_OBJECT_TO_SELECTION: {

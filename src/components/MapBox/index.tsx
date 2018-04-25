@@ -2,12 +2,16 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import * as SO from '../../types/sense-object';
+import { noop } from '../../types/utils';
 
 interface Props {
   mapObject: SO.BoxObjectData;
+  selected?: Boolean;
+  toggleSelection?(id: SO.ObjectID): void;
 }
 
 const borderColor = '#21ffc7';
+const borderColorSelected = '#ff21c7';
 const borderWidth = 6;
 const bgColor = '#ffffff';
 const titleFontFamily = 'sans-serif';
@@ -17,9 +21,16 @@ const titlePadding = 5;
 
 function MapBox(props: Props) {
   const {id, x, y, width, height, title} = props.mapObject;
+  const toggleSelection = props.toggleSelection || noop;
   return (
-    <Group x={x} y={y} draggable={true} key={id}>
-      <Rect fill={bgColor} width={width} height={height} stroke={borderColor} strokeWidth={borderWidth} />
+    <Group x={x} y={y} draggable={true} key={id} onClick={() => toggleSelection(id)}>
+      <Rect
+        fill={bgColor}
+        width={width}
+        height={height}
+        stroke={props.selected ? borderColorSelected : borderColor}
+        strokeWidth={borderWidth}
+      />
       <Text
         y={(height - titleFontSize) / 2}
         align="center"

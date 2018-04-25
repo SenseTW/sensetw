@@ -11,3 +11,5 @@ export function objectId() {
   const randomChar = () => chars[Math.floor(Math.random() * chars.length)];
   return Array(idLength).fill(0).map(randomChar).join('');
 }
+
+export function noop() { return; }
