@@ -5,12 +5,12 @@ import { Stage, Layer } from 'react-konva';
 import MapBox from '../MapBox';
 import MapCard from '../MapCard';
 // import * as SC from '../../types/sense-card';
-import * as SM from '../../types/sense-map';
+import * as SO from '../../types/sense-object';
 // import * as T from '../../types';
 
 /*
 interface StateFromProps {
-  cards: SM.MapObject[];
+  cards: SO.ObjectData[];
 }
 
 interface DispatchFromProps {
@@ -27,14 +27,14 @@ type Props = StateFromProps & DispatchFromProps;
 interface Props {
   width: number;
   height: number;
-  objects: SM.MapObject[];
+  objects: SO.ObjectData[];
 }
 
-function renderCard(o: SM.MapObject) {
+function renderCard(o: SO.ObjectData) {
   return <MapCard mapObject={o} />;
 }
 
-function renderBox(o: SM.MapObject) {
+function renderBox(o: SO.ObjectData) {
   return <MapBox mapObject={o} />;
 }
 
@@ -42,8 +42,8 @@ function Map(props: Props) {
   const objects = props.objects.map(
     o => {
       switch (o.objectType) {
-        case SM.ObjectType.CARD: return renderCard(o);
-        case SM.ObjectType.BOX: return renderBox(o);
+        case SO.ObjectType.Card: return renderCard(o);
+        case SO.ObjectType.Box: return renderBox(o);
         default: throw Error('This never happens.');
       }
     });

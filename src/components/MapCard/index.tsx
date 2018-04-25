@@ -1,10 +1,10 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import * as SM from '../../types/sense-map';
+import * as SO from '../../types/sense-object';
 
 interface Props {
-  mapObject: SM.MapObject;
+  mapObject: SO.ObjectData;
 }
 
 const titlePadding = 14;
@@ -22,8 +22,7 @@ const shadowOffsetX = (shadowBlur) / 4;
 const shadowOffsetY = shadowBlur;
 
 function MapCard(props: Props) {
-  const {id, x, y, width, height} = props.mapObject;
-  const {title, cardType} = props.mapObject.data;
+  const {id, x, y, width, height, title, cardType} = props.mapObject as SO.CardObjectData;
   const bgColor = bgColors[cardType];
   return (
     <Group draggable={true} x={x} y={y} key={id}>

@@ -1,5 +1,5 @@
 import { Dispatch as ReduxDispatch } from 'redux';
-import { ObjectID } from './sense-object';
+import { ObjectID, ObjectType } from './sense-object';
 import { CardID, CardData, emptyCardData } from './sense-card';
 import { BoxID } from './sense-box';
 
@@ -10,37 +10,8 @@ export type MapID = string;
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
-export interface Geometry {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  zIndex: number;
-}
-
-export enum ObjectType {
-  CARD,
-  BOX
-}
-
-export interface MapObject extends Geometry {
-  id: ObjectID;
-  mapId: MapID;
-  objectType: ObjectType;
-  // tslint:disable-next-line:no-any
-  data: any;
-  belongsTo: BoxID | null;
-}
-
-export type Rect = {
-  left: number,
-  top: number,
-  right: number,
-  bottom: number,
-};
-
 const ADD_CARDS = 'ADD_CARDS';
-const addCards = (cards: MapObject[]) => ({
+const addCards = (cards: ObjectType[]) => ({
   type: ADD_CARDS as typeof ADD_CARDS,
   payload: { cards }
 });
@@ -135,7 +106,7 @@ export const actions = {
 };
 
 export type State = {
-  cards: MapObject[]
+  cards: ObjectType[]
 };
 
 export const initial: State = {
