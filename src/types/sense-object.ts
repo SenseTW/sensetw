@@ -1,5 +1,5 @@
-import { CardID, CardType } from './sense-card';
-import { BoxID } from './sense-box';
+import { CardData } from './sense-card';
+import { BoxID, BoxData } from './sense-box';
 import { TimeStamp } from './utils';
 
 export type ObjectID = string;
@@ -9,7 +9,7 @@ export enum ObjectType {
   Box
 }
 
-interface BaseObjectData {
+export interface BaseObjectData {
   id: ObjectID;
   createdAt: TimeStamp;
   updatedAt: TimeStamp;
@@ -20,25 +20,26 @@ interface BaseObjectData {
   width: number;
   height: number;
   zIndex: number;
-  // map: MapID[];
   belongsTo?: BoxID;
 }
 
-export interface CardObjectData extends BaseObjectData {
-  objectType: ObjectType.Card;
-  card: CardID;
-  cardType: CardType;
-  saidBy: string;
-  stakeholder: string;
-  url: string;
-}
+export const emptyObjectData = {
+  id: '0',
+  createdAt: 0,
+  updatedAt: 0,
+  title: '',
+  summary: '',
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  zIndex: 0
+};
 
-export interface BoxObjectData extends BaseObjectData {
-  objectType: ObjectType.Box;
-  box: BoxID;
-  contains: { [key: string]: ObjectData };
-}
+// re-export types
+export type CardData = CardData;
+export type BoxData = BoxData;
 
 export type ObjectData
-  = CardObjectData
-  | BoxObjectData;
+  = CardData
+  | BoxData;

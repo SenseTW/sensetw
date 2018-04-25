@@ -1,6 +1,6 @@
-import { ObjectID } from './sense-object';
+import { ObjectType, BaseObjectData, emptyObjectData } from './sense-object';
 import { ActionUnion, emptyAction } from './index';
-import { TimeStamp, Color, objectId } from './utils';
+import { objectId } from './utils';
 
 // sense card data
 export type CardID = string;
@@ -27,80 +27,77 @@ export const typeToString = (type: CardType) => {
   }
 };
 
-export interface CardData {
-  id: CardID;
-  createdAt: TimeStamp;
-  updatedAt: TimeStamp;
-  title: string;
-  description: string;
+export interface CardData extends BaseObjectData {
+  objectType: ObjectType.Card;
+  card: CardID;
   saidBy: string;
   stakeholder: string;
-  url: URL;
-  color: Color;
+  url: string;
   cardType: CardType;
-  objects?: ObjectID[];
 }
 
 export const emptyCardData: CardData = {
-  id: '0',
-  createdAt: 0,
-  updatedAt: 0,
-  title: '',
-  description: '',
+  ...emptyObjectData,
+  objectType: ObjectType.Card,
+  card: '0',
   saidBy: '',
   stakeholder: '',
-  url: new URL('http://example.com'),
-  color: '#fff',
+  url: 'http://example.com',
   cardType: CardType.Normal
 };
 
 const now = +Date.now();
 export const sampleCardList: CardData[] = [{
-  id: objectId(),
+  ...emptyObjectData,
+  objectType: ObjectType.Card,
+  card: objectId(),
   createdAt: now,
   updatedAt: now,
   title: '這是一張卡',
-  description: '這是卡片的內容',
+  summary: '這是卡片的內容',
   saidBy: '',
   stakeholder: '',
-  url: new URL('http://example.com'),
-  color: '#f00',
+  url: 'http://example.com',
   cardType: CardType.Question
 }, {
-  id: objectId(),
+  ...emptyObjectData,
+  objectType: ObjectType.Card,
+  card: objectId(),
   createdAt: now,
   updatedAt: now,
   title: '這是另外一張卡',
-  description: '這是另外一張卡的內容',
+  summary: '這是另外一張卡的內容',
   saidBy: '',
   stakeholder: '',
-  url: new URL('http://example.com'),
-  color: '#00f',
+  url: 'http://example.com',
   cardType: CardType.Answer
 }, {
-  id: objectId(),
+  ...emptyObjectData,
+  objectType: ObjectType.Card,
+  card: objectId(),
   createdAt: now,
   updatedAt: now,
   title: '這是一個 Note',
-  description: '這是 Note 的內容',
+  summary: '這是 Note 的內容',
   saidBy: '',
   stakeholder: '',
-  url: new URL('http://example.com'),
-  color: '#fff',
+  url: 'http://example.com',
   cardType: CardType.Note
 }];
 
 export const sampleCardMap = {};
-sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
+sampleCardList.forEach((c) => { sampleCardMap[c.card] = c; });
 
 // sense card actions
+// TODO: should be UPDATE_OBJECT_TITLE
 const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';
 export const updateTitle = (title: string) =>
   ({ type: UPDATE_CARD_TITLE as typeof UPDATE_CARD_TITLE, title });
 
-const UPDATE_CARD_DESCRIPTION = 'UPDATE_CARD_DESCRIPTION';
-export const updateDescription = (description: string) =>
-  ({ type: UPDATE_CARD_DESCRIPTION as typeof UPDATE_CARD_DESCRIPTION, description });
+// TODO: should be UPDATE_OBJECT_SUMMARY
+const UPDATE_CARD_SUMMARY = 'UPDATE_CARD_SUMMARY';
+export const updateSummary = (summary: string) =>
+  ({ type: UPDATE_CARD_SUMMARY as typeof UPDATE_CARD_SUMMARY, summary });
 
 const UPDATE_CARD_SAID_BY = 'UPDATE_CARD_SAID_BY';
 export const updateSaidBy = (saidBy: string) =>
@@ -116,7 +113,7 @@ export const updateColor = (color: string) =>
 
 export const actions = {
   updateTitle,
-  updateDescription,
+  updateSummary,
   updateColor,
   updateSaidBy,
   updateStakeholder
@@ -130,9 +127,9 @@ export const reducer = (state: CardData, action: Action = emptyAction) => {
       const { title } = action;
       return { ...state, title };
     }
-    case UPDATE_CARD_DESCRIPTION: {
-      const { description } = action;
-      return { ...state, description };
+    case UPDATE_CARD_SUMMARY: {
+      const { summary } = action;
+      return { ...state, summary };
     }
     case UPDATE_CARD_SAID_BY: {
       const { saidBy } = action;

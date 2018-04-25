@@ -1,14 +1,10 @@
-import { ObjectID } from './sense-object';
-import { TimeStamp, Color } from './utils';
+import { ObjectType, BaseObjectData, ObjectData } from './sense-object';
 
 export type BoxID = string;
 
-export interface BoxData {
-  id: BoxID;
-  createdAt: TimeStamp;
-  updatedAt: TimeStamp;
-  title: string;
-  color: Color;
-  objects?: ObjectID[];
-  contains: ObjectID[];
+export interface BoxData extends BaseObjectData {
+  objectType: ObjectType.Box;
+  // XXX: wait for something like opaque type in Flow to describe them properly
+  box: BoxID;
+  contains: { [key: string]: ObjectData };
 }

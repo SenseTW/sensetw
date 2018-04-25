@@ -5,7 +5,7 @@ import * as SO from '../../types/sense-object';
 import { noop } from '../../types/utils';
 
 interface Props {
-  mapObject: SO.BoxObjectData;
+  mapObject: SO.BoxData;
   selected?: Boolean;
   toggleSelection?(id: SO.ObjectID): void;
 }

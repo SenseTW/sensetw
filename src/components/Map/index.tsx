@@ -32,7 +32,7 @@ function renderObject(o: SO.ObjectData, props: Props) {
     case SO.ObjectType.Card: {
       return (
         <MapCard
-          mapObject={o as SO.CardObjectData}
+          mapObject={o as SO.CardData}
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
         />);
@@ -40,7 +40,7 @@ function renderObject(o: SO.ObjectData, props: Props) {
     case SO.ObjectType.Box: {
       return (
         <MapBox
-          mapObject={o as SO.BoxObjectData}
+          mapObject={o as SO.BoxData}
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
         />);

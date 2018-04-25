@@ -35,7 +35,7 @@ class CardContent extends React.PureComponent<Props> {
 
   render() {
     const { children, data, isEditing, onKeyUp, onChange } = this.props;
-    const { title, description, saidBy, stakeholder, cardType } = data;
+    const { title, summary, saidBy, stakeholder, cardType } = data;
 
     const titleSection =
       isEditing
@@ -52,19 +52,19 @@ class CardContent extends React.PureComponent<Props> {
         )
         : title;
 
-    const descriptionSection =
+    const summarySection =
       isEditing
         ? (
           <Input
             fluid
             transparent
             placeholder="卡片描述"
-            value={description}
+            value={summary}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SC.updateDescription(e.currentTarget.value))}
+            onChange={e => onChange && onChange(SC.updateSummary(e.currentTarget.value))}
           />
         )
-        : description;
+        : summary;
 
     const saidBySection =
       isEditing
@@ -100,8 +100,8 @@ class CardContent extends React.PureComponent<Props> {
           {titleSection}
           <Header.Subheader>{SC.typeToString(cardType)}</Header.Subheader>
         </Header>
-        <div className="core-card__description">
-          {descriptionSection}
+        <div className="core-card__summary">
+          {summarySection}
         </div>
         <div className="core-card__said-by">
           <Header as="h3">發言人</Header>
