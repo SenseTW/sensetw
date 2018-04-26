@@ -33,10 +33,10 @@ export type Props = StateFromProps & DispatchFromProps & PropsFromParent;
 function renderObject(o: SO.ObjectData, props: Props) {
   const toggleSelection = props.actions.toggleObjectSelection;
   switch (o.objectType) {
-    case SO.ObjectType.None: {
+    case SO.ObjectType.NONE: {
       return <Group />;
     }
-    case SO.ObjectType.Card: {
+    case SO.ObjectType.CARD: {
       if (!props.cards[o.data]) {
         return <Group />;
       }
@@ -48,7 +48,7 @@ function renderObject(o: SO.ObjectData, props: Props) {
           toggleSelection={toggleSelection}
         />);
     }
-    case SO.ObjectType.Box: {
+    case SO.ObjectType.BOX: {
       if (!props.boxes[o.data]) {
         return <Group />;
       }

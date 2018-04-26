@@ -8,18 +8,18 @@ import { TimeStamp, arrayToObject } from './utils';
 export type ObjectID = string;
 
 export enum ObjectType {
-  None = 'None',
-  Card = 'Card',
-  Box = 'Box',
+  NONE = 'NONE',
+  CARD = 'CARD',
+  BOX = 'BOX',
 }
 
 export const stringToType: (name: string) => ObjectType =
   name => {
     switch (name) {
-      case 'NONE': return ObjectType.None;
-      case 'CARD': return ObjectType.Card;
-      case 'BOX': return ObjectType.Box;
-      default: return ObjectType.None;
+      case 'NONE': return ObjectType.NONE;
+      case 'CARD': return ObjectType.CARD;
+      case 'BOX': return ObjectType.BOX;
+      default: return ObjectType.NONE;
     }
   };
 
@@ -52,9 +52,9 @@ export const initial: State = {
 // tslint:disable-next-line:no-any
 const toData = (o: any) => {
   switch (stringToType(o.objectType as string)) {
-    case ObjectType.None: { return undefined; }
-    case ObjectType.Card: { return o.card.id; }
-    case ObjectType.Box:  { return o.box.id;  }
+    case ObjectType.NONE: { return undefined; }
+    case ObjectType.CARD: { return o.card.id; }
+    case ObjectType.BOX:  { return o.box.id;  }
     default:              { return undefined; }
   }
 };
@@ -240,7 +240,7 @@ export const emptyObjectData = {
   width: 0,
   height: 0,
   zIndex: 0,
-  objectType: ObjectType.None,
+  objectType: ObjectType.NONE,
   data: '0',
 };
 
@@ -254,7 +254,7 @@ export const sampleStateObjects = {
     width: 280,
     height: 150,
     zIndex: 0,
-    objectType: ObjectType.Card,
+    objectType: ObjectType.CARD,
     data: '456',
   },
   '124': {
@@ -266,7 +266,7 @@ export const sampleStateObjects = {
     width: 280,
     height: 150,
     zIndex: 0,
-    objectType: ObjectType.Card,
+    objectType: ObjectType.CARD,
     belongsTo: '127',
     data: '457',
   },
@@ -279,7 +279,7 @@ export const sampleStateObjects = {
     width: 280,
     height: 150,
     zIndex: 0,
-    objectType: ObjectType.Card,
+    objectType: ObjectType.CARD,
     belongsTo: '127',
     data: '458',
   },
@@ -292,7 +292,7 @@ export const sampleStateObjects = {
     width: 280,
     height: 150,
     zIndex: 0,
-    objectType: ObjectType.Card,
+    objectType: ObjectType.CARD,
     data: '459',
   },
   '127': {
@@ -304,7 +304,7 @@ export const sampleStateObjects = {
     width: 280,
     height: 100,
     zIndex: 0,
-    objectType: ObjectType.Box,
+    objectType: ObjectType.BOX,
     data: '461',
   },
   '137': {
@@ -316,7 +316,7 @@ export const sampleStateObjects = {
     width: 280,
     height: 100,
     zIndex: 0,
-    objectType: ObjectType.Box,
+    objectType: ObjectType.BOX,
     data: '462',
   },
 };

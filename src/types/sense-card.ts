@@ -6,24 +6,24 @@ import { objectId, TimeStamp } from './utils';
 export type CardID = string;
 
 export enum CardType {
-  Normal,
-  Question,
-  Answer,
-  Note
+  NORMAL = 'NORMAL',
+  QUESTION = 'QUESTION',
+  ANSWER = 'ANSWER',
+  NOTE = 'NOTE',
 }
 
 export const typeToString = (type: CardType) => {
   switch (type) {
-    case CardType.Normal:
-      return 'Normal';
-    case CardType.Question:
-      return 'Card';
-    case CardType.Answer:
-      return 'Answer';
-    case CardType.Note:
-      return 'Note';
+    case CardType.NORMAL:
+      return 'NORMAL';
+    case CardType.QUESTION:
+      return 'CARD';
+    case CardType.ANSWER:
+      return 'ANSWER';
+    case CardType.NOTE:
+      return 'NOTE';
     default:
-      return 'Unknown';
+      return 'UNKNOWN';
   }
 };
 
@@ -50,7 +50,7 @@ export const emptyCardData: CardData = {
   saidBy: '',
   stakeholder: '',
   url: 'http://example.com',
-  cardType: CardType.Normal
+  cardType: CardType.NORMAL
 };
 
 const now = +Date.now();
@@ -64,7 +64,7 @@ export const sampleCardList: CardData[] = [{
   saidBy: '',
   stakeholder: '',
   url: 'http://example.com',
-  cardType: CardType.Question
+  cardType: CardType.QUESTION
 }, {
   id: objectId(),
   createdAt: now,
@@ -75,7 +75,7 @@ export const sampleCardList: CardData[] = [{
   saidBy: '',
   stakeholder: '',
   url: 'http://example.com',
-  cardType: CardType.Answer
+  cardType: CardType.ANSWER
 }, {
   id: objectId(),
   createdAt: now,
@@ -86,7 +86,7 @@ export const sampleCardList: CardData[] = [{
   saidBy: '',
   stakeholder: '',
   url: 'http://example.com',
-  cardType: CardType.Note
+  cardType: CardType.NOTE
 }];
 
 export const sampleCardMap = {};
@@ -163,7 +163,7 @@ export const cards: { [key: string]: CardData } = {
     saidBy: '同學一整學期沒有上過任何課',
     stakeholder: '汗水，這是怎麼回事',
     url: 'http://more.handlino.com/',
-    cardType: CardType.Note,
+    cardType: CardType.NOTE,
     objects: { '123': '123' },
   },
   '459': {
@@ -176,7 +176,7 @@ export const cards: { [key: string]: CardData } = {
     saidBy: '聯想控股董事長柳傳志',
     stakeholder: '感謝上師',
     url: 'http://more.handlino.com/',
-    cardType: CardType.Normal,
+    cardType: CardType.NORMAL,
     objects: { '126': '126' },
   },
   '458': {
@@ -189,7 +189,7 @@ export const cards: { [key: string]: CardData } = {
     saidBy: '宏達電主打HTC，南投鹿神祭，全大運',
     stakeholder: '業者書讀得不多沒關係',
     url: 'http://more.handlino.com/',
-    cardType: CardType.Answer,
+    cardType: CardType.ANSWER,
     objects: { '125': '125' },
   },
   '457': {
@@ -202,7 +202,7 @@ export const cards: { [key: string]: CardData } = {
     saidBy: '必須跟風險投資共擔風險',
     stakeholder: '做企業不是做俠客',
     url: 'http://more.handlino.com/',
-    cardType: CardType.Question,
+    cardType: CardType.QUESTION,
     objects: { '124': '124' },
   },
 };

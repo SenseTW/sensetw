@@ -29,7 +29,7 @@ type Object @model {
   height: Float!
   zIndex: Float!
   map: Map! @relation(name: "MapObjects")
-  objectType: ObjectType!
+  objectType: ObjectType! @migrationValue(value: CARD)
   card: Card @relation(name: "ObjectCard")
   box: Box @relation(name: "ObjectBox")
   belongsTo: Box @relation(name: "ContainCards")
