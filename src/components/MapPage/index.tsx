@@ -16,6 +16,10 @@ interface StateFromProps {
 }
 
 interface DispatchFromProps {
+  actions: {
+    updateCard: typeof SO.actions.updateCard,
+    updateBox: typeof SO.actions.updateBox
+  };
 }
 
 type Props = StateFromProps & DispatchFromProps;
@@ -55,7 +59,7 @@ class MapPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { objectType, target } = this.props;
+    const { actions, objectType, target } = this.props;
 
     return (
       <Sidebar.Pushable className="map-page">
@@ -64,6 +68,17 @@ class MapPage extends React.Component<Props, State> {
             <ObjectContent
               objectType={objectType}
               data={target}
+              onChange={(data) => {
+                switch (objectType) {
+                  case SO.ObjectType.CARD:
+                    actions.updateCard(data.id, data as SC.CardData);
+                    break;
+                  case SO.ObjectType.BOX:
+                    actions.updateBox(data.id, data as SB.BoxData);
+                    break;
+                  default:
+                }
+              }}
             />
         }
         </Sidebar>
@@ -103,5 +118,11 @@ export default connect(
     }
 
     return { objectType, target };
-  }
+  },
+  (dispatch: T.Dispatch) => ({
+    actions: {
+      updateCard: (id: SC.CardID, card: SC.CardData) => dispatch(SO.actions.updateCard(id, card)),
+      updateBox: (id: SB.BoxID, box: SB.BoxData) => dispatch(SO.actions.updateBox(id, box))
+    }
+  })
 )(MapPage);
