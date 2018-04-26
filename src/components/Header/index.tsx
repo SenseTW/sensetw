@@ -19,14 +19,6 @@ class Header extends React.PureComponent<RouteComponentProps<any>> {
         </Menu.Item>
         <Menu.Item
           as={Link}
-          to="/counter"
-          name="counter"
-          active={location.pathname === '/counter'}
-        >
-          counter
-        </Menu.Item>
-        <Menu.Item
-          as={Link}
           to="/map"
           name="map"
           active={location.pathname === '/map'}
