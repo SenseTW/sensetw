@@ -60,15 +60,11 @@ class MapPage extends React.Component<Props, State> {
     return (
       <Sidebar.Pushable className="map-page">
         <Sidebar visible={!!target} animation="overlay" width="wide">{
-          objectType === SO.ObjectType.BOX ?
-            <div /> :
-          objectType === SO.ObjectType.CARD ? (
+          target &&
             <ObjectContent
-              data={target as SC.CardData}
+              objectType={objectType}
+              data={target}
             />
-          ) :
-          // otherwise
-            <div />
         }
         </Sidebar>
         <Sidebar.Pusher>
