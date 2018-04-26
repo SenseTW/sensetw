@@ -18,6 +18,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     loadObjects(id: SM.MapID): Promise<T.Action>,
     loadCards(id: SM.MapID): Promise<T.Action>,
     loadBoxes(id: SM.MapID): Promise<T.Action>,
+    moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
   };
 }
 
@@ -52,6 +53,8 @@ export default connect<CO.StateFromProps, DispatchFromProps, PropsFromParent>(
         dispatch(T.actions.senseObject.loadCards(id)),
       loadBoxes: (id: SM.MapID) =>
         dispatch(T.actions.senseObject.loadBoxes(id)),
+      moveObject: (id: SO.ObjectID, x: number, y: number) =>
+        dispatch(T.actions.senseObject.moveObject(id, x, y)),
     }
   })
 )(Map);

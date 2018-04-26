@@ -4,12 +4,14 @@ import { Group, Rect, Text } from 'react-konva';
 import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
 import { noop } from '../../types/utils';
+import { moveStart, moveEnd } from '../../tools/point';
 
 interface Props {
   mapObject: SO.ObjectData;
   box: SB.BoxData;
   selected?: Boolean;
   toggleSelection?(id: SO.ObjectID): void;
+  moveObject?(id: SO.ObjectID, x: number, y: number): void;
 }
 
 const borderColor = '#21ffc7';
@@ -28,8 +30,22 @@ function MapBox(props: Props) {
   const {title} = props.box;
 
   const toggleSelection = props.toggleSelection || noop;
+  const moveObject      = props.moveObject      || noop;
   return (
-    <Group x={x} y={y} draggable={true} key={id} onClick={() => toggleSelection(id)}>
+    <Group
+      x={x}
+      y={y}
+      key={id}
+      draggable={true}
+      onClick={() => toggleSelection(id)}
+      onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
+      onDragEnd={(e) => {
+        // XXX TypeScript ought to understand this...
+        // return moveObject(id, ...moveEnd(id, e.evt.layerX, e.evt.layerY));
+        const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
+        return moveObject(id, r[0], r[1]);
+      }}
+    >
       <Rect
         fill={bgColor}
         width={width}

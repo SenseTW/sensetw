@@ -20,6 +20,7 @@ export interface StateFromProps {
 export interface DispatchFromProps {
   actions: {
     toggleObjectSelection(id: SO.ObjectID): T.Action,
+    moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
   };
 }
 
@@ -32,6 +33,7 @@ export type Props = StateFromProps & DispatchFromProps & PropsFromParent;
 
 function renderObject(o: SO.ObjectData, props: Props) {
   const toggleSelection = props.actions.toggleObjectSelection;
+  const moveObject = props.actions.moveObject;
   switch (o.objectType) {
     case SO.ObjectType.NONE: {
       return <Group />;
@@ -46,6 +48,7 @@ function renderObject(o: SO.ObjectData, props: Props) {
           card={props.cards[o.data]}
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
+          moveObject={moveObject}
         />);
     }
     case SO.ObjectType.BOX: {
@@ -58,6 +61,7 @@ function renderObject(o: SO.ObjectData, props: Props) {
           box={props.boxes[o.data]}
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
+          moveObject={moveObject}
         />);
     }
     default: {

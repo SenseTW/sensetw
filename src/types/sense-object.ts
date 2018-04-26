@@ -131,9 +131,12 @@ const loadObjects =
     const query = `
       query AllObjects($id: ID!) {
         allObjects(filter: { map: { id: $id } }) {
-          id, createdAt, updatedAt, x, y, width, height, zIndex,
-          objectType, card { id } , box { id }
+          ...objectFields
         }
+      }
+      fragment objectFields on Object {
+        id, createdAt, updatedAt, x, y, width, height, zIndex,
+        objectType, card { id } , box { id }
       }
     `;
     const variables = { id };
@@ -182,15 +185,24 @@ const loadBoxes =
 const moveObject =
   (id: ObjectID, x: number, y: number) =>
   (dispatch: ReduxDispatch<State>) => {
-    /*
     const query = `
       mutation MoveObject($id: ID!, $x: Float!, $y: Float!) {
         updateObject(id: $id, x: $x, y: $y) {
-          id, x, y
+          ...objectFields
         }
       }
+      fragment objectFields on Object {
+        id, createdAt, updatedAt, x, y, width, height, zIndex,
+        objectType, card { id } , box { id }
+      }
     `;
-   */
+    const variables = { id, x, y };
+    return client.request(query, variables)
+      // tslint:disable-next-line:no-console
+      .then((data) => { console.log(data); return data; })
+      .then(({ updateObject }) => dispatch(updateObjects({
+        [updateObject.id]: toObjectData(updateObject),
+      })));
   };
 
 export const actions = {

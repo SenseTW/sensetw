@@ -4,12 +4,14 @@ import { Group, Rect, Text } from 'react-konva';
 import * as SO from '../../types/sense-object';
 import * as SC from '../../types/sense-card';
 import { noop } from '../../types/utils';
+import { moveStart, moveEnd } from '../../tools/point';
 
 interface Props {
   mapObject: SO.ObjectData;
   card: SC.CardData;
   selected?: Boolean;
   toggleSelection?(id: SO.ObjectID): void;
+  moveObject?(id: SO.ObjectID, x: number, y: number): void;
 }
 
 const titlePadding = 14;
@@ -35,9 +37,23 @@ function MapCard(props: Props) {
   const {title, cardType} = props.card;
 
   const toggleSelection = props.toggleSelection || noop;
+  const moveObject      = props.moveObject      || noop;
   const bgColor = bgColors[cardType];
   return (
-    <Group draggable={true} x={x} y={y} key={id} onClick={() => toggleSelection(id)}>
+    <Group
+      x={x}
+      y={y}
+      key={id}
+      draggable={true}
+      onClick={() => toggleSelection(id)}
+      onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
+      onDragEnd={(e) => {
+        // XXX TypeScript ought to understand this...
+        // return moveObject(id, ...moveEnd(id, e.evt.layerX, e.evt.layerY));
+        const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
+        return moveObject(id, r[0], r[1]);
+      }}
+    >
       <Rect
         width={width}
         height={height}
