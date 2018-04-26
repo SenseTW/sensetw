@@ -3,6 +3,8 @@ type Map @model {
   createdAt: DateTime!
   updatedAt: DateTime!
   objects: [Object!]! @relation(name: "MapObjects")
+  cards: [Card!]! @relation(name: "MapCards")
+  boxes: [Box!]! @relation(name: "MapBoxes")
 }
 
 enum ObjectType {
@@ -44,6 +46,7 @@ type Card @model {
   url: String
   cardType: CardType @migrationValue(value: NORMAL)
   objects: [Object!]! @relation(name: "ObjectCard")
+  map: Map @relation(name: "MapCards")
 }
 
 type Box @model {
@@ -54,6 +57,7 @@ type Box @model {
   summary: String
   objects: [Object!]! @relation(name: "ObjectBox")
   contains: [Object!]! @relation(name: "ContainCards")
+  map: Map @relation(name: "MapBoxes")
 }
 
 type File @model {

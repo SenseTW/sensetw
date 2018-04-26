@@ -1,9 +1,9 @@
 import { Dispatch as ReduxDispatch } from 'redux';
 import { client } from './client';
-import { CardID } from './sense-card';
-import { BoxID } from './sense-box';
+import { CardID, CardData } from './sense-card';
+import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
-import { TimeStamp } from './utils';
+import { TimeStamp, arrayToObject } from './utils';
 
 export type ObjectID = string;
 
@@ -37,18 +37,30 @@ export interface ObjectData {
   data: CardID | BoxID;
 }
 
-const arrayToObject: (data: ObjectData[]) => { [key: string]: ObjectData } =
-  data => data.reduce((o, item) => { o[item.id] = item; return o; }, {});
-
 export type State = {
   objects: { [key: string]: ObjectData },
+  cards: { [key: string]: CardData },
+  boxes: { [key: string]: BoxData },
 };
 
 export const initial: State = {
   objects: {},
+  cards: {},
+  boxes: {},
 };
 
-const toObjectData: (o: { [key: string]: number | string }) => ObjectData =
+// tslint:disable-next-line:no-any
+const toData = (o: any) => {
+  switch (stringToType(o.objectType as string)) {
+    case ObjectType.None: { return undefined; }
+    case ObjectType.Card: { return o.card.id; }
+    case ObjectType.Box:  { return o.box.id;  }
+    default:              { return undefined; }
+  }
+};
+
+// tslint:disable-next-line:no-any
+const toObjectData: (o: any) => ObjectData =
   o => ({
     id: o.id,
     createdAt: 0,
@@ -59,9 +71,38 @@ const toObjectData: (o: { [key: string]: number | string }) => ObjectData =
     height: o.height,
     zIndex: o.zIndex,
     objectType: stringToType(o.objectType as string),
-    // XXX need to fix this later
-    data: o.card || o.box,
+    data: toData(o),
   } as ObjectData);
+
+// tslint:disable-next-line:no-any
+const toCardData: (c: any) => CardData =
+  c => ({
+    id: c.id,
+    createdAt: 0,
+    updatedAt: 0,
+    title: c.title,
+    summary: c.summary,
+    saidBy: c.saidBy,
+    stakeholder: c.stakeholder,
+    url: c.url,
+    cardType: c.cardType,
+    // tslint:disable-next-line:no-any
+    objects: c.objects.map((o: any) => o.id),
+  } as CardData);
+
+// tslint:disable-next-line:no-any
+const toBoxData: (b: any) => BoxData =
+  b => ({
+    id: b.id,
+    createdAt: 0,
+    updatedAt: 0,
+    title: b.title,
+    summary: b.summary,
+    // tslint:disable-next-line:no-any
+    objects: b.objects.map((o: any) => o.id),
+    // tslint:disable-next-line:no-any
+    contains: b.contains.map((o: any) => o.id),
+  } as BoxData);
 
 const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
 const updateObjects =
@@ -70,14 +111,26 @@ const updateObjects =
     payload: objects,
   });
 
+const UPDATE_CARDS = 'UPDATE_CARDS';
+const updateCards =
+  (cards: typeof initial.cards) => ({
+    type: UPDATE_CARDS as typeof UPDATE_CARDS,
+    payload: cards,
+  });
+
+const UPDATE_BOXES = 'UPDATE_BOXES';
+const updateBoxes =
+  (boxes: typeof initial.boxes) => ({
+    type: UPDATE_BOXES as typeof UPDATE_BOXES,
+    payload: boxes,
+  });
+
 const loadObjects =
   (id: MapID) =>
   (dispatch: ReduxDispatch<State>) => {
     const query = `
       query AllObjects($id: ID!) {
-        allObjects(filter: {
-          map: { id: $id }
-        }) {
+        allObjects(filter: { map: { id: $id } }) {
           id, createdAt, updatedAt, x, y, width, height, zIndex,
           objectType, card { id } , box { id }
         }
@@ -86,10 +139,44 @@ const loadObjects =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allObjects }) => allObjects.map(toObjectData))
-      .then(data => arrayToObject(data))
-      // tslint:disable-next-line:no-console
-      .then(data => { console.log(data); return data; })
+      .then(data => arrayToObject<ObjectData>(data))
       .then(data => dispatch(updateObjects(data)));
+  };
+
+const loadCards =
+  (id: MapID) =>
+  (dispatch: ReduxDispatch<State>) => {
+    const query = `
+      query AllCards($id: ID!) {
+        allCards(filter: { map: { id: $id } }) {
+          id, createdAt, updatedAt, title, summary, saidBy, stakeholder,
+          url, cardType, objects { id }
+        }
+      }
+    `;
+    const variables = { id };
+    return client.request(query, variables)
+      .then(({ allCards }) => allCards.map(toCardData))
+      .then(data => arrayToObject<CardData>(data))
+      .then(data => dispatch(updateCards(data)));
+  };
+
+const loadBoxes =
+  (id: MapID) =>
+  (dispatch: ReduxDispatch<State>) => {
+    const query = `
+      query AllBoxes($id: ID!) {
+        allBoxes(filter: { map: { id: $id } }) {
+          id, createdAt, updatedAt, title, summary,
+          objects { id }, contains { id }
+        }
+      }
+    `;
+    const variables = { id };
+    return client.request(query, variables)
+      .then(({ allBoxes }) => allBoxes.map(toBoxData))
+      .then(data => arrayToObject<BoxData>(data))
+      .then(data => dispatch(updateBoxes(data)));
   };
 
 const moveObject =
@@ -108,17 +195,34 @@ const moveObject =
 
 export const actions = {
   updateObjects,
+  updateCards,
+  updateBoxes,
   loadObjects,
+  loadCards,
+  loadBoxes,
   moveObject,
 };
 
-export type Action = ReturnType<typeof updateObjects>;
+export type Action
+  = ReturnType<typeof updateObjects>
+  | ReturnType<typeof updateCards>
+  | ReturnType<typeof updateBoxes>;
 
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
     case UPDATE_OBJECTS: {
       return Object.assign({}, state, {
         objects: Object.assign({}, state.objects, action.payload),
+      });
+    }
+    case UPDATE_CARDS: {
+      return Object.assign({}, state, {
+        cards: Object.assign({}, state.cards, action.payload),
+      });
+    }
+    case UPDATE_BOXES: {
+      return Object.assign({}, state, {
+        boxes: Object.assign({}, state.boxes, action.payload),
       });
     }
     default: {

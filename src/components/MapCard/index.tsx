@@ -30,10 +30,9 @@ const shadowOffsetY = shadowBlur;
 
 function MapCard(props: Props) {
   const {id, x, y, width, height} = props.mapObject;
-
-  // const {title, cardType} = props.card;
-  const title = 'Yo';
-  const cardType = SC.CardType.Question;
+  const {title, cardType} = props.card;
+  // const title = 'Yo';
+  // const cardType = SC.CardType.Question;
 
   const toggleSelection = props.toggleSelection || noop;
   const bgColor = bgColors[SC.typeToString(cardType)];

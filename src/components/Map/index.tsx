@@ -13,6 +13,8 @@ import * as T from '../../types';
 export interface StateFromProps {
   selection: SO.ObjectID[];
   objects: { [key: string]: SO.ObjectData };
+  cards: { [key: string]: SC.CardData };
+  boxes: { [key: string]: SB.BoxData };
 }
 
 export interface DispatchFromProps {
@@ -22,8 +24,6 @@ export interface DispatchFromProps {
 }
 
 export interface PropsFromParent {
-  cards: { [key: string]: SC.CardData };
-  boxes: { [key: string]: SB.BoxData };
   width: number;
   height: number;
 }
@@ -37,6 +37,9 @@ function renderObject(o: SO.ObjectData, props: Props) {
       return <Group />;
     }
     case SO.ObjectType.Card: {
+      if (!props.cards[o.data]) {
+        return <Group />;
+      }
       return (
         <MapCard
           mapObject={o}
@@ -46,6 +49,9 @@ function renderObject(o: SO.ObjectData, props: Props) {
         />);
     }
     case SO.ObjectType.Box: {
+      if (!props.boxes[o.data]) {
+        return <Group />;
+      }
       return (
         <MapBox
           mapObject={o}

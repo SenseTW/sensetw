@@ -16,6 +16,8 @@ interface DispatchFromProps extends CO.DispatchFromProps {
   actions: {
     toggleObjectSelection(id: SO.ObjectID): T.Action,
     loadObjects(id: SM.MapID): Promise<T.Action>,
+    loadCards(id: SM.MapID): Promise<T.Action>,
+    loadBoxes(id: SM.MapID): Promise<T.Action>,
   };
 }
 
@@ -26,6 +28,8 @@ class Map extends React.Component<Props> {
     // tslint:disable-next-line:no-console
     console.log(this.props.id);
     this.props.actions.loadObjects(this.props.id);
+    this.props.actions.loadCards(this.props.id);
+    this.props.actions.loadBoxes(this.props.id);
   }
 
   render() {
@@ -37,6 +41,8 @@ export default connect<CO.StateFromProps, DispatchFromProps, PropsFromParent>(
   (state: T.State) => ({
     selection: state.selection,
     objects: state.senseObject.objects,
+    cards: state.senseObject.cards,
+    boxes: state.senseObject.boxes,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
@@ -44,6 +50,10 @@ export default connect<CO.StateFromProps, DispatchFromProps, PropsFromParent>(
         dispatch(T.actions.selection.toggleObjectSelection(id)),
       loadObjects: (id: SM.MapID) =>
         dispatch(T.actions.senseObject.loadObjects(id)),
+      loadCards: (id: SM.MapID) =>
+        dispatch(T.actions.senseObject.loadCards(id)),
+      loadBoxes: (id: SM.MapID) =>
+        dispatch(T.actions.senseObject.loadBoxes(id)),
     }
   })
 )(Map);
