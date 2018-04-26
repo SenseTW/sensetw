@@ -20,12 +20,12 @@ const titleFontFamily = 'sans-serif';
 const titleColor = '#000000';
 const titleFontSize = 28;
 const titlePadding = 5;
+const width = 380;
+const height = 100;
 
 function MapBox(props: Props) {
-  const {id, x, y, width, height} = props.mapObject;
-
-  // const {title} = props.box;
-  const title = 'Foo';
+  const {id, x, y} = props.mapObject;
+  const {title} = props.box;
 
   const toggleSelection = props.toggleSelection || noop;
   return (

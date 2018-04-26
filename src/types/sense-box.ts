@@ -13,7 +13,7 @@ export interface BoxData {
   contains: { [key: string]: ObjectID };
 }
 
-export const boxes: { [key: string]: BoxData } = {
+export const sampleStateBoxes: { [key: string]: BoxData } = {
   '461': {
     id: '461',
     createdAt: 0,

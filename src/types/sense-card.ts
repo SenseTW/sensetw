@@ -27,6 +27,9 @@ export const typeToString = (type: CardType) => {
   }
 };
 
+export const stringToType: (name: string) => CardType =
+  name => CardType[name];
+
 export interface CardData {
   id: CardID;
   createdAt: TimeStamp;
@@ -152,7 +155,7 @@ export const reducer = (state: CardData, action: Action = emptyAction) => {
   }
 };
 
-export const cards: { [key: string]: CardData } = {
+export const sampleStateCards: { [key: string]: CardData } = {
   '456': {
     id: '456',
     createdAt: 0,

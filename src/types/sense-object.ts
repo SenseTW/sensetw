@@ -1,6 +1,6 @@
 import { Dispatch as ReduxDispatch } from 'redux';
 import { client } from './client';
-import { CardID, CardData } from './sense-card';
+import { CardID, CardData, stringToType as stringToCardType } from './sense-card';
 import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp, arrayToObject } from './utils';
@@ -85,7 +85,7 @@ const toCardData: (c: any) => CardData =
     saidBy: c.saidBy,
     stakeholder: c.stakeholder,
     url: c.url,
-    cardType: c.cardType,
+    cardType: stringToCardType(c.cardType as string),
     // tslint:disable-next-line:no-any
     objects: c.objects.map((o: any) => o.id),
   } as CardData);

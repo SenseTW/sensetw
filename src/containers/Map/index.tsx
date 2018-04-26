@@ -25,8 +25,6 @@ type Props = CO.StateFromProps & DispatchFromProps & PropsFromParent;
 
 class Map extends React.Component<Props> {
   componentDidMount() {
-    // tslint:disable-next-line:no-console
-    console.log(this.props.id);
     this.props.actions.loadObjects(this.props.id);
     this.props.actions.loadCards(this.props.id);
     this.props.actions.loadBoxes(this.props.id);

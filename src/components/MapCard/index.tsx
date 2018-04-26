@@ -18,24 +18,24 @@ const titleFontSize = 14;
 const borderColor = '#999';
 const borderColorSelected = '#9999ff';
 const bgColors = {
-  'Normal': '#ffffff',
-  'Note': '#ffffff',
-  'Question': '#ff9999',
-  'Answer': '#a7ccf2',
+  'NORMAL': '#ffffff',
+  'NOTE': '#ffffff',
+  'QUESTION': '#ff9999',
+  'ANSWER': '#a7ccf2',
 };
 const shadowBlur = 5;
 const shadowColor = '#999';
 const shadowOffsetX = (shadowBlur) / 4;
 const shadowOffsetY = shadowBlur;
+const width = 380;
+const height = 100;
 
 function MapCard(props: Props) {
-  const {id, x, y, width, height} = props.mapObject;
+  const {id, x, y} = props.mapObject;
   const {title, cardType} = props.card;
-  // const title = 'Yo';
-  // const cardType = SC.CardType.Question;
 
   const toggleSelection = props.toggleSelection || noop;
-  const bgColor = bgColors[SC.typeToString(cardType)];
+  const bgColor = bgColors[cardType];
   return (
     <Group draggable={true} x={x} y={y} key={id} onClick={() => toggleSelection(id)}>
       <Rect
