@@ -95,19 +95,19 @@ class CardContent extends React.PureComponent<Props> {
         : stakeholder;
 
     return (
-      <div className="core-card">
-        <Header as="h1" className="core-card__header">
+      <div className="card-content">
+        <Header as="h1" className="card-content__header">
           {titleSection}
           <Header.Subheader>{SC.typeToString(cardType)}</Header.Subheader>
         </Header>
-        <div className="core-card__summary">
+        <div className="card-content__summary">
           {summarySection}
         </div>
-        <div className="core-card__said-by">
+        <div className="card-content__said-by">
           <Header as="h3">發言人</Header>
           {saidBySection}
         </div>
-        <div className="core-card__stakeholder">
+        <div className="card-content__stakeholder">
           <Header as="h3">利害關係人</Header>
           {stakeholderSection}
         </div>
