@@ -1,3 +1,4 @@
+import { CardID } from './sense-card';
 import { BoxID } from './sense-box';
 import { TimeStamp } from './utils';
 

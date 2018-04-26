@@ -4,6 +4,8 @@ import { Stage, Layer } from 'react-konva';
 import MapBox from '../MapBox';
 import MapCard from '../MapCard';
 import * as SO from '../../types/sense-object';
+import * as SC from '../../types/sense-card';
+import * as SB from '../../types/sense-box';
 import * as SL from '../../types/selection';
 import { connect } from 'react-redux';
 import * as T from '../../types';
@@ -21,7 +23,9 @@ interface DispatchFromProps {
 interface PropsFromParent {
   width: number;
   height: number;
-  objects: SO.ObjectData[];
+  objects: { [key: string]: SO.ObjectData };
+  cards: { [key: string]: SC.CardData };
+  boxes: { [key: string]: SB.BoxData };
 }
 
 type Props = StateFromProps & DispatchFromProps & PropsFromParent;
@@ -32,7 +36,8 @@ function renderObject(o: SO.ObjectData, props: Props) {
     case SO.ObjectType.Card: {
       return (
         <MapCard
-          mapObject={o as SO.CardData}
+          mapObject={o}
+          card={props.cards[o.data]}
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
         />);
@@ -40,7 +45,8 @@ function renderObject(o: SO.ObjectData, props: Props) {
     case SO.ObjectType.Box: {
       return (
         <MapBox
-          mapObject={o as SO.BoxData}
+          mapObject={o}
+          box={props.boxes[o.data]}
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
         />);
@@ -52,7 +58,9 @@ function renderObject(o: SO.ObjectData, props: Props) {
 }
 
 function Map(props: Props) {
-  const objects = props.objects.map(o => renderObject(o, props));
+  const objects = Object.values(props.objects)
+    .filter(o => !o.belongsTo)
+    .map(o => renderObject(o, props));
   return (
     <Stage width={props.width} height={props.height}>
       <Layer>

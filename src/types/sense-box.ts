@@ -1,4 +1,5 @@
-import { ObjectID, ObjectData } from './sense-object';
+import { ObjectID } from './sense-object';
+import { TimeStamp } from './utils';
 
 export type BoxID = string;
 

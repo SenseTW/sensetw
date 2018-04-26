@@ -2,10 +2,12 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import * as SO from '../../types/sense-object';
+import * as SB from '../../types/sense-box';
 import { noop } from '../../types/utils';
 
 interface Props {
-  mapObject: SO.BoxData;
+  mapObject: SO.ObjectData;
+  box: SB.BoxData;
   selected?: Boolean;
   toggleSelection?(id: SO.ObjectID): void;
 }
@@ -20,7 +22,8 @@ const titleFontSize = 28;
 const titlePadding = 5;
 
 function MapBox(props: Props) {
-  const {id, x, y, width, height, title} = props.mapObject;
+  const {id, x, y, width, height} = props.mapObject;
+  const {title} = props.box;
   const toggleSelection = props.toggleSelection || noop;
   return (
     <Group x={x} y={y} draggable={true} key={id} onClick={() => toggleSelection(id)}>

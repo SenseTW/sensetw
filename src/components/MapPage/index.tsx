@@ -3,17 +3,11 @@ import { Container } from 'semantic-ui-react';
 import Map from '../Map';
 import * as SO from '../../types/sense-object';
 import * as SC from '../../types/sense-card';
+import * as SB from '../../types/sense-box';
 
-const objects: SO.ObjectData[] = [
-  {
-    id: '123',
-    x: 10,
-    y: 30,
-    width: 280,
-    height: 150,
-    zIndex: 0,
-    objectType: SO.ObjectType.Card,
-    card: '456',
+const cards: { [key: string]: SC.CardData } = {
+  '456': {
+    id: '456',
     createdAt: 0,
     updatedAt: 0,
     title: '架構了一個網站寫好原始碼之後過來打分數',
@@ -23,16 +17,10 @@ const objects: SO.ObjectData[] = [
     stakeholder: '汗水，這是怎麼回事',
     url: 'http://more.handlino.com/',
     cardType: SC.CardType.Note,
+    objects: { '123': '123' },
   },
-  {
-    id: '126',
-    x: 350,
-    y: 150,
-    width: 280,
-    height: 150,
-    zIndex: 0,
-    objectType: SO.ObjectType.Card,
-    card: '459',
+  '459': {
+    id: '459',
     createdAt: 0,
     updatedAt: 0,
     title: '像是長在大塊岩石底下的嫩草',
@@ -42,87 +30,141 @@ const objects: SO.ObjectData[] = [
     stakeholder: '感謝上師',
     url: 'http://more.handlino.com/',
     cardType: SC.CardType.Normal,
+    objects: { '126': '126' },
   },
-  {
-    id: '127',
-    x: 550,
-    y: 150,
-    width: 280,
-    height: 100,
-    zIndex: 0,
-    objectType: SO.ObjectType.Box,
-    box: '461',
+  '458': {
+    id: '458',
+    createdAt: 0,
+    updatedAt: 0,
+    title: '那麼我為什麼要叫他們不要講話？',
+    // tslint:disable-next-line:max-line-length
+    summary: '在學期末之後，在學期末之後，老師好我是網頁設計課的同學，在學期末之後，但從頭到尾那些網頁也不是他自己寫的',
+    saidBy: '宏達電主打HTC，南投鹿神祭，全大運',
+    stakeholder: '業者書讀得不多沒關係',
+    url: 'http://more.handlino.com/',
+    cardType: SC.CardType.Answer,
+    objects: { '125': '125' },
+  },
+  '457': {
+    id: '457',
+    createdAt: 0,
+    updatedAt: 0,
+    title: '現在我不敢肯定，我只要妳。',
+    // tslint:disable-next-line:max-line-length
+    summary: '《蘋果娛樂Online》線上直播，就讓我們繼續看下去...有想過女兒的心情嗎...老婆好大方...小編看傻眼惹。宏達電主打HTC，南投鹿神祭',
+    saidBy: '必須跟風險投資共擔風險',
+    stakeholder: '做企業不是做俠客',
+    url: 'http://more.handlino.com/',
+    cardType: SC.CardType.Question,
+    objects: { '124': '124' },
+  },
+};
+
+const boxes: { [key: string]: SB.BoxData } = {
+  '461': {
+    id: '461',
     createdAt: 0,
     updatedAt: 0,
     title: '安睡在天地',
     // tslint:disable-next-line:max-line-length
     summary: '將黑夜都遺忘在沙灘上光著我的腳丫在沙灘上光著我的腳丫姊姊你長得實在好漂亮對著每個人說撒哇低咖就這一次',
-    contains: {
-      '125': {
-        id: '125',
-        x: 250,
-        y: 80,
-        width: 280,
-        height: 150,
-        zIndex: 0,
-        objectType: SO.ObjectType.Card,
-        belongsTo: '127',
-        card: '458',
-        createdAt: 0,
-        updatedAt: 0,
-        title: '那麼我為什麼要叫他們不要講話？',
-        // tslint:disable-next-line:max-line-length
-        summary: '在學期末之後，在學期末之後，老師好我是網頁設計課的同學，在學期末之後，但從頭到尾那些網頁也不是他自己寫的',
-        saidBy: '宏達電主打HTC，南投鹿神祭，全大運',
-        stakeholder: '業者書讀得不多沒關係',
-        url: 'http://more.handlino.com/',
-        cardType: SC.CardType.Answer,
-      },
-      '124': {
-        id: '124',
-        x: 50,
-        y: 100,
-        width: 280,
-        height: 150,
-        zIndex: 0,
-        objectType: SO.ObjectType.Card,
-        belongsTo: '127',
-        card: '457',
-        createdAt: 0,
-        updatedAt: 0,
-        title: '現在我不敢肯定，我只要妳。',
-        // tslint:disable-next-line:max-line-length
-        summary: '《蘋果娛樂Online》線上直播，就讓我們繼續看下去...有想過女兒的心情嗎...老婆好大方...小編看傻眼惹。宏達電主打HTC，南投鹿神祭',
-        saidBy: '必須跟風險投資共擔風險',
-        stakeholder: '做企業不是做俠客',
-        url: 'http://more.handlino.com/',
-        cardType: SC.CardType.Question,
-      },
-    },
+    objects: { '127': '127' },
+    contains: {},
   },
-  {
-    id: '137',
-    x: 50,
-    y: 200,
-    width: 280,
-    height: 100,
-    zIndex: 0,
-    objectType: SO.ObjectType.Box,
-    box: '461',
+  '462': {
+    id: '462',
     createdAt: 0,
     updatedAt: 0,
     title: '我心裏卻并不快爽',
     // tslint:disable-next-line:max-line-length
     summary: '不在乎我的過往，安睡在天地的大房間。',
     contains: {},
+    objects: { '137': '137' },
   },
-];
+};
+
+const objects: { [key: string]: SO.ObjectData } = {
+  '123': {
+    id: '123',
+    createdAt: 0,
+    updatedAt: 0,
+    x: 10,
+    y: 30,
+    width: 280,
+    height: 150,
+    zIndex: 0,
+    objectType: SO.ObjectType.Card,
+    data: '456',
+  },
+  '124': {
+    id: '124',
+    createdAt: 0,
+    updatedAt: 0,
+    x: 50,
+    y: 100,
+    width: 280,
+    height: 150,
+    zIndex: 0,
+    objectType: SO.ObjectType.Card,
+    belongsTo: '127',
+    data: '457',
+  },
+  '125': {
+    id: '125',
+    createdAt: 0,
+    updatedAt: 0,
+    x: 250,
+    y: 80,
+    width: 280,
+    height: 150,
+    zIndex: 0,
+    objectType: SO.ObjectType.Card,
+    belongsTo: '127',
+    data: '458',
+  },
+  '126': {
+    id: '126',
+    createdAt: 0,
+    updatedAt: 0,
+    x: 350,
+    y: 150,
+    width: 280,
+    height: 150,
+    zIndex: 0,
+    objectType: SO.ObjectType.Card,
+    data: '459',
+  },
+  '127': {
+    id: '127',
+    createdAt: 0,
+    updatedAt: 0,
+    x: 550,
+    y: 150,
+    width: 280,
+    height: 100,
+    zIndex: 0,
+    objectType: SO.ObjectType.Box,
+    data: '461',
+  },
+  '137': {
+    id: '137',
+    createdAt: 0,
+    updatedAt: 0,
+    x: 50,
+    y: 200,
+    width: 280,
+    height: 100,
+    zIndex: 0,
+    objectType: SO.ObjectType.Box,
+    data: '462',
+  },
+};
 
 class MapPage extends React.Component {
   render() {
     return (
       <Container text>
-        <Map width={960} height={600} objects={objects} />
+        <Map width={960} height={600} objects={objects} cards={cards} boxes={boxes} />
       </Container>
     );
   }

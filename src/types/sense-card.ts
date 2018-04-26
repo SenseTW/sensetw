@@ -1,6 +1,6 @@
-import { ObjectID, emptyObjectData } from './sense-object';
+import { ObjectID } from './sense-object';
 import { ActionUnion, emptyAction } from './index';
-import { objectId } from './utils';
+import { objectId, TimeStamp } from './utils';
 
 // sense card data
 export type CardID = string;
@@ -90,7 +90,7 @@ export const sampleCardList: CardData[] = [{
 }];
 
 export const sampleCardMap = {};
-sampleCardList.forEach((c) => { sampleCardMap[c.card] = c; });
+sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
 
 // sense card actions
 // TODO: should be UPDATE_OBJECT_TITLE
