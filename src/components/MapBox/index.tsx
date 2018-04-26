@@ -23,7 +23,10 @@ const titlePadding = 5;
 
 function MapBox(props: Props) {
   const {id, x, y, width, height} = props.mapObject;
-  const {title} = props.box;
+
+  // const {title} = props.box;
+  const title = 'Foo';
+
   const toggleSelection = props.toggleSelection || noop;
   return (
     <Group x={x} y={y} draggable={true} key={id} onClick={() => toggleSelection(id)}>

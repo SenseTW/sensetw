@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Container } from 'semantic-ui-react';
-import Map from '../Map';
-import * as SO from '../../types/sense-object';
+import Map from '../../containers/Map';
 import * as SC from '../../types/sense-card';
 import * as SB from '../../types/sense-box';
 
@@ -83,88 +82,17 @@ const boxes: { [key: string]: SB.BoxData } = {
   },
 };
 
-const objects: { [key: string]: SO.ObjectData } = {
-  '123': {
-    id: '123',
-    createdAt: 0,
-    updatedAt: 0,
-    x: 10,
-    y: 30,
-    width: 280,
-    height: 150,
-    zIndex: 0,
-    objectType: SO.ObjectType.Card,
-    data: '456',
-  },
-  '124': {
-    id: '124',
-    createdAt: 0,
-    updatedAt: 0,
-    x: 50,
-    y: 100,
-    width: 280,
-    height: 150,
-    zIndex: 0,
-    objectType: SO.ObjectType.Card,
-    belongsTo: '127',
-    data: '457',
-  },
-  '125': {
-    id: '125',
-    createdAt: 0,
-    updatedAt: 0,
-    x: 250,
-    y: 80,
-    width: 280,
-    height: 150,
-    zIndex: 0,
-    objectType: SO.ObjectType.Card,
-    belongsTo: '127',
-    data: '458',
-  },
-  '126': {
-    id: '126',
-    createdAt: 0,
-    updatedAt: 0,
-    x: 350,
-    y: 150,
-    width: 280,
-    height: 150,
-    zIndex: 0,
-    objectType: SO.ObjectType.Card,
-    data: '459',
-  },
-  '127': {
-    id: '127',
-    createdAt: 0,
-    updatedAt: 0,
-    x: 550,
-    y: 150,
-    width: 280,
-    height: 100,
-    zIndex: 0,
-    objectType: SO.ObjectType.Box,
-    data: '461',
-  },
-  '137': {
-    id: '137',
-    createdAt: 0,
-    updatedAt: 0,
-    x: 50,
-    y: 200,
-    width: 280,
-    height: 100,
-    zIndex: 0,
-    objectType: SO.ObjectType.Box,
-    data: '462',
-  },
-};
-
 class MapPage extends React.Component {
   render() {
     return (
       <Container text>
-        <Map width={960} height={600} objects={objects} cards={cards} boxes={boxes} />
+        <Map
+          id="cjgdo1yhj0si501559s0hgw2a"
+          width={960}
+          height={600}
+          cards={cards}
+          boxes={boxes}
+        />
       </Container>
     );
   }

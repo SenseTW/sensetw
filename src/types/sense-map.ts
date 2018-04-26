@@ -55,15 +55,6 @@ const DELETE_OBJECT = 'DELETE_OBJECT';
 type DeleteObjectAction = { type: typeof DELETE_OBJECT };
 const deleteObject = (id: ObjectID): DeleteObjectAction => ({ type: DELETE_OBJECT });
 
-const MOVE_OBJECT = 'MOVE_OBJECT';
-const moveObject = (id: ObjectID, position: PositionInMap) => ({
-  type: MOVE_OBJECT as typeof MOVE_OBJECT,
-  payload: {
-    id,
-    position
-  }
-});
-
 const ADD_CARD_TO_BOX = 'ADD_CARD_TO_BOX';
 type AddCardToBoxAction = { type: typeof ADD_CARD_TO_BOX };
 const addCardToBox = (cardID: CardID, boxID: BoxID): AddCardToBoxAction => ({ type: ADD_CARD_TO_BOX });
@@ -96,7 +87,6 @@ export const actions = {
   updateCard,
   createBox,
   deleteObject,
-  moveObject,
   addCardToBox,
   removeCardFromBox,
   openBox,
@@ -120,8 +110,6 @@ export const reducer = (state: State = initial, action: any): State => {
       return Object.assign({}, state, {
         cards: [...state.cards, ...action.payload.cards]
       });
-    case MOVE_OBJECT:
-      return state;
     default:
       return state;
   }
