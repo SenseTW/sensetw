@@ -4,6 +4,7 @@ import * as SM from './sense-map';
 import * as SO from './sense-object';
 import * as SC from './sense-card';
 import * as SL from './selection';
+import * as OE from './object-editor';
 
 export const emptyAction = { type: null };
 // tslint:disable-next-line:no-any
@@ -16,6 +17,7 @@ export type State = {
   senseMap: SM.State,
   senseObject: SO.State,
   selection: SL.State,
+  editor: OE.State
 };
 
 export const initial: State = {
@@ -23,20 +25,23 @@ export const initial: State = {
   senseMap: SM.initial,
   senseObject: SO.initial,
   selection: SL.initial,
+  editor: OE.initial
 };
 
 export type Action
   = ActionUnion<typeof C.actions>
   | ActionUnion<typeof SM.actions>
   | SO.Action
-  | ActionUnion<typeof SC.actions>
-  | ActionUnion<typeof SL.actions>;
+  | SC.Action
+  | ActionUnion<typeof SL.actions>
+  | OE.Action;
 
 export const actions = {
   counter: C.actions,
   senseMap: SM.actions,
   senseObject: SO.actions,
   selection: SL.actions,
+  editor: OE.actions
 };
 
 export type Dispatch = ReduxDispatch<Action>;
@@ -48,4 +53,5 @@ export const reducer = combineReducers({
   senseMap: SM.reducer,
   senseObject: SO.reducer,
   selection: SL.reducer,
+  editor: OE.reducer
 });

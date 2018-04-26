@@ -43,10 +43,6 @@ const loadCards = (mapId: MapID) => (dispatch: ReduxDispatch<State>) => {
       });
 };
 
-const UPDATE_CARD = 'UPDATE_CARD';
-type UpdateCardAction = { type: typeof UPDATE_CARD, id: CardID, d: CardData };
-const updateCard = (id: CardID, d: CardData): UpdateCardAction => ({ type: UPDATE_CARD, id, d });
-
 const CREATE_BOX = 'CREATE_BOX';
 type CreateBoxAction = { type: typeof CREATE_BOX };
 const createBox = (pos: PositionInMap): CreateBoxAction => ({ type: CREATE_BOX });
@@ -84,7 +80,6 @@ export const actions = {
   addCards,
   loadCards,
   createCard,
-  updateCard,
   createBox,
   deleteObject,
   addCardToBox,

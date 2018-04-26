@@ -4,6 +4,7 @@ import { CardID, CardData, stringToType as stringToCardType } from './sense-card
 import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp, arrayToObject } from './utils';
+import { ActionUnion } from '.';
 
 export type ObjectID = string;
 
@@ -111,11 +112,25 @@ const updateObjects =
     payload: objects,
   });
 
+const UPDATE_CARD = 'UPDATE_CARD';
+const updateCard =
+  (id: CardID, card: CardData) => ({
+    type: UPDATE_CARD as typeof UPDATE_CARD,
+    payload: { id, card }
+  });
+
 const UPDATE_CARDS = 'UPDATE_CARDS';
 const updateCards =
   (cards: typeof initial.cards) => ({
     type: UPDATE_CARDS as typeof UPDATE_CARDS,
     payload: cards,
+  });
+
+const UPDATE_BOX = 'UPDATE_BOX';
+const updateBox =
+  (id: BoxID, box: BoxData) => ({
+    type: UPDATE_BOX as typeof UPDATE_BOX,
+    payload: { id, box }
   });
 
 const UPDATE_BOXES = 'UPDATE_BOXES';
@@ -205,9 +220,19 @@ const moveObject =
       })));
   };
 
+export const syncActions = {
+  updateObjects,
+  updateCard,
+  updateCards,
+  updateBox,
+  updateBoxes
+};
+
 export const actions = {
   updateObjects,
+  updateCard,
   updateCards,
+  updateBox,
   updateBoxes,
   loadObjects,
   loadCards,
@@ -215,10 +240,7 @@ export const actions = {
   moveObject,
 };
 
-export type Action
-  = ReturnType<typeof updateObjects>
-  | ReturnType<typeof updateCards>
-  | ReturnType<typeof updateBoxes>;
+export type Action = ActionUnion<typeof syncActions>;
 
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
@@ -227,10 +249,32 @@ export const reducer = (state: State = initial, action: Action): State => {
         objects: Object.assign({}, state.objects, action.payload),
       });
     }
+    case UPDATE_CARD: {
+      const { id, card } = action.payload;
+
+      return {
+        ...state,
+        cards: {
+          ...state.cards,
+          [id]: card
+        }
+      };
+    }
     case UPDATE_CARDS: {
       return Object.assign({}, state, {
         cards: Object.assign({}, state.cards, action.payload),
       });
+    }
+    case UPDATE_BOX: {
+      const { id, box } = action.payload;
+
+      return {
+        ...state,
+        boxes: {
+          ...state.boxes,
+          [id]: box
+        }
+      };
     }
     case UPDATE_BOXES: {
       return Object.assign({}, state, {
