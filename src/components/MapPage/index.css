@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.map-page .sidebar {
+  background-color: #fff;
+}
+
 .map-page .ui.menu {
   position: absolute;
   top: 56px;

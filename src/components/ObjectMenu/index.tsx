@@ -36,6 +36,12 @@ class ObjectMenu extends React.PureComponent<Props> {
         >
           編輯
         </Menu.Item>
+        <Menu.Item
+          name="close"
+          onClick={() => actions.selectObject(null)}
+        >
+          關閉
+        </Menu.Item>
       </Menu>
     );
   }
