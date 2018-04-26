@@ -1,4 +1,4 @@
-import { ObjectType, BaseObjectData, emptyObjectData } from './sense-object';
+import { ObjectID, emptyObjectData } from './sense-object';
 import { ActionUnion, emptyAction } from './index';
 import { objectId } from './utils';
 
@@ -27,9 +27,13 @@ export const typeToString = (type: CardType) => {
   }
 };
 
-export interface CardData extends BaseObjectData {
-  objectType: ObjectType.Card;
-  card: CardID;
+export interface CardData {
+  id: CardID;
+  createdAt: TimeStamp;
+  updatedAt: TimeStamp;
+  objects: { [key: string]: ObjectID };
+  title: string;
+  summary: string;
   saidBy: string;
   stakeholder: string;
   url: string;
@@ -37,9 +41,12 @@ export interface CardData extends BaseObjectData {
 }
 
 export const emptyCardData: CardData = {
-  ...emptyObjectData,
-  objectType: ObjectType.Card,
-  card: '0',
+  id: '0',
+  createdAt: 0,
+  updatedAt: 0,
+  objects: {},
+  title: '',
+  summary: '',
   saidBy: '',
   stakeholder: '',
   url: 'http://example.com',
@@ -48,11 +55,10 @@ export const emptyCardData: CardData = {
 
 const now = +Date.now();
 export const sampleCardList: CardData[] = [{
-  ...emptyObjectData,
-  objectType: ObjectType.Card,
-  card: objectId(),
+  id: objectId(),
   createdAt: now,
   updatedAt: now,
+  objects: {},
   title: '這是一張卡',
   summary: '這是卡片的內容',
   saidBy: '',
@@ -60,11 +66,10 @@ export const sampleCardList: CardData[] = [{
   url: 'http://example.com',
   cardType: CardType.Question
 }, {
-  ...emptyObjectData,
-  objectType: ObjectType.Card,
-  card: objectId(),
+  id: objectId(),
   createdAt: now,
   updatedAt: now,
+  objects: {},
   title: '這是另外一張卡',
   summary: '這是另外一張卡的內容',
   saidBy: '',
@@ -72,11 +77,10 @@ export const sampleCardList: CardData[] = [{
   url: 'http://example.com',
   cardType: CardType.Answer
 }, {
-  ...emptyObjectData,
-  objectType: ObjectType.Card,
-  card: objectId(),
+  id: objectId(),
   createdAt: now,
   updatedAt: now,
+  objects: {},
   title: '這是一個 Note',
   summary: '這是 Note 的內容',
   saidBy: '',
