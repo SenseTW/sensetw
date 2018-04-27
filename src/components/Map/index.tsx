@@ -21,6 +21,8 @@ export interface DispatchFromProps {
   actions: {
     toggleObjectSelection(id: SO.ObjectID): T.Action,
     moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
+    addCardToBox(card: SO.ObjectID, box: SB.BoxID): Promise<T.Action>,
+    removeCardFromBox(card: SO.ObjectID): Promise<T.Action>,
   };
 }
 

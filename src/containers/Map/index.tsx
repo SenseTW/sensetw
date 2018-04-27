@@ -5,7 +5,7 @@ import * as CO from '../../components/Map';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 // import * as SC from '../../types/sense-card';
-// import * as SB from '../../types/sense-box';
+import * as SB from '../../types/sense-box';
 import * as T from '../../types';
 
 interface PropsFromParent extends CO.PropsFromParent {
@@ -19,6 +19,8 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     loadCards(id: SM.MapID): Promise<T.Action>,
     loadBoxes(id: SM.MapID): Promise<T.Action>,
     moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
+    addCardToBox(card: SO.ObjectID, box: SB.BoxID): Promise<T.Action>,
+    removeCardFromBox(card: SO.ObjectID): Promise<T.Action>,
   };
 }
 
@@ -55,6 +57,10 @@ export default connect<CO.StateFromProps, DispatchFromProps, PropsFromParent>(
         dispatch(T.actions.senseObject.loadBoxes(id)),
       moveObject: (id: SO.ObjectID, x: number, y: number) =>
         dispatch(T.actions.senseObject.moveObject(id, x, y)),
+      addCardToBox: (card: SO.ObjectID, box: SB.BoxID) =>
+        dispatch(T.actions.senseObject.addCardToBox(card, box)),
+      removeCardFromBox: (card: SO.ObjectID) =>
+        dispatch(T.actions.senseObject.removeCardFromBox(card)),
     }
   })
 )(Map);

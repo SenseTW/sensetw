@@ -219,6 +219,48 @@ const moveObject =
       })));
   };
 
+const addCardToBox =
+  (cardObject: ObjectID, box: BoxID) =>
+  (dispatch: ReduxDispatch<State>) => {
+    const query = `
+      mutation AddCardToBox($cardObject: ID!, $box: ID!) {
+        updateObject(id: $cardObject, belongsToId: $box) {
+          ...objectFields
+        }
+      }
+      fragment objectFields on Object {
+        id, createdAt, updatedAt, x, y, width, height, zIndex,
+        objectType, card { id } , box { id }, belongsTo { id }
+      }
+    `;
+    const variables = { cardObject, box };
+    return client.request(query, variables)
+      .then(({ updateObject }) => dispatch(updateObjects({
+        [updateObject.id]: toObjectData(updateObject),
+      })));
+  };
+
+const removeCardFromBox =
+  (cardObject: ObjectID) =>
+  (dispatch: ReduxDispatch<State>) => {
+    const query = `
+      mutation RemoveCardFromBox($cardObject: ID!) {
+        updateObject(id: $cardObject, belongsToId: null) {
+          ...objectFields
+        }
+      }
+      fragment objectFields on Object {
+        id, createdAt, updatedAt, x, y, width, height, zIndex,
+        objectType, card { id } , box { id }, belongsTo { id }
+      }
+    `;
+    const variables = { cardObject };
+    return client.request(query, variables)
+      .then(({ updateObject }) => dispatch(updateObjects({
+        [updateObject.id]: toObjectData(updateObject),
+      })));
+  };
+
 export const syncActions = {
   updateObjects,
   updateCard,
@@ -237,6 +279,8 @@ export const actions = {
   loadCards,
   loadBoxes,
   moveObject,
+  addCardToBox,
+  removeCardFromBox,
 };
 
 export type Action = ActionUnion<typeof syncActions>;
