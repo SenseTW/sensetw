@@ -16,10 +16,10 @@ interface Props {
   objectType: SO.ObjectType;
   data: Data;
   onChange? (value: Data): void;
+  onCancel? (): void;
 }
 
 interface State {
-  isEditing: boolean;
   data: Data;
 }
 
@@ -37,19 +37,16 @@ class ObjectContent extends React.Component<Props, State> {
     switch (objectType) {
       case SO.ObjectType.CARD:
         this.state = {
-          isEditing: false,
           data: SC.reducer(data as SC.CardData)
         };
         break;
       case SO.ObjectType.BOX:
         this.state = {
-          isEditing: false,
           data: SB.reducer(data as SB.BoxData)
         };
         break;
       default:
         this.state = {
-          isEditing: false,
           data: SC.emptyCardData
         };
     }
@@ -74,12 +71,6 @@ class ObjectContent extends React.Component<Props, State> {
         default:
       }
     }
-  }
-
-  handleEdit = () => {
-    this.setState({
-      isEditing: true
-    });
   }
 
   handleChange = (action: SC.Action | SB.Action) => {
@@ -120,10 +111,6 @@ class ObjectContent extends React.Component<Props, State> {
     if (onChange) {
       onChange(this.state.data);
     }
-
-    this.setState({
-      isEditing: false
-    });
   }
 
   handleCancel = () => {
@@ -132,13 +119,11 @@ class ObjectContent extends React.Component<Props, State> {
     switch (objectType) {
       case SO.ObjectType.CARD:
         this.setState({
-          isEditing: false,
           data: SC.reducer(data as SC.CardData)
         });
         break;
       case SO.ObjectType.BOX:
         this.setState({
-          isEditing: false,
           data: SB.reducer(data as SB.BoxData)
         });
         break;
@@ -147,8 +132,8 @@ class ObjectContent extends React.Component<Props, State> {
   }
 
   render() {
-    const { objectType } = this.props;
-    const { isEditing, data } = this.state;
+    const { objectType, onCancel } = this.props;
+    const { data } = this.state;
 
     let content;
     switch (objectType) {
@@ -156,7 +141,6 @@ class ObjectContent extends React.Component<Props, State> {
         content = (
           <CardContent
             data={data as SC.CardData}
-            isEditing={isEditing}
             onKeyUp={this.handleKey}
             onChange={action => this.handleChange(action)}
           />
@@ -166,7 +150,6 @@ class ObjectContent extends React.Component<Props, State> {
         content = (
           <BoxContent
             data={data as SB.BoxData}
-            isEditing={isEditing}
             onKeyUp={this.handleKey}
             onChange={action => this.handleChange(action)}
           />
@@ -176,20 +159,25 @@ class ObjectContent extends React.Component<Props, State> {
     }
 
     return (
-      <div className="card-content">
+      <div className="object-content">
         {content}
         <Divider />
-        <div className="card-content__actions">{
-          isEditing
-            ? <Button.Group>
-                <Button onClick={this.handleCancel}>取消</Button>
-                <Button.Or />
-                <Button positive onClick={this.handleSave}>完成</Button>
-              </Button.Group>
-            : <Button primary onClick={this.handleEdit}>
-                編輯
-              </Button>
-        }</div>
+        <div className="object-content__actions">
+          <Button.Group>
+            <Button
+              onClick={() => {
+                this.handleCancel();
+                if (typeof onCancel === 'function') {
+                  onCancel();
+                }
+              }}
+            >
+              取消
+            </Button>
+            <Button.Or />
+            <Button positive onClick={this.handleSave}>完成</Button>
+          </Button.Group>
+        </div>
       </div>
     );
   }

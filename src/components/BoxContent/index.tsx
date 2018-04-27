@@ -1,10 +1,9 @@
 import * as React from 'react';
-import { Header, Input } from 'semantic-ui-react';
+import { Form, TextArea, Input } from 'semantic-ui-react';
 import * as SB from '../../types/sense-box';
 
 interface Props {
   data: SB.BoxData;
-  isEditing: boolean;
   onKeyUp? (e: React.KeyboardEvent<HTMLElement>): void;
   onChange? (action: SB.Action): void;
 }
@@ -12,70 +11,33 @@ interface Props {
 class BoxContent extends React.PureComponent<Props> {
   static defaultProps = {
     data: SB.emptyBoxData,
-    isEditing: false
   };
 
-  titleInput: Input | null;
-
-  constructor(props: Props) {
-    super(props);
-
-    this.titleInput = null;
-  }
-
-  componentDidUpdate(prevProps: Props) {
-    if (prevProps.isEditing === false && this.props.isEditing === true) {
-      setImmediate(() => {
-        if (this.titleInput) {
-          this.titleInput.focus();
-        }
-      });
-    }
-  }
-
   render() {
-    const { children, data, isEditing, onKeyUp, onChange } = this.props;
+    const { children, data, onKeyUp, onChange } = this.props;
     const { title, summary } = data;
 
-    const titleSection =
-      isEditing
-        ? (
+    return (
+      <Form className="box-content">
+        <Form.Field className="box-content__summary">
+          <label>Summary</label>
+          <TextArea
+            placeholder="Box 描述"
+            value={summary}
+            onChange={e => onChange && onChange(SB.updateSummary(e.currentTarget.value))}
+          />
+        </Form.Field>
+        <Form.Field className="box-content__title">
+          <label>Title</label>
           <Input
-            fluid
-            transparent
-            ref={e => this.titleInput = e}
             placeholder="Box 標題"
             value={title}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SB.updateTitle(e.currentTarget.value))}
           />
-        )
-        : title;
-
-    const summarySection =
-      isEditing
-        ? (
-          <Input
-            fluid
-            transparent
-            placeholder="Box 描述"
-            value={summary}
-            onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SB.updateSummary(e.currentTarget.value))}
-          />
-        )
-        : summary;
-
-    return (
-      <div className="box-content">
-        <Header as="h1" className="box-content__header">
-          {titleSection}
-        </Header>
-        <div className="box-content__summary">
-          {summarySection}
-        </div>
+        </Form.Field>
         {children}
-      </div>
+      </Form>
     );
   }
 }

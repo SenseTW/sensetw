@@ -1,3 +1,15 @@
-.card-content {
+.object-content {
   padding: 1em;
+  color: #4a4a4a;
+}
+
+.object-content .ui.form .field>label {
+  color: #2d323a;
+}
+
+.object-content .ui.form .ui.input input,
+.object-content .ui.form textarea {
+  border-radius: 10px;
+  border: solid 1px #d6dee9;
+  background-color: #fff;
 }

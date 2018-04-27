@@ -8,6 +8,7 @@ import * as T from '../../types';
 import * as SO from '../../types/sense-object';
 import * as SC from '../../types/sense-card';
 import * as SB from '../../types/sense-box';
+import * as OE from '../../types/object-editor';
 import './index.css';
 
 interface StateFromProps {
@@ -17,6 +18,7 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
+    selectObject: typeof OE.actions.selectObject,
     updateCard: typeof SO.actions.updateCard,
     updateBox: typeof SO.actions.updateBox
   };
@@ -79,6 +81,7 @@ class MapPage extends React.Component<Props, State> {
                   default:
                 }
               }}
+              onCancel={() => actions.selectObject(null)}
             />
         }
         </Sidebar>
@@ -121,6 +124,7 @@ export default connect(
   },
   (dispatch: T.Dispatch) => ({
     actions: {
+      selectObject: (id: SO.ObjectID) => dispatch(OE.actions.selectObject(id)),
       updateCard: (id: SC.CardID, card: SC.CardData) => dispatch(SO.actions.updateCard(id, card)),
       updateBox: (id: SB.BoxID, box: SB.BoxData) => dispatch(SO.actions.updateBox(id, box))
     }
