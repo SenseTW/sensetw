@@ -213,8 +213,6 @@ const moveObject =
     `;
     const variables = { id, x, y };
     return client.request(query, variables)
-      // tslint:disable-next-line:no-console
-      .then((data) => { console.log(data); return data; })
       .then(({ updateObject }) => dispatch(updateObjects({
         [updateObject.id]: toObjectData(updateObject),
       })));
