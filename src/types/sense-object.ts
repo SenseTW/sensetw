@@ -102,15 +102,15 @@ const toBoxData: (b: any) => BoxData =
     summary: b.summary,
     objects: b.objects.reduce(
       // tslint:disable-next-line:no-any
-      (acc: any, id: string) => {
-        acc[id] = id;
+      (acc: any, o: any) => {
+        acc[o.id] = o;
         return acc;
       },
       {}),
     contains: b.contains.reduce(
       // tslint:disable-next-line:no-any
-      (acc: any, id: string) => {
-        acc[id] = id;
+      (acc: any, o: any) => {
+        acc[o.id] = o;
         return acc;
       },
       {}),

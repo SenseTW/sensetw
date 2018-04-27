@@ -42,6 +42,8 @@ class Map extends React.Component<Props> {
     let componentProps = this.props;
     if (this.props.scope.type === SM.MapScopeType.BOX && !!this.props.scope.box) {
       const box = this.props.boxes[this.props.scope.box];
+      // tslint:disable-next-line:no-console
+      console.log(box);
       if (!!box) {
         const objects = Object.keys(box.contains).reduce(
           (acc, id) => {
