@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Menu } from 'semantic-ui-react';
 import { RouteComponentProps, withRouter, Link } from 'react-router-dom';
+import * as R from '../../types/routes';
 
 // tslint:disable-next-line:no-any
 class Header extends React.PureComponent<RouteComponentProps<any>> {
@@ -11,17 +12,17 @@ class Header extends React.PureComponent<RouteComponentProps<any>> {
       <Menu fixed="top">
         <Menu.Item
           as={Link}
-          to="/"
-          name="main"
-          active={location.pathname === '/'}
+          to={R.index}
+          name="index"
+          active={location.pathname === R.index}
         >
           sense.tw
         </Menu.Item>
         <Menu.Item
           as={Link}
-          to="/map"
+          to={R.map}
           name="map"
-          active={location.pathname === '/map'}
+          active={location.pathname === R.map}
         >
           map
         </Menu.Item>

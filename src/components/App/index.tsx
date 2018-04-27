@@ -6,6 +6,7 @@ import {
 import Header from '../Header';
 import MainPage from '../MainPage';
 import MapPage from '../MapPage';
+import * as R from '../../types/routes';
 import './index.css';
 
 class App extends React.Component {
@@ -14,8 +15,8 @@ class App extends React.Component {
       <Router>
         <div className="App">
           <Header />
-          <Route exact path="/" component={MainPage} />
-          <Route exact path="/map" component={MapPage} />
+          <Route exact path={R.index} component={MainPage} />
+          <Route exact path={R.map} component={MapPage} />
         </div>
       </Router>
     );
