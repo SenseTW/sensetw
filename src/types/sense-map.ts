@@ -49,7 +49,8 @@ export type State = {
 export const initial: State = {
   scope: {
     type: MapScopeType.FULL_MAP,
-    // box: 'cjgg9aq070w630155uqvmrslh',
+    // type: MapScopeType.BOX,
+    // box: 'cjgg9ar6x0w660155wi4s2sp7'
   },
 };
 

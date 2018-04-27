@@ -77,7 +77,6 @@ function renderObject(o: SO.ObjectData, props: Props) {
 
 export function Map(props: Props) {
   const objects = Object.values(props.objects)
-    .filter(o => !o.belongsTo)
     .map(o => renderObject(o, props));
   return (
     <Stage width={props.width} height={props.height}>

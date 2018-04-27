@@ -42,17 +42,27 @@ class Map extends React.Component<Props> {
     let componentProps = this.props;
     if (this.props.scope.type === SM.MapScopeType.BOX && !!this.props.scope.box) {
       const box = this.props.boxes[this.props.scope.box];
-      // tslint:disable-next-line:no-console
-      console.log(box);
       if (!!box) {
         const objects = Object.keys(box.contains).reduce(
           (acc, id) => {
-            acc[id] = this.props.objects[id];
+            if (!!this.props.objects[id]) {
+              acc[id] = this.props.objects[id];
+            }
             return acc;
           },
           {});
         componentProps = { ...this.props, objects };
       }
+    } else {
+      const objects = Object.values(this.props.objects)
+        .filter(o => !o.belongsTo)
+        .reduce(
+          (acc, o) => {
+            acc[o.id] = o;
+            return acc;
+          },
+          {});
+      componentProps = { ...this.props, objects };
     }
     return <CO.Map {...componentProps} />;
   }
