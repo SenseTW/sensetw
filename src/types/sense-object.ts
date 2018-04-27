@@ -73,6 +73,7 @@ const toObjectData: (o: any) => ObjectData =
     zIndex: o.zIndex,
     objectType: stringToType(o.objectType as string),
     data: toData(o),
+    belongsTo: !!o.belongsTo ? o.belongsTo.id : null,
   } as ObjectData);
 
 // tslint:disable-next-line:no-any
@@ -151,7 +152,7 @@ const loadObjects =
       }
       fragment objectFields on Object {
         id, createdAt, updatedAt, x, y, width, height, zIndex,
-        objectType, card { id } , box { id }
+        objectType, card { id } , box { id }, belongsTo { id }
       }
     `;
     const variables = { id };
