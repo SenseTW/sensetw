@@ -12,6 +12,10 @@ interface PropsFromParent extends CO.PropsFromParent {
   id: SM.MapID;
 }
 
+interface StateFromProps extends CO.StateFromProps {
+  scope: { type: SM.MapScopeType, box?: SB.BoxID };
+}
+
 interface DispatchFromProps extends CO.DispatchFromProps {
   actions: {
     toggleObjectSelection(id: SO.ObjectID): T.Action,
@@ -24,7 +28,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
   };
 }
 
-type Props = CO.StateFromProps & DispatchFromProps & PropsFromParent;
+type Props = StateFromProps & DispatchFromProps & PropsFromParent;
 
 class Map extends React.Component<Props> {
   componentDidMount() {
@@ -34,13 +38,27 @@ class Map extends React.Component<Props> {
   }
 
   render() {
-    return <CO.Map {...this.props} />;
+    let componentProps = this.props;
+    if (this.props.scope.type === SM.MapScopeType.BOX && !!this.props.scope.box) {
+      const box = this.props.boxes[this.props.scope.box];
+      if (!!box) {
+        const objects = Object.keys(box.contains).reduce(
+          (acc, id) => {
+            acc[id] = this.props.objects[id];
+            return acc;
+          },
+          {});
+        componentProps = { ...this.props, objects };
+      }
+    }
+    return <CO.Map {...componentProps} />;
   }
 }
 
-export default connect<CO.StateFromProps, DispatchFromProps, PropsFromParent>(
+export default connect<StateFromProps, DispatchFromProps, PropsFromParent>(
   (state: T.State) => ({
     selection: state.selection,
+    scope: state.senseMap.scope,
     objects: state.senseObject.objects,
     cards: state.senseObject.cards,
     boxes: state.senseObject.boxes,

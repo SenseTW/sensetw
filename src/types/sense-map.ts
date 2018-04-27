@@ -3,6 +3,11 @@ import { BoxID } from './sense-box';
 
 export type MapID = string;
 
+export enum MapScopeType {
+  FULL_MAP = 'FULL_MAP',
+  BOX      = 'BOX',
+}
+
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
@@ -32,9 +37,17 @@ export const actions = {
 export type Action = ActionUnion<typeof actions>;
 
 export type State = {
+  scope: {
+    type: MapScopeType,
+    box?: BoxID,
+  },
 };
 
 export const initial: State = {
+  scope: {
+    type: MapScopeType.BOX,
+    box: 'cjgg9aq070w630155uqvmrslh',
+  },
 };
 
 // tslint:disable-next-line:no-any

@@ -100,10 +100,20 @@ const toBoxData: (b: any) => BoxData =
     updatedAt: 0,
     title: b.title,
     summary: b.summary,
-    // tslint:disable-next-line:no-any
-    objects: b.objects.map((o: any) => o.id),
-    // tslint:disable-next-line:no-any
-    contains: b.contains.map((o: any) => o.id),
+    objects: b.objects.reduce(
+      // tslint:disable-next-line:no-any
+      (acc: any, id: string) => {
+        acc[id] = id;
+        return acc;
+      },
+      {}),
+    contains: b.contains.reduce(
+      // tslint:disable-next-line:no-any
+      (acc: any, id: string) => {
+        acc[id] = id;
+        return acc;
+      },
+      {}),
   } as BoxData);
 
 const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
