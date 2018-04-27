@@ -12,12 +12,15 @@ export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
 const OPEN_BOX = 'OPEN_BOX';
-type OpenBoxAction = { type: typeof OPEN_BOX };
-const openBox = (boxID: BoxID): OpenBoxAction => ({ type: OPEN_BOX });
+const openBox = (box: BoxID) => ({
+  type: OPEN_BOX as typeof OPEN_BOX,
+  payload: { box },
+});
 
 const CLOSE_BOX = 'CLOSE_BOX';
-type CloseBoxAction = { type: typeof CLOSE_BOX };
-const closeBox = (boxID: BoxID): CloseBoxAction => ({ type: CLOSE_BOX });
+const closeBox = (boxID: BoxID) => ({
+  type: CLOSE_BOX as typeof CLOSE_BOX,
+});
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 type PanViewportAction = { type: typeof PAN_VIEWPORT };
@@ -45,14 +48,20 @@ export type State = {
 
 export const initial: State = {
   scope: {
-    type: MapScopeType.BOX,
-    box: 'cjgg9aq070w630155uqvmrslh',
+    type: MapScopeType.FULL_MAP,
+    // box: 'cjgg9aq070w630155uqvmrslh',
   },
 };
 
 // tslint:disable-next-line:no-any
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
+    case OPEN_BOX: {
+      return { ...state, ...{ scope: { type: MapScopeType.BOX, box: action.payload.box } } };
+    }
+    case CLOSE_BOX: {
+      return { ...state, ...{ scope: { type: MapScopeType.FULL_MAP } } };
+    }
     default:
       return state;
   }

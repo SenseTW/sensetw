@@ -23,6 +23,7 @@ export interface DispatchFromProps {
     moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
     addCardToBox(card: SO.ObjectID, box: SB.BoxID): Promise<T.Action>,
     removeCardFromBox(card: SO.ObjectID): Promise<T.Action>,
+    openBox(box: SB.BoxID): T.Action,
   };
 }
 
@@ -36,6 +37,7 @@ export type Props = StateFromProps & DispatchFromProps & PropsFromParent;
 function renderObject(o: SO.ObjectData, props: Props) {
   const toggleSelection = props.actions.toggleObjectSelection;
   const moveObject = props.actions.moveObject;
+  const openBox = props.actions.openBox;
   switch (o.objectType) {
     case SO.ObjectType.NONE: {
       return <Group />;
@@ -64,6 +66,7 @@ function renderObject(o: SO.ObjectData, props: Props) {
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
           moveObject={moveObject}
+          openBox={openBox}
         />);
     }
     default: {

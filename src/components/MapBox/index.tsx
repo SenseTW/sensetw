@@ -12,6 +12,7 @@ interface Props {
   selected?: Boolean;
   toggleSelection?(id: SO.ObjectID): void;
   moveObject?(id: SO.ObjectID, x: number, y: number): void;
+  openBox?(box: SB.BoxID): void;
 }
 
 const borderColor = '#21ffc7';
@@ -28,9 +29,11 @@ const height = 100;
 function MapBox(props: Props) {
   const {id, x, y} = props.mapObject;
   const {title} = props.box;
+  const boxID = props.box.id;
 
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
+  const openBox         = props.openBox         || noop;
   return (
     <Group
       x={x}
@@ -45,6 +48,7 @@ function MapBox(props: Props) {
         const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
         return moveObject(id, r[0], r[1]);
       }}
+      onDblClick={() => openBox(boxID)}
     >
       <Rect
         fill={bgColor}

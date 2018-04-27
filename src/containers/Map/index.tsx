@@ -25,6 +25,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
     addCardToBox(card: SO.ObjectID, box: SB.BoxID): Promise<T.Action>,
     removeCardFromBox(card: SO.ObjectID): Promise<T.Action>,
+    openBox(box: SB.BoxID): T.Action,
   };
 }
 
@@ -79,6 +80,8 @@ export default connect<StateFromProps, DispatchFromProps, PropsFromParent>(
         dispatch(T.actions.senseObject.addCardToBox(card, box)),
       removeCardFromBox: (card: SO.ObjectID) =>
         dispatch(T.actions.senseObject.removeCardFromBox(card)),
+      openBox: (box: SB.BoxID) =>
+        dispatch(T.actions.senseMap.openBox(box)),
     }
   })
 )(Map);
