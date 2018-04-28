@@ -1,10 +1,9 @@
-import { Dispatch as ReduxDispatch } from 'redux';
 import { client } from './client';
 import { CardID, CardData, stringToType as stringToCardType } from './sense-card';
 import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp, arrayToObject } from './utils';
-import { ActionUnion } from '.';
+import { ActionUnion, Dispatch } from '.';
 
 export type ObjectID = string;
 
@@ -130,6 +129,42 @@ const updateCard =
     payload: { id, card }
   });
 
+const updateRemoteCard =
+  (card: CardData) =>
+  (dispatch: Dispatch) => {
+    const query = `
+      mutation UpdateCard(
+        $id: ID!,
+        $title: String,
+        $summary: String,
+        $saidBy: String,
+        $stakeholder: String,
+        $url: String,
+        $cardType: CardType
+      ) {
+        updateCard(
+          id: $id,
+          title: $title,
+          summary: $summary,
+          saidBy: $saidBy,
+          stakeholder: $stakeholder,
+          url: $url
+          cardType: $cardType
+        ) {
+          ...cardFields
+        }
+      }
+      fragment cardFields on Card {
+        id,
+        createdAt, updatedAt,
+        title, summary, saidBy, stakeholder, url, cardType,
+        objects { id }, map { id }
+      }
+    `;
+    return client.request(query, card)
+      .then(({ updateCard: newCard }) => updateCard(newCard.id, newCard));
+  };
+
 const UPDATE_CARDS = 'UPDATE_CARDS';
 const updateCards =
   (cards: typeof initial.cards) => ({
@@ -153,7 +188,7 @@ const updateBoxes =
 
 const loadObjects =
   (id: MapID) =>
-  (dispatch: ReduxDispatch<State>) => {
+  (dispatch: Dispatch) => {
     const query = `
       query AllObjects($id: ID!) {
         allObjects(filter: { map: { id: $id } }) {
@@ -174,7 +209,7 @@ const loadObjects =
 
 const loadCards =
   (id: MapID) =>
-  (dispatch: ReduxDispatch<State>) => {
+  (dispatch: Dispatch) => {
     const query = `
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
@@ -192,7 +227,7 @@ const loadCards =
 
 const loadBoxes =
   (id: MapID) =>
-  (dispatch: ReduxDispatch<State>) => {
+  (dispatch: Dispatch) => {
     const query = `
       query AllBoxes($id: ID!) {
         allBoxes(filter: { map: { id: $id } }) {
@@ -210,7 +245,7 @@ const loadBoxes =
 
 const moveObject =
   (id: ObjectID, x: number, y: number) =>
-  (dispatch: ReduxDispatch<State>) => {
+  (dispatch: Dispatch) => {
     const query = `
       mutation MoveObject($id: ID!, $x: Float!, $y: Float!) {
         updateObject(id: $id, x: $x, y: $y) {
@@ -231,7 +266,7 @@ const moveObject =
 
 const addCardToBox =
   (cardObject: ObjectID, box: BoxID) =>
-  (dispatch: ReduxDispatch<State>) => {
+  (dispatch: Dispatch) => {
     const query = `
       mutation AddCardToBox($cardObject: ID!, $box: ID!) {
         updateObject(id: $cardObject, belongsToId: $box) {
@@ -252,7 +287,7 @@ const addCardToBox =
 
 const removeCardFromBox =
   (cardObject: ObjectID) =>
-  (dispatch: ReduxDispatch<State>) => {
+  (dispatch: Dispatch) => {
     const query = `
       mutation RemoveCardFromBox($cardObject: ID!) {
         updateObject(id: $cardObject, belongsToId: null) {
@@ -282,6 +317,7 @@ export const syncActions = {
 export const actions = {
   updateObjects,
   updateCard,
+  updateRemoteCard,
   updateCards,
   updateBox,
   updateBoxes,

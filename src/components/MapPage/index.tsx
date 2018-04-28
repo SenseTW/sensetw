@@ -19,8 +19,8 @@ interface StateFromProps {
 interface DispatchFromProps {
   actions: {
     selectObject: typeof OE.actions.selectObject,
-    updateCard: typeof SO.actions.updateCard,
-    updateBox: typeof SO.actions.updateBox
+    updateBox: typeof SO.actions.updateBox,
+    updateRemoteCard(card: SC.CardData): Promise<T.Action>
   };
 }
 
@@ -40,7 +40,7 @@ class MapPage extends React.Component<Props> {
               onChange={(data) => {
                 switch (objectType) {
                   case SO.ObjectType.CARD:
-                    actions.updateCard(data.id, data as SC.CardData);
+                    actions.updateRemoteCard(data as SC.CardData);
                     break;
                   case SO.ObjectType.BOX:
                     actions.updateBox(data.id, data as SB.BoxData);
@@ -65,10 +65,10 @@ class MapPage extends React.Component<Props> {
   }
 }
 
-export default connect(
+export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => {
     if (!state.editor.id) {
-      return { target: null };
+      return { objectType: SO.ObjectType.NONE, target: null };
     }
 
     const object = state.senseObject.objects[state.editor.id];
@@ -92,8 +92,8 @@ export default connect(
   (dispatch: T.Dispatch) => ({
     actions: {
       selectObject: (id: SO.ObjectID) => dispatch(OE.actions.selectObject(id)),
-      updateCard: (id: SC.CardID, card: SC.CardData) => dispatch(SO.actions.updateCard(id, card)),
-      updateBox: (id: SB.BoxID, box: SB.BoxData) => dispatch(SO.actions.updateBox(id, box))
+      updateBox: (id: SB.BoxID, box: SB.BoxData) => dispatch(SO.actions.updateBox(id, box)),
+      updateRemoteCard: (card: SC.CardData) => dispatch(SO.actions.updateRemoteCard(card))
     }
   })
 )(MapPage);
