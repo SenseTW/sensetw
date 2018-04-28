@@ -179,6 +179,24 @@ const updateBox =
     payload: { id, box }
   });
 
+const updateRemoteBox =
+  (box: BoxData) =>
+  (dispatch: Dispatch) => {
+    const query = `
+      mutation UpdateBox($id: ID!, $title: String, $summary: String) {
+        updateBox(id: $id, title: $title, summary: $summary) {
+          ...boxFields
+        }
+      }
+      fragment boxFields on Box {
+        id, createdAt, updatedAt, title, summary,
+        objects { id }, map { id }
+      }
+    `;
+    return client.request(query, box)
+      .then(({ updateBox: newBox }) => updateBox(newBox.id, newBox));
+  };
+
 const UPDATE_BOXES = 'UPDATE_BOXES';
 const updateBoxes =
   (boxes: typeof initial.boxes) => ({
@@ -320,6 +338,7 @@ export const actions = {
   updateRemoteCard,
   updateCards,
   updateBox,
+  updateRemoteBox,
   updateBoxes,
   loadObjects,
   loadCards,

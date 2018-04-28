@@ -19,7 +19,7 @@ interface StateFromProps {
 interface DispatchFromProps {
   actions: {
     selectObject: typeof OE.actions.selectObject,
-    updateBox: typeof SO.actions.updateBox,
+    updateRemoteBox(box: SB.BoxData): Promise<T.Action>
     updateRemoteCard(card: SC.CardData): Promise<T.Action>
   };
 }
@@ -43,7 +43,7 @@ class MapPage extends React.Component<Props> {
                     actions.updateRemoteCard(data as SC.CardData);
                     break;
                   case SO.ObjectType.BOX:
-                    actions.updateBox(data.id, data as SB.BoxData);
+                    actions.updateRemoteBox(data as SB.BoxData);
                     break;
                   default:
                 }
@@ -92,7 +92,7 @@ export default connect<StateFromProps, DispatchFromProps>(
   (dispatch: T.Dispatch) => ({
     actions: {
       selectObject: (id: SO.ObjectID) => dispatch(OE.actions.selectObject(id)),
-      updateBox: (id: SB.BoxID, box: SB.BoxData) => dispatch(SO.actions.updateBox(id, box)),
+      updateRemoteBox: (box: SB.BoxData) => dispatch(SO.actions.updateRemoteBox(box)),
       updateRemoteCard: (card: SC.CardData) => dispatch(SO.actions.updateRemoteCard(card))
     }
   })
