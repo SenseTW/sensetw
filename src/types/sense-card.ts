@@ -123,11 +123,18 @@ export const updateStakeholder = (stakeholder: string) => ({
   payload: { stakeholder }
 });
 
+const UPDATE_CARD_URL = 'UPDATE_CARD_URL';
+export const updateUrl = (url: string) => ({
+  type: UPDATE_CARD_URL as typeof UPDATE_CARD_URL,
+  payload: { url }
+});
+
 export const actions = {
   updateTitle,
   updateSummary,
   updateSaidBy,
-  updateStakeholder
+  updateStakeholder,
+  updateUrl
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -149,6 +156,10 @@ export const reducer = (state: CardData, action: Action = emptyAction) => {
     case UPDATE_CARD_STAKEHOLDER: {
       const { stakeholder } = action.payload;
       return { ...state, stakeholder };
+    }
+    case UPDATE_CARD_URL: {
+      const { url } = action.payload;
+      return { ...state, url };
     }
     default:
       return state;

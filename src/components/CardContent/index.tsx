@@ -45,6 +45,7 @@ class CardContent extends React.PureComponent<Props> {
             placeholder="網址"
             value={url}
             onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SC.updateUrl(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__said-by" inline>
