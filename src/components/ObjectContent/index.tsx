@@ -172,10 +172,10 @@ class ObjectContent extends React.Component<Props, State> {
                 }
               }}
             >
-              取消
+              關閉
             </Button>
             <Button.Or />
-            <Button positive onClick={this.handleSave}>完成</Button>
+            <Button positive onClick={this.handleSave}>更新</Button>
           </Button.Group>
         </div>
       </div>
