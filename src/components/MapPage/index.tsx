@@ -26,40 +26,7 @@ interface DispatchFromProps {
 
 type Props = StateFromProps & DispatchFromProps;
 
-interface State {
-  isCardVisible: boolean;
-  currentCardId: SC.CardID;
-  cards: { [key: string]: SC.CardData };
-}
-
-class MapPage extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      isCardVisible: false,
-      currentCardId: '0',
-      cards: SC.sampleCardMap
-    };
-  }
-
-  handleCardChange = (id: SC.CardID, card: SC.CardData) => {
-    this.setState({
-      cards: {
-        ...this.state.cards,
-        [id]: card
-      }
-    });
-  }
-
-  toggleCard = (currentCardId: SC.CardID) => {
-    const isCardVisible =
-      currentCardId === this.state.currentCardId
-        ? !this.state.isCardVisible
-        : true;
-    this.setState({ isCardVisible, currentCardId });
-  }
-
+class MapPage extends React.Component<Props> {
   render() {
     const { actions, objectType, target } = this.props;
 

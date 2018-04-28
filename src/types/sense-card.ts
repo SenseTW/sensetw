@@ -57,7 +57,7 @@ export const emptyCardData: CardData = {
 };
 
 const now = +Date.now();
-export const sampleCardList: CardData[] = [{
+const sampleCardList: CardData[] = [{
   id: objectId(),
   createdAt: now,
   updatedAt: now,
@@ -92,11 +92,10 @@ export const sampleCardList: CardData[] = [{
   cardType: CardType.NOTE
 }];
 
-export const sampleCardMap = {};
+const sampleCardMap = {};
 sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
 
 // sense card actions
-// TODO: should be UPDATE_OBJECT_TITLE
 const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';
 export const updateTitle =
   (title: string) => ({
@@ -104,7 +103,6 @@ export const updateTitle =
     payload: { title }
   });
 
-// TODO: should be UPDATE_OBJECT_SUMMARY
 const UPDATE_CARD_SUMMARY = 'UPDATE_CARD_SUMMARY';
 export const updateSummary =
   (summary: string) => ({
@@ -125,16 +123,9 @@ export const updateStakeholder = (stakeholder: string) => ({
   payload: { stakeholder }
 });
 
-const UPDATE_CARD_COLOR = 'UPDATE_CARD_COLOR';
-export const updateColor = (color: string) => ({
-  type: UPDATE_CARD_COLOR as typeof UPDATE_CARD_COLOR,
-  payload: { color }
-});
-
 export const actions = {
   updateTitle,
   updateSummary,
-  updateColor,
   updateSaidBy,
   updateStakeholder
 };
@@ -158,10 +149,6 @@ export const reducer = (state: CardData, action: Action = emptyAction) => {
     case UPDATE_CARD_STAKEHOLDER: {
       const { stakeholder } = action.payload;
       return { ...state, stakeholder };
-    }
-    case UPDATE_CARD_COLOR: {
-      const { color } = action.payload;
-      return { ...state, color };
     }
     default:
       return state;
