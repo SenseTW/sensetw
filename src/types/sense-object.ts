@@ -206,11 +206,24 @@ const updateObjects =
     payload: objects,
   });
 
-const UPDATE_CARD = 'UPDATE_CARD';
-const updateCard =
-  (id: CardID, card: CardData) => ({
-    type: UPDATE_CARD as typeof UPDATE_CARD,
-    payload: { id, card }
+/**
+ * Partially update `cards` in Redux state.
+ */
+const UPDATE_CARDS = 'UPDATE_CARDS';
+const updateCards =
+  (cards: State['cards']) => ({
+    type: UPDATE_CARDS as typeof UPDATE_CARDS,
+    payload: cards,
+  });
+
+/**
+ * Partially update `boxes` in Redux state.
+ */
+const UPDATE_BOXES = 'UPDATE_BOXES';
+const updateBoxes =
+  (boxes: State['boxes']) => ({
+    type: UPDATE_BOXES as typeof UPDATE_BOXES,
+    payload: boxes,
   });
 
 const updateRemoteCard =
@@ -241,25 +254,8 @@ const updateRemoteCard =
       ${graphQLCardFieldsFragment}
     `;
     return client.request(query, card)
-      .then(({ updateCard: newCard }) => updateCard(newCard.id, newCard));
+      .then(({ updateCard: newCard }) => updateCards(toIDMap([toCardData(newCard)])));
   };
-
-/**
- * Partially update `cards` in Redux state.
- */
-const UPDATE_CARDS = 'UPDATE_CARDS';
-const updateCards =
-  (cards: State['cards']) => ({
-    type: UPDATE_CARDS as typeof UPDATE_CARDS,
-    payload: cards,
-  });
-
-const UPDATE_BOX = 'UPDATE_BOX';
-const updateBox =
-  (id: BoxID, box: BoxData) => ({
-    type: UPDATE_BOX as typeof UPDATE_BOX,
-    payload: { id, box }
-  });
 
 const updateRemoteBox =
   (box: BoxData) =>
@@ -273,18 +269,8 @@ const updateRemoteBox =
       ${graphQLBoxFieldsFragment}
     `;
     return client.request(query, box)
-      .then(({ updateBox: newBox }) => updateBox(newBox.id, newBox));
+      .then(({ updateBox: newBox }) => updateBoxes(toIDMap([toBoxData(newBox)])));
   };
-
-/**
- * Partially update `boxes` in Redux state.
- */
-const UPDATE_BOXES = 'UPDATE_BOXES';
-const updateBoxes =
-  (boxes: State['boxes']) => ({
-    type: UPDATE_BOXES as typeof UPDATE_BOXES,
-    payload: boxes,
-  });
 
 const loadObjects =
   (id: MapID) =>
@@ -396,18 +382,14 @@ const removeCardFromBox =
 
 export const syncActions = {
   updateObjects,
-  updateCard,
   updateCards,
-  updateBox,
   updateBoxes
 };
 
 export const actions = {
   updateObjects,
-  updateCard,
   updateRemoteCard,
   updateCards,
-  updateBox,
   updateRemoteBox,
   updateBoxes,
   loadObjects,
@@ -427,37 +409,17 @@ export const reducer = (state: State = initial, action: Action): State => {
         objects: Object.assign({}, state.objects, action.payload),
       });
     }
-    case UPDATE_CARD: {
-      const { id, card } = action.payload;
-
-      return {
-        ...state,
-        cards: {
-          ...state.cards,
-          [id]: card
-        }
-      };
-    }
     case UPDATE_CARDS: {
-      return Object.assign({}, state, {
-        cards: Object.assign({}, state.cards, action.payload),
-      });
-    }
-    case UPDATE_BOX: {
-      const { id, box } = action.payload;
-
       return {
         ...state,
-        boxes: {
-          ...state.boxes,
-          [id]: box
-        }
+        cards: { ...state.cards, ...action.payload },
       };
     }
     case UPDATE_BOXES: {
-      return Object.assign({}, state, {
-        boxes: Object.assign({}, state.boxes, action.payload),
-      });
+      return {
+        ...state,
+        boxes: { ...state.boxes, ...action.payload },
+      };
     }
     default: {
       return state;
