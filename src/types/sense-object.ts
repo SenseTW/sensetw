@@ -251,9 +251,9 @@ const updateRemoteCard =
       ${graphQLCardFieldsFragment}
     `;
     return client.request(query, card)
-      .then(({ updateCard: newCard }) => updateCards(toIDMap<CardData>([
+      .then(({ updateCard: newCard }) => dispatch(updateCards(toIDMap<CardData>([
         toCardData(newCard),
-      ])));
+      ]))));
   };
 
 const updateRemoteBox =
@@ -268,9 +268,9 @@ const updateRemoteBox =
       ${graphQLBoxFieldsFragment}
     `;
     return client.request(query, box)
-      .then(({ updateBox: newBox }) => updateBoxes(toIDMap<BoxData>([
+      .then(({ updateBox: newBox }) => dispatch(updateBoxes(toIDMap<BoxData>([
         toBoxData(newBox),
-      ])));
+      ]))));
   };
 
 const loadObjects =
