@@ -199,6 +199,9 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     contains:  toIDMap(b.contains),
   });
 
+/**
+ * Partially update `objects` in Redux state.
+ */
 const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
 const updateObjects =
   (objects: { [key: string]: ObjectData }) => ({
@@ -387,11 +390,9 @@ export const syncActions = {
 };
 
 export const actions = {
-  updateObjects,
+  ...syncActions,
   updateRemoteCard,
-  updateCards,
   updateRemoteBox,
-  updateBoxes,
   loadObjects,
   loadCards,
   loadBoxes,
@@ -405,9 +406,10 @@ export type Action = ActionUnion<typeof syncActions>;
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
     case UPDATE_OBJECTS: {
-      return Object.assign({}, state, {
-        objects: Object.assign({}, state.objects, action.payload),
-      });
+      return {
+        ...state,
+        objects: { ...state.objects, ...action.payload },
+      };
     }
     case UPDATE_CARDS: {
       return {
