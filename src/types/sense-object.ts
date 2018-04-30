@@ -7,10 +7,14 @@ import { ActionUnion, Dispatch } from '.';
 
 export type ObjectID = string;
 
+interface HasID {
+  id: string;
+}
+
 export enum ObjectType {
   NONE = 'NONE',
   CARD = 'CARD',
-  BOX = 'BOX',
+  BOX  = 'BOX',
 }
 
 export const stringToType: (name: string) => ObjectType =
@@ -18,102 +22,182 @@ export const stringToType: (name: string) => ObjectType =
     switch (name) {
       case 'NONE': return ObjectType.NONE;
       case 'CARD': return ObjectType.CARD;
-      case 'BOX': return ObjectType.BOX;
-      default: return ObjectType.NONE;
+      case 'BOX':  return ObjectType.BOX;
+      default:     return ObjectType.NONE;
     }
   };
 
 export interface ObjectData {
-  id: ObjectID;
-  createdAt: TimeStamp;
-  updatedAt: TimeStamp;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  zIndex: number;
-  belongsTo?: BoxID;
+  id:         ObjectID;
+  createdAt:  TimeStamp;
+  updatedAt:  TimeStamp;
+  x:          number;
+  y:          number;
+  width:      number;
+  height:     number;
+  zIndex:     number;
   objectType: ObjectType;
-  data: CardID | BoxID;
+  belongsTo?: BoxID;
+  data:       CardID | BoxID;
 }
 
 export type State = {
   objects: { [key: string]: ObjectData },
-  cards: { [key: string]: CardData },
-  boxes: { [key: string]: BoxData },
+  cards:   { [key: string]: CardData },
+  boxes:   { [key: string]: BoxData },
 };
 
 export const initial: State = {
   objects: {},
-  cards: {},
-  boxes: {},
+  cards:   {},
+  boxes:   {},
 };
 
-// tslint:disable-next-line:no-any
-const toData = (o: any) => {
-  switch (stringToType(o.objectType as string)) {
-    case ObjectType.NONE: { return undefined; }
-    case ObjectType.CARD: { return o.card.id; }
-    case ObjectType.BOX:  { return o.box.id;  }
-    default:              { return undefined; }
-  }
-};
+const graphQLObjectFieldsFragment = `
+  fragment objectFields on Object {
+    id, createdAt, updatedAt, x, y, width, height, zIndex,
+    objectType, card { id } , box { id }, belongsTo { id }
+  }`;
 
-// tslint:disable-next-line:no-any
-const toObjectData: (o: any) => ObjectData =
+interface GraphQLObjectFields {
+  id:         string;
+  createdAt:  string;
+  updatedAt:  string;
+  x:          number;
+  y:          number;
+  width:      number;
+  height:     number;
+  zIndex:     number;
+  objectType: string;
+  card?:      HasID;
+  box?:       HasID;
+  belongsTo?: HasID;
+}
+
+const idOrUndefined: (o?: HasID) => string | undefined =
+  (o) => {
+    if (!o) {
+      return undefined;
+    }
+    return o.id;
+  };
+
+const idOrError: (err: string, o?: HasID) => string =
+  (err, o) => {
+    if (!o) {
+      throw Error(err);
+    }
+    return o.id;
+  };
+
+const toObjectDataFieldData: (o: GraphQLObjectFields) => string =
+  o => {
+    switch (stringToType(o.objectType)) {
+      case ObjectType.NONE: {
+        throw Error('Object loaded from backend has no objectType.');
+      }
+      case ObjectType.CARD: {
+        return idOrError('Object of type CARD does not has Card ID.',
+                         o.card);
+      }
+      case ObjectType.BOX: {
+        return idOrError('Object of type BOX does not has Box ID.',
+                         o.box);
+      }
+      default: {
+        throw Error('Object loaded from backend has no objectType.');
+      }
+    }
+  };
+
+const toObjectData: (o: GraphQLObjectFields) => ObjectData =
   o => ({
-    id: o.id,
-    createdAt: 0,
-    updatedAt: 0,
-    x: o.x,
-    y: o.y,
-    width: o.width,
-    height: o.height,
-    zIndex: o.zIndex,
-    objectType: stringToType(o.objectType as string),
-    data: toData(o),
-    belongsTo: !!o.belongsTo ? o.belongsTo.id : null,
-  } as ObjectData);
+    id:         o.id,
+    createdAt:  0, // TODO
+    updatedAt:  0, // TODO
+    x:          o.x,
+    y:          o.y,
+    width:      o.width,
+    height:     o.height,
+    zIndex:     o.zIndex,
+    objectType: stringToType(o.objectType),
+    data:       toObjectDataFieldData(o),
+    belongsTo:  idOrUndefined(o.belongsTo),
+  });
 
-// tslint:disable-next-line:no-any
-const toCardData: (c: any) => CardData =
+const graphQLCardFieldsFragment = `
+  fragment cardFields on Card {
+    id,
+    createdAt, updatedAt,
+    title, summary, saidBy, stakeholder, url, cardType,
+    objects { id }, map { id }
+  }`;
+
+interface GraphQLCardFields {
+  id:          string;
+  createdAt:   string;
+  updatedAt:   string;
+  title:       string;
+  summary:     string;
+  saidBy:      string;
+  stakeholder: string;
+  url:         string;
+  cardType:    string;
+  objects:     HasID[];
+  map?:        HasID;
+}
+
+function toIDMap<T extends HasID>(objects: T[]): { [key: string]: T } {
+  return objects
+    .reduce(
+      (acc, o) => {
+        acc[o.id] = o;
+        return acc;
+      },
+      {});
+}
+
+const toCardData: (c: GraphQLCardFields) => CardData =
   c => ({
-    id: c.id,
-    createdAt: 0,
-    updatedAt: 0,
-    title: c.title,
-    summary: c.summary,
-    saidBy: c.saidBy,
+    id:          c.id,
+    createdAt:   0, // TODO
+    updatedAt:   0, // TODO
+    title:       c.title,
+    summary:     c.summary,
+    saidBy:      c.saidBy,
     stakeholder: c.stakeholder,
-    url: c.url,
-    cardType: stringToCardType(c.cardType as string),
-    // tslint:disable-next-line:no-any
-    objects: c.objects.map((o: any) => o.id),
-  } as CardData);
+    url:         c.url,
+    cardType:    stringToCardType(c.cardType),
+    objects:     toIDMap(c.objects),
+  });
 
-// tslint:disable-next-line:no-any
-const toBoxData: (b: any) => BoxData =
+const graphQLBoxFieldsFragment = `
+  fragment boxFields on Box {
+    id, createdAt, updatedAt, title, summary,
+    objects { id }, contains { id }, map { id }
+  }`;
+
+interface GraphQLBoxFields {
+  id:        string;
+  createdAt: string;
+  updatedAt: string;
+  title:     string;
+  summary:   string;
+  objects:   HasID[];
+  contains:  HasID[];
+  map?:      HasID;
+}
+
+const toBoxData: (b: GraphQLBoxFields) => BoxData =
   b => ({
-    id: b.id,
-    createdAt: 0,
-    updatedAt: 0,
-    title: b.title,
-    summary: b.summary,
-    objects: b.objects.reduce(
-      // tslint:disable-next-line:no-any
-      (acc: any, o: any) => {
-        acc[o.id] = o;
-        return acc;
-      },
-      {}),
-    contains: b.contains.reduce(
-      // tslint:disable-next-line:no-any
-      (acc: any, o: any) => {
-        acc[o.id] = o;
-        return acc;
-      },
-      {}),
-  } as BoxData);
+    id:        b.id,
+    createdAt: 0, // TODO
+    updatedAt: 0, // TODO
+    title:     b.title,
+    summary:   b.summary,
+    objects:   toIDMap(b.objects),
+    contains:  toIDMap(b.contains),
+  });
 
 const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
 const updateObjects =
@@ -154,20 +238,18 @@ const updateRemoteCard =
           ...cardFields
         }
       }
-      fragment cardFields on Card {
-        id,
-        createdAt, updatedAt,
-        title, summary, saidBy, stakeholder, url, cardType,
-        objects { id }, map { id }
-      }
+      ${graphQLCardFieldsFragment}
     `;
     return client.request(query, card)
       .then(({ updateCard: newCard }) => updateCard(newCard.id, newCard));
   };
 
+/**
+ * Partially update `cards` in Redux state.
+ */
 const UPDATE_CARDS = 'UPDATE_CARDS';
 const updateCards =
-  (cards: typeof initial.cards) => ({
+  (cards: State['cards']) => ({
     type: UPDATE_CARDS as typeof UPDATE_CARDS,
     payload: cards,
   });
@@ -188,18 +270,18 @@ const updateRemoteBox =
           ...boxFields
         }
       }
-      fragment boxFields on Box {
-        id, createdAt, updatedAt, title, summary,
-        objects { id }, map { id }
-      }
+      ${graphQLBoxFieldsFragment}
     `;
     return client.request(query, box)
       .then(({ updateBox: newBox }) => updateBox(newBox.id, newBox));
   };
 
+/**
+ * Partially update `boxes` in Redux state.
+ */
 const UPDATE_BOXES = 'UPDATE_BOXES';
 const updateBoxes =
-  (boxes: typeof initial.boxes) => ({
+  (boxes: State['boxes']) => ({
     type: UPDATE_BOXES as typeof UPDATE_BOXES,
     payload: boxes,
   });
@@ -213,10 +295,7 @@ const loadObjects =
           ...objectFields
         }
       }
-      fragment objectFields on Object {
-        id, createdAt, updatedAt, x, y, width, height, zIndex,
-        objectType, card { id } , box { id }, belongsTo { id }
-      }
+      ${graphQLObjectFieldsFragment}
     `;
     const variables = { id };
     return client.request(query, variables)
@@ -249,10 +328,10 @@ const loadBoxes =
     const query = `
       query AllBoxes($id: ID!) {
         allBoxes(filter: { map: { id: $id } }) {
-          id, createdAt, updatedAt, title, summary,
-          objects { id }, contains { id }
+          ...boxFields
         }
       }
+      ${graphQLBoxFieldsFragment}
     `;
     const variables = { id };
     return client.request(query, variables)
@@ -270,10 +349,7 @@ const moveObject =
           ...objectFields
         }
       }
-      fragment objectFields on Object {
-        id, createdAt, updatedAt, x, y, width, height, zIndex,
-        objectType, card { id } , box { id }
-      }
+      ${graphQLObjectFieldsFragment}
     `;
     const variables = { id, x, y };
     return client.request(query, variables)
@@ -291,10 +367,7 @@ const addCardToBox =
           ...objectFields
         }
       }
-      fragment objectFields on Object {
-        id, createdAt, updatedAt, x, y, width, height, zIndex,
-        objectType, card { id } , box { id }, belongsTo { id }
-      }
+      ${graphQLObjectFieldsFragment}
     `;
     const variables = { cardObject, box };
     return client.request(query, variables)
@@ -312,10 +385,7 @@ const removeCardFromBox =
           ...objectFields
         }
       }
-      fragment objectFields on Object {
-        id, createdAt, updatedAt, x, y, width, height, zIndex,
-        objectType, card { id } , box { id }, belongsTo { id }
-      }
+      ${graphQLObjectFieldsFragment}
     `;
     const variables = { cardObject };
     return client.request(query, variables)

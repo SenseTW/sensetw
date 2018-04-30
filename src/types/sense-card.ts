@@ -34,7 +34,7 @@ export interface CardData {
   id: CardID;
   createdAt: TimeStamp;
   updatedAt: TimeStamp;
-  objects: { [key: string]: ObjectID };
+  objects: { [key: string]: { id: ObjectID } };
   title: string;
   summary: string;
   saidBy: string;
@@ -178,7 +178,7 @@ export const sampleStateCards: { [key: string]: CardData } = {
     stakeholder: '汗水，這是怎麼回事',
     url: 'http://more.handlino.com/',
     cardType: CardType.NOTE,
-    objects: { '123': '123' },
+    objects: { '123': { id: '123' } },
   },
   '459': {
     id: '459',
@@ -191,7 +191,7 @@ export const sampleStateCards: { [key: string]: CardData } = {
     stakeholder: '感謝上師',
     url: 'http://more.handlino.com/',
     cardType: CardType.NORMAL,
-    objects: { '126': '126' },
+    objects: { '126': { id: '126' } },
   },
   '458': {
     id: '458',
@@ -204,7 +204,7 @@ export const sampleStateCards: { [key: string]: CardData } = {
     stakeholder: '業者書讀得不多沒關係',
     url: 'http://more.handlino.com/',
     cardType: CardType.ANSWER,
-    objects: { '125': '125' },
+    objects: { '125': { id: '125' } },
   },
   '457': {
     id: '457',
@@ -217,6 +217,6 @@ export const sampleStateCards: { [key: string]: CardData } = {
     stakeholder: '做企業不是做俠客',
     url: 'http://more.handlino.com/',
     cardType: CardType.QUESTION,
-    objects: { '124': '124' },
+    objects: { '124': { id: '124' } },
   },
 };
