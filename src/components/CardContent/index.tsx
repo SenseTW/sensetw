@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Form, TextArea, Input } from 'semantic-ui-react';
+import CardTypeSelector from './CardTypeSelector';
 import * as SC from '../../types/sense-card';
 
 interface Props {
@@ -21,7 +22,10 @@ class CardContent extends React.PureComponent<Props> {
       <Form className="card-content">
         <Form.Field className="card-content__card-type">
           <label>Card Type</label>
-          {SC.typeToString(cardType)}
+          <CardTypeSelector
+            cardType={cardType}
+            onChange={type => onChange && onChange(SC.updateCardType(type))}
+          />
         </Form.Field>
         <Form.Field className="card-content__summary">
           <label>Summary</label>

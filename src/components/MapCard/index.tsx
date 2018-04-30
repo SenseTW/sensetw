@@ -19,12 +19,6 @@ const titleFontFamily = 'sans-serif';
 const titleFontSize = 14;
 const borderColor = '#999';
 const borderColorSelected = '#9999ff';
-const bgColors = {
-  'NORMAL': '#ffffff',
-  'NOTE': '#ffffff',
-  'QUESTION': '#ff9999',
-  'ANSWER': '#a7ccf2',
-};
 const shadowBlur = 5;
 const shadowColor = '#999';
 const shadowOffsetX = (shadowBlur) / 4;
@@ -38,7 +32,7 @@ function MapCard(props: Props) {
 
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
-  const bgColor = bgColors[cardType];
+  const bgColor = SC.color[cardType];
   return (
     <Group
       x={x}

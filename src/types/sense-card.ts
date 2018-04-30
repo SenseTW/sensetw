@@ -12,6 +12,13 @@ export enum CardType {
   NOTE = 'NOTE',
 }
 
+export const color = {
+  [CardType.NORMAL]: '#ffffff',
+  [CardType.NOTE]: '#ffffff',
+  [CardType.QUESTION]: '#ff9999',
+  [CardType.ANSWER]: '#a7ccf2'
+};
+
 export const typeToString = (type: CardType) => {
   switch (type) {
     case CardType.NORMAL:
@@ -96,6 +103,13 @@ const sampleCardMap = {};
 sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
 
 // sense card actions
+const UPDATE_CARD_TYPE = 'UPDATE_CARD_TYPE';
+export const updateCardType =
+  (cardType: CardType) => ({
+    type: UPDATE_CARD_TYPE as typeof UPDATE_CARD_TYPE,
+    payload: { cardType }
+  });
+
 const UPDATE_CARD_TITLE = 'UPDATE_CARD_TITLE';
 export const updateTitle =
   (title: string) => ({
@@ -130,6 +144,7 @@ export const updateUrl = (url: string) => ({
 });
 
 export const actions = {
+  updateCardType,
   updateTitle,
   updateSummary,
   updateSaidBy,
@@ -141,6 +156,10 @@ export type Action = ActionUnion<typeof actions>;
 
 export const reducer = (state: CardData, action: Action = emptyAction) => {
   switch (action.type) {
+    case UPDATE_CARD_TYPE: {
+      const { cardType } = action.payload;
+      return { ...state, cardType };
+    }
     case UPDATE_CARD_TITLE: {
       const { title } = action.payload;
       return { ...state, title };
