@@ -2,7 +2,7 @@ import { client } from './client';
 import { CardID, CardData, stringToType as stringToCardType } from './sense-card';
 import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
-import { TimeStamp, arrayToObject } from './utils';
+import { TimeStamp } from './utils';
 import { ActionUnion, Dispatch } from '.';
 
 export type ObjectID = string;
@@ -147,14 +147,8 @@ interface GraphQLCardFields {
   map?:        HasID;
 }
 
-function toIDMap<T extends HasID>(objects: T[]): { [key: string]: T } {
-  return objects
-    .reduce(
-      (acc, o) => {
-        acc[o.id] = o;
-        return acc;
-      },
-      {});
+function toIDMap<T extends HasID>(this: void, objects: T[]): { [key: string]: T } {
+  return objects.reduce((acc, o) => { acc[o.id] = o; return acc; }, {});
 }
 
 const toCardData: (c: GraphQLCardFields) => CardData =
@@ -257,7 +251,9 @@ const updateRemoteCard =
       ${graphQLCardFieldsFragment}
     `;
     return client.request(query, card)
-      .then(({ updateCard: newCard }) => updateCards(toIDMap([toCardData(newCard)])));
+      .then(({ updateCard: newCard }) => updateCards(toIDMap<CardData>([
+        toCardData(newCard),
+      ])));
   };
 
 const updateRemoteBox =
@@ -272,7 +268,9 @@ const updateRemoteBox =
       ${graphQLBoxFieldsFragment}
     `;
     return client.request(query, box)
-      .then(({ updateBox: newBox }) => updateBoxes(toIDMap([toBoxData(newBox)])));
+      .then(({ updateBox: newBox }) => updateBoxes(toIDMap<BoxData>([
+        toBoxData(newBox),
+      ])));
   };
 
 const loadObjects =
@@ -289,7 +287,7 @@ const loadObjects =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allObjects }) => allObjects.map(toObjectData))
-      .then(data => arrayToObject<ObjectData>(data))
+      .then(data => toIDMap<ObjectData>(data))
       .then(data => dispatch(updateObjects(data)));
   };
 
@@ -307,7 +305,7 @@ const loadCards =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData))
-      .then(data => arrayToObject<CardData>(data))
+      .then(data => toIDMap<CardData>(data))
       .then(data => dispatch(updateCards(data)));
   };
 
@@ -325,7 +323,7 @@ const loadBoxes =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allBoxes }) => allBoxes.map(toBoxData))
-      .then(data => arrayToObject<BoxData>(data))
+      .then(data => toIDMap<BoxData>(data))
       .then(data => dispatch(updateBoxes(data)));
   };
 
@@ -342,9 +340,9 @@ const moveObject =
     `;
     const variables = { id, x, y };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateObjects({
-        [updateObject.id]: toObjectData(updateObject),
-      })));
+      .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
+        toObjectData(updateObject),
+      ]))));
   };
 
 const addCardToBox =
@@ -360,9 +358,9 @@ const addCardToBox =
     `;
     const variables = { cardObject, box };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateObjects({
-        [updateObject.id]: toObjectData(updateObject),
-      })));
+      .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
+        toObjectData(updateObject),
+      ]))));
   };
 
 const removeCardFromBox =
@@ -378,9 +376,9 @@ const removeCardFromBox =
     `;
     const variables = { cardObject };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateObjects({
-        [updateObject.id]: toObjectData(updateObject),
-      })));
+      .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
+        toObjectData(updateObject),
+      ]))));
   };
 
 export const syncActions = {

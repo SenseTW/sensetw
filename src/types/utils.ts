@@ -11,11 +11,3 @@ export function objectId() {
 }
 
 export function noop() { return; }
-
-interface Identifiable {
-  id: string;
-}
-
-export function arrayToObject<T extends Identifiable>(this: void, data: T[]): { [key: string]: T } {
-  return data.reduce((o, item) => { o[item.id] = item; return o; }, {});
-}
