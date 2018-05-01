@@ -194,7 +194,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
   });
 
 /**
- * Partially update `objects` in Redux state.
+ * Partially update `objects` state.
  */
 const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
 const updateObjects =
@@ -204,7 +204,7 @@ const updateObjects =
   });
 
 /**
- * Partially update `cards` in Redux state.
+ * Partially update `cards` state.
  */
 const UPDATE_CARDS = 'UPDATE_CARDS';
 const updateCards =
@@ -214,7 +214,7 @@ const updateCards =
   });
 
 /**
- * Partially update `boxes` in Redux state.
+ * Partially update `boxes` state.
  */
 const UPDATE_BOXES = 'UPDATE_BOXES';
 const updateBoxes =

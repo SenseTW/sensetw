@@ -5,36 +5,35 @@ import MapBox from '../MapBox';
 import MapCard from '../MapCard';
 import { Group } from 'react-konva';
 import * as SO from '../../types/sense-object';
-import * as SC from '../../types/sense-card';
 import * as SB from '../../types/sense-box';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
 
 export interface StateFromProps {
-  selection: SO.ObjectID[];
-  objects: { [key: string]: SO.ObjectData };
-  cards: { [key: string]: SC.CardData };
-  boxes: { [key: string]: SB.BoxData };
+  selection: T.State['selection'];
+  objects:   T.State['senseObject']['objects'];
+  cards:     T.State['senseObject']['cards'];
+  boxes:     T.State['senseObject']['boxes'];
 }
 
 export interface DispatchFromProps {
   actions: {
-    toggleObjectSelection(id: SO.ObjectID): T.Action,
-    moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
-    addCardToBox(card: SO.ObjectID, box: SB.BoxID): Promise<T.Action>,
-    removeCardFromBox(card: SO.ObjectID): Promise<T.Action>,
-    openBox(box: SB.BoxID): T.Action,
+    toggleObjectSelection(id: SO.ObjectID): T.ActionChain,
+    moveObject(id: SO.ObjectID, x: number, y: number): T.ActionChain,
+    addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
+    removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
+    openBox(box: SB.BoxID): T.ActionChain,
   };
 }
 
-export interface PropsFromParent {
+export interface OwnProps {
   width: number;
   height: number;
 }
 
-export type Props = StateFromProps & DispatchFromProps & PropsFromParent;
+export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
-function renderObject(o: SO.ObjectData, props: Props) {
+const renderObject = (o: SO.ObjectData, props: Props) => {
   const toggleSelection = props.actions.toggleObjectSelection;
   const moveObject = props.actions.moveObject;
   const openBox = props.actions.openBox;
@@ -70,14 +69,13 @@ function renderObject(o: SO.ObjectData, props: Props) {
         />);
     }
     default: {
-      throw Error(`Unknown ObjectData ${o.objectType}`);
+      throw Error(`Unknown ObjectData type ${o.objectType}`);
     }
   }
-}
+};
 
 export function Map(props: Props) {
-  const objects = Object.values(props.objects)
-    .map(o => renderObject(o, props));
+  const objects = Object.values(props.objects).map(o => renderObject(o, props));
   return (
     <Stage width={props.width} height={props.height}>
       <Layer>

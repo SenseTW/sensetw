@@ -8,7 +8,7 @@ import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
 import * as T from '../../types';
 
-interface PropsFromParent extends CO.PropsFromParent {
+interface OwnProps extends CO.OwnProps {
   id: SM.MapID;
 }
 
@@ -29,7 +29,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
   };
 }
 
-type Props = StateFromProps & DispatchFromProps & PropsFromParent;
+type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 class Map extends React.Component<Props> {
   componentDidMount() {
@@ -68,7 +68,7 @@ class Map extends React.Component<Props> {
   }
 }
 
-export default connect<StateFromProps, DispatchFromProps, PropsFromParent>(
+export default connect<StateFromProps, DispatchFromProps, OwnProps>(
   (state: T.State) => ({
     selection: state.selection,
     scope: state.senseMap.scope,

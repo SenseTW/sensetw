@@ -30,11 +30,13 @@ export const initial: State = {
 
 export type Action
   = ActionUnion<typeof C.actions>
-  | ActionUnion<typeof SM.actions>
+  | SM.Action
   | SO.Action
   | SC.Action
-  | ActionUnion<typeof SL.actions>
+  | SL.Action
   | OE.Action;
+
+export type ActionChain = Action | Promise<Action>;
 
 export const actions = {
   counter: C.actions,
