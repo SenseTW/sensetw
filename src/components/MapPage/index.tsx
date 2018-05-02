@@ -10,6 +10,7 @@ import * as SC from '../../types/sense-card';
 import * as SB from '../../types/sense-box';
 import * as OE from '../../types/object-editor';
 import './index.css';
+const background = require('./background-map.png');
 
 interface StateFromProps {
   objectType: SO.ObjectType;
@@ -31,7 +32,7 @@ class MapPage extends React.Component<Props> {
     const { actions, objectType, target } = this.props;
 
     return (
-      <Sidebar.Pushable className="map-page">
+      <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
         <Sidebar visible={!!target} animation="overlay" width="wide">{
           target &&
             <ObjectContent
