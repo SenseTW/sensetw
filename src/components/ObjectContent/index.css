@@ -5,6 +5,7 @@
 
 .object-content .ui.form .field>label {
   color: #2d323a;
+  font-weight: normal;
 }
 
 .object-content .ui.form .ui.input input,

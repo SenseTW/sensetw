@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Form, Checkbox } from 'semantic-ui-react';
 import * as SC from '../../../types/sense-card';
 import { noop } from '../../../types/utils';
+import './index.css';
 
 interface Props {
   cardType: SC.CardType;
@@ -9,6 +10,13 @@ interface Props {
 }
 
 const groupName = 'card-type-selector';
+
+const capitalize = (str: string): string => {
+  if (str.length === 0) {
+    return str;
+  }
+  return str[0] + str.slice(1).toLowerCase();
+};
 
 function CardTypeSelector(props: Props) {
   const { cardType, onChange = noop } = props;
@@ -20,7 +28,7 @@ function CardTypeSelector(props: Props) {
           <Checkbox
             radio
             className={`card-type-selector__${ty.toLowerCase()}`}
-            label={ty}
+            label={capitalize(ty)}
             name={groupName}
             value={ty}
             checked={cardType === ty}
