@@ -4,6 +4,7 @@ import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp } from './utils';
 import { ActionUnion, Dispatch } from '.';
+import * as SL from './selection';
 
 export type ObjectID = string;
 
@@ -223,6 +224,26 @@ const updateBoxes =
     payload: boxes,
   });
 
+/**
+ * Remove card from Box.contains bidirectional relation.
+ */
+const UPDATE_NOT_IN_BOX = 'UPDATE_NOT_IN_BOX';
+const updateNotInBox =
+  (cardObject: ObjectID, box: BoxID) => ({
+    type: UPDATE_NOT_IN_BOX as typeof UPDATE_NOT_IN_BOX,
+    payload: { cardObject, box }
+  });
+
+/**
+ * Add card to Box.contains bidirectional relation.
+ */
+const UPDATE_IN_BOX = 'UPDATE_IN_BOX';
+const updateInBox =
+  (cardObject: ObjectID, box: BoxID) => ({
+    type: UPDATE_IN_BOX as typeof UPDATE_IN_BOX,
+    payload: { cardObject, box }
+  });
+
 const updateRemoteCard =
   (card: CardData) =>
   (dispatch: Dispatch) => {
@@ -358,13 +379,12 @@ const addCardToBox =
     `;
     const variables = { cardObject, box };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
-        toObjectData(updateObject),
-      ]))));
+      .then(({ updateObject }) => dispatch(updateInBox(cardObject, box)))
+      .then(() => dispatch(SL.actions.clearSelection()));
   };
 
 const removeCardFromBox =
-  (cardObject: ObjectID) =>
+  (cardObject: ObjectID, box: BoxID) =>
   (dispatch: Dispatch) => {
     const query = `
       mutation RemoveCardFromBox($cardObject: ID!) {
@@ -376,15 +396,16 @@ const removeCardFromBox =
     `;
     const variables = { cardObject };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
-        toObjectData(updateObject),
-      ]))));
+      .then(({ updateObject }) => dispatch(updateNotInBox(cardObject, box)))
+      .then(() => dispatch(SL.actions.clearSelection()));
   };
 
 export const syncActions = {
   updateObjects,
   updateCards,
-  updateBoxes
+  updateBoxes,
+  updateNotInBox,
+  updateInBox,
 };
 
 export const actions = {
@@ -419,6 +440,42 @@ export const reducer = (state: State = initial, action: Action): State => {
       return {
         ...state,
         boxes: { ...state.boxes, ...action.payload },
+      };
+    }
+    case UPDATE_NOT_IN_BOX: {
+      const box        = state.boxes[action.payload.box];
+      const cardObject = state.objects[action.payload.cardObject];
+      let { contains } = box;
+      delete(contains[cardObject.id]);
+      return {
+        ...state,
+        boxes: {
+          ...state.boxes,
+          [box.id]: { ...box, contains },
+        },
+        objects: {
+          ...state.objects,
+          [cardObject.id]: { ...cardObject, belongsTo: undefined },
+        }
+      };
+    }
+    case UPDATE_IN_BOX: {
+      const box        = state.boxes[action.payload.box];
+      const cardObject = state.objects[action.payload.cardObject];
+      const contains   = {
+        ...box.contains,
+        [cardObject.id]: { id: cardObject.id },
+      };
+      return {
+        ...state,
+        boxes: {
+          ...state.boxes,
+          [box.id]: { ...box, contains },
+        },
+        objects: {
+          ...state.objects,
+          [cardObject.id]: { ...cardObject, belongsTo: box.id },
+        },
       };
     }
     default: {

@@ -1,5 +1,6 @@
-import { ActionUnion } from './index';
+import { ActionUnion, Dispatch } from './index';
 import { BoxID } from './sense-box';
+import * as SL from './selection';
 
 export type MapID = string;
 
@@ -11,16 +12,30 @@ export enum MapScopeType {
 export type PositionInMap = [number, number];
 type ZoomLevel = number;
 
-const OPEN_BOX = 'OPEN_BOX';
-const openBox = (box: BoxID) => ({
-  type: OPEN_BOX as typeof OPEN_BOX,
+const SET_SCOPE_TO_BOX = 'SET_SCOPE_TO_BOX';
+const setScopeToBox = (box: BoxID) => ({
+  type: SET_SCOPE_TO_BOX as typeof SET_SCOPE_TO_BOX,
   payload: { box },
 });
 
-const CLOSE_BOX = 'CLOSE_BOX';
-const closeBox = (boxID: BoxID) => ({
-  type: CLOSE_BOX as typeof CLOSE_BOX,
+const SET_SCOPE_TO_FULL_MAP = 'SET_SCOPE_TO_FULL_MAP';
+const setScopeToFullmap = () => ({
+  type: SET_SCOPE_TO_FULL_MAP as typeof SET_SCOPE_TO_FULL_MAP,
 });
+
+const openBox =
+  (box: BoxID) =>
+  (dispatch: Dispatch) => {
+    return new Promise((resolve) => resolve(dispatch(setScopeToBox(box))))
+      .then(() => dispatch(SL.actions.clearSelection()));
+  };
+
+const closeBox =
+  () =>
+  (dispatch: Dispatch) => {
+    return new Promise((resolve) => resolve(dispatch(setScopeToFullmap())))
+      .then(() => dispatch(SL.actions.clearSelection()));
+  };
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 type PanViewportAction = { type: typeof PAN_VIEWPORT };
@@ -30,14 +45,20 @@ const ZOOM_VIEWPORT = 'ZOOM_VIEWPORT';
 type ZoomViewportAction = { type: typeof ZOOM_VIEWPORT };
 const zoomViewport = (level: ZoomLevel): ZoomViewportAction => ({ type: ZOOM_VIEWPORT });
 
-export const actions = {
-  openBox,
-  closeBox,
+const syncActions = {
+  setScopeToBox,
+  setScopeToFullmap,
   panViewport,
   zoomViewport,
 };
 
-export type Action = ActionUnion<typeof actions>;
+export const actions = {
+  ...syncActions,
+  openBox,
+  closeBox,
+};
+
+export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
   scope: {
@@ -49,18 +70,15 @@ export type State = {
 export const initial: State = {
   scope: {
     type: MapScopeType.FULL_MAP,
-    // type: MapScopeType.BOX,
-    // box: 'cjgg9ar6x0w660155wi4s2sp7'
   },
 };
 
-// tslint:disable-next-line:no-any
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
-    case OPEN_BOX: {
+    case SET_SCOPE_TO_BOX: {
       return { ...state, ...{ scope: { type: MapScopeType.BOX, box: action.payload.box } } };
     }
-    case CLOSE_BOX: {
+    case SET_SCOPE_TO_FULL_MAP: {
       return { ...state, ...{ scope: { type: MapScopeType.FULL_MAP } } };
     }
     default:

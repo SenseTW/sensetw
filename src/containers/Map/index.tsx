@@ -18,14 +18,14 @@ interface StateFromProps extends CO.StateFromProps {
 
 interface DispatchFromProps extends CO.DispatchFromProps {
   actions: {
-    toggleObjectSelection(id: SO.ObjectID): T.Action,
-    loadObjects(id: SM.MapID): Promise<T.Action>,
-    loadCards(id: SM.MapID): Promise<T.Action>,
-    loadBoxes(id: SM.MapID): Promise<T.Action>,
-    moveObject(id: SO.ObjectID, x: number, y: number): Promise<T.Action>,
-    addCardToBox(card: SO.ObjectID, box: SB.BoxID): Promise<T.Action>,
-    removeCardFromBox(card: SO.ObjectID): Promise<T.Action>,
-    openBox(box: SB.BoxID): T.Action,
+    toggleObjectSelection(id: SO.ObjectID): T.ActionChain,
+    loadObjects(id: SM.MapID): T.ActionChain,
+    loadCards(id: SM.MapID): T.ActionChain,
+    loadBoxes(id: SM.MapID): T.ActionChain,
+    moveObject(id: SO.ObjectID, x: number, y: number): T.ActionChain,
+    addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
+    removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
+    openBox(box: SB.BoxID): T.ActionChain,
   };
 }
 
@@ -90,8 +90,8 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
         dispatch(T.actions.senseObject.moveObject(id, x, y)),
       addCardToBox: (card: SO.ObjectID, box: SB.BoxID) =>
         dispatch(T.actions.senseObject.addCardToBox(card, box)),
-      removeCardFromBox: (card: SO.ObjectID) =>
-        dispatch(T.actions.senseObject.removeCardFromBox(card)),
+      removeCardFromBox: (card: SO.ObjectID, box: SB.BoxID) =>
+        dispatch(T.actions.senseObject.removeCardFromBox(card, box)),
       openBox: (box: SB.BoxID) =>
         dispatch(T.actions.senseMap.openBox(box)),
     }
