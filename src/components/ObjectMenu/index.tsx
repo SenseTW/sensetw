@@ -6,7 +6,6 @@ import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
-import * as OE from '../../types/object-editor';
 
 interface StateFromProps {
   selection: SL.State;
@@ -16,7 +15,7 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    selectObject: typeof OE.actions.selectObject,
+    selectObject(id: SO.ObjectID | null): T.ActionChain,
     addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
     removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
   };

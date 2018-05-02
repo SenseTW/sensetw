@@ -9,8 +9,8 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    increase: () => T.Action,
-    decrease: () => T.Action
+    increase: () => T.ActionChain,
+    decrease: () => T.ActionChain
   };
 }
 
