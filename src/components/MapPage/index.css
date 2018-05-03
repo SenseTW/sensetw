@@ -12,3 +12,9 @@
   right: 16px;
   margin: 0;
 }
+
+.map-page .breadcrumb {
+  position: absolute;
+  top: 16px;
+  left: 0;
+}

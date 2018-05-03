@@ -4,6 +4,7 @@ import { Sidebar } from 'semantic-ui-react';
 import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
+import Breadcrumb from '../Breadcrumb';
 import * as T from '../../types';
 import * as SO from '../../types/sense-object';
 import * as SC from '../../types/sense-card';
@@ -60,6 +61,7 @@ class MapPage extends React.Component<Props> {
             height={1200}
           />
           <ObjectMenu />
+          <Breadcrumb />
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     );
