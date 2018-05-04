@@ -14,16 +14,34 @@ interface Props {
   moveObject?(id: SO.ObjectID, x: number, y: number): void;
 }
 
-const width = 300;
-const height = 180;
+const width = 240;
+const height = 160;
 const cornerRadius = 4;
-const titlePadding = 10;
-const titleHeight = 130;
+
+const summaryPadding = 0;
+const summaryOffsetX = 10 - summaryPadding;
+const summaryOffsetY = 8 - summaryPadding;
+const summaryWidth = width - summaryOffsetX * 2;
+const summaryFontFamily = 'sans-serif';
+const summaryFontSize = 16;
+const summaryAbsoluteLineHegiht = 22;
+const summaryLineHeight = summaryAbsoluteLineHegiht / summaryFontSize;
+const summaryHeight = summaryAbsoluteLineHegiht * 3;
+const summaryColor = '#000000';
+const summaryLimit = 39;
+
+const titlePadding = 0;
+const titleOffsetX = 10 - titlePadding;
+const titleOffsetY = 12 + summaryHeight - summaryPadding - titlePadding;
+const titleWidth = width - titleOffsetX * 2;
 const titleFontFamily = 'sans-serif';
-const titleFontSize = 16;
-// const borderColor = '#999';
-// const borderColorSelected = '#9999ff';
-// const strokeWidth = 0;
+const titleFontSize = 13;
+const titleAbsoluteLineHeight = 16;
+const titleLineHeight = titleAbsoluteLineHeight / titleFontSize;
+const titleHeight = titleAbsoluteLineHeight * 2;
+const titleColor = '#5a5a5a';
+const titleLimit = 32;
+
 const shadowBlur = 10;
 const shadowColor = '#999';
 const shadowOffsetX = 2;
@@ -31,15 +49,17 @@ const shadowOffsetY = 3;
 
 const selectedOffsetX = -6;
 const selectedOffsetY = -6;
-const selectedWidth = 312;
-const selectedHeight = 192;
+const selectedWidth = width - selectedOffsetX * 2;
+const selectedHeight = height - selectedOffsetY * 2;
 const selectedCornerRadius = 8;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 3;
 
 function MapCard(props: Props) {
   const {id, x, y} = props.mapObject;
-  const {title, cardType} = props.card;
+  const {title, summary, cardType} = props.card;
+  const sanitizedSummary = summary.substr(0, summaryLimit);
+  const sanitizedTitle   = title.substr(0, titleLimit);
 
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
@@ -81,16 +101,30 @@ function MapCard(props: Props) {
         shadowOffsetX={shadowOffsetX}
         shadowOffsetY={shadowOffsetY}
         shadowColor={shadowColor}
-//        stroke={props.selected ? borderColorSelected : borderColor}
-//        strokeWidth={strokeWidth}
       />
       <Text
-        width={width}
+        x={summaryOffsetX}
+        y={summaryOffsetY}
+        width={summaryWidth}
+        height={summaryHeight}
+        padding={summaryPadding}
+        fontSize={summaryFontSize}
+        fontFamily={summaryFontFamily}
+        lineHeight={summaryLineHeight}
+        fill={summaryColor}
+        text={sanitizedSummary}
+      />
+      <Text
+        x={titleOffsetX}
+        y={titleOffsetY}
+        width={titleWidth}
         height={titleHeight}
         padding={titlePadding}
         fontSize={titleFontSize}
         fontFamily={titleFontFamily}
-        text={title}
+        lineHeight={titleLineHeight}
+        fill={titleColor}
+        text={sanitizedTitle}
       />
     </Group>
   );

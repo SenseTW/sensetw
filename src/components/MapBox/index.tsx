@@ -15,21 +15,28 @@ interface Props {
   openBox?(box: SB.BoxID): void;
 }
 
-const width = 300;
-const height = 120;
-const borderColor = '#00ffd2';
+const width = 240;
+const height = 90;
+const borderColor = '#707070';
 const borderWidth = 8;
 const bgColor = '#ffffff';
 const cornerRadius = 4;
+
+const titlePadding = 0;
+const titleWidth = 180;
+const titleOffsetX = (width - (titleWidth + titlePadding)) / 2;
 const titleFontFamily = 'sans-serif';
 const titleColor = '#000000';
-const titleFontSize = 36;
-const titlePadding = 5;
+const titleFontSize = 20;
+const titleLineHeight = 22 / titleFontSize;
+const titleOffsetY = (height - titleFontSize) / 2;
+const titleLineBreak = 9;
+const titleLimit = 18;
 
 const selectedOffsetX = -6;
 const selectedOffsetY = -6;
-const selectedWidth = 312;
-const selectedHeight = 132;
+const selectedWidth = width - selectedOffsetY * 2;
+const selectedHeight = height - selectedOffsetX * 2;
 const selectedCornerRadius = 4;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 2;
@@ -37,6 +44,7 @@ const selectedStrokeWidth = 2;
 function MapBox(props: Props) {
   const {id, x, y} = props.mapObject;
   const {title} = props.box;
+  const sanitizedTitle = title.substr(0, titleLimit);
   const boxID = props.box.id;
 
   const toggleSelection = props.toggleSelection || noop;
@@ -53,6 +61,10 @@ function MapBox(props: Props) {
       stroke={selectedColor}
       strokeWidth={selectedStrokeWidth}
     />);
+
+  const offsetY = sanitizedTitle.length <= titleLineBreak ? titleOffsetY : titleOffsetY - titleFontSize / 2;
+  // tslint:disable-next-line:no-console
+  console.log(titleOffsetY, offsetY, sanitizedTitle.length);
 
   return (
     <Group
@@ -80,14 +92,14 @@ function MapBox(props: Props) {
         cornerRadius={cornerRadius}
       />
       <Text
-        y={(height - titleFontSize) / 2}
+        x={titleOffsetX}
+        y={offsetY}
         align="center"
-        width={width}
-        height={height}
-        stroke={titleColor}
-        strokeWidth={1}
+        width={titleWidth}
+        fill={titleColor}
         fontFamily={titleFontFamily}
         fontSize={titleFontSize}
+        lineHeight={titleLineHeight}
         padding={titlePadding}
         text={title}
       />
