@@ -37,7 +37,7 @@ const selectedOffsetX = -6;
 const selectedOffsetY = -6;
 const selectedWidth = width - selectedOffsetY * 2;
 const selectedHeight = height - selectedOffsetX * 2;
-const selectedCornerRadius = 4;
+const selectedCornerRadius = 10;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 2;
 
