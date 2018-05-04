@@ -29,6 +29,14 @@ const shadowColor = '#999';
 const shadowOffsetX = 2;
 const shadowOffsetY = 3;
 
+const selectedOffsetX = -6;
+const selectedOffsetY = -6;
+const selectedWidth = 312;
+const selectedHeight = 192;
+const selectedCornerRadius = 8;
+const selectedColor = '#3ad8fa';
+const selectedStrokeWidth = 3;
+
 function MapCard(props: Props) {
   const {id, x, y} = props.mapObject;
   const {title, cardType} = props.card;
@@ -36,6 +44,18 @@ function MapCard(props: Props) {
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
   const bgColor = SC.color[cardType];
+
+  const selected = (
+    <Rect
+      x={selectedOffsetX}
+      y={selectedOffsetY}
+      width={selectedWidth}
+      height={selectedHeight}
+      cornerRadius={selectedCornerRadius}
+      stroke={selectedColor}
+      strokeWidth={selectedStrokeWidth}
+    />);
+
   return (
     <Group
       x={x}
@@ -51,6 +71,7 @@ function MapCard(props: Props) {
         return moveObject(id, r[0], r[1]);
       }}
     >
+      {props.selected ? selected : null}
       <Rect
         width={width}
         height={height}

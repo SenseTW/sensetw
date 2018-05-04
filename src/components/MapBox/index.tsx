@@ -18,13 +18,21 @@ interface Props {
 const width = 300;
 const height = 120;
 const borderColor = '#00ffd2';
-const borderColorSelected = '#ff21c7';
 const borderWidth = 8;
 const bgColor = '#ffffff';
+const cornerRadius = 4;
 const titleFontFamily = 'sans-serif';
 const titleColor = '#000000';
 const titleFontSize = 36;
 const titlePadding = 5;
+
+const selectedOffsetX = -6;
+const selectedOffsetY = -6;
+const selectedWidth = 312;
+const selectedHeight = 132;
+const selectedCornerRadius = 4;
+const selectedColor = '#3ad8fa';
+const selectedStrokeWidth = 2;
 
 function MapBox(props: Props) {
   const {id, x, y} = props.mapObject;
@@ -34,6 +42,18 @@ function MapBox(props: Props) {
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
   const openBox         = props.openBox         || noop;
+
+  const selected = (
+    <Rect
+      x={selectedOffsetX}
+      y={selectedOffsetY}
+      width={selectedWidth}
+      height={selectedHeight}
+      cornerRadius={selectedCornerRadius}
+      stroke={selectedColor}
+      strokeWidth={selectedStrokeWidth}
+    />);
+
   return (
     <Group
       x={x}
@@ -50,12 +70,14 @@ function MapBox(props: Props) {
       }}
       onDblClick={() => openBox(boxID)}
     >
+      {props.selected ? selected : null}
       <Rect
         fill={bgColor}
         width={width}
         height={height}
-        stroke={props.selected ? borderColorSelected : borderColor}
+        stroke={borderColor}
         strokeWidth={borderWidth}
+        cornerRadius={cornerRadius}
       />
       <Text
         y={(height - titleFontSize) / 2}
