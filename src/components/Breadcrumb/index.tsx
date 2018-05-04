@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Segment, Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../types';
 import * as SM from '../../types/sense-map';
 import * as SB from '../../types/sense-box';
@@ -24,29 +25,33 @@ class Breadcrumb extends React.PureComponent<Props> {
     const { actions, box } = this.props;
 
     return (
-      <div className="breadcrumb">
+      <Segment compact className="breadcrumb">
+      <SBreadcrumb>
         {
           box.id !== SB.emptyBoxData.id
             ? (
-              <Link
+              <SBreadcrumb.Section
+                link
+                as={Link}
                 to={R.index}
                 onClick={() => actions.setScopeToFullmap()}
               >
                 Map
-              </Link>
+              </SBreadcrumb.Section>
             )
-            : <span>Map</span>
+            : <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
         }
         {
           box.id !== SB.emptyBoxData.id &&
             (
               <React.Fragment>
-                <span>></span>
-                <span>{box.title}</span>
+                <SBreadcrumb.Divider icon="right angle" />
+                <SBreadcrumb.Section active>{box.title}</SBreadcrumb.Section>
               </React.Fragment>
             )
         }
-      </div>
+      </SBreadcrumb>
+      </Segment>
     );
   }
 }

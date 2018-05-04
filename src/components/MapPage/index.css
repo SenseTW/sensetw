@@ -13,8 +13,10 @@
   margin: 0;
 }
 
-.map-page .breadcrumb {
+.map-page .ui.segment.breadcrumb {
   position: absolute;
   top: 16px;
   left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
