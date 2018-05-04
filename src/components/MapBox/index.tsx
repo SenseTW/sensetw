@@ -20,7 +20,7 @@ const height = 90;
 const borderColor = '#707070';
 const borderWidth = 8;
 const bgColor = '#ffffff';
-const cornerRadius = 4;
+const cornerRadius = 2;
 
 const titlePadding = 0;
 const titleWidth = 180;
@@ -33,8 +33,8 @@ const titleOffsetY = (height - titleFontSize) / 2;
 const titleLineBreak = 9;
 const titleLimit = 18;
 
-const selectedOffsetX = -6;
-const selectedOffsetY = -6;
+const selectedOffsetX = -8;
+const selectedOffsetY = -8;
 const selectedWidth = width - selectedOffsetY * 2;
 const selectedHeight = height - selectedOffsetX * 2;
 const selectedCornerRadius = 10;
