@@ -1,34 +1,68 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { History } from 'history';
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Segment, Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../types';
+import * as SO from '../../types/sense-object';
 import * as SM from '../../types/sense-map';
 import * as SB from '../../types/sense-box';
 import * as R from '../../types/routes';
 
 interface StateFromProps {
-  box: SB.BoxData;
+  history: History;
+  scope: typeof SM.initial.scope;
+  boxes: typeof SO.initial.boxes;
+  bid: string;
 }
 
 interface DispatchFromProps {
   actions: {
+    setScopeToBox(box: SB.BoxID): T.ActionChain;
     setScopeToFullmap(): T.ActionChain;
   };
 }
 
-type Props = StateFromProps & DispatchFromProps;
+type RouterProps = RouteComponentProps<{ bid: string }>;
+
+type Props = StateFromProps & DispatchFromProps & RouterProps;
 
 class Breadcrumb extends React.PureComponent<Props> {
+  componentWillMount() {
+    const { actions, bid } = this.props;
+
+    // sync the route to the scope
+    if (bid) {
+      actions.setScopeToBox(bid);
+    } else {
+      actions.setScopeToFullmap();
+    }
+  }
+
+  componentDidUpdate() {
+    const { history, scope, bid } = this.props;
+
+    // sync the scope to the route
+    if (scope.type === SM.MapScopeType.FULL_MAP) {
+      if (bid) {
+        history.push(R.index);
+      }
+    } else {
+      if (scope.box !== bid) {
+        history.push(`${R.index}${scope.box}`);
+      }
+    }
+  }
 
   render() {
-    const { actions, box } = this.props;
+    const { actions, scope, boxes, bid } = this.props;
+    const box = boxes[scope.box || ''] || { title: bid };
 
     return (
       <Segment compact className="breadcrumb">
       <SBreadcrumb>
         {
-          box.id !== SB.emptyBoxData.id
+          scope.type === SM.MapScopeType.BOX
             ? (
               <SBreadcrumb.Section
                 link
@@ -42,7 +76,7 @@ class Breadcrumb extends React.PureComponent<Props> {
             : <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
         }
         {
-          box.id !== SB.emptyBoxData.id &&
+          scope.type === SM.MapScopeType.BOX &&
             (
               <React.Fragment>
                 <SBreadcrumb.Divider icon="right angle" />
@@ -56,22 +90,19 @@ class Breadcrumb extends React.PureComponent<Props> {
   }
 }
 
-export default connect<StateFromProps, DispatchFromProps>(
-  (state: T.State) => {
-    const { senseObject } = state;
+export default withRouter(connect<StateFromProps, DispatchFromProps, RouterProps>(
+  (state: T.State, router) => {
+    const { boxes } = state.senseObject;
     const { scope } = state.senseMap;
+    const { history } = router;
+    const { bid } = router.match.params;
 
-    switch (scope.type) {
-      case SM.MapScopeType.BOX:
-        return { box: senseObject.boxes[scope.box || ''] || SB.emptyBoxData };
-      case SM.MapScopeType.FULL_MAP:
-      default:
-        return { box: SB.emptyBoxData };
-    }
+    return { history, scope, boxes, bid };
   },
   (dispatch: T.Dispatch) => ({
     actions: {
+      setScopeToBox: (box: SB.BoxID) => dispatch(SM.actions.setScopeToBox(box)),
       setScopeToFullmap: () => dispatch(SM.actions.setScopeToFullmap())
     }
   })
-)(Breadcrumb);
+)(Breadcrumb));

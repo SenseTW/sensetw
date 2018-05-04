@@ -7,12 +7,16 @@ import MapPage from '../MapPage';
 import * as R from '../../types/routes';
 import './index.css';
 
+// tslint:disable-next-line
+console.log(R.index);
+
 class App extends React.Component {
   render() {
     return (
       <Router>
         <div className="App">
           <Route exact path={R.index} component={MapPage} />
+          <Route path={`${R.index}:bid`} component={MapPage} />
         </div>
       </Router>
     );
