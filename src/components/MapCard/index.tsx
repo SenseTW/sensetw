@@ -14,17 +14,20 @@ interface Props {
   moveObject?(id: SO.ObjectID, x: number, y: number): void;
 }
 
-const titlePadding = 14;
+const width = 300;
+const height = 180;
+const cornerRadius = 4;
+const titlePadding = 10;
+const titleHeight = 130;
 const titleFontFamily = 'sans-serif';
-const titleFontSize = 14;
-const borderColor = '#999';
-const borderColorSelected = '#9999ff';
-const shadowBlur = 5;
+const titleFontSize = 16;
+// const borderColor = '#999';
+// const borderColorSelected = '#9999ff';
+// const strokeWidth = 0;
+const shadowBlur = 10;
 const shadowColor = '#999';
-const shadowOffsetX = (shadowBlur) / 4;
-const shadowOffsetY = shadowBlur;
-const width = 380;
-const height = 100;
+const shadowOffsetX = 2;
+const shadowOffsetY = 3;
 
 function MapCard(props: Props) {
   const {id, x, y} = props.mapObject;
@@ -51,21 +54,18 @@ function MapCard(props: Props) {
       <Rect
         width={width}
         height={height}
+        fill={bgColor}
+        cornerRadius={cornerRadius}
         shadowBlur={shadowBlur}
         shadowOffsetX={shadowOffsetX}
         shadowOffsetY={shadowOffsetY}
         shadowColor={shadowColor}
-        fill={bgColor}
-      />
-      <Rect
-        width={width}
-        height={height}
-        fill={bgColor}
-        stroke={props.selected ? borderColorSelected : borderColor}
+//        stroke={props.selected ? borderColorSelected : borderColor}
+//        strokeWidth={strokeWidth}
       />
       <Text
         width={width}
-        height={height}
+        height={titleHeight}
         padding={titlePadding}
         fontSize={titleFontSize}
         fontFamily={titleFontFamily}

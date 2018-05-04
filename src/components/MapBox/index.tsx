@@ -15,16 +15,16 @@ interface Props {
   openBox?(box: SB.BoxID): void;
 }
 
-const borderColor = '#21ffc7';
+const width = 300;
+const height = 120;
+const borderColor = '#00ffd2';
 const borderColorSelected = '#ff21c7';
-const borderWidth = 6;
+const borderWidth = 8;
 const bgColor = '#ffffff';
 const titleFontFamily = 'sans-serif';
 const titleColor = '#000000';
-const titleFontSize = 28;
+const titleFontSize = 36;
 const titlePadding = 5;
-const width = 380;
-const height = 100;
 
 function MapBox(props: Props) {
   const {id, x, y} = props.mapObject;

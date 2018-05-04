@@ -13,10 +13,10 @@ export enum CardType {
 }
 
 export const color = {
-  [CardType.NORMAL]: '#ffffff',
-  [CardType.NOTE]: '#ffffff',
-  [CardType.QUESTION]: '#ff9999',
-  [CardType.ANSWER]: '#a7ccf2'
+  [CardType.NORMAL]: 'rgba(255, 255, 255, 1)',
+  [CardType.NOTE]: 'rgba(255, 255, 255, 1)',
+  [CardType.QUESTION]: 'rgba(255, 236, 239, 1)',
+  [CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
 };
 
 export const typeToString = (type: CardType) => {
