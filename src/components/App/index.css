@@ -2,6 +2,8 @@
   height: 100%;
 }
 
-.ui.sidebar {
+.ui.left.sidebar {
   padding-top: 40px;
+  top: 80px !important;
+  height: 85% !important;
 }
