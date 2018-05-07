@@ -409,16 +409,15 @@ const removeCardFromBox =
   (cardObject: ObjectID, box: BoxID) =>
   (dispatch: Dispatch) => {
     const query = `
-      mutation RemoveCardFromBox($cardObject: ID!) {
+      mutation RemoveCardFromBox($cardObject: ID!, $box: ID!) {
         removeFromContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
-          ...objectFields
+          containsObject { id } belongsToBox { id }
         }
       }
-      ${graphQLObjectFieldsFragment}
     `;
     const variables = { cardObject, box };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateNotInBox(cardObject, box)))
+      .then(() => dispatch(updateNotInBox(cardObject, box)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
