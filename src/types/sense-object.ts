@@ -205,6 +205,13 @@ const updateObjects =
     payload: objects,
   });
 
+const OVERWRITE_OBJECTS = 'OVERWRITE_OBJECTS';
+const overwriteObjects =
+  (objects: { [key: string]: ObjectData }) => ({
+    type: OVERWRITE_OBJECTS as typeof OVERWRITE_OBJECTS,
+    payload: objects,
+  });
+
 /**
  * Partially update `cards` state.
  */
@@ -215,6 +222,13 @@ const updateCards =
     payload: cards,
   });
 
+const OVERWRITE_CARDS = 'OVERWRITE_CARDS';
+const overwriteCards =
+  (cards: State['cards']) => ({
+    type: OVERWRITE_CARDS as typeof OVERWRITE_CARDS,
+    payload: cards,
+  });
+
 /**
  * Partially update `boxes` state.
  */
@@ -222,6 +236,13 @@ const UPDATE_BOXES = 'UPDATE_BOXES';
 const updateBoxes =
   (boxes: State['boxes']) => ({
     type: UPDATE_BOXES as typeof UPDATE_BOXES,
+    payload: boxes,
+  });
+
+const OVERWRITE_BOXES = 'OVERWRITE_BOXES';
+const overwriteBoxes =
+  (boxes: State['boxes']) => ({
+    type: OVERWRITE_BOXES as typeof OVERWRITE_BOXES,
     payload: boxes,
   });
 
@@ -296,7 +317,7 @@ const updateRemoteBox =
   };
 
 const loadObjects =
-  (id: MapID) =>
+  (id: MapID, overwrite: Boolean = false) =>
   (dispatch: Dispatch) => {
     const query = `
       query AllObjects($id: ID!) {
@@ -310,11 +331,11 @@ const loadObjects =
     return client.request(query, variables)
       .then(({ allObjects }) => allObjects.map(toObjectData))
       .then(data => toIDMap<ObjectData>(data))
-      .then(data => dispatch(updateObjects(data)));
+      .then(data => dispatch(overwrite ? overwriteObjects(data) : updateObjects(data)));
   };
 
 const loadCards =
-  (id: MapID) =>
+  (id: MapID, overwrite: Boolean = false) =>
   (dispatch: Dispatch) => {
     const query = `
       query AllCards($id: ID!) {
@@ -328,11 +349,11 @@ const loadCards =
     return client.request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData))
       .then(data => toIDMap<CardData>(data))
-      .then(data => dispatch(updateCards(data)));
+      .then(data => dispatch(overwrite ? overwriteCards(data) : updateCards(data)));
   };
 
 const loadBoxes =
-  (id: MapID) =>
+  (id: MapID, overwrite: Boolean = false) =>
   (dispatch: Dispatch) => {
     const query = `
       query AllBoxes($id: ID!) {
@@ -346,7 +367,7 @@ const loadBoxes =
     return client.request(query, variables)
       .then(({ allBoxes }) => allBoxes.map(toBoxData))
       .then(data => toIDMap<BoxData>(data))
-      .then(data => dispatch(updateBoxes(data)));
+      .then(data => dispatch(overwrite ? overwriteBoxes(data) : updateBoxes(data)));
   };
 
 const moveObject =
@@ -435,8 +456,8 @@ const deleteCardWithObject =
     return client.request(query, variables)
       .then(({ deleteCard }: { deleteCard: { objects: { id: ObjectID }[] } }) =>
             Promise.all(deleteCard.objects.map(({ id }) => deleteObjectRequest(id))))
-      .then(() => dispatch(loadCards(map)))
-      .then(() => dispatch(loadObjects(map)));
+      .then(() => dispatch(loadCards(map, true)))
+      .then(() => dispatch(loadObjects(map, true)));
   };
 
 const deleteBoxWithObjectRequest =
@@ -459,8 +480,8 @@ const deleteBoxWithObject =
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
     return deleteBoxWithObjectRequest(boxID)
-      .then(() => dispatch(loadBoxes(map)))
-      .then(() => dispatch(loadObjects(map)));
+      .then(() => dispatch(loadBoxes(map, true)))
+      .then(() => dispatch(loadObjects(map, true)));
   };
 
 const unboxCards =
@@ -469,15 +490,18 @@ const unboxCards =
   (dispatch: any, getState: any) => {
     const { senseMap: { map } } = getState();
     return deleteBoxWithObjectRequest(box)
-      .then(() => dispatch(loadBoxes(map)))
-      .then(() => dispatch(loadObjects(map)))
+      .then(() => dispatch(loadBoxes(map, true)))
+      .then(() => dispatch(loadObjects(map, true)))
       .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 
 export const syncActions = {
   updateObjects,
+  overwriteObjects,
   updateCards,
+  overwriteCards,
   updateBoxes,
+  overwriteBoxes,
   updateNotInBox,
   updateInBox,
 };
@@ -508,16 +532,34 @@ export const reducer = (state: State = initial, action: Action): State => {
         objects: { ...state.objects, ...action.payload },
       };
     }
+    case OVERWRITE_OBJECTS: {
+      return {
+        ...state,
+        objects: action.payload,
+      };
+    }
     case UPDATE_CARDS: {
       return {
         ...state,
         cards: { ...state.cards, ...action.payload },
       };
     }
+    case OVERWRITE_CARDS: {
+      return {
+        ...state,
+        cards: action.payload,
+      };
+    }
     case UPDATE_BOXES: {
       return {
         ...state,
         boxes: { ...state.boxes, ...action.payload },
+      };
+    }
+    case OVERWRITE_BOXES: {
+      return {
+        ...state,
+        boxes: action.payload,
       };
     }
     case UPDATE_NOT_IN_BOX: {
