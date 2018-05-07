@@ -3,8 +3,9 @@ import { CardID, CardData, stringToType as stringToCardType } from './sense-card
 import { BoxID, BoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp } from './utils';
-import { ActionUnion, Dispatch } from '.';
+import { ActionUnion, Dispatch, GetState } from '.';
 import * as SL from './selection';
+import * as SM from './sense-map';
 
 export type ObjectID = string;
 
@@ -388,16 +389,89 @@ const removeCardFromBox =
   (dispatch: Dispatch) => {
     const query = `
       mutation RemoveCardFromBox($cardObject: ID!) {
-        updateObject(id: $cardObject, belongsToId: null) {
+        removeFromContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
           ...objectFields
         }
       }
       ${graphQLObjectFieldsFragment}
     `;
-    const variables = { cardObject };
+    const variables = { cardObject, box };
     return client.request(query, variables)
       .then(({ updateObject }) => dispatch(updateNotInBox(cardObject, box)))
       .then(() => dispatch(SL.actions.clearSelection()));
+  };
+
+const deleteObjectRequest =
+  (objectID: ObjectID) => {
+    const query = `
+      mutation DeleteObject($objectID: ID!) {
+        deleteObject(id: $objectID) { ...objectFields }
+      }
+      ${graphQLObjectFieldsFragment}
+    `;
+    const variables = { objectID };
+    return client.request(query, variables);
+  };
+
+const deleteObject =
+  (objectID: ObjectID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseMap: { map } } = getState();
+    return deleteObjectRequest(objectID)
+      .then(() => dispatch(loadObjects(map)));
+  };
+
+const deleteCardWithObject =
+  (cardID: CardID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const query = `
+      mutation DeleteCard($cardID: ID!) {
+        deleteCard(id: $cardID) { ...cardFields }
+      }
+      ${graphQLCardFieldsFragment}
+    `;
+    const variables = { cardID };
+    const { senseMap: { map } } = getState();
+    return client.request(query, variables)
+      .then(({ deleteCard }: { deleteCard: { objects: { id: ObjectID }[] } }) =>
+            Promise.all(deleteCard.objects.map(({ id }) => deleteObjectRequest(id))))
+      .then(() => dispatch(loadCards(map)))
+      .then(() => dispatch(loadObjects(map)));
+  };
+
+const deleteBoxWithObjectRequest =
+  (boxID: BoxID) => {
+    const query = `
+      mutation DeleteBox($boxID: ID!) {
+        deleteBox(id: $boxID) { ...boxFields }
+      }
+      ${graphQLBoxFieldsFragment}
+    `;
+    const variables = { boxID };
+    return client.request(`query BoxObjects($boxID: ID!) { Box(id: $boxID) { objects { id } } }`, variables)
+      .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
+            Promise.all(Box.objects.map(({ id }) => deleteObjectRequest(id))))
+      .then(() => client.request(query, variables));
+  };
+
+const deleteBoxWithObject =
+  (boxID: BoxID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseMap: { map } } = getState();
+    return deleteBoxWithObjectRequest(boxID)
+      .then(() => dispatch(loadBoxes(map)))
+      .then(() => dispatch(loadObjects(map)));
+  };
+
+const unboxCards =
+  (box: BoxID) =>
+  // tslint:disable-next-line:no-any
+  (dispatch: any, getState: any) => {
+    const { senseMap: { map } } = getState();
+    return deleteBoxWithObjectRequest(box)
+      .then(() => dispatch(loadBoxes(map)))
+      .then(() => dispatch(loadObjects(map)))
+      .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 
 export const syncActions = {
@@ -418,6 +492,10 @@ export const actions = {
   moveObject,
   addCardToBox,
   removeCardFromBox,
+  unboxCards,
+  deleteObject,
+  deleteCardWithObject,
+  deleteBoxWithObject,
 };
 
 export type Action = ActionUnion<typeof syncActions>;

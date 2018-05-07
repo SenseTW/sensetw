@@ -18,6 +18,7 @@ interface DispatchFromProps {
     selectObject(id: SO.ObjectID | null): T.ActionChain,
     addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
     removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
+    unboxCards(box: SB.BoxID): T.ActionChain,
   };
 }
 
@@ -49,6 +50,23 @@ class ObjectMenu extends React.PureComponent<Props> {
     this.handleAddCard = this.handleAddCard.bind(this);
     this.canRemoveCard = this.canRemoveCard.bind(this);
     this.handleRemoveCard = this.handleRemoveCard.bind(this);
+    this.handleUnbox = this.handleUnbox.bind(this);
+  }
+
+  canUnbox(): Boolean {
+    return this.props.scope.type === SM.MapScopeType.BOX;
+  }
+
+  handleUnbox(): void {
+    if (!this.canUnbox()) {
+      return;
+    }
+    const box = this.props.scope.box;
+    if (!box) {
+      throw Error('Scope BOX without a box ID.');
+    }
+    this.props.actions.unboxCards(box);
+    return;
   }
 
   canAddCard(): Boolean {
@@ -117,6 +135,13 @@ class ObjectMenu extends React.PureComponent<Props> {
         >
           退出
         </Menu.Item>
+        <Menu.Item
+          name="unbox"
+          disabled={!this.canUnbox()}
+          onClick={this.handleUnbox}
+        >
+          Unbox
+        </Menu.Item>
       </Menu>
     );
   }
@@ -135,6 +160,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.addCardToBox(card, box)),
       removeCardFromBox: (card, box) =>
         dispatch(T.actions.senseObject.removeCardFromBox(card, box)),
+      unboxCards: (box) =>
+        dispatch(T.actions.senseObject.unboxCards(box)),
     }
   })
 )(ObjectMenu);

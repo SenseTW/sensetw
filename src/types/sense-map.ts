@@ -61,6 +61,7 @@ export const actions = {
 export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
+  map: MapID,
   scope: {
     type: MapScopeType,
     box?: BoxID,
@@ -68,6 +69,7 @@ export type State = {
 };
 
 export const initial: State = {
+  map: 'cjgdo1yhj0si501559s0hgw2a',
   scope: {
     type: MapScopeType.FULL_MAP,
   },

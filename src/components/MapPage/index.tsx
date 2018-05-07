@@ -6,6 +6,7 @@ import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
 import * as T from '../../types';
+import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as SC from '../../types/sense-card';
 import * as SB from '../../types/sense-box';
@@ -14,6 +15,7 @@ import './index.css';
 const background = require('./background-map.png');
 
 interface StateFromProps {
+  map: SM.MapID;
   objectType: SO.ObjectType;
   target: SC.CardData | SB.BoxData | null;
 }
@@ -30,7 +32,7 @@ type Props = StateFromProps & DispatchFromProps;
 
 class MapPage extends React.Component<Props> {
   render() {
-    const { actions, objectType, target } = this.props;
+    const { actions, objectType, target, map } = this.props;
 
     return (
       <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
@@ -56,7 +58,7 @@ class MapPage extends React.Component<Props> {
         </Sidebar>
         <Sidebar.Pusher>
           <Map
-            id="cjgdo1yhj0si501559s0hgw2a"
+            id={map}
             width={1960}
             height={1200}
           />
@@ -70,8 +72,10 @@ class MapPage extends React.Component<Props> {
 
 export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => {
+    const map = state.senseMap.map;
+
     if (!state.editor.id) {
-      return { objectType: SO.ObjectType.NONE, target: null };
+      return { objectType: SO.ObjectType.NONE, target: null, map };
     }
 
     const object = state.senseObject.objects[state.editor.id];
@@ -90,7 +94,7 @@ export default connect<StateFromProps, DispatchFromProps>(
         target = null;
     }
 
-    return { objectType, target };
+    return { objectType, target, map };
   },
   (dispatch: T.Dispatch) => ({
     actions: {

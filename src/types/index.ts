@@ -48,6 +48,8 @@ export const actions = {
 
 export type Dispatch = ReduxDispatch<Action>;
 
+export type GetState = () => State;
+
 export type Reducer = ReduxReducer<State>;
 
 export const reducer = combineReducers({
