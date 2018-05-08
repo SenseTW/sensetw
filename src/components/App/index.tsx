@@ -7,9 +7,6 @@ import MapPage from '../MapPage';
 import * as R from '../../types/routes';
 import './index.css';
 
-// tslint:disable-next-line
-console.log(R.index);
-
 class App extends React.Component {
   render() {
     return (
