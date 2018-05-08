@@ -16,14 +16,15 @@ const background = require('./background-map.png');
 
 interface StateFromProps {
   map: SM.MapID;
-  objectType: SO.ObjectType;
-  target: SC.CardData | SB.BoxData | null;
+  editor: OE.Status;
 }
 
 interface DispatchFromProps {
   actions: {
-    selectObject(id: SO.ObjectID | null): T.ActionChain,
-    updateRemoteBox(box: SB.BoxData): T.ActionChain
+    selectObject(status: OE.Status): T.ActionChain,
+    createBoxObject(mapId: SM.MapID, box: SB.BoxData): T.ActionChain,
+    createCardObject(mapID: SM.MapID, card: SC.CardData): T.ActionChain,
+    updateRemoteBox(box: SB.BoxData): T.ActionChain,
     updateRemoteCard(card: SC.CardData): T.ActionChain
   };
 }
@@ -32,27 +33,44 @@ type Props = StateFromProps & DispatchFromProps;
 
 class MapPage extends React.Component<Props> {
   render() {
-    const { actions, objectType, target, map } = this.props;
+    const { actions, editor, map } = this.props;
+    const { objectType, data } = editor;
 
     return (
       <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
-        <Sidebar visible={!!target} animation="overlay" width="wide">{
-          target &&
+        <Sidebar visible={editor.type !== OE.StatusType.HIDE} animation="overlay" width="wide">{
+          data &&
             <ObjectContent
               objectType={objectType}
-              data={target}
-              onChange={(data) => {
-                switch (objectType) {
-                  case SO.ObjectType.CARD:
-                    actions.updateRemoteCard(data as SC.CardData);
-                    break;
-                  case SO.ObjectType.BOX:
-                    actions.updateRemoteBox(data as SB.BoxData);
-                    break;
-                  default:
+              data={data}
+              changeText={editor.type === OE.StatusType.CREATE ? '送出' : '更新'}
+              onChange={(newData) => {
+                if (editor.type === OE.StatusType.CREATE) {
+                  switch (objectType) {
+                    case SO.ObjectType.CARD:
+                      actions.createCardObject(map, newData as SC.CardData);
+                      // XXX: should we wait for the previous action to complete?
+                      actions.selectObject(OE.hide());
+                      break;
+                    case SO.ObjectType.BOX:
+                      actions.createBoxObject(map, newData as SB.BoxData);
+                      actions.selectObject(OE.hide());
+                      break;
+                    default:
+                  }
+                } else if (editor.type === OE.StatusType.EDIT) {
+                  switch (objectType) {
+                    case SO.ObjectType.CARD:
+                      actions.updateRemoteCard(newData as SC.CardData);
+                      break;
+                    case SO.ObjectType.BOX:
+                      actions.updateRemoteBox(newData as SB.BoxData);
+                      break;
+                    default:
+                  }
                 }
               }}
-              onCancel={() => actions.selectObject(null)}
+              onCancel={() => actions.selectObject(OE.hide())}
             />
         }
         </Sidebar>
@@ -73,32 +91,15 @@ class MapPage extends React.Component<Props> {
 export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => {
     const map = state.senseMap.map;
+    const { editor } = state;
 
-    if (!state.editor.id) {
-      return { objectType: SO.ObjectType.NONE, target: null, map };
-    }
-
-    const object = state.senseObject.objects[state.editor.id];
-    const { objectType, data } = object;
-
-    let target;
-    switch (objectType) {
-      case SO.ObjectType.BOX:
-        target = state.senseObject.boxes[data];
-        break;
-      case SO.ObjectType.CARD:
-        target = state.senseObject.cards[data];
-        break;
-      case SO.ObjectType.NONE:
-      default:
-        target = null;
-    }
-
-    return { objectType, target, map };
+    return { map, editor };
   },
   (dispatch: T.Dispatch) => ({
     actions: {
-      selectObject: (id: SO.ObjectID | null) => dispatch(OE.actions.selectObject(id)),
+      selectObject: (status: OE.Status) => dispatch(OE.actions.selectObject(status)),
+      createBoxObject: (mapId: SM.MapID, box: SB.BoxData) => dispatch(SO.actions.createBoxObject(mapId, box)),
+      createCardObject: (mapId: SM.MapID, card: SC.CardData) => dispatch(SO.actions.createCardObject(mapId, card)),
       updateRemoteBox: (box: SB.BoxData) => dispatch(SO.actions.updateRemoteBox(box)),
       updateRemoteCard: (card: SC.CardData) => dispatch(SO.actions.updateRemoteCard(card))
     }

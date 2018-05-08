@@ -1,6 +1,6 @@
 import { client } from './client';
-import { CardID, CardData, stringToType as stringToCardType } from './sense-card';
-import { BoxID, BoxData } from './sense-box';
+import { CardID, CardData, emptyCardData, stringToType as stringToCardType } from './sense-card';
+import { BoxID, BoxData, emptyBoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp } from './utils';
 import { ActionUnion, Dispatch, GetState } from '.';
@@ -43,6 +43,19 @@ export interface ObjectData {
   data:       CardID | BoxID;
 }
 
+export const emptyObjectData = {
+  id: '0',
+  createdAt: 0,
+  updatedAt: 0,
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  zIndex: 0,
+  objectType: ObjectType.NONE,
+  data: '0',
+};
+
 export type State = {
   objects: { [key: string]: ObjectData },
   cards:   { [key: string]: CardData },
@@ -54,6 +67,10 @@ export const initial: State = {
   cards:   {},
   boxes:   {},
 };
+
+export const getObject = (state: State, id: ObjectID): ObjectData => state.objects[id] || emptyObjectData;
+export const getCard = (state: State, id: CardID): CardData => state.cards[id] || emptyCardData;
+export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
 
 const graphQLObjectFieldsFragment = `
   fragment objectFields on Object {
@@ -266,6 +283,39 @@ const updateInBox =
     payload: { cardObject, box }
   });
 
+const createCard =
+  (mapId: MapID, card: CardData) =>
+  async (dispatch: Dispatch) => {
+    const query = `
+      mutation CreateCard(
+        $title: String,
+        $summary: String,
+        $saidBy: String,
+        $stakeholder: String,
+        $url: String,
+        $cardType: CardType,
+        $mapId: ID
+      ) {
+        createCard(
+          title: $title,
+          summary: $summary,
+          saidBy: $saidBy,
+          stakeholder: $stakeholder,
+          url: $url,
+          cardType: $cardType,
+          mapId: $mapId
+        ) {
+          ...cardFields
+        }
+      }
+      ${graphQLCardFieldsFragment}
+    `;
+    return client.request(query, { ...card, mapId })
+      .then(({ createCard: newCard }) => dispatch(updateCards(toIDMap<CardData>([
+        toCardData(newCard),
+      ]))));
+  };
+
 const updateRemoteCard =
   (card: CardData) =>
   (dispatch: Dispatch) => {
@@ -296,6 +346,23 @@ const updateRemoteCard =
     return client.request(query, card)
       .then(({ updateCard: newCard }) => dispatch(updateCards(toIDMap<CardData>([
         toCardData(newCard),
+      ]))));
+  };
+
+const createBox =
+  (mapId: MapID, box: BoxData) =>
+  async (dispatch: Dispatch) => {
+    const query = `
+      mutation CreateBox($title: String, $summary: String, $mapId: ID) {
+        createBox(title: $title, summary: $summary, mapId: $mapId) {
+          ...boxFields
+        }
+      }
+      ${graphQLBoxFieldsFragment}
+    `;
+    return client.request(query, { ...box, mapId })
+      .then(({ createBox: newBox }) => dispatch(updateBoxes(toIDMap<BoxData>([
+        toBoxData(newBox),
       ]))));
   };
 
@@ -368,6 +435,78 @@ const loadBoxes =
       .then(({ allBoxes }) => allBoxes.map(toBoxData))
       .then(data => toIDMap<BoxData>(data))
       .then(data => dispatch(overwrite ? overwriteBoxes(data) : updateBoxes(data)));
+  };
+
+const createObject =
+  (mapId: MapID, data: ObjectData) =>
+  (dispatch: Dispatch) => {
+    const query = `
+      mutation CreateObject(
+        $x: Float!,
+        $y: Float!,
+        $width: Float!,
+        $height: Float!,
+        $zIndex: Float!,
+        $objectType: ObjectType!,
+        $data: ID,
+        $mapId: ID
+      ) {
+        createObject(
+          x: $x,
+          y: $y,
+          width: $width,
+          height: $height,
+          zIndex: $zIndex,
+          objectType: $objectType,
+          ${
+            data.objectType === ObjectType.BOX
+              ? 'boxId: $data,' :
+            data.objectType === ObjectType.CARD
+              ? 'cardId: $data,' :
+            // otherwise
+              ''
+          }
+          mapId: $mapId
+        ) {
+          ...objectFields
+        }
+      }
+      ${graphQLObjectFieldsFragment}
+    `;
+    return client.request(query, { ...data, mapId })
+      .then(({ createObject: newObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
+        toObjectData(newObject),
+      ]))));
+  };
+
+const createBoxObject =
+  (mapId: MapID, box: BoxData) =>
+  async (dispatch: Dispatch) => {
+    const action = await createBox(mapId, box)(dispatch);
+    const { id = '' } = Object.values(action.payload)[0] || {};
+    return createObject(
+      mapId,
+      {
+        ...emptyObjectData,
+        objectType: ObjectType.BOX,
+        data: id,
+      }
+    )(dispatch);
+  };
+
+const createCardObject =
+  (mapId: MapID, card: CardData) =>
+  async (dispatch: Dispatch) => {
+    const action = await createCard(mapId, card)(dispatch);
+    const { id = '' } = Object.values(action.payload)[0] || {};
+    return createObject(
+      mapId,
+      {
+        ...emptyObjectData,
+        objectType: ObjectType.CARD,
+        data: id,
+      }
+    )(dispatch);
   };
 
 const moveObject =
@@ -512,6 +651,8 @@ export const actions = {
   loadObjects,
   loadCards,
   loadBoxes,
+  createBoxObject,
+  createCardObject,
   moveObject,
   addCardToBox,
   removeCardFromBox,
@@ -601,19 +742,6 @@ export const reducer = (state: State = initial, action: Action): State => {
       return state;
     }
   }
-};
-
-export const emptyObjectData = {
-  id: '0',
-  createdAt: 0,
-  updatedAt: 0,
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
-  zIndex: 0,
-  objectType: ObjectType.NONE,
-  data: '0',
 };
 
 export const sampleStateObjects = {

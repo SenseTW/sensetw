@@ -17,7 +17,7 @@ export type State = {
   senseMap: SM.State,
   senseObject: SO.State,
   selection: SL.State,
-  editor: OE.State
+  editor: OE.State,
 };
 
 export const initial: State = {
@@ -25,7 +25,7 @@ export const initial: State = {
   senseMap: SM.initial,
   senseObject: SO.initial,
   selection: SL.initial,
-  editor: OE.initial
+  editor: OE.initial,
 };
 
 export type Action
@@ -43,7 +43,7 @@ export const actions = {
   senseMap: SM.actions,
   senseObject: SO.actions,
   selection: SL.actions,
-  editor: OE.actions
+  editor: OE.actions,
 };
 
 export type Dispatch = ReduxDispatch<Action>;
@@ -57,5 +57,5 @@ export const reducer = combineReducers({
   senseMap: SM.reducer,
   senseObject: SO.reducer,
   selection: SL.reducer,
-  editor: OE.reducer
+  editor: OE.reducer,
 });

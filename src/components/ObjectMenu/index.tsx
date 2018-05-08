@@ -6,16 +6,18 @@ import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
+import * as SC from '../../types/sense-card';
+import * as OE from '../../types/object-editor';
 
 interface StateFromProps {
-  selection: SL.State;
-  objects:   SO.State['objects'];
-  scope:     SM.State['scope'];
+  selection:   SL.State;
+  senseObject: SO.State;
+  scope:       SM.State['scope'];
 }
 
 interface DispatchFromProps {
   actions: {
-    selectObject(id: SO.ObjectID | null): T.ActionChain,
+    selectObject(status: OE.Status): T.ActionChain,
     addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
     removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
     unboxCards(box: SB.BoxID): T.ActionChain,
@@ -28,7 +30,7 @@ const selectedCardsAndBoxes:
   (props: Props) => { cards: SO.ObjectID[], boxes: SO.ObjectID[] } =
   props => props.selection.reduce(
     (acc, id) => {
-      switch (props.objects[id].objectType) {
+      switch (props.senseObject.objects[id].objectType) {
         case SO.ObjectType.CARD: {
           return { ...acc, cards: [ ...acc.cards, id ] };
         }
@@ -82,7 +84,7 @@ class ObjectMenu extends React.PureComponent<Props> {
       return;
     }
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    this.props.actions.addCardToBox(cards[0], this.props.objects[boxes[0]].data);
+    this.props.actions.addCardToBox(cards[0], this.props.senseObject.objects[boxes[0]].data);
     return;
   }
 
@@ -105,7 +107,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, selection } = this.props;
+    const { actions, senseObject, selection } = this.props;
 
     return (
       <Menu vertical>
@@ -115,9 +117,34 @@ class ObjectMenu extends React.PureComponent<Props> {
             : `選取了 ${selection.length} 張卡片`
         }</Menu.Item>
         <Menu.Item
+          name="create-box"
+          onClick={() => actions.selectObject(OE.createBox(SB.emptyBoxData))}
+        >
+          新增 Box
+        </Menu.Item>
+        <Menu.Item
+          name="create-card"
+          onClick={() => actions.selectObject(OE.createCard(SC.emptyCardData))}
+        >
+          新增卡片
+        </Menu.Item>
+        <Menu.Item
           name="edit"
           disabled={selection.length !== 1}
-          onClick={() => actions.selectObject(selection[0])}
+          onClick={() => {
+            const id = selection[0];
+            const object = SO.getObject(senseObject, id);
+
+            switch (object.objectType) {
+              case SO.ObjectType.BOX:
+                actions.selectObject(OE.editBox(SO.getBox(senseObject, object.data)));
+                break;
+              case SO.ObjectType.CARD:
+                actions.selectObject(OE.editCard(SO.getCard(senseObject, object.data)));
+                break;
+              default:
+            }
+          }}
         >
           編輯
         </Menu.Item>
@@ -151,11 +178,11 @@ export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => ({
     selection: state.selection,
     scope: state.senseMap.scope,
-    objects: state.senseObject.objects,
+    senseObject: state.senseObject,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      selectObject: (id: SO.ObjectID | null) => dispatch(T.actions.editor.selectObject(id)),
+      selectObject: (status: OE.Status) => dispatch(T.actions.editor.selectObject(status)),
       addCardToBox: (card, box) =>
         dispatch(T.actions.senseObject.addCardToBox(card, box)),
       removeCardFromBox: (card, box) =>

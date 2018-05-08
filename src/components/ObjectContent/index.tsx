@@ -15,6 +15,7 @@ type Data
 interface Props {
   objectType: SO.ObjectType;
   data: Data;
+  changeText?: string;
   onChange? (value: Data): void;
   onCancel? (): void;
 }
@@ -132,7 +133,7 @@ class ObjectContent extends React.Component<Props, State> {
   }
 
   render() {
-    const { objectType, onCancel } = this.props;
+    const { objectType, changeText, onCancel } = this.props;
     const { data } = this.state;
 
     let content;
@@ -175,7 +176,7 @@ class ObjectContent extends React.Component<Props, State> {
               關閉
             </Button>
             <Button.Or />
-            <Button positive onClick={this.handleSave}>更新</Button>
+            <Button positive onClick={this.handleSave}>{changeText || '送出'}</Button>
           </Button.Group>
         </div>
       </div>

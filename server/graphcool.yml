@@ -27,6 +27,10 @@ permissions:
 - operation: Object.delete
 - operation: MapObjects.connect
 - operation: MapObjects.disconnect
+- operation: MapCards.connect
+- operation: MapCards.disconnect
+- operation: MapBoxes.connect
+- operation: MapBoxes.disconnect
 - operation: ObjectCard.connect
 - operation: ObjectCard.disconnect
 - operation: ObjectBox.connect
