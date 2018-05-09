@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import * as T from '../../types';
 import { noop } from '../../types/utils';
-import { moveStart, moveEnd } from '../../tools/point';
+import { moveStart, moveEnd } from '../../graphics/point';
 
 interface Props {
   mapObject: T.ObjectData;
