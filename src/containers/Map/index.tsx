@@ -2,30 +2,26 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
-import * as SM from '../../types/sense-map';
-import * as SO from '../../types/sense-object';
-// import * as SC from '../../types/sense-card';
-import * as SB from '../../types/sense-box';
 import * as T from '../../types';
 
 interface OwnProps extends CO.OwnProps {
-  id: SM.MapID;
+  id: T.MapID;
 }
 
 interface StateFromProps extends CO.StateFromProps {
-  scope: { type: SM.MapScopeType, box?: SB.BoxID };
+  scope: { type: T.MapScopeType, box?: T.BoxID };
 }
 
 interface DispatchFromProps extends CO.DispatchFromProps {
   actions: {
-    toggleObjectSelection(id: SO.ObjectID): T.ActionChain,
-    loadObjects(id: SM.MapID): T.ActionChain,
-    loadCards(id: SM.MapID): T.ActionChain,
-    loadBoxes(id: SM.MapID): T.ActionChain,
-    moveObject(id: SO.ObjectID, x: number, y: number): T.ActionChain,
-    addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
-    removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
-    openBox(box: SB.BoxID): T.ActionChain,
+    toggleObjectSelection(id: T.ObjectID): T.ActionChain,
+    loadObjects(id: T.MapID): T.ActionChain,
+    loadCards(id: T.MapID): T.ActionChain,
+    loadBoxes(id: T.MapID): T.ActionChain,
+    moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
+    addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
+    removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
+    openBox(box: T.BoxID): T.ActionChain,
   };
 }
 
@@ -40,7 +36,7 @@ class Map extends React.Component<Props> {
 
   render() {
     let componentProps = this.props;
-    if (this.props.scope.type === SM.MapScopeType.BOX && !!this.props.scope.box) {
+    if (this.props.scope.type === T.MapScopeType.BOX && !!this.props.scope.box) {
       const box = this.props.boxes[this.props.scope.box];
       if (!!box) {
         const objects = Object.keys(box.contains).reduce(
@@ -78,21 +74,21 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      toggleObjectSelection: (id: SO.ObjectID) =>
+      toggleObjectSelection: (id: T.ObjectID) =>
         dispatch(T.actions.selection.toggleObjectSelection(id)),
-      loadObjects: (id: SM.MapID) =>
+      loadObjects: (id: T.MapID) =>
         dispatch(T.actions.senseObject.loadObjects(id)),
-      loadCards: (id: SM.MapID) =>
+      loadCards: (id: T.MapID) =>
         dispatch(T.actions.senseObject.loadCards(id)),
-      loadBoxes: (id: SM.MapID) =>
+      loadBoxes: (id: T.MapID) =>
         dispatch(T.actions.senseObject.loadBoxes(id)),
-      moveObject: (id: SO.ObjectID, x: number, y: number) =>
+      moveObject: (id: T.ObjectID, x: number, y: number) =>
         dispatch(T.actions.senseObject.moveObject(id, x, y)),
-      addCardToBox: (card: SO.ObjectID, box: SB.BoxID) =>
+      addCardToBox: (card: T.ObjectID, box: T.BoxID) =>
         dispatch(T.actions.senseObject.addCardToBox(card, box)),
-      removeCardFromBox: (card: SO.ObjectID, box: SB.BoxID) =>
+      removeCardFromBox: (card: T.ObjectID, box: T.BoxID) =>
         dispatch(T.actions.senseObject.removeCardFromBox(card, box)),
-      openBox: (box: SB.BoxID) =>
+      openBox: (box: T.BoxID) =>
         dispatch(T.actions.senseMap.openBox(box)),
     }
   })

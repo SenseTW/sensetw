@@ -4,8 +4,6 @@ import { Stage, Layer } from 'react-konva';
 import MapBox from '../MapBox';
 import MapCard from '../MapCard';
 import { Group } from 'react-konva';
-import * as SO from '../../types/sense-object';
-import * as SB from '../../types/sense-box';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
 
@@ -18,11 +16,11 @@ export interface StateFromProps {
 
 export interface DispatchFromProps {
   actions: {
-    toggleObjectSelection(id: SO.ObjectID): T.ActionChain,
-    moveObject(id: SO.ObjectID, x: number, y: number): T.ActionChain,
-    addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
-    removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
-    openBox(box: SB.BoxID): T.ActionChain,
+    toggleObjectSelection(id: T.ObjectID): T.ActionChain,
+    moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
+    addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
+    removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
+    openBox(box: T.BoxID): T.ActionChain,
   };
 }
 
@@ -33,15 +31,15 @@ export interface OwnProps {
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
-const renderObject = (o: SO.ObjectData, props: Props) => {
+const renderObject = (o: T.ObjectData, props: Props) => {
   const toggleSelection = props.actions.toggleObjectSelection;
   const moveObject = props.actions.moveObject;
   const openBox = props.actions.openBox;
   switch (o.objectType) {
-    case SO.ObjectType.NONE: {
+    case T.ObjectType.NONE: {
       return <Group />;
     }
-    case SO.ObjectType.CARD: {
+    case T.ObjectType.CARD: {
       if (!props.cards[o.data]) {
         return <Group />;
       }
@@ -54,7 +52,7 @@ const renderObject = (o: SO.ObjectData, props: Props) => {
           moveObject={moveObject}
         />);
     }
-    case SO.ObjectType.BOX: {
+    case T.ObjectType.BOX: {
       if (!props.boxes[o.data]) {
         return <Group />;
       }

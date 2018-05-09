@@ -1,18 +1,17 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import * as SO from '../../types/sense-object';
-import * as SB from '../../types/sense-box';
+import * as T from '../../types';
 import { noop } from '../../types/utils';
 import { moveStart, moveEnd } from '../../tools/point';
 
 interface Props {
-  mapObject: SO.ObjectData;
-  box: SB.BoxData;
+  mapObject: T.ObjectData;
+  box: T.BoxData;
   selected?: Boolean;
-  toggleSelection?(id: SO.ObjectID): void;
-  moveObject?(id: SO.ObjectID, x: number, y: number): void;
-  openBox?(box: SB.BoxID): void;
+  toggleSelection?(id: T.ObjectID): void;
+  moveObject?(id: T.ObjectID, x: number, y: number): void;
+  openBox?(box: T.BoxID): void;
 }
 
 const width = 240;

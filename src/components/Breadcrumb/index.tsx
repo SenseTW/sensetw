@@ -4,21 +4,18 @@ import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Segment, Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../types';
-import * as SO from '../../types/sense-object';
-import * as SM from '../../types/sense-map';
-import * as SB from '../../types/sense-box';
 import * as R from '../../types/routes';
 
 interface StateFromProps {
   history: History;
-  scope: typeof SM.initial.scope;
-  boxes: typeof SO.initial.boxes;
+  scope: typeof T.initial.senseMap.scope;
+  boxes: typeof T.initial.senseObject.boxes;
   bid: string;
 }
 
 interface DispatchFromProps {
   actions: {
-    setScopeToBox(box: SB.BoxID): T.ActionChain;
+    setScopeToBox(box: T.BoxID): T.ActionChain;
     setScopeToFullmap(): T.ActionChain;
   };
 }
@@ -43,7 +40,7 @@ class Breadcrumb extends React.PureComponent<Props> {
     const { history, scope, bid } = this.props;
 
     // sync the scope to the route
-    if (scope.type === SM.MapScopeType.FULL_MAP) {
+    if (scope.type === T.MapScopeType.FULL_MAP) {
       if (bid) {
         history.push(R.index);
       }
@@ -62,7 +59,7 @@ class Breadcrumb extends React.PureComponent<Props> {
       <Segment compact className="breadcrumb">
       <SBreadcrumb>
         {
-          scope.type === SM.MapScopeType.BOX
+          scope.type === T.MapScopeType.BOX
             ? (
               <SBreadcrumb.Section
                 link
@@ -76,7 +73,7 @@ class Breadcrumb extends React.PureComponent<Props> {
             : <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
         }
         {
-          scope.type === SM.MapScopeType.BOX &&
+          scope.type === T.MapScopeType.BOX &&
             (
               <React.Fragment>
                 <SBreadcrumb.Divider icon="right angle" />
@@ -101,8 +98,8 @@ export default withRouter(connect<StateFromProps, DispatchFromProps, RouterProps
   },
   (dispatch: T.Dispatch) => ({
     actions: {
-      setScopeToBox: (box: SB.BoxID) => dispatch(SM.actions.setScopeToBox(box)),
-      setScopeToFullmap: () => dispatch(SM.actions.setScopeToFullmap())
+      setScopeToBox: (box: T.BoxID) => dispatch(T.actions.senseMap.setScopeToBox(box)),
+      setScopeToFullmap: () => dispatch(T.actions.senseMap.setScopeToFullmap())
     }
   })
 )(Breadcrumb));

@@ -1,17 +1,16 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import * as SO from '../../types/sense-object';
-import * as SC from '../../types/sense-card';
+import * as T from '../../types';
 import { noop } from '../../types/utils';
 import { moveStart, moveEnd } from '../../tools/point';
 
 interface Props {
-  mapObject: SO.ObjectData;
-  card: SC.CardData;
+  mapObject: T.ObjectData;
+  card: T.CardData;
   selected?: Boolean;
-  toggleSelection?(id: SO.ObjectID): void;
-  moveObject?(id: SO.ObjectID, x: number, y: number): void;
+  toggleSelection?(id: T.ObjectID): void;
+  moveObject?(id: T.ObjectID, x: number, y: number): void;
 }
 
 const width = 240;
@@ -42,6 +41,13 @@ const titleHeight = titleAbsoluteLineHeight * 2;
 const titleColor = '#5a5a5a';
 const titleLimit = 32;
 
+const color = {
+  [T.CardType.NORMAL]: 'rgba(255, 255, 255, 1)',
+  [T.CardType.NOTE]: 'rgba(255, 255, 255, 1)',
+  [T.CardType.QUESTION]: 'rgba(255, 236, 239, 1)',
+  [T.CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
+};
+
 const shadowBlur = 10;
 const shadowColor = '#999';
 const shadowOffsetX = 2;
@@ -63,7 +69,7 @@ function MapCard(props: Props) {
 
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
-  const bgColor = SC.color[cardType];
+  const bgColor         = color[cardType];
 
   const selected = (
     <Rect

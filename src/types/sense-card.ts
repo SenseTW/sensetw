@@ -12,13 +12,6 @@ export enum CardType {
   NOTE = 'NOTE',
 }
 
-export const color = {
-  [CardType.NORMAL]: 'rgba(255, 255, 255, 1)',
-  [CardType.NOTE]: 'rgba(255, 255, 255, 1)',
-  [CardType.QUESTION]: 'rgba(255, 236, 239, 1)',
-  [CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
-};
-
 export const typeToString = (type: CardType) => {
   switch (type) {
     case CardType.NORMAL:

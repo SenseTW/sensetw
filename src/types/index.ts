@@ -6,6 +6,11 @@ import * as SC from './sense-card';
 import * as SL from './selection';
 import * as OE from './object-editor';
 
+export { MapID, MapScopeType } from './sense-map';
+export { ObjectID, ObjectType, ObjectData } from './sense-object';
+export { CardID, CardType, CardData } from './sense-card';
+export { BoxID, BoxData } from './sense-box';
+
 export const emptyAction = { type: null };
 // tslint:disable-next-line:no-any
 type FunctionType = (...args: any[]) => any;

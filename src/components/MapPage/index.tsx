@@ -6,26 +6,22 @@ import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
 import * as T from '../../types';
-import * as SM from '../../types/sense-map';
-import * as SO from '../../types/sense-object';
-import * as SC from '../../types/sense-card';
-import * as SB from '../../types/sense-box';
 import * as OE from '../../types/object-editor';
 import './index.css';
 const background = require('./background-map.png');
 
 interface StateFromProps {
-  map: SM.MapID;
+  map: T.MapID;
   editor: OE.Status;
 }
 
 interface DispatchFromProps {
   actions: {
     selectObject(status: OE.Status): T.ActionChain,
-    createBoxObject(mapId: SM.MapID, box: SB.BoxData): T.ActionChain,
-    createCardObject(mapID: SM.MapID, card: SC.CardData): T.ActionChain,
-    updateRemoteBox(box: SB.BoxData): T.ActionChain,
-    updateRemoteCard(card: SC.CardData): T.ActionChain
+    createBoxObject(mapId: T.MapID, box: T.BoxData): T.ActionChain,
+    createCardObject(mapID: T.MapID, card: T.CardData): T.ActionChain,
+    updateRemoteBox(box: T.BoxData): T.ActionChain,
+    updateRemoteCard(card: T.CardData): T.ActionChain
   };
 }
 
@@ -47,24 +43,24 @@ class MapPage extends React.Component<Props> {
               onChange={(newData) => {
                 if (editor.type === OE.StatusType.CREATE) {
                   switch (objectType) {
-                    case SO.ObjectType.CARD:
-                      actions.createCardObject(map, newData as SC.CardData);
+                    case T.ObjectType.CARD:
+                      actions.createCardObject(map, newData as T.CardData);
                       // XXX: should we wait for the previous action to complete?
                       actions.selectObject(OE.hide());
                       break;
-                    case SO.ObjectType.BOX:
-                      actions.createBoxObject(map, newData as SB.BoxData);
+                    case T.ObjectType.BOX:
+                      actions.createBoxObject(map, newData as T.BoxData);
                       actions.selectObject(OE.hide());
                       break;
                     default:
                   }
                 } else if (editor.type === OE.StatusType.EDIT) {
                   switch (objectType) {
-                    case SO.ObjectType.CARD:
-                      actions.updateRemoteCard(newData as SC.CardData);
+                    case T.ObjectType.CARD:
+                      actions.updateRemoteCard(newData as T.CardData);
                       break;
-                    case SO.ObjectType.BOX:
-                      actions.updateRemoteBox(newData as SB.BoxData);
+                    case T.ObjectType.BOX:
+                      actions.updateRemoteBox(newData as T.BoxData);
                       break;
                     default:
                   }
@@ -98,10 +94,12 @@ export default connect<StateFromProps, DispatchFromProps>(
   (dispatch: T.Dispatch) => ({
     actions: {
       selectObject: (status: OE.Status) => dispatch(OE.actions.selectObject(status)),
-      createBoxObject: (mapId: SM.MapID, box: SB.BoxData) => dispatch(SO.actions.createBoxObject(mapId, box)),
-      createCardObject: (mapId: SM.MapID, card: SC.CardData) => dispatch(SO.actions.createCardObject(mapId, card)),
-      updateRemoteBox: (box: SB.BoxData) => dispatch(SO.actions.updateRemoteBox(box)),
-      updateRemoteCard: (card: SC.CardData) => dispatch(SO.actions.updateRemoteCard(card))
+      createBoxObject: (mapId: T.MapID, box: T.BoxData) =>
+        dispatch(T.actions.senseObject.createBoxObject(mapId, box)),
+      createCardObject: (mapId: T.MapID, card: T.CardData) =>
+        dispatch(T.actions.senseObject.createCardObject(mapId, card)),
+      updateRemoteBox: (box: T.BoxData) => dispatch(T.actions.senseObject.updateRemoteBox(box)),
+      updateRemoteCard: (card: T.CardData) => dispatch(T.actions.senseObject.updateRemoteCard(card))
     }
   })
 )(MapPage);

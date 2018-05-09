@@ -3,7 +3,7 @@ import { Key } from 'ts-keycode-enum';
 import { Divider, Button } from 'semantic-ui-react';
 import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
-import * as SO from '../../types/sense-object';
+import * as T from '../../types';
 import * as SC from '../../types/sense-card';
 import * as SB from '../../types/sense-box';
 import './index.css';
@@ -13,7 +13,7 @@ type Data
   | SB.BoxData;
 
 interface Props {
-  objectType: SO.ObjectType;
+  objectType: T.ObjectType;
   data: Data;
   changeText?: string;
   onChange? (value: Data): void;
@@ -26,7 +26,7 @@ interface State {
 
 class ObjectContent extends React.Component<Props, State> {
   static defaultProps = {
-    objectType: SO.ObjectType.CARD,
+    objectType: T.ObjectType.CARD,
     data: SC.emptyCardData
   };
 
@@ -36,12 +36,12 @@ class ObjectContent extends React.Component<Props, State> {
     const { objectType, data } = props;
 
     switch (objectType) {
-      case SO.ObjectType.CARD:
+      case T.ObjectType.CARD:
         this.state = {
           data: SC.reducer(data as SC.CardData)
         };
         break;
-      case SO.ObjectType.BOX:
+      case T.ObjectType.BOX:
         this.state = {
           data: SB.reducer(data as SB.BoxData)
         };
@@ -59,12 +59,12 @@ class ObjectContent extends React.Component<Props, State> {
       const { objectType, data } = nextProps;
 
       switch (objectType) {
-        case SO.ObjectType.CARD:
+        case T.ObjectType.CARD:
           this.setState({
             data: SC.reducer(data as SC.CardData)
           });
           break;
-        case SO.ObjectType.BOX:
+        case T.ObjectType.BOX:
           this.setState({
             data: SB.reducer(data as SB.BoxData)
           });
@@ -79,12 +79,12 @@ class ObjectContent extends React.Component<Props, State> {
     const { data } = this.state;
 
     switch (objectType) {
-      case SO.ObjectType.CARD:
+      case T.ObjectType.CARD:
         this.setState({
           data: SC.reducer(data as SC.CardData, action as SC.Action)
         });
         break;
-      case SO.ObjectType.BOX:
+      case T.ObjectType.BOX:
         this.setState({
           data: SB.reducer(data as SB.BoxData, action as SB.Action)
         });
@@ -118,12 +118,12 @@ class ObjectContent extends React.Component<Props, State> {
     const { objectType, data } = this.props;
 
     switch (objectType) {
-      case SO.ObjectType.CARD:
+      case T.ObjectType.CARD:
         this.setState({
           data: SC.reducer(data as SC.CardData)
         });
         break;
-      case SO.ObjectType.BOX:
+      case T.ObjectType.BOX:
         this.setState({
           data: SB.reducer(data as SB.BoxData)
         });
@@ -138,7 +138,7 @@ class ObjectContent extends React.Component<Props, State> {
 
     let content;
     switch (objectType) {
-      case SO.ObjectType.CARD:
+      case T.ObjectType.CARD:
         content = (
           <CardContent
             data={data as SC.CardData}
@@ -147,7 +147,7 @@ class ObjectContent extends React.Component<Props, State> {
           />
         );
         break;
-      case SO.ObjectType.BOX:
+      case T.ObjectType.BOX:
         content = (
           <BoxContent
             data={data as SB.BoxData}

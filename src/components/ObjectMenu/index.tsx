@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { Menu } from 'semantic-ui-react';
 import * as T from '../../types';
 import * as SL from '../../types/selection';
-import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
 import * as SC from '../../types/sense-card';
@@ -11,15 +10,15 @@ import * as OE from '../../types/object-editor';
 
 interface StateFromProps {
   selection:   SL.State;
-  senseObject: SO.State;
-  scope:       SM.State['scope'];
+  senseObject: T.State['senseObject'];
+  scope:       T.State['senseMap']['scope'];
 }
 
 interface DispatchFromProps {
   actions: {
     selectObject(status: OE.Status): T.ActionChain,
-    addCardToBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
-    removeCardFromBox(card: SO.ObjectID, box: SB.BoxID): T.ActionChain,
+    addCardToBox(card: T.ObjectID, box: SB.BoxID): T.ActionChain,
+    removeCardFromBox(card: T.ObjectID, box: SB.BoxID): T.ActionChain,
     unboxCards(box: SB.BoxID): T.ActionChain,
   };
 }
@@ -27,14 +26,14 @@ interface DispatchFromProps {
 type Props = StateFromProps & DispatchFromProps;
 
 const selectedCardsAndBoxes:
-  (props: Props) => { cards: SO.ObjectID[], boxes: SO.ObjectID[] } =
+  (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
   props => props.selection.reduce(
     (acc, id) => {
       switch (props.senseObject.objects[id].objectType) {
-        case SO.ObjectType.CARD: {
+        case T.ObjectType.CARD: {
           return { ...acc, cards: [ ...acc.cards, id ] };
         }
-        case SO.ObjectType.BOX: {
+        case T.ObjectType.BOX: {
           return { ...acc, boxes: [ ...acc.boxes, id ] };
         }
         default: {
@@ -56,7 +55,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canUnbox(): Boolean {
-    return this.props.scope.type === SM.MapScopeType.BOX;
+    return this.props.scope.type === T.MapScopeType.BOX;
   }
 
   handleUnbox(): void {
@@ -72,7 +71,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canAddCard(): Boolean {
-    if (this.props.scope.type !== SM.MapScopeType.FULL_MAP) {
+    if (this.props.scope.type !== T.MapScopeType.FULL_MAP) {
       return false;
     }
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
@@ -89,7 +88,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canRemoveCard(): Boolean {
-    return this.props.scope.type === SM.MapScopeType.BOX
+    return this.props.scope.type === T.MapScopeType.BOX
       && this.props.selection.length === 1;
   }
 
@@ -136,10 +135,10 @@ class ObjectMenu extends React.PureComponent<Props> {
             const object = SO.getObject(senseObject, id);
 
             switch (object.objectType) {
-              case SO.ObjectType.BOX:
+              case T.ObjectType.BOX:
                 actions.selectObject(OE.editBox(SO.getBox(senseObject, object.data)));
                 break;
-              case SO.ObjectType.CARD:
+              case T.ObjectType.CARD:
                 actions.selectObject(OE.editCard(SO.getCard(senseObject, object.data)));
                 break;
               default:
