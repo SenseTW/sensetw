@@ -583,19 +583,30 @@ const deleteObject =
 const deleteCardWithObject =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const query = `
-      mutation DeleteCard($cardID: ID!) {
-        deleteCard(id: $cardID) { ...cardFields }
+    let query = `
+      query GetCard($cardID: ID!) {
+        Card(id: $cardID) { ...cardFields }
       }
       ${graphQLCardFieldsFragment}
     `;
-    const variables = { cardID };
-    const { senseMap: { map } } = getState();
+    let variables = { cardID };
     return client.request(query, variables)
-      .then(({ deleteCard }: { deleteCard: { objects: { id: ObjectID }[] } }) =>
-            Promise.all(deleteCard.objects.map(({ id }) => deleteObjectRequest(id))))
-      .then(() => dispatch(loadCards(map, true)))
-      .then(() => dispatch(loadObjects(map, true)));
+      .then(({ Card }: { Card: { objects: { id: ObjectID }[] } }) =>
+            Promise.all(Card.objects.map(({ id }) => deleteObjectRequest(id))))
+      .then(() => {
+        query = `
+          mutation DeleteCard($cardID: ID!) {
+            deleteCard(id: $cardID) { ...cardFields }
+          }
+          ${graphQLCardFieldsFragment}
+        `;
+        variables = { cardID };
+        const { senseMap: { map } } = getState();
+        return client.request(query, variables)
+          .then(() => SL.actions.clearSelection())
+          .then(() => dispatch(loadCards(map, true)))
+          .then(() => dispatch(loadObjects(map, true)));
+      });
   };
 
 const deleteBoxWithObjectRequest =
