@@ -54,6 +54,14 @@ class ObjectMenu extends React.PureComponent<Props> {
     this.handleUnbox = this.handleUnbox.bind(this);
   }
 
+  canCreateBox(): Boolean {
+    return this.props.scope.type === T.MapScopeType.FULL_MAP;
+  }
+
+  canEdit(): Boolean {
+    return this.props.selection.length === 1;
+  }
+
   canUnbox(): Boolean {
     return this.props.scope.type === T.MapScopeType.BOX;
   }
@@ -115,69 +123,79 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, senseObject, selection, scope } = this.props;
+    const { actions, senseObject, selection } = this.props;
 
     return (
       <Menu vertical>
         <Menu.Item>{
           selection.length === 0
             ? '功能選單'
-            : `選取了 ${selection.length} 張卡片`
+            : `選取了 ${selection.length} 個物件`
         }</Menu.Item>
-        <Menu.Item
-          name="create-box"
-          disabled={scope.type === T.MapScopeType.BOX}
-          onClick={() => actions.selectObject(OE.createBox(SB.emptyBoxData))}
-        >
-          新增 Box
-        </Menu.Item>
+        {
+          this.canCreateBox() &&
+          <Menu.Item
+            name="create-box"
+            onClick={() => actions.selectObject(OE.createBox(SB.emptyBoxData))}
+          >
+            新增 Box
+          </Menu.Item>
+        }
         <Menu.Item
           name="create-card"
           onClick={() => actions.selectObject(OE.createCard(SC.emptyCardData))}
         >
           新增卡片
         </Menu.Item>
-        <Menu.Item
-          name="edit"
-          disabled={selection.length !== 1}
-          onClick={() => {
-            const id = selection[0];
-            const object = SO.getObject(senseObject, id);
+        {
+          this.canEdit() &&
+          <Menu.Item
+            name="edit"
+            onClick={() => {
+              const id = selection[0];
+              const object = SO.getObject(senseObject, id);
 
-            switch (object.objectType) {
-              case T.ObjectType.BOX:
-                actions.selectObject(OE.editBox(SO.getBox(senseObject, object.data)));
-                break;
-              case T.ObjectType.CARD:
-                actions.selectObject(OE.editCard(SO.getCard(senseObject, object.data)));
-                break;
-              default:
-            }
-          }}
-        >
-          編輯
-        </Menu.Item>
-        <Menu.Item
-          name="addCard"
-          disabled={!this.canAddCard()}
-          onClick={this.handleAddCard}
-        >
-          加入
-        </Menu.Item>
-        <Menu.Item
-          name="removeCard"
-          disabled={!this.canRemoveCard()}
-          onClick={this.handleRemoveCard}
-        >
-          退出
-        </Menu.Item>
-        <Menu.Item
-          name="unbox"
-          disabled={!this.canUnbox()}
-          onClick={this.handleUnbox}
-        >
-          Unbox
-        </Menu.Item>
+              switch (object.objectType) {
+                case T.ObjectType.BOX:
+                  actions.selectObject(OE.editBox(SO.getBox(senseObject, object.data)));
+                  break;
+                case T.ObjectType.CARD:
+                  actions.selectObject(OE.editCard(SO.getCard(senseObject, object.data)));
+                  break;
+                default:
+              }
+            }}
+          >
+            編輯
+          </Menu.Item>
+        }
+        {
+          this.canAddCard() &&
+          <Menu.Item
+            name="addCard"
+            onClick={this.handleAddCard}
+          >
+            加入
+          </Menu.Item>
+        }
+        {
+          this.canRemoveCard() &&
+          <Menu.Item
+            name="removeCard"
+            onClick={this.handleRemoveCard}
+          >
+            退出
+          </Menu.Item>
+        }
+        {
+          this.canUnbox() &&
+          <Menu.Item
+            name="unbox"
+            onClick={this.handleUnbox}
+          >
+            Unbox
+          </Menu.Item>
+        }
       </Menu>
     );
   }
