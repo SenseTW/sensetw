@@ -51,7 +51,7 @@ export const actions = {
   editor: OE.actions,
 };
 
-export type Dispatch = ReduxDispatch<Action>;
+export type Dispatch = ReduxDispatch<State>;
 
 export type GetState = () => State;
 
