@@ -6,6 +6,8 @@ import MapCard from '../MapCard';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
+import * as OE from '../../types/object-editor';
+import * as SO from '../../types/sense-object';
 
 export interface StateFromProps {
   selection: T.State['selection'];
@@ -21,6 +23,7 @@ export interface DispatchFromProps {
     addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     openBox(box: T.BoxID): T.ActionChain,
+    selectObject(status: OE.Status): T.ActionChain,
   };
 }
 
@@ -35,6 +38,8 @@ const renderObject = (o: T.ObjectData, props: Props) => {
   const toggleSelection = props.actions.toggleObjectSelection;
   const moveObject = props.actions.moveObject;
   const openBox = props.actions.openBox;
+  const selectObject = props.actions.selectObject;
+
   switch (o.objectType) {
     case T.ObjectType.NONE: {
       return <Group />;
@@ -50,6 +55,7 @@ const renderObject = (o: T.ObjectData, props: Props) => {
           selected={SL.contains(props.selection, o.id)}
           toggleSelection={toggleSelection}
           moveObject={moveObject}
+          openCard={(id) => selectObject(OE.editCard(SO.getCard(props as SO.State, id)))}
         />);
     }
     case T.ObjectType.BOX: {

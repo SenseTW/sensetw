@@ -11,6 +11,7 @@ interface Props {
   selected?: Boolean;
   toggleSelection?(id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
+  openCard?(id: T.CardID): void;
 }
 
 const width = 240;
@@ -62,13 +63,14 @@ const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 3;
 
 function MapCard(props: Props) {
-  const {id, x, y} = props.mapObject;
+  const {id, x, y, data} = props.mapObject;
   const {title, summary, cardType} = props.card;
   const sanitizedSummary = summary.substr(0, summaryLimit);
   const sanitizedTitle   = title.substr(0, titleLimit);
 
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
+  const openCard        = props.openCard        || noop;
   const bgColor         = color[cardType];
 
   const selected = (
@@ -96,6 +98,7 @@ function MapCard(props: Props) {
         const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
         return moveObject(id, r[0], r[1]);
       }}
+      onDblClick={() => openCard(data)}
     >
       {props.selected ? selected : null}
       <Rect

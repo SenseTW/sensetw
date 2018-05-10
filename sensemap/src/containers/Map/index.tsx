@@ -3,6 +3,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import * as T from '../../types';
+import * as OE from '../../types/object-editor';
 
 interface OwnProps extends CO.OwnProps {
   id: T.MapID;
@@ -22,6 +23,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     openBox(box: T.BoxID): T.ActionChain,
+    selectObject(status: OE.Status): T.ActionChain,
   };
 }
 
@@ -90,6 +92,8 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
         dispatch(T.actions.senseObject.removeCardFromBox(card, box)),
       openBox: (box: T.BoxID) =>
         dispatch(T.actions.senseMap.openBox(box)),
+      selectObject: (status: OE.Status) =>
+        dispatch(T.actions.editor.selectObject(status)),
     }
   })
 )(Map);
