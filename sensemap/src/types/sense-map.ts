@@ -60,12 +60,18 @@ export const actions = {
 
 export type Action = ActionUnion<typeof syncActions>;
 
+type FullMapScope = {
+  type: MapScopeType.FULL_MAP,
+};
+
+type BoxScope = {
+  type: MapScopeType.BOX,
+  box: BoxID,
+};
+
 export type State = {
   map: MapID,
-  scope: {
-    type: MapScopeType,
-    box?: BoxID,
-  },
+  scope: FullMapScope | BoxScope,
 };
 
 export const initial: State = {

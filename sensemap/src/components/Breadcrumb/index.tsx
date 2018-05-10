@@ -53,7 +53,10 @@ class Breadcrumb extends React.PureComponent<Props> {
 
   render() {
     const { actions, scope, boxes, bid } = this.props;
-    const box = boxes[scope.box || ''] || { title: bid };
+    let box = { title: bid };
+    if (scope.type === T.MapScopeType.BOX) {
+      box = boxes[scope.box] || box;
+    }
 
     return (
       <Segment compact className="breadcrumb">

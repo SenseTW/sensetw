@@ -59,15 +59,18 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   handleUnbox(): void {
-    if (!this.canUnbox()) {
-      return;
+    switch (this.props.scope.type) {
+      case T.MapScopeType.BOX: {
+        const box = this.props.scope.box;
+        if (!box) {
+          throw Error('Scope BOX without a box ID.');
+        }
+        this.props.actions.unboxCards(box);
+        break;
+      }
+      case T.MapScopeType.FULL_MAP:
+      default:
     }
-    const box = this.props.scope.box;
-    if (!box) {
-      throw Error('Scope BOX without a box ID.');
-    }
-    this.props.actions.unboxCards(box);
-    return;
   }
 
   canAddCard(): Boolean {
@@ -96,17 +99,23 @@ class ObjectMenu extends React.PureComponent<Props> {
     if (!this.canRemoveCard()) {
       return;
     }
-    const card = this.props.selection[0];
-    const box  = this.props.scope.box;
-    if (!box) {
-      throw Error('This cannot happen: map scope has type BOX with null box ID.');
+    switch (this.props.scope.type) {
+      case T.MapScopeType.BOX: {
+        const card = this.props.selection[0];
+        const box  = this.props.scope.box;
+        if (!box) {
+          throw Error('This cannot happen: map scope has type BOX with null box ID.');
+        }
+        this.props.actions.removeCardFromBox(card, box);
+        break;
+      }
+      case T.MapScopeType.FULL_MAP:
+      default:
     }
-    this.props.actions.removeCardFromBox(card, box);
-    return;
   }
 
   render() {
-    const { actions, senseObject, selection } = this.props;
+    const { actions, senseObject, selection, scope } = this.props;
 
     return (
       <Menu vertical>
@@ -117,6 +126,7 @@ class ObjectMenu extends React.PureComponent<Props> {
         }</Menu.Item>
         <Menu.Item
           name="create-box"
+          disabled={scope.type === T.MapScopeType.BOX}
           onClick={() => actions.selectObject(OE.createBox(SB.emptyBoxData))}
         >
           新增 Box
