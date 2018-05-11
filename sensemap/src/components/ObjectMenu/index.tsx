@@ -17,8 +17,8 @@ interface StateFromProps {
 interface DispatchFromProps {
   actions: {
     selectObject(status: OE.Status): T.ActionChain,
-    addCardToBox(card: T.ObjectID, box: SB.BoxID): T.ActionChain,
-    removeCardFromBox(card: T.ObjectID, box: SB.BoxID): T.ActionChain,
+    addCardsToBox(cards: T.ObjectID[], box: SB.BoxID): T.ActionChain,
+    removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     deleteCardWithObject(card: T.CardID): T.ActionChain,
     unboxCards(box: SB.BoxID): T.ActionChain,
   };
@@ -87,7 +87,7 @@ class ObjectMenu extends React.PureComponent<Props> {
       return false;
     }
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    return cards.length === 1 && boxes.length === 1;
+    return cards.length >= 1 && boxes.length === 1;
   }
 
   handleAddCard(): void {
@@ -95,13 +95,13 @@ class ObjectMenu extends React.PureComponent<Props> {
       return;
     }
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    this.props.actions.addCardToBox(cards[0], this.props.senseObject.objects[boxes[0]].data);
+    this.props.actions.addCardsToBox(cards, this.props.senseObject.objects[boxes[0]].data);
     return;
   }
 
   canRemoveCard(): Boolean {
     return this.props.scope.type === T.MapScopeType.BOX
-      && this.props.selection.length === 1;
+      && this.props.selection.length >= 1;
   }
 
   canDeleteCard(): Boolean {
@@ -115,12 +115,12 @@ class ObjectMenu extends React.PureComponent<Props> {
     }
     switch (this.props.scope.type) {
       case T.MapScopeType.BOX: {
-        const card = this.props.selection[0];
-        const box  = this.props.scope.box;
+        const cards = this.props.selection;
+        const box   = this.props.scope.box;
         if (!box) {
           throw Error('This cannot happen: map scope has type BOX with null box ID.');
         }
-        this.props.actions.removeCardFromBox(card, box);
+        this.props.actions.removeCardsFromBox(cards, box);
         break;
       }
       case T.MapScopeType.FULL_MAP:
@@ -228,10 +228,10 @@ export default connect<StateFromProps, DispatchFromProps>(
   (dispatch: T.Dispatch) => ({
     actions: {
       selectObject: (status: OE.Status) => dispatch(T.actions.editor.selectObject(status)),
-      addCardToBox: (card, box) =>
-        dispatch(T.actions.senseObject.addCardToBox(card, box)),
-      removeCardFromBox: (card, box) =>
-        dispatch(T.actions.senseObject.removeCardFromBox(card, box)),
+      addCardsToBox: (cards, box) =>
+        dispatch(T.actions.senseObject.addCardsToBox(cards, box)),
+      removeCardsFromBox: (cards, box) =>
+        dispatch(T.actions.senseObject.removeCardsFromBox(cards, box)),
       deleteCardWithObject: (card) =>
         dispatch(T.actions.senseObject.deleteCardWithObject(card)),
       unboxCards: (box) =>

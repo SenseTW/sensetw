@@ -532,16 +532,24 @@ const addCardToBox =
   (dispatch: Dispatch) => {
     const query = `
       mutation AddCardToBox($cardObject: ID!, $box: ID!) {
-        updateObject(id: $cardObject, belongsToId: $box) {
-          ...objectFields
+        addToContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
+          containsObject { id } belongsToBox { id }
         }
       }
-      ${graphQLObjectFieldsFragment}
     `;
     const variables = { cardObject, box };
     return client.request(query, variables)
       .then(({ updateObject }) => dispatch(updateInBox(cardObject, box)))
       .then(() => dispatch(SL.actions.clearSelection()));
+  };
+
+const addCardsToBox =
+  (cardObjects: ObjectID[], box: BoxID) =>
+  async (dispatch: Dispatch) => {
+    await Promise.all(
+      cardObjects.map(id => dispatch(addCardToBox(id, box)))
+    );
+    return dispatch(SL.actions.clearSelection());
   };
 
 const removeCardFromBox =
@@ -558,6 +566,15 @@ const removeCardFromBox =
     return client.request(query, variables)
       .then(() => dispatch(updateNotInBox(cardObject, box)))
       .then(() => dispatch(SL.actions.clearSelection()));
+  };
+
+const removeCardsFromBox =
+  (cardObjects: ObjectID[], box: BoxID) =>
+  async (dispatch: Dispatch) => {
+    await Promise.all(
+      cardObjects.map(id => dispatch(removeCardFromBox(id, box)))
+    );
+    return dispatch(SL.actions.clearSelection());
   };
 
 const deleteObjectRequest =
@@ -665,7 +682,9 @@ export const actions = {
   createCardObject,
   moveObject,
   addCardToBox,
+  addCardsToBox,
   removeCardFromBox,
+  removeCardsFromBox,
   unboxCards,
   deleteObject,
   deleteCardWithObject,
