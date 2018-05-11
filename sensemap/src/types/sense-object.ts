@@ -635,8 +635,7 @@ const deleteBoxWithObject =
 
 const unboxCards =
   (box: BoxID) =>
-  // tslint:disable-next-line:no-any
-  (dispatch: any, getState: any) => {
+  (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
     return deleteBoxWithObjectRequest(box)
       .then(() => dispatch(loadBoxes(map, true)))
