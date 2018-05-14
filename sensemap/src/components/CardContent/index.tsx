@@ -20,13 +20,6 @@ class CardContent extends React.PureComponent<Props> {
 
     return (
       <Form className="card-content">
-        <Form.Field className="card-content__card-type">
-          <label>Card Type</label>
-          <CardTypeSelector
-            cardType={cardType}
-            onChange={type => onChange && onChange(SC.updateCardType(type))}
-          />
-        </Form.Field>
         <Form.Field className="card-content__summary">
           <label>Summary</label>
           <TextArea
@@ -77,6 +70,13 @@ class CardContent extends React.PureComponent<Props> {
             value={stakeholder}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateStakeholder(e.currentTarget.value))}
+          />
+        </Form.Field>
+        <Form.Field className="card-content__card-type">
+          <label>Card Type</label>
+          <CardTypeSelector
+            cardType={cardType}
+            onChange={type => onChange && onChange(SC.updateCardType(type))}
           />
         </Form.Field>
         {children}
