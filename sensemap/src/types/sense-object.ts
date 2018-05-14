@@ -148,7 +148,7 @@ const graphQLCardFieldsFragment = `
   fragment cardFields on Card {
     id,
     createdAt, updatedAt,
-    title, summary, saidBy, stakeholder, url, cardType,
+    title, summary, tags, saidBy, stakeholder, url, cardType,
     objects { id }, map { id }
   }`;
 
@@ -158,6 +158,7 @@ interface GraphQLCardFields {
   updatedAt:   string;
   title:       string;
   summary:     string;
+  tags:        string;
   saidBy:      string;
   stakeholder: string;
   url:         string;
@@ -177,6 +178,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     updatedAt:   0, // TODO
     title:       c.title,
     summary:     c.summary,
+    tags:        c.tags || '',
     saidBy:      c.saidBy,
     stakeholder: c.stakeholder,
     url:         c.url,
@@ -290,6 +292,7 @@ const createCard =
       mutation CreateCard(
         $title: String,
         $summary: String,
+        $tags: String,
         $saidBy: String,
         $stakeholder: String,
         $url: String,
@@ -299,6 +302,7 @@ const createCard =
         createCard(
           title: $title,
           summary: $summary,
+          tags: $tags,
           saidBy: $saidBy,
           stakeholder: $stakeholder,
           url: $url,
@@ -324,6 +328,7 @@ const updateRemoteCard =
         $id: ID!,
         $title: String,
         $summary: String,
+        $tags: String,
         $saidBy: String,
         $stakeholder: String,
         $url: String,
@@ -333,6 +338,7 @@ const updateRemoteCard =
           id: $id,
           title: $title,
           summary: $summary,
+          tags: $tags,
           saidBy: $saidBy,
           stakeholder: $stakeholder,
           url: $url
@@ -407,7 +413,7 @@ const loadCards =
     const query = `
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
-          id, createdAt, updatedAt, title, summary, saidBy, stakeholder,
+          id, createdAt, updatedAt, title, summary, tags, saidBy, stakeholder,
           url, cardType, objects { id }
         }
       }

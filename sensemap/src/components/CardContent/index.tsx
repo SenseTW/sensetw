@@ -16,7 +16,7 @@ class CardContent extends React.PureComponent<Props> {
 
   render() {
     const { children, data, onKeyUp, onChange } = this.props;
-    const { title, summary, url, saidBy, stakeholder, cardType } = data;
+    const { title, summary, tags, url, saidBy, stakeholder, cardType } = data;
 
     return (
       <Form className="card-content">
@@ -33,6 +33,15 @@ class CardContent extends React.PureComponent<Props> {
             placeholder="卡片描述"
             value={summary}
             onChange={e => onChange && onChange(SC.updateSummary(e.currentTarget.value))}
+          />
+        </Form.Field>
+        <Form.Field>
+          <label>Tag</label>
+          <Input
+            placeholedr="卡片, 標籤"
+            value={tags}
+            onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SC.updateTags(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__title">
