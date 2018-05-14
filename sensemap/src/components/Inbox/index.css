@@ -1,0 +1,12 @@
+.inbox {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  width: 398px;
+  height: 950px;
+  background-color: #37474f;
+  padding: 0 12px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-evenly;
+}

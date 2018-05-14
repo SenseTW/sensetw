@@ -6,6 +6,7 @@ import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
+import Inbox from '../Inbox';
 import * as T from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
@@ -95,6 +96,7 @@ class MapPage extends React.Component<Props> {
           />
           <ObjectMenu />
           <Breadcrumb />
+          <Inbox />
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     );

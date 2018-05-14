@@ -1,0 +1,14 @@
+.card-actions {
+  width: 172px;
+  height: 86px;
+  border-radius: 4px;
+  background-blend-mode: lighten;
+  background-image: linear-gradient(rgba(58, 216, 250, 0.8), rgba(58, 216, 250, 0.8));
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.card-actions .button {
+  max-height: 3em;
+}
