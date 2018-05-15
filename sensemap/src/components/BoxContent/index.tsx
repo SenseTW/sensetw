@@ -19,14 +19,6 @@ class BoxContent extends React.PureComponent<Props> {
 
     return (
       <Form className="box-content">
-        <Form.Field className="box-content__summary">
-          <label>Summary</label>
-          <TextArea
-            placeholder="Box 描述"
-            value={summary}
-            onChange={e => onChange && onChange(SB.updateSummary(e.currentTarget.value))}
-          />
-        </Form.Field>
         <Form.Field className="box-content__title">
           <label>Title</label>
           <Input
@@ -34,6 +26,14 @@ class BoxContent extends React.PureComponent<Props> {
             value={title}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SB.updateTitle(e.currentTarget.value))}
+          />
+        </Form.Field>
+        <Form.Field className="box-content__summary">
+          <label>Summary</label>
+          <TextArea
+            placeholder="Box 描述"
+            value={summary}
+            onChange={e => onChange && onChange(SB.updateSummary(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="box-content__tags">
