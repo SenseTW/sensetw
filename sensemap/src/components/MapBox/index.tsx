@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import * as T from '../../types';
-import { noop } from '../../types/utils';
+import { noop, toTags } from '../../types/utils';
 import { moveStart, moveEnd } from '../../graphics/point';
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const width = 240;
-const height = 90;
+const height = 90 + 24;
 const borderColor = '#707070';
 const borderWidth = 8;
 const bgColor = '#ffffff';
@@ -40,15 +40,57 @@ const selectedCornerRadius = 10;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 2;
 
+const tagLeft = 8;
+const tagBottom = 8;
+const tagPadding = 4;
+const tagMargin = 2;
+const tagBackground = '#d8d8d8';
+const tagColor = '#000000';
+const tagRadius = 4;
+const tagFontSize = 14;
+
 function MapBox(props: Props) {
   const {id, x, y} = props.mapObject;
-  const {title} = props.box;
+  const {title, tags} = props.box;
   const sanitizedTitle = title.substr(0, titleLimit);
   const boxID = props.box.id;
 
   const toggleSelection = props.toggleSelection || noop;
   const moveObject      = props.moveObject      || noop;
   const openBox         = props.openBox         || noop;
+
+  let left = 0;
+  let tagElements: React.ReactNode[] = [];
+  toTags(tags).forEach((tag, key) => {
+    const w = tag.length * tagFontSize + 2 * tagPadding;
+    const h = tagFontSize + 2 * tagPadding;
+
+    tagElements.push(
+      <Group
+        key={key}
+        x={tagLeft + left}
+        y={height - tagBottom - h}
+      >
+        <Rect
+          width={w}
+          height={h}
+          fill={tagBackground}
+          cornerRadius={tagRadius}
+        />
+        <Text
+          x={tagPadding}
+          y={tagPadding}
+          width={w - 2 * tagPadding}
+          height={h - 2 * tagPadding}
+          fontSize={tagFontSize}
+          fill={tagColor}
+          text={tag}
+        />
+      </Group>
+    );
+
+    left += w + tagMargin;
+  });
 
   const selected = (
     <Rect
@@ -102,6 +144,7 @@ function MapBox(props: Props) {
         padding={titlePadding}
         text={title}
       />
+      {tagElements}
     </Group>
   );
 }

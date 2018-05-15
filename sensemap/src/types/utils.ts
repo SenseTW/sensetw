@@ -11,3 +11,11 @@ export function objectId() {
 }
 
 export function noop() { return; }
+
+export function toTags(str: string): string[] {
+  return str.split(/,\s*/).filter(it => it);
+}
+
+export function fromTags(tags: string[]): string {
+  return tags.join(', ');
+}
