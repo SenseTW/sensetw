@@ -1,6 +1,7 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
+import MapTag from '../MapTag';
 import * as T from '../../types';
 import { noop, toTags } from '../../types/utils';
 import { moveStart, moveEnd } from '../../graphics/point';
@@ -44,9 +45,6 @@ const tagLeft = 8;
 const tagBottom = 8;
 const tagPadding = 4;
 const tagMargin = 2;
-const tagBackground = '#d8d8d8';
-const tagColor = '#000000';
-const tagRadius = 4;
 const tagFontSize = 14;
 
 function MapBox(props: Props) {
@@ -66,27 +64,12 @@ function MapBox(props: Props) {
     const h = tagFontSize + 2 * tagPadding;
 
     tagElements.push(
-      <Group
+      <MapTag
         key={key}
         x={tagLeft + left}
         y={height - tagBottom - h}
-      >
-        <Rect
-          width={w}
-          height={h}
-          fill={tagBackground}
-          cornerRadius={tagRadius}
-        />
-        <Text
-          x={tagPadding}
-          y={tagPadding}
-          width={w - 2 * tagPadding}
-          height={h - 2 * tagPadding}
-          fontSize={tagFontSize}
-          fill={tagColor}
-          text={tag}
-        />
-      </Group>
+        text={tag}
+      />
     );
 
     left += w + tagMargin;
