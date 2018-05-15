@@ -28,10 +28,10 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(SC.updateSummary(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field>
+        <Form.Field className="card-content__tags">
           <label>Tag</label>
           <Input
-            placeholedr="卡片, 標籤"
+            placeholder="卡片, 標籤"
             value={tags}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateTags(e.currentTarget.value))}
