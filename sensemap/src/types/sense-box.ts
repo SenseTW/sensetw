@@ -11,6 +11,7 @@ export interface BoxData {
   objects: { [key: string]: { id: ObjectID } };
   title: string;
   summary: string;
+  tags: string;
   contains: { [key: string]: { id: ObjectID } };
 }
 
@@ -21,6 +22,7 @@ export const emptyBoxData: BoxData = {
   objects: {},
   title: '',
   summary: '',
+  tags: '',
   contains: {}
 };
 
@@ -38,9 +40,17 @@ export const updateSummary =
     payload: { summary }
   });
 
+const UPDATE_BOX_TAGS = 'UPDATE_BOX_TAGS';
+export const updateTags =
+  (tags: string) => ({
+    type: UPDATE_BOX_TAGS as typeof UPDATE_BOX_TAGS,
+    payload: { tags }
+  });
+
 export const actions = {
   updateTitle,
-  updateSummary
+  updateSummary,
+  updateTags,
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -63,6 +73,14 @@ export const reducer = (state: BoxData, action: Action = emptyAction) => {
         summary
       };
     }
+    case UPDATE_BOX_TAGS: {
+      const { tags } = action.payload;
+
+      return {
+        ...state,
+        tags
+      };
+    }
     default: {
       return state;
     }
@@ -77,6 +95,7 @@ export const sampleStateBoxes: { [key: string]: BoxData } = {
     title: '安睡在天地',
     // tslint:disable-next-line:max-line-length
     summary: '將黑夜都遺忘在沙灘上光著我的腳丫在沙灘上光著我的腳丫姊姊你長得實在好漂亮對著每個人說撒哇低咖就這一次',
+    tags: '',
     objects: { '127': { id: '127' } },
     contains: {},
   },
@@ -87,6 +106,7 @@ export const sampleStateBoxes: { [key: string]: BoxData } = {
     title: '我心裏卻并不快爽',
     // tslint:disable-next-line:max-line-length
     summary: '不在乎我的過往，安睡在天地的大房間。',
+    tags: '',
     contains: {},
     objects: { '137': { id: '137' } },
   },

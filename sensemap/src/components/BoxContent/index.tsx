@@ -15,7 +15,7 @@ class BoxContent extends React.PureComponent<Props> {
 
   render() {
     const { children, data, onKeyUp, onChange } = this.props;
-    const { title, summary } = data;
+    const { title, summary, tags } = data;
 
     return (
       <Form className="box-content">
@@ -34,6 +34,15 @@ class BoxContent extends React.PureComponent<Props> {
             value={title}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SB.updateTitle(e.currentTarget.value))}
+          />
+        </Form.Field>
+        <Form.Field className="box-content__tags">
+          <label>Tag</label>
+          <Input
+            placeholder="Box, 標籤"
+            value={tags}
+            onKeyUp={onKeyUp}
+            onChange={e => onChange && onChange(SB.updateTags(e.currentTarget.value))}
           />
         </Form.Field>
         {children}

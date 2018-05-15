@@ -188,7 +188,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
 
 const graphQLBoxFieldsFragment = `
   fragment boxFields on Box {
-    id, createdAt, updatedAt, title, summary,
+    id, createdAt, updatedAt, title, summary, tags,
     objects { id }, contains { id }, map { id }
   }`;
 
@@ -198,6 +198,7 @@ interface GraphQLBoxFields {
   updatedAt: string;
   title:     string;
   summary:   string;
+  tags:      string;
   objects:   HasID[];
   contains:  HasID[];
   map?:      HasID;
@@ -210,6 +211,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     updatedAt: 0, // TODO
     title:     b.title,
     summary:   b.summary,
+    tags:      b.tags || '',
     objects:   toIDMap(b.objects),
     contains:  toIDMap(b.contains),
   });
@@ -359,8 +361,8 @@ const createBox =
   (mapId: MapID, box: BoxData) =>
   async (dispatch: Dispatch) => {
     const query = `
-      mutation CreateBox($title: String, $summary: String, $mapId: ID) {
-        createBox(title: $title, summary: $summary, mapId: $mapId) {
+      mutation CreateBox($title: String, $summary: String, $tags: String, $mapId: ID) {
+        createBox(title: $title, summary: $summary, tags: $tags, mapId: $mapId) {
           ...boxFields
         }
       }
@@ -376,8 +378,8 @@ const updateRemoteBox =
   (box: BoxData) =>
   (dispatch: Dispatch) => {
     const query = `
-      mutation UpdateBox($id: ID!, $title: String, $summary: String) {
-        updateBox(id: $id, title: $title, summary: $summary) {
+      mutation UpdateBox($id: ID!, $title: String, $summary: String, $tags: String) {
+        updateBox(id: $id, title: $title, summary: $summary, tags: $tags) {
           ...boxFields
         }
       }
