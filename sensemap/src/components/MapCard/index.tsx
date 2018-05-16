@@ -1,8 +1,9 @@
 
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
+import MapTagList from '../MapTagList';
 import * as T from '../../types';
-import { noop } from '../../types/utils';
+import { noop, toTags } from '../../types/utils';
 import { moveStart, moveEnd } from '../../graphics/point';
 
 interface Props {
@@ -12,6 +13,10 @@ interface Props {
   toggleSelection?(id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openCard?(id: T.CardID): void;
+}
+
+interface State {
+  tagHeight: number;
 }
 
 const width = 240;
@@ -62,81 +67,97 @@ const selectedCornerRadius = 8;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 3;
 
-function MapCard(props: Props) {
-  const {id, x, y, data} = props.mapObject;
-  const {title, summary, cardType} = props.card;
-  const sanitizedSummary = summary.substr(0, summaryLimit);
-  const sanitizedTitle   = title.substr(0, titleLimit);
+const tagLeft = 8;
+const tagBottom = 8;
 
-  const toggleSelection = props.toggleSelection || noop;
-  const moveObject      = props.moveObject      || noop;
-  const openCard        = props.openCard        || noop;
-  const bgColor         = color[cardType];
+class MapCard extends React.Component<Props, State> {
+  state = {
+    tagHeight: 0
+  };
 
-  const selected = (
-    <Rect
-      x={selectedOffsetX}
-      y={selectedOffsetY}
-      width={selectedWidth}
-      height={selectedHeight}
-      cornerRadius={selectedCornerRadius}
-      stroke={selectedColor}
-      strokeWidth={selectedStrokeWidth}
-    />);
+  render() {
+    const {id, x, y, data} = this.props.mapObject;
+    const {title, summary, cardType, tags} = this.props.card;
+    const sanitizedSummary = summary.substr(0, summaryLimit);
+    const sanitizedTitle   = title.substr(0, titleLimit);
+    const tagHeight = this.state.tagHeight;
 
-  return (
-    <Group
-      x={x}
-      y={y}
-      key={id}
-      draggable={true}
-      onClick={() => toggleSelection(id)}
-      onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
-      onDragEnd={(e) => {
-        // XXX TypeScript ought to understand this...
-        // return moveObject(id, ...moveEnd(id, e.evt.layerX, e.evt.layerY));
-        const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
-        return moveObject(id, r[0], r[1]);
-      }}
-      onDblClick={() => openCard(data)}
-    >
-      {props.selected ? selected : null}
+    const toggleSelection = this.props.toggleSelection || noop;
+    const moveObject      = this.props.moveObject      || noop;
+    const openCard        = this.props.openCard        || noop;
+    const bgColor         = color[cardType];
+
+    const selected = (
       <Rect
-        width={width}
-        height={height}
-        fill={bgColor}
-        cornerRadius={cornerRadius}
-        shadowBlur={shadowBlur}
-        shadowOffsetX={shadowOffsetX}
-        shadowOffsetY={shadowOffsetY}
-        shadowColor={shadowColor}
-      />
-      <Text
-        x={summaryOffsetX}
-        y={summaryOffsetY}
-        width={summaryWidth}
-        height={summaryHeight}
-        padding={summaryPadding}
-        fontSize={summaryFontSize}
-        fontFamily={summaryFontFamily}
-        lineHeight={summaryLineHeight}
-        fill={summaryColor}
-        text={sanitizedSummary}
-      />
-      <Text
-        x={titleOffsetX}
-        y={titleOffsetY}
-        width={titleWidth}
-        height={titleHeight}
-        padding={titlePadding}
-        fontSize={titleFontSize}
-        fontFamily={titleFontFamily}
-        lineHeight={titleLineHeight}
-        fill={titleColor}
-        text={sanitizedTitle}
-      />
-    </Group>
-  );
+        x={selectedOffsetX}
+        y={selectedOffsetY}
+        width={selectedWidth}
+        height={selectedHeight}
+        cornerRadius={selectedCornerRadius}
+        stroke={selectedColor}
+        strokeWidth={selectedStrokeWidth}
+      />);
+
+    return (
+      <Group
+        x={x}
+        y={y}
+        key={id}
+        draggable={true}
+        onClick={() => toggleSelection(id)}
+        onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
+        onDragEnd={(e) => {
+          // XXX TypeScript ought to understand this...
+          // return moveObject(id, ...moveEnd(id, e.evt.layerX, e.evt.layerY));
+          const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
+          return moveObject(id, r[0], r[1]);
+        }}
+        onDblClick={() => openCard(data)}
+      >
+        {this.props.selected ? selected : null}
+        <Rect
+          width={width}
+          height={height}
+          fill={bgColor}
+          cornerRadius={cornerRadius}
+          shadowBlur={shadowBlur}
+          shadowOffsetX={shadowOffsetX}
+          shadowOffsetY={shadowOffsetY}
+          shadowColor={shadowColor}
+        />
+        <Text
+          x={summaryOffsetX}
+          y={summaryOffsetY}
+          width={summaryWidth}
+          height={summaryHeight}
+          padding={summaryPadding}
+          fontSize={summaryFontSize}
+          fontFamily={summaryFontFamily}
+          lineHeight={summaryLineHeight}
+          fill={summaryColor}
+          text={sanitizedSummary}
+        />
+        <Text
+          x={titleOffsetX}
+          y={titleOffsetY}
+          width={titleWidth}
+          height={titleHeight}
+          padding={titlePadding}
+          fontSize={titleFontSize}
+          fontFamily={titleFontFamily}
+          lineHeight={titleLineHeight}
+          fill={titleColor}
+          text={sanitizedTitle}
+        />
+        <MapTagList
+          x={tagLeft}
+          y={height - tagBottom - tagHeight}
+          tags={toTags(tags)}
+          onResize={(w, h) => this.setState({ tagHeight: h })}
+        />
+      </Group>
+    );
+  }
 }
 
 export default MapCard;
