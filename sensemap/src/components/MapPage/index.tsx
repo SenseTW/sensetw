@@ -6,7 +6,7 @@ import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
-import Inbox from '../Inbox';
+import Inbox from '../../containers/Inbox';
 import * as T from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';

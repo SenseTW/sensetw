@@ -11,12 +11,35 @@
   width: 172px;
   height: 86px;
   border-radius: 4px;
-  background-color: #ffffff;
   box-shadow: 0 0 10px 0 rgba(117, 117, 117, 0.5);
   padding-top: 8px;
   padding-left: 6px;
   padding-right: 6px;
   padding-bottom: 7px;
+}
+
+.card.card--not-in-map .card__body {
+  background-color: #ffffff;
+}
+
+.card.card--in-map .card__body {
+  background-color: rgba(110, 110, 110, 1);
+}
+
+.card.card--not-in-map.question .card__body {
+  background-color: rgba(255, 236, 239, 1);
+}
+
+.card.card--in-map.question .card__body {
+  background-color: rgba(93, 27, 55, 1);
+}
+
+.card.card--not-in-map.answer .card__body {
+  background-color: rgba(222, 255, 245, 1);
+}
+
+.card.card--in-map.answer .card__body {
+  background-color: rgba(27, 93, 93, 1);
 }
 
 .card__summary {
