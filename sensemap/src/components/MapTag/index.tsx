@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Text as TextNode } from 'konva';
 import { Group, Rect, Text } from 'react-konva';
+import { noop } from '../../types/utils';
 
 const tagPadding = 4;
 const tagBackground = '#d8d8d8';
@@ -9,8 +10,8 @@ const tagRadius = 4;
 const tagFontSize = 14;
 
 interface Props {
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
   text: string;
   onResize?(width: number, height: number): void;
 }
@@ -37,14 +38,12 @@ class MapTag extends React.Component<Props, State> {
     const h = this.textNode.getHeight();
     this.setState({ w, h });
 
-    const { onResize } = this.props;
-    if (onResize) {
-      onResize(w, h);
-    }
+    const { onResize = noop } = this.props;
+    onResize(w + 2 * tagPadding, h + 2 * tagPadding);
   }
 
   render() {
-    const { x, y, text } = this.props;
+    const { x = 0, y = 0, text } = this.props;
     const { w, h } = this.state;
 
     return (
