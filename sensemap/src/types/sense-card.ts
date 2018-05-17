@@ -59,7 +59,7 @@ export const emptyCardData: CardData = {
   tags: '',
   saidBy: '',
   stakeholder: '',
-  url: 'http://example.com',
+  url: '',
   cardType: CardType.NORMAL
 };
 

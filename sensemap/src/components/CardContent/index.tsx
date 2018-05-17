@@ -23,7 +23,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__summary">
           <label>Summary / Description</label>
           <TextArea
-            placeholder="總結"
+            placeholder="說重點"
             value={summary}
             onChange={e => onChange && onChange(SC.updateSummary(e.currentTarget.value))}
           />
@@ -31,7 +31,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__tags">
           <label>Tag</label>
           <Input
-            placeholder="卡片, 標籤"
+            placeholder="tag1, tag2, tag3"
             value={tags}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateTags(e.currentTarget.value))}
@@ -40,7 +40,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__title">
           <label>Source Title</label>
           <TextArea
-            placeholder="卡片標題"
+            placeholder="資料來源，e.g. 【AI全面啟動Ⅱ：台灣企業行不行？關鍵在老闆｜天下雜誌】"
             value={title}
             onChange={e => onChange && onChange(SC.updateTitle(e.currentTarget.value))}
           />
@@ -48,14 +48,14 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__description">
           <label>Quote</label>
           <TextArea
-            placeholder="卡片描述"
+            placeholder="資料原文摘錄與補充資訊"
             value={description}
             onChange={e => onChange && onChange(SC.updateDescription(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__url">
           <Input
-            placeholder="網址"
+            placeholder="https://o.sense.tw/abcd"
             value={url}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateUrl(e.currentTarget.value))}
@@ -64,7 +64,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__said-by" inline>
           <label>發言人</label>
           <Input
-            placeholder="發言人"
+            placeholder="誰提出的意見？ e.g. XX 大學校長 XXX"
             value={saidBy}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateSaidBy(e.currentTarget.value))}
@@ -73,7 +73,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__stakeholder" inline>
           <label>利害關係人</label>
           <Input
-            placeholder="利害關係人"
+            placeholder="誰會被影響？（用逗號隔開）e.g. 經濟部, 半導體廠商, 大學"
             value={stakeholder}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateStakeholder(e.currentTarget.value))}
