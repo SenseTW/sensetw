@@ -39,10 +39,9 @@ class CardContent extends React.PureComponent<Props> {
         </Form.Field>
         <Form.Field className="card-content__title">
           <label>Source Title</label>
-          <Input
+          <TextArea
             placeholder="卡片標題"
             value={title}
-            onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SC.updateTitle(e.currentTarget.value))}
           />
         </Form.Field>
