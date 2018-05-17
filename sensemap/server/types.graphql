@@ -41,6 +41,7 @@ type Card @model {
   updatedAt: DateTime!
   title: String
   summary: String
+  description: String
   tags: String
   saidBy: String
   stakeholder: String
