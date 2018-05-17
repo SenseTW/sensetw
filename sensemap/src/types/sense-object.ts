@@ -148,7 +148,7 @@ const graphQLCardFieldsFragment = `
   fragment cardFields on Card {
     id,
     createdAt, updatedAt,
-    title, summary, tags, saidBy, stakeholder, url, cardType,
+    title, summary, description, tags, saidBy, stakeholder, url, cardType,
     objects { id }, map { id }
   }`;
 
@@ -158,6 +158,7 @@ interface GraphQLCardFields {
   updatedAt:   string;
   title:       string;
   summary:     string;
+  description: string;
   tags:        string;
   saidBy:      string;
   stakeholder: string;
@@ -178,6 +179,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     updatedAt:   0, // TODO
     title:       c.title,
     summary:     c.summary,
+    description: c.description || '',
     tags:        c.tags || '',
     saidBy:      c.saidBy,
     stakeholder: c.stakeholder,
@@ -294,6 +296,7 @@ const createCard =
       mutation CreateCard(
         $title: String,
         $summary: String,
+        $description: String,
         $tags: String,
         $saidBy: String,
         $stakeholder: String,
@@ -304,6 +307,7 @@ const createCard =
         createCard(
           title: $title,
           summary: $summary,
+          description: $description,
           tags: $tags,
           saidBy: $saidBy,
           stakeholder: $stakeholder,
@@ -330,6 +334,7 @@ const updateRemoteCard =
         $id: ID!,
         $title: String,
         $summary: String,
+        $description: String,
         $tags: String,
         $saidBy: String,
         $stakeholder: String,
@@ -340,6 +345,7 @@ const updateRemoteCard =
           id: $id,
           title: $title,
           summary: $summary,
+          description: $description,
           tags: $tags,
           saidBy: $saidBy,
           stakeholder: $stakeholder,
@@ -415,7 +421,7 @@ const loadCards =
     const query = `
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
-          id, createdAt, updatedAt, title, summary, tags, saidBy, stakeholder,
+          id, createdAt, updatedAt, title, summary, description, tags, saidBy, stakeholder,
           url, cardType, objects { id }
         }
       }
