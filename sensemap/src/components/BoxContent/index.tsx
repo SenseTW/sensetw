@@ -22,7 +22,7 @@ class BoxContent extends React.PureComponent<Props> {
         <Form.Field className="box-content__title">
           <label>Title</label>
           <Input
-            placeholder="Box 標題"
+            placeholder="one concept or one argument"
             value={title}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SB.updateTitle(e.currentTarget.value))}
@@ -31,7 +31,7 @@ class BoxContent extends React.PureComponent<Props> {
         <Form.Field className="box-content__summary">
           <label>Summary</label>
           <TextArea
-            placeholder="Box 描述"
+            placeholder="文化部提供的議題分析表"
             value={summary}
             onChange={e => onChange && onChange(SB.updateSummary(e.currentTarget.value))}
           />
@@ -39,7 +39,7 @@ class BoxContent extends React.PureComponent<Props> {
         <Form.Field className="box-content__tags">
           <label>Tag</label>
           <Input
-            placeholder="Box, 標籤"
+            placeholder="tag1, tag2, tag3"
             value={tags}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(SB.updateTags(e.currentTarget.value))}
