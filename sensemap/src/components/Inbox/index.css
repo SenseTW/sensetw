@@ -10,3 +10,7 @@
   flex-flow: column nowrap;
   justify-content: space-evenly;
 }
+
+.inbox__pagination {
+  position: relative !important;
+}
