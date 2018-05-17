@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import MapTagList from '../MapTagList';
 import * as T from '../../types';
+import * as C from '../../types/sense-card';
 import { noop, toTags } from '../../types/utils';
 import { moveStart, moveEnd } from '../../graphics/point';
 
@@ -19,8 +20,8 @@ interface State {
   tagHeight: number;
 }
 
-const width = 240;
-const height = 160;
+const width = C.DEFAULT_WIDTH;
+const height = C.DEFAULT_HEIGHT;
 const cornerRadius = 4;
 
 const summaryPadding = 0;

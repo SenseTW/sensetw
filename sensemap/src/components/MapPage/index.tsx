@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Sidebar } from 'semantic-ui-react';
+import ResizeDetector from 'react-resize-detector';
 import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
@@ -26,12 +27,18 @@ interface DispatchFromProps {
     updateRemoteBox(box: T.BoxData): T.ActionChain,
     updateRemoteCard(card: T.CardData): T.ActionChain,
     addCardToBox(cardObject: T.ObjectID, box: T.BoxID): T.ActionChain,
+    resizeViewpart(dimension: SM.DimensionInMap): T.ActionChain,
   };
 }
 
 type Props = StateFromProps & DispatchFromProps;
 
 class MapPage extends React.Component<Props> {
+  handleResize = (width: number, height: number) => {
+    const { actions } = this.props;
+    actions.resizeViewpart([width, height]);
+  }
+
   render() {
     const { actions, editor, map, scope } = this.props;
     const { objectType, data } = editor;
@@ -80,6 +87,7 @@ class MapPage extends React.Component<Props> {
         }
         </Sidebar>
         <Sidebar.Pusher>
+          <ResizeDetector handleWidth handleHeight onResize={this.handleResize} />
           <Map
             id={map}
             width={1960}
@@ -115,6 +123,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.updateRemoteCard(card)),
       addCardToBox: (cardObject: T.ObjectID, box: T.BoxID) =>
         dispatch(T.actions.senseObject.addCardToBox(cardObject, box)),
+      resizeViewpart: (dimension: SM.DimensionInMap) =>
+        dispatch(T.actions.senseMap.resizeViewport(dimension)),
     }
   })
 )(MapPage);

@@ -1,5 +1,7 @@
 import { client } from './client';
+import * as C from './sense-card';
 import { CardID, CardData, emptyCardData, stringToType as stringToCardType } from './sense-card';
+import * as B from './sense-box';
 import { BoxID, BoxData, emptyBoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp } from './utils';
@@ -54,6 +56,27 @@ export const emptyObjectData = {
   zIndex: 0,
   objectType: ObjectType.NONE,
   data: '0',
+};
+
+interface PartialObjectData {
+  x?:          number;
+  y?:          number;
+  width?:      number;
+  height?:     number;
+  zIndex?:     number;
+  objectType?: ObjectType;
+  data?:       CardID | BoxID;
+}
+
+export const objectData = (partial: PartialObjectData): ObjectData => {
+  const now = +Date.now();
+
+  return {
+    ...emptyObjectData,
+    ...partial,
+    createdAt: now,
+    updatedAt: now,
+  };
 };
 
 export type State = {
@@ -495,31 +518,37 @@ const createObject =
 
 const createBoxObject =
   (mapId: MapID, box: BoxData) =>
-  async (dispatch: Dispatch) => {
+  async (dispatch: Dispatch, getState: GetState) => {
     const action = await createBox(mapId, box)(dispatch);
     const { id = '' } = Object.values(action.payload)[0] || {};
+    const { senseMap: { dimension } } = getState();
+    const x = (dimension[0] - B.DEFAULT_WIDTH) / 2;
+    const y = (dimension[1] - B.DEFAULT_HEIGHT) / 2;
     return createObject(
       mapId,
-      {
-        ...emptyObjectData,
+      objectData({
+        x, y,
         objectType: ObjectType.BOX,
         data: id,
-      }
+      })
     )(dispatch);
   };
 
 const createCardObject =
   (mapId: MapID, card: CardData) =>
-  async (dispatch: Dispatch) => {
+  async (dispatch: Dispatch, getState: GetState) => {
     const action = await createCard(mapId, card)(dispatch);
     const { id = '' } = Object.values(action.payload)[0] || {};
+    const { senseMap: { dimension } } = getState();
+    const x = (dimension[0] - C.DEFAULT_WIDTH) / 2;
+    const y = (dimension[1] - C.DEFAULT_HEIGHT) / 2;
     return createObject(
       mapId,
-      {
-        ...emptyObjectData,
+      objectData({
+        x, y,
         objectType: ObjectType.CARD,
         data: id,
-      }
+      })
     )(dispatch);
   };
 

@@ -12,6 +12,9 @@ export enum CardType {
   NOTE = 'NOTE',
 }
 
+export const DEFAULT_WIDTH  = 240;
+export const DEFAULT_HEIGHT = 160;
+
 export const typeToString = (type: CardType) => {
   switch (type) {
     case CardType.NORMAL:

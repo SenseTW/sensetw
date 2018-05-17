@@ -10,6 +10,7 @@ export enum MapScopeType {
 }
 
 export type PositionInMap = [number, number];
+export type DimensionInMap = [number, number];
 type ZoomLevel = number;
 
 const SET_SCOPE_TO_BOX = 'SET_SCOPE_TO_BOX';
@@ -38,18 +39,32 @@ const closeBox =
   };
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
-type PanViewportAction = { type: typeof PAN_VIEWPORT };
-const panViewport = (pos: PositionInMap): PanViewportAction => ({ type: PAN_VIEWPORT });
+const panViewport =
+  (pos: PositionInMap) => ({
+    type: PAN_VIEWPORT as typeof PAN_VIEWPORT,
+    payload: { pos }
+  });
 
 const ZOOM_VIEWPORT = 'ZOOM_VIEWPORT';
-type ZoomViewportAction = { type: typeof ZOOM_VIEWPORT };
-const zoomViewport = (level: ZoomLevel): ZoomViewportAction => ({ type: ZOOM_VIEWPORT });
+const zoomViewport =
+  (level: ZoomLevel) => ({
+    type: ZOOM_VIEWPORT as typeof ZOOM_VIEWPORT,
+    payload: { level }
+  });
+
+const RESIZE_VIEWPORT = 'RESIZE_VIEWPORT';
+const resizeViewport =
+  (dimension: DimensionInMap) => ({
+    type: RESIZE_VIEWPORT as typeof RESIZE_VIEWPORT,
+    payload: { dimension }
+  });
 
 const syncActions = {
   setScopeToBox,
   setScopeToFullmap,
   panViewport,
   zoomViewport,
+  resizeViewport,
 };
 
 export const actions = {
@@ -72,6 +87,7 @@ type BoxScope = {
 export type State = {
   map: MapID,
   scope: FullMapScope | BoxScope,
+  dimension: DimensionInMap,
 };
 
 export const initial: State = {
@@ -79,6 +95,7 @@ export const initial: State = {
   scope: {
     type: MapScopeType.FULL_MAP,
   },
+  dimension: [0, 0],
 };
 
 export const reducer = (state: State = initial, action: Action): State => {
@@ -88,6 +105,10 @@ export const reducer = (state: State = initial, action: Action): State => {
     }
     case SET_SCOPE_TO_FULL_MAP: {
       return { ...state, ...{ scope: { type: MapScopeType.FULL_MAP } } };
+    }
+    case RESIZE_VIEWPORT: {
+      const { dimension } = action.payload;
+      return { ...state, dimension };
     }
     default:
       return state;

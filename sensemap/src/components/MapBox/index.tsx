@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import MapTagList from '../MapTagList';
 import * as T from '../../types';
+import * as B from '../../types/sense-box';
 import { noop, toTags } from '../../types/utils';
 import { moveStart, moveEnd } from '../../graphics/point';
 
@@ -18,8 +19,8 @@ interface State {
   tagHeight: number;
 }
 
-const width = 240;
-const height = 90 + 24;
+const width = B.DEFAULT_WIDTH;
+const height = B.DEFAULT_HEIGHT;
 const borderColor = '#707070';
 const borderWidth = 8;
 const bgColor = '#ffffff';

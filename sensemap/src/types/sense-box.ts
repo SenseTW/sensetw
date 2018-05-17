@@ -4,6 +4,9 @@ import { ActionUnion, emptyAction } from '.';
 
 export type BoxID = string;
 
+export const DEFAULT_WIDTH  = 240;
+export const DEFAULT_HEIGHT = 114; // 90px + 24px for tags
+
 export interface BoxData {
   id: BoxID;
   createdAt: TimeStamp;
