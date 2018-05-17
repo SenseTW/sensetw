@@ -637,40 +637,48 @@ const deleteObject =
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
     return deleteObjectRequest(objectID)
-      .then(() => dispatch(loadObjects(map)));
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => dispatch(loadObjects(map, true)))
+      .then(() => dispatch(loadCards(map, true)))
+      .then(() => dispatch(loadBoxes(map, true)));
+  };
+
+const deleteCard =
+  (cardID: CardID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const query = `
+      mutation DeleteCard($cardID: ID!) {
+        deleteCard(id: $cardID) { ...cardFields }
+      }
+      ${graphQLCardFieldsFragment}
+    `;
+    const variables = { cardID };
+    const { senseMap: { map } } = getState();
+    return client.request(query, variables)
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => dispatch(loadCards(map, true)))
+      .then(() => dispatch(loadObjects(map, true)));
   };
 
 const deleteCardWithObject =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    let query = `
+    const query = `
       query GetCard($cardID: ID!) {
         Card(id: $cardID) { ...cardFields }
       }
       ${graphQLCardFieldsFragment}
     `;
-    let variables = { cardID };
+    const variables = { cardID };
     return client.request(query, variables)
       .then(({ Card }: { Card: { objects: { id: ObjectID }[] } }) =>
             Promise.all(Card.objects.map(({ id }) => deleteObjectRequest(id))))
-      .then(() => {
-        query = `
-          mutation DeleteCard($cardID: ID!) {
-            deleteCard(id: $cardID) { ...cardFields }
-          }
-          ${graphQLCardFieldsFragment}
-        `;
-        variables = { cardID };
-        const { senseMap: { map } } = getState();
-        return client.request(query, variables)
-          .then(() => SL.actions.clearSelection())
-          .then(() => dispatch(loadCards(map, true)))
-          .then(() => dispatch(loadObjects(map, true)));
-      });
+      .then(() => dispatch(deleteCard(cardID)));
   };
 
-const deleteBoxWithObjectRequest =
-  (boxID: BoxID) => {
+const deleteBox =
+  (boxID: BoxID) =>
+  (dispatch: Dispatch, getState: GetState) => {
     const query = `
       mutation DeleteBox($boxID: ID!) {
         deleteBox(id: $boxID) { ...boxFields }
@@ -678,28 +686,32 @@ const deleteBoxWithObjectRequest =
       ${graphQLBoxFieldsFragment}
     `;
     const variables = { boxID };
-    return client.request(`query BoxObjects($boxID: ID!) { Box(id: $boxID) { objects { id } } }`, variables)
-      .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
-            Promise.all(Box.objects.map(({ id }) => deleteObjectRequest(id))))
-      .then(() => client.request(query, variables));
+    const { senseMap: { map } } = getState();
+    return client.request(query, variables)
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => dispatch(loadBoxes(map, true)))
+      .then(() => dispatch(loadObjects(map, true)));
   };
 
 const deleteBoxWithObject =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    return deleteBoxWithObjectRequest(boxID)
-      .then(() => dispatch(loadBoxes(map, true)))
-      .then(() => dispatch(loadObjects(map, true)));
+    const query = `
+      query GetBoxObjects($boxID: ID!) {
+        Box(id: $boxID) { objects { id } }
+      }
+    `;
+    const variables = { boxID };
+    return client.request(query, variables)
+      .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
+            Promise.all(Box.objects.map(({ id }) => deleteObjectRequest(id))))
+      .then(() => dispatch(deleteBox(boxID)));
   };
 
 const unboxCards =
-  (box: BoxID) =>
+  (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    return deleteBoxWithObjectRequest(box)
-      .then(() => dispatch(loadBoxes(map, true)))
-      .then(() => dispatch(loadObjects(map, true)))
+    return dispatch(deleteBoxWithObject(boxID))
       .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 

@@ -19,7 +19,7 @@ interface DispatchFromProps {
     selectObject(status: OE.Status): T.ActionChain,
     addCardsToBox(cards: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
-    deleteCardWithObject(card: T.CardID): T.ActionChain,
+    deleteObject(object: T.ObjectID): T.ActionChain,
     unboxCards(box: SB.BoxID): T.ActionChain,
   };
 }
@@ -198,8 +198,8 @@ class ObjectMenu extends React.PureComponent<Props> {
           <Menu.Item
             name="deleteCard"
             onClick={() => {
-              const { data: id } = SO.getObject(senseObject, selection[0]);
-              actions.deleteCardWithObject(id);
+              const { id } = SO.getObject(senseObject, selection[0]);
+              actions.deleteObject(id);
             }}
           >
             刪除
@@ -232,8 +232,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.addCardsToBox(cards, box)),
       removeCardsFromBox: (cards, box) =>
         dispatch(T.actions.senseObject.removeCardsFromBox(cards, box)),
-      deleteCardWithObject: (card) =>
-        dispatch(T.actions.senseObject.deleteCardWithObject(card)),
+      deleteObject: (object) =>
+        dispatch(T.actions.senseObject.deleteObject(object)),
       unboxCards: (box) =>
         dispatch(T.actions.senseObject.unboxCards(box)),
     }
