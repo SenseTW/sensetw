@@ -38,7 +38,7 @@ class MapPage extends React.Component<Props> {
 
     return (
       <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
-        <Sidebar visible={editor.type !== OE.StatusType.HIDE} animation="overlay" width="wide">{
+        <Sidebar visible={editor.type !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
           data &&
             <ObjectContent
               objectType={objectType}

@@ -60,31 +60,31 @@ class Breadcrumb extends React.PureComponent<Props> {
 
     return (
       <Segment compact className="breadcrumb">
-      <SBreadcrumb>
-        {
-          scope.type === T.MapScopeType.BOX
-            ? (
-              <SBreadcrumb.Section
-                link
-                as={Link}
-                to={R.index}
-                onClick={() => actions.setScopeToFullmap()}
-              >
-                Map
-              </SBreadcrumb.Section>
-            )
-            : <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
-        }
-        {
-          scope.type === T.MapScopeType.BOX &&
-            (
-              <React.Fragment>
-                <SBreadcrumb.Divider icon="right angle" />
-                <SBreadcrumb.Section active>{box.title}</SBreadcrumb.Section>
-              </React.Fragment>
-            )
-        }
-      </SBreadcrumb>
+        <SBreadcrumb>
+          {
+            scope.type === T.MapScopeType.BOX &&
+              (
+                <React.Fragment>
+                  <SBreadcrumb.Section active>{box.title}</SBreadcrumb.Section>
+                  <SBreadcrumb.Divider icon="left angle" />
+                </React.Fragment>
+              )
+          }
+          {
+            scope.type === T.MapScopeType.BOX
+              ? (
+                <SBreadcrumb.Section
+                  link
+                  as={Link}
+                  to={R.index}
+                  onClick={() => actions.setScopeToFullmap()}
+                >
+                  Map
+                </SBreadcrumb.Section>
+              )
+              : <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
+          }
+        </SBreadcrumb>
       </Segment>
     );
   }
