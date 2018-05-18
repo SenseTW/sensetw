@@ -1,21 +1,31 @@
 
 .card {
-  width: 180px;
-  height: 94px;
-  border-radius: 8px;
-  border: solid 2px #3ad8fa;
+  width: 300px;
+  height: 84px;
+  border-radius: 4px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  margin-left: 2px;
+  margin-right: 2px;
   padding: 2px;
 }
 
+.card.card--focused {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  margin-left: 0px;
+  margin-right: 0px;
+  border: solid 2px #3ad8fa;
+}
+
 .card__body {
-  width: 172px;
-  height: 86px;
-  border-radius: 4px;
-  box-shadow: 0 0 10px 0 rgba(117, 117, 117, 0.5);
+  width: 292px;
+  height: 76px;
+  border-radius: 2px;
   padding-top: 8px;
-  padding-left: 6px;
-  padding-right: 6px;
-  padding-bottom: 7px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 6px;
 }
 
 .card.card--not-in-map .card__body {
@@ -23,42 +33,41 @@
 }
 
 .card.card--in-map .card__body {
-  background-color: rgba(110, 110, 110, 1);
+  background-color: rgb(176, 176, 176);
 }
 
-.card.card--not-in-map.question .card__body {
-  background-color: rgba(255, 236, 239, 1);
+.card.card--not-in-map.card--question .card__body {
+  background-color: rgba(255, 236, 239);
 }
 
-.card.card--in-map.question .card__body {
-  background-color: rgba(93, 27, 55, 1);
+.card.card--in-map.card--question .card__body {
+  background-color: rgb(147, 112, 127);
 }
 
-.card.card--not-in-map.answer .card__body {
-  background-color: rgba(222, 255, 245, 1);
+.card.card--not-in-map.card--answer .card__body {
+  background-color: rgba(222, 255, 245);
 }
 
-.card.card--in-map.answer .card__body {
-  background-color: rgba(27, 93, 93, 1);
+.card.card--in-map.card--answer .card__body {
+  background-color: rgb(71, 138, 138);
 }
 
 .card__summary {
-  width: 160px;
-  height: 53px;
+  height: 32px;
   font-family: NotoSansCJKtc;
-  font-size: 12px;
-  font-weight: normal;
+  font-size: 13px;
+  font-weight: 500;
   font-style: normal;
   font-stretch: normal;
-  line-height: 1.33;
+  line-height: 1.23;
   letter-spacing: normal;
   text-align: left;
   color: #000000;
 }
 
 .card__tag-panel {
-  width: 160px;
-  height: 16px;
+  margin-top: 6px;
+  height: 24px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -69,14 +78,14 @@
 }
 
 .card__tag {
-  width: 48px;
-  height: 16px;
-  border-radius: 2px;
-  background-color: #d8d8d8;
+  height: 24px;
+  border-radius: 4px;
+  background-color: #e7e7e7;
   padding: 3px;
-  font-family: NotoSans;
-  font-size: 10px;
-  font-weight: normal;
+
+  font-family: PingFangTC;
+  font-size: 12px;
+  font-weight: 500;
   font-style: normal;
   font-stretch: normal;
   line-height: normal;

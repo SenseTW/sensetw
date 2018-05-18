@@ -1,16 +1,32 @@
 .inbox {
-  position: absolute;
-  top: 100px;
-  left: 0;
-  width: 398px;
-  height: 950px;
   background-color: #37474f;
-  padding: 0 12px;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: space-evenly;
+  padding-top: 0.1px; /* XXX fix the blank space on top */
+  padding-bottom: 24px;
+  height: 960px;
+}
+
+.inbox__close-btn {
+  width: 96px;
+  height: 36px;
+  margin-top: 16px;
+}
+
+.inbox__close-btn button {
+  width: 96px;
+}
+
+.inbox__add-card-btn {
+  text-align: center;
+  margin-top: 14px;
+  margin-right: 8px;
+  margin-left: 8px;
+  height: 24px;
+  opacity: 0.17;
+  border-radius: 4px;
+  border: solid 2px #979797;
 }
 
 .inbox__pagination {
-  position: relative !important;
+  margin-top: 24px;
+  position: relative !important; /* XXX broken by a `.map-page .ui.menu` rule */
 }
