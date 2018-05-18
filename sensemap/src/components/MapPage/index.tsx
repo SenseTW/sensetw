@@ -15,7 +15,7 @@ import './index.css';
 const background = require('./background-map.png');
 
 interface StateFromProps {
-  map: T.MapID;
+  senseMap: T.State['senseMap'];
   editor: OE.Status;
   scope: typeof SM.initial.scope;
 }
@@ -41,11 +41,14 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions, editor, map, scope } = this.props;
+    const { actions, editor, scope, senseMap } = this.props;
     const { objectType, data } = editor;
 
     return (
       <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
+        <Sidebar visible={senseMap.inbox === SM.InboxVisibility.VISIBLE} direction="left">
+          <Inbox />
+        </Sidebar>
         <Sidebar visible={editor.type !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
           data &&
             <ObjectContent
@@ -56,7 +59,7 @@ class MapPage extends React.Component<Props> {
                 if (editor.type === OE.StatusType.CREATE) {
                   switch (objectType) {
                     case T.ObjectType.CARD:
-                      const action = await actions.createCardObject(map, newData as T.CardData);
+                      const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
                       const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
                       if (scope.type === T.MapScopeType.BOX) {
                         const object = Object.values(objects)[0];
@@ -66,7 +69,7 @@ class MapPage extends React.Component<Props> {
                       actions.selectObject(OE.hide());
                       break;
                     case T.ObjectType.BOX:
-                      actions.createBoxObject(map, newData as T.BoxData);
+                      actions.createBoxObject(senseMap.map, newData as T.BoxData);
                       actions.selectObject(OE.hide());
                       break;
                     default:
@@ -90,13 +93,12 @@ class MapPage extends React.Component<Props> {
         <Sidebar.Pusher>
           <ResizeDetector handleWidth handleHeight onResize={this.handleResize} />
           <Map
-            id={map}
+            id={senseMap.map}
             width={1960}
             height={1200}
           />
           <ObjectMenu />
           <Breadcrumb />
-          <Inbox />
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     );
@@ -105,11 +107,11 @@ class MapPage extends React.Component<Props> {
 
 export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => {
-    const map = state.senseMap.map;
+    const senseMap = state.senseMap;
     const scope = state.senseMap.scope;
     const { editor } = state;
 
-    return { map, scope, editor };
+    return { senseMap, scope, editor };
   },
   (dispatch: T.Dispatch) => ({
     actions: {

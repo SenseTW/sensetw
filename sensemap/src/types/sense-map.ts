@@ -9,6 +9,11 @@ export enum MapScopeType {
   BOX      = 'BOX',
 }
 
+export enum InboxVisibility {
+  VISIBLE = 'VISIBLE',
+  HIDDEN  = 'HIDDEN',
+}
+
 export type PositionInMap = [number, number];
 export type DimensionInMap = [number, number];
 type ZoomLevel = number;
@@ -22,6 +27,16 @@ const setScopeToBox = (box: BoxID) => ({
 const SET_SCOPE_TO_FULL_MAP = 'SET_SCOPE_TO_FULL_MAP';
 const setScopeToFullmap = () => ({
   type: SET_SCOPE_TO_FULL_MAP as typeof SET_SCOPE_TO_FULL_MAP,
+});
+
+const OPEN_INBOX = 'OPEN_INBOX';
+const openInbox = () => ({
+  type: OPEN_INBOX as typeof OPEN_INBOX,
+});
+
+const CLOSE_INBOX = 'CLOSE_INBOX';
+const closeInbox = () => ({
+  type: CLOSE_INBOX as typeof CLOSE_INBOX,
 });
 
 const openBox =
@@ -65,6 +80,8 @@ const syncActions = {
   panViewport,
   zoomViewport,
   resizeViewport,
+  openInbox,
+  closeInbox,
 };
 
 export const actions = {
@@ -88,6 +105,7 @@ export type State = {
   map: MapID,
   scope: FullMapScope | BoxScope,
   dimension: DimensionInMap,
+  inbox: InboxVisibility,
 };
 
 export const initial: State = {
@@ -96,6 +114,7 @@ export const initial: State = {
     type: MapScopeType.FULL_MAP,
   },
   dimension: [0, 0],
+  inbox: InboxVisibility.HIDDEN,
 };
 
 export const reducer = (state: State = initial, action: Action): State => {
@@ -109,6 +128,12 @@ export const reducer = (state: State = initial, action: Action): State => {
     case RESIZE_VIEWPORT: {
       const { dimension } = action.payload;
       return { ...state, dimension };
+    }
+    case OPEN_INBOX: {
+      return { ...state, inbox: InboxVisibility.VISIBLE };
+    }
+    case CLOSE_INBOX: {
+      return { ...state, inbox: InboxVisibility.HIDDEN };
     }
     default:
       return state;

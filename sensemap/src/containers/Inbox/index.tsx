@@ -9,5 +9,9 @@ export default connect<CO.StateFromProps, CO.DispatchFromProps, CO.OwnProps>(
     return { cards };
   },
   (dispatch: T.Dispatch) => ({
+    actions: {
+      closeInbox: () =>
+        dispatch(T.actions.senseMap.closeInbox()),
+    }
   })
 )(CO.Inbox);

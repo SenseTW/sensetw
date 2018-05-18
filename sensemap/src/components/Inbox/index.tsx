@@ -10,16 +10,20 @@ export interface StateFromProps {
   cards: T.CardData[];
 }
 
-export interface DispatchFromProps {}
+export interface DispatchFromProps {
+  actions: {
+    closeInbox(): T.ActionChain,
+  };
+}
 
 export interface OwnProps {}
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
-export function Inbox({ cards }: Props) {
+export function Inbox({ cards, actions: { closeInbox } }: Props) {
   return (
     <div className="inbox">
-      <Button secondary icon labelPosition="right">INBOX <Icon name="arrow left" /></Button>
+      <Button secondary icon labelPosition="right" onClick={closeInbox}>INBOX <Icon name="arrow left" /></Button>
       <AddCardButton />
       <Pager data={cards} pageSize={12}>
         {({ data, totalPages, currentPage, handlePageChange }) => {

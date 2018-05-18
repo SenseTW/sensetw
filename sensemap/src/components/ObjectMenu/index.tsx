@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Menu } from 'semantic-ui-react';
 import * as T from '../../types';
 import * as SL from '../../types/selection';
+import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
 import * as SC from '../../types/sense-card';
@@ -12,6 +13,7 @@ interface StateFromProps {
   selection:   SL.State;
   senseObject: T.State['senseObject'];
   scope:       T.State['senseMap']['scope'];
+  senseMap:    T.State['senseMap'];
 }
 
 interface DispatchFromProps {
@@ -21,6 +23,7 @@ interface DispatchFromProps {
     removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     deleteObject(object: T.ObjectID): T.ActionChain,
     unboxCards(box: SB.BoxID): T.ActionChain,
+    openInbox(): T.ActionChain,
   };
 }
 
@@ -129,7 +132,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, senseObject, selection } = this.props;
+    const { actions, senseObject, selection, senseMap } = this.props;
 
     return (
       <Menu vertical>
@@ -138,6 +141,15 @@ class ObjectMenu extends React.PureComponent<Props> {
             ? '功能選單'
             : `選取了 ${selection.length} 個物件`
         }</Menu.Item>
+        {
+          senseMap.inbox === SM.InboxVisibility.HIDDEN &&
+          <Menu.Item
+            name="open-inbox"
+            onClick={actions.openInbox}
+          >
+            Inbox
+          </Menu.Item>
+        }
         {
           this.canCreateBox() &&
           <Menu.Item
@@ -224,6 +236,7 @@ export default connect<StateFromProps, DispatchFromProps>(
     selection: state.selection,
     scope: state.senseMap.scope,
     senseObject: state.senseObject,
+    senseMap: state.senseMap,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
@@ -236,6 +249,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.deleteObject(object)),
       unboxCards: (box) =>
         dispatch(T.actions.senseObject.unboxCards(box)),
+      openInbox: () =>
+        dispatch(T.actions.senseMap.openInbox()),
     }
   })
 )(ObjectMenu);
