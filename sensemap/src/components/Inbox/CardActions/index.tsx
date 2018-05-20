@@ -12,7 +12,7 @@ interface StateFromProps {
 interface DispatchFromProps {
   actions: {
     selectObject(status: OE.Status): T.ActionChain,
-    createObjectForCard(mapId: T.MapID, cardId: T.CardID): T.ActionChain,
+    createObjectForCard(mapId: T.MapID, cardId: T.CardID, box?: T.BoxID): T.ActionChain,
   };
 }
 
@@ -23,6 +23,10 @@ interface OwnProps {
 type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 function CardActions({ card, actions, senseMap }: Props) {
+  const box =
+    senseMap.scope.type === T.MapScopeType.BOX
+      ? senseMap.scope.box
+      : undefined;
   return (
     <div className="card-actions">
       <Button
@@ -31,7 +35,7 @@ function CardActions({ card, actions, senseMap }: Props) {
       />
       <Button
         icon="plus square outline"
-        onClick={() => actions.createObjectForCard(senseMap.map, card.id)}
+        onClick={() => actions.createObjectForCard(senseMap.map, card.id, box)}
       />
       <Button icon="trash" />
     </div>
@@ -46,8 +50,8 @@ export default connect<StateFromProps, DispatchFromProps>(
     actions: {
       selectObject: (status: OE.Status) =>
         dispatch(T.actions.editor.selectObject(status)),
-      createObjectForCard: (mapId: T.MapID, cardId: T.CardID) =>
-        dispatch(T.actions.senseObject.createObjectForCard(mapId, cardId)),
+      createObjectForCard: (mapId: T.MapID, cardId: T.CardID, box?: T.BoxID) =>
+        dispatch(T.actions.senseObject.createObjectForCard(mapId, cardId, box)),
     }
   })
 )(CardActions);

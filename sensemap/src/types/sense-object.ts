@@ -474,6 +474,31 @@ const loadBoxes =
       .then(data => dispatch(overwrite ? overwriteBoxes(data) : updateBoxes(data)));
   };
 
+const addCardToBox =
+  (cardObject: ObjectID, box: BoxID) =>
+  (dispatch: Dispatch) => {
+    const query = `
+      mutation AddCardToBox($cardObject: ID!, $box: ID!) {
+        addToContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
+          containsObject { id } belongsToBox { id }
+        }
+      }
+    `;
+    const variables = { cardObject, box };
+    return client.request(query, variables)
+      .then(({ updateObject }) => dispatch(updateInBox(cardObject, box)))
+      .then(() => dispatch(SL.actions.clearSelection()));
+  };
+
+const addCardsToBox =
+  (cardObjects: ObjectID[], box: BoxID) =>
+  async (dispatch: Dispatch) => {
+    await Promise.all(
+      cardObjects.map(id => dispatch(addCardToBox(id, box)))
+    );
+    return dispatch(SL.actions.clearSelection());
+  };
+
 const createObject =
   (mapId: MapID, data: ObjectData) =>
   (dispatch: Dispatch) => {
@@ -535,12 +560,12 @@ const createBoxObject =
   };
 
 const createObjectForCard =
-  (mapId: MapID, cardId: CardID) =>
+  (mapId: MapID, cardId: CardID, box?: BoxID) =>
   async (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { dimension } } = getState();
     const x = (dimension[0] - C.DEFAULT_WIDTH) / 2;
     const y = (dimension[1] - C.DEFAULT_HEIGHT) / 2;
-    return createObject(
+    const action = await createObject(
       mapId,
       objectData({
         x, y,
@@ -548,6 +573,12 @@ const createObjectForCard =
         data: cardId,
       })
     )(dispatch);
+    const { id = '' } = Object.values(action.payload)[0] || {};
+    if (box) {
+      return addCardToBox(id, box)(dispatch);
+    } else {
+      return action;
+    }
   };
 
 const createCardObject =
@@ -574,31 +605,6 @@ const moveObject =
       .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
         toObjectData(updateObject),
       ]))));
-  };
-
-const addCardToBox =
-  (cardObject: ObjectID, box: BoxID) =>
-  (dispatch: Dispatch) => {
-    const query = `
-      mutation AddCardToBox($cardObject: ID!, $box: ID!) {
-        addToContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
-          containsObject { id } belongsToBox { id }
-        }
-      }
-    `;
-    const variables = { cardObject, box };
-    return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateInBox(cardObject, box)))
-      .then(() => dispatch(SL.actions.clearSelection()));
-  };
-
-const addCardsToBox =
-  (cardObjects: ObjectID[], box: BoxID) =>
-  async (dispatch: Dispatch) => {
-    await Promise.all(
-      cardObjects.map(id => dispatch(addCardToBox(id, box)))
-    );
-    return dispatch(SL.actions.clearSelection());
   };
 
 const removeCardFromBox =
