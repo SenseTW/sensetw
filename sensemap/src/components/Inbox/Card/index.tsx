@@ -32,7 +32,6 @@ export default function Card(props: Props) {
     'card',
     (Object.keys(card.objects).length > 0 ? 'card--in-map' : 'card--not-in-map'),
     `card--${(card.cardType as string).toLowerCase()}`,
-    (Math.random() > 0.5 ? `card--focused` : ''),
   ].join(' ');
   return (
     <div className={className}>
