@@ -4,13 +4,14 @@ import MapTagList from '../MapTagList';
 import * as T from '../../types';
 import * as B from '../../types/sense-box';
 import { noop, toTags } from '../../types/utils';
+import { Event as KonvaEvent } from '../../types/konva';
 import { moveStart, moveEnd } from '../../graphics/point';
 
 interface Props {
   mapObject: T.ObjectData;
   box: T.BoxData;
   selected?: Boolean;
-  toggleSelection?(id: T.ObjectID): void;
+  toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openBox?(box: T.BoxID): void;
 }
@@ -85,7 +86,7 @@ class MapBox extends React.Component<Props, State> {
         y={y}
         key={id}
         draggable={true}
-        onClick={() => toggleSelection(id)}
+        onClick={(e) => toggleSelection(e, id)}
         onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
         onDragEnd={(e) => {
           // XXX TypeScript ought to understand this...

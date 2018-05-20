@@ -14,7 +14,9 @@ interface StateFromProps extends CO.StateFromProps {
 
 interface DispatchFromProps extends CO.DispatchFromProps {
   actions: {
+    addObjectToSelection(id: T.ObjectID): T.ActionChain,
     toggleObjectSelection(id: T.ObjectID): T.ActionChain,
+    clearSelection(): T.ActionChain,
     loadObjects(id: T.MapID): T.ActionChain,
     loadCards(id: T.MapID): T.ActionChain,
     loadBoxes(id: T.MapID): T.ActionChain,
@@ -72,11 +74,16 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
     objects: state.senseObject.objects,
     cards: state.senseObject.cards,
     boxes: state.senseObject.boxes,
+    input: state.input,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
+      addObjectToSelection: (id: T.ObjectID) =>
+        dispatch(T.actions.selection.addObjectToSelection(id)),
       toggleObjectSelection: (id: T.ObjectID) =>
         dispatch(T.actions.selection.toggleObjectSelection(id)),
+      clearSelection: () =>
+        dispatch(T.actions.selection.clearSelection()),
       loadObjects: (id: T.MapID) =>
         dispatch(T.actions.senseObject.loadObjects(id)),
       loadCards: (id: T.MapID) =>

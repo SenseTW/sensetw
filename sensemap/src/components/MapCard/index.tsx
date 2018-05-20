@@ -5,13 +5,14 @@ import MapTagList from '../MapTagList';
 import * as T from '../../types';
 import * as C from '../../types/sense-card';
 import { noop, toTags } from '../../types/utils';
+import { Event as KonvaEvent } from '../../types/konva';
 import { moveStart, moveEnd } from '../../graphics/point';
 
 interface Props {
   mapObject: T.ObjectData;
   card: T.CardData;
   selected?: Boolean;
-  toggleSelection?(id: T.ObjectID): void;
+  toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openCard?(id: T.CardID): void;
 }
@@ -105,7 +106,8 @@ class MapCard extends React.Component<Props, State> {
         y={y}
         key={id}
         draggable={true}
-        onClick={() => toggleSelection(id)}
+        // tslint:disable-next-line
+        onClick={(e) => toggleSelection(e, id)}
         onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
         onDragEnd={(e) => {
           // XXX TypeScript ought to understand this...

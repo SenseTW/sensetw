@@ -30,8 +30,16 @@ export const initial: State = {
   keyStatus: {
     [Key.Shift]: false,
     [Key.Ctrl]: false,
+    [Key.LeftWindowKey]: false,
+    [Key.RightWindowKey]: false,
   },
 };
+
+export const isMultiSelectable = (state: State) =>
+  state.keyStatus[Key.Shift] ||
+  state.keyStatus[Key.Ctrl] ||
+  state.keyStatus[Key.LeftWindowKey] ||
+  state.keyStatus[Key.RightWindowKey];
 
 export const reducer = (state: State = initial, action: Action = emptyAction): State => {
   switch (action.type) {

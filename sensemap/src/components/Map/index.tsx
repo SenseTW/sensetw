@@ -8,17 +8,22 @@ import * as SL from '../../types/selection';
 import * as T from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SO from '../../types/sense-object';
+import * as I from '../../types/input';
+import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
   selection: T.State['selection'];
   objects:   T.State['senseObject']['objects'];
   cards:     T.State['senseObject']['cards'];
   boxes:     T.State['senseObject']['boxes'];
+  input:     T.State['input'];
 }
 
 export interface DispatchFromProps {
   actions: {
+    addObjectToSelection(id: T.ObjectID): T.ActionChain,
     toggleObjectSelection(id: T.ObjectID): T.ActionChain,
+    clearSelection(): T.ActionChain,
     moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
     addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
@@ -35,10 +40,30 @@ export interface OwnProps {
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 const renderObject = (o: T.ObjectData, props: Props) => {
+  const addObjectToSelection = props.actions.addObjectToSelection;
   const toggleSelection = props.actions.toggleObjectSelection;
+  const clearSelection = props.actions.clearSelection;
   const moveObject = props.actions.moveObject;
   const openBox = props.actions.openBox;
   const selectObject = props.actions.selectObject;
+  const isMultiSelectable = I.isMultiSelectable(props.input);
+  const isSelected = SL.contains(props.selection, o.id);
+
+  const handleSelection = (e: KonvaEvent.Mouse, id: T.ObjectID) => {
+    // stop event propagation by setting the e.cancelBubble
+    // notice that it's useless to set e.evt.cancelBubble directly
+    // check: https://github.com/lavrton/react-konva/issues/139
+    e.cancelBubble = true;
+
+    if (isMultiSelectable) {
+      toggleSelection(id);
+    } else {
+      clearSelection();
+      if (!isSelected || props.selection.length > 1) {
+        addObjectToSelection(id);
+      }
+    }
+  };
 
   switch (o.objectType) {
     case T.ObjectType.NONE: {
@@ -52,8 +77,8 @@ const renderObject = (o: T.ObjectData, props: Props) => {
         <MapCard
           mapObject={o}
           card={props.cards[o.data]}
-          selected={SL.contains(props.selection, o.id)}
-          toggleSelection={toggleSelection}
+          selected={isSelected}
+          toggleSelection={handleSelection}
           moveObject={moveObject}
           openCard={(id) => selectObject(OE.editCard(SO.getCard(props as SO.State, id)))}
         />);
@@ -66,8 +91,8 @@ const renderObject = (o: T.ObjectData, props: Props) => {
         <MapBox
           mapObject={o}
           box={props.boxes[o.data]}
-          selected={SL.contains(props.selection, o.id)}
-          toggleSelection={toggleSelection}
+          selected={isSelected}
+          toggleSelection={handleSelection}
           moveObject={moveObject}
           openBox={openBox}
         />);
@@ -79,9 +104,17 @@ const renderObject = (o: T.ObjectData, props: Props) => {
 };
 
 export function Map(props: Props) {
+  const clearSelection = props.actions.clearSelection;
   const objects = Object.values(props.objects).map(o => renderObject(o, props));
+  let stage: Stage | null = null;
+
   return (
-    <Stage width={props.width} height={props.height}>
+    <Stage
+      ref={(node) => stage = node as (Stage | null)}
+      width={props.width}
+      height={props.height}
+      onClick={() => clearSelection()}
+    >
       <Layer>
         {objects}
       </Layer>
