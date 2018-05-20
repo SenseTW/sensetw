@@ -38,9 +38,10 @@ export default function Card(props: Props) {
     <div className={className}>
       <Reveal animated="fade">
         <Reveal.Content hidden>
-          <CardAction />
+          <CardAction card={card} />
         </Reveal.Content>
-        <Reveal.Content visible>
+        /* XXX a hack */
+        <Reveal.Content visible style={{ pointerEvents: 'none' }}>
           <div className="card__body">
             <div className="card__summary">
               {card.summary}
