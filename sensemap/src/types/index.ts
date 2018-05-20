@@ -5,6 +5,7 @@ import * as SO from './sense-object';
 import * as SC from './sense-card';
 import * as SL from './selection';
 import * as OE from './object-editor';
+import * as I from './input';
 
 export { MapID, MapScopeType } from './sense-map';
 export { ObjectID, ObjectType, ObjectData } from './sense-object';
@@ -23,6 +24,7 @@ export type State = {
   senseObject: SO.State,
   selection: SL.State,
   editor: OE.State,
+  input: I.State,
 };
 
 export const initial: State = {
@@ -31,6 +33,7 @@ export const initial: State = {
   senseObject: SO.initial,
   selection: SL.initial,
   editor: OE.initial,
+  input: I.initial,
 };
 
 export type Action
@@ -39,7 +42,8 @@ export type Action
   | SO.Action
   | SC.Action
   | SL.Action
-  | OE.Action;
+  | OE.Action
+  | I.Action;
 
 export type ActionChain = Action | Promise<Action>;
 
@@ -49,6 +53,7 @@ export const actions = {
   senseObject: SO.actions,
   selection: SL.actions,
   editor: OE.actions,
+  input: I.actions,
 };
 
 export type Dispatch = ReduxDispatch<State>;
@@ -63,4 +68,5 @@ export const reducer = combineReducers({
   senseObject: SO.reducer,
   selection: SL.reducer,
   editor: OE.reducer,
+  input: I.reducer,
 });

@@ -11,6 +11,7 @@ import * as T from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
+import { Key } from 'ts-keycode-enum';
 import './index.css';
 const background = require('./background-map.png');
 
@@ -29,6 +30,8 @@ interface DispatchFromProps {
     updateRemoteCard(card: T.CardData): T.ActionChain,
     addCardToBox(cardObject: T.ObjectID, box: T.BoxID): T.ActionChain,
     resizeViewpart(dimension: SM.DimensionInMap): T.ActionChain,
+    keyPress(key: Key): T.ActionChain,
+    keyRelease(key: Key): T.ActionChain,
   };
 }
 
@@ -38,6 +41,26 @@ class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions } = this.props;
     actions.resizeViewpart([width, height]);
+  }
+
+  handleKeyUp = (e: KeyboardEvent) => {
+    const { actions } = this.props;
+    actions.keyRelease(e.which);
+  }
+
+  handleKeyDown = (e: KeyboardEvent) => {
+    const { actions } = this.props;
+    actions.keyPress(e.which);
+  }
+
+  componentDidMount() {
+    window.addEventListener('keyup', this.handleKeyUp);
+    window.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keyup', this.handleKeyUp);
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
   render() {
@@ -129,6 +152,10 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.addCardToBox(cardObject, box)),
       resizeViewpart: (dimension: SM.DimensionInMap) =>
         dispatch(T.actions.senseMap.resizeViewport(dimension)),
+      keyPress: (key: Key) =>
+        dispatch(T.actions.input.keyPress(key)),
+      keyRelease: (key: Key) =>
+        dispatch(T.actions.input.keyRelease(key)),
     }
   })
 )(MapPage);
