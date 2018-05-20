@@ -534,11 +534,9 @@ const createBoxObject =
     )(dispatch);
   };
 
-const createCardObject =
-  (mapId: MapID, card: CardData) =>
+const createObjectForCard =
+  (mapId: MapID, cardId: CardID) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const action = await createCard(mapId, card)(dispatch);
-    const { id = '' } = Object.values(action.payload)[0] || {};
     const { senseMap: { dimension } } = getState();
     const x = (dimension[0] - C.DEFAULT_WIDTH) / 2;
     const y = (dimension[1] - C.DEFAULT_HEIGHT) / 2;
@@ -547,9 +545,17 @@ const createCardObject =
       objectData({
         x, y,
         objectType: ObjectType.CARD,
-        data: id,
+        data: cardId,
       })
     )(dispatch);
+  };
+
+const createCardObject =
+  (mapId: MapID, card: CardData) =>
+  async (dispatch: Dispatch, getState: GetState) => {
+    const action = await createCard(mapId, card)(dispatch);
+    const { id = '' } = Object.values(action.payload)[0] || {};
+    return createObjectForCard(mapId, id)(dispatch, getState);
   };
 
 const moveObject =
@@ -734,6 +740,7 @@ export const actions = {
   loadCards,
   loadBoxes,
   createBoxObject,
+  createObjectForCard,
   createCardObject,
   moveObject,
   addCardToBox,
