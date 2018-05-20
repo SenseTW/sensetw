@@ -94,7 +94,10 @@ const renderObject = (o: T.ObjectData, props: Props) => {
           selected={isSelected}
           toggleSelection={handleSelection}
           moveObject={moveObject}
-          openBox={openBox}
+          openBox={(id) => {
+            clearSelection();
+            openBox(id);
+          }}
         />);
     }
     default: {

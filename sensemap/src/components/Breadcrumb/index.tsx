@@ -17,6 +17,7 @@ interface DispatchFromProps {
   actions: {
     setScopeToBox(box: T.BoxID): T.ActionChain;
     setScopeToFullmap(): T.ActionChain;
+    clearSelection(): T.ActionChain;
   };
 }
 
@@ -77,7 +78,10 @@ class Breadcrumb extends React.PureComponent<Props> {
                   link
                   as={Link}
                   to={R.index}
-                  onClick={() => actions.setScopeToFullmap()}
+                  onClick={() => {
+                    actions.clearSelection();
+                    actions.setScopeToFullmap();
+                  }}
                 >
                   Map
                 </SBreadcrumb.Section>
@@ -102,7 +106,8 @@ export default withRouter(connect<StateFromProps, DispatchFromProps, RouterProps
   (dispatch: T.Dispatch) => ({
     actions: {
       setScopeToBox: (box: T.BoxID) => dispatch(T.actions.senseMap.setScopeToBox(box)),
-      setScopeToFullmap: () => dispatch(T.actions.senseMap.setScopeToFullmap())
+      setScopeToFullmap: () => dispatch(T.actions.senseMap.setScopeToFullmap()),
+      clearSelection: () => dispatch(T.actions.selection.clearSelection()),
     }
   })
 )(Breadcrumb));
