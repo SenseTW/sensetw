@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import { client } from './client';
 import * as C from './sense-card';
 import { CardID, CardData, emptyCardData, stringToType as stringToCardType } from './sense-card';
@@ -155,8 +156,8 @@ const toObjectDataFieldData: (o: GraphQLObjectFields) => string =
 const toObjectData: (o: GraphQLObjectFields) => ObjectData =
   o => ({
     id:         o.id,
-    createdAt:  0, // TODO
-    updatedAt:  0, // TODO
+    createdAt:  +moment(o.createdAt),
+    updatedAt:  +moment(o.updatedAt),
     x:          o.x,
     y:          o.y,
     width:      o.width,
@@ -198,8 +199,8 @@ function toIDMap<T extends HasID>(this: void, objects: T[]): { [key: string]: T 
 const toCardData: (c: GraphQLCardFields) => CardData =
   c => ({
     id:          c.id,
-    createdAt:   0, // TODO
-    updatedAt:   0, // TODO
+    createdAt:   +moment(c.createdAt),
+    updatedAt:   +moment(c.updatedAt),
     title:       c.title,
     summary:     c.summary,
     description: c.description || '',
@@ -232,8 +233,8 @@ interface GraphQLBoxFields {
 const toBoxData: (b: GraphQLBoxFields) => BoxData =
   b => ({
     id:        b.id,
-    createdAt: 0, // TODO
-    updatedAt: 0, // TODO
+    createdAt: +moment(b.createdAt),
+    updatedAt: +moment(b.updatedAt),
     title:     b.title,
     summary:   b.summary,
     tags:      b.tags || '',
@@ -745,6 +746,7 @@ export const actions = {
   loadObjects,
   loadCards,
   loadBoxes,
+  createCard,
   createBoxObject,
   createObjectForCard,
   createCardObject,

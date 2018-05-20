@@ -63,6 +63,16 @@ export const emptyCardData: CardData = {
   cardType: CardType.NORMAL
 };
 
+export const newCardData: () => CardData =
+  () => {
+    const dateNow = Date.now();
+    return {
+      ...emptyCardData,
+      createdAt: dateNow,
+      updatedAt: dateNow,
+    };
+  };
+
 const now = +Date.now();
 const sampleCardList: CardData[] = [{
   id: objectId(),
