@@ -8,12 +8,14 @@ import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
 import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
+import * as I from '../../types/input';
 
 interface StateFromProps {
   selection:   SL.State;
   senseObject: T.State['senseObject'];
   scope:       T.State['senseMap']['scope'];
   senseMap:    T.State['senseMap'];
+  input:       T.State['input'];
 }
 
 interface DispatchFromProps {
@@ -132,14 +134,19 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, senseObject, selection, senseMap } = this.props;
+    const { actions, senseObject, selection, senseMap, input } = this.props;
+    const isMultiSelectable = I.isMultiSelectable(input);
 
     return (
       <Menu vertical>
         <Menu.Item>{
           selection.length === 0
             ? '功能選單'
-            : `選取了 ${selection.length} 個物件`
+            : selection.length === 1
+              ? isMultiSelectable
+                ? '多選模式'
+                : '按 Shift/Ctrl 選取多張卡片'
+              : `選取了 ${selection.length} 張卡片`
         }</Menu.Item>
         {
           senseMap.inbox === SM.InboxVisibility.HIDDEN &&
@@ -237,6 +244,7 @@ export default connect<StateFromProps, DispatchFromProps>(
     scope: state.senseMap.scope,
     senseObject: state.senseObject,
     senseMap: state.senseMap,
+    input: state.input,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
