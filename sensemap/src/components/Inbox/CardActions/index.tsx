@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as T from '../../../types';
-import * as OE from '../../../types/object-editor';
 import { Button } from 'semantic-ui-react';
 import './index.css';
 
@@ -11,7 +10,7 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    selectObject(status: OE.Status): T.ActionChain,
+    focusObject(focus: T.ObjectID): T.ActionChain,
     createObjectForCard(mapId: T.MapID, cardId: T.CardID, box?: T.BoxID): T.ActionChain,
   };
 }
@@ -31,7 +30,9 @@ function CardActions({ card, actions, senseMap }: Props) {
     <div className="card-actions">
       <Button
         icon="edit"
-        onClick={() => actions.selectObject(OE.editCard(card))}
+        onClick={() => {
+          // TODO: use object type instead of the whole object
+        }}
       />
       <Button
         icon="plus square outline"
@@ -48,8 +49,8 @@ export default connect<StateFromProps, DispatchFromProps>(
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      selectObject: (status: OE.Status) =>
-        dispatch(T.actions.editor.selectObject(status)),
+      focusObject: (focus: T.ObjectID) =>
+        dispatch(T.actions.editor.focusObject(focus)),
       createObjectForCard: (mapId: T.MapID, cardId: T.CardID, box?: T.BoxID) =>
         dispatch(T.actions.senseObject.createObjectForCard(mapId, cardId, box)),
     }

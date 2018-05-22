@@ -2,7 +2,6 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import * as T from '../../types';
-import * as OE from '../../types/object-editor';
 
 interface OwnProps extends CO.OwnProps {
   id: T.MapID;
@@ -28,6 +27,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     stageMouseUp(): T.ActionChain,
     stageMouseDown(): T.ActionChain,
     stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
+    focusObject(id: T.ObjectID): T.ActionChain,
   };
 }
 
@@ -110,6 +110,8 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
         dispatch(T.actions.stage.stageMouseUp()),
       stageMouseMove: ({ dx, dy }: { dx: number, dy: number }) =>
         dispatch(T.actions.stage.stageMouseMove({ dx, dy })),
+      focusObject: (id: T.ObjectID) =>
+        dispatch(T.actions.editor.focusObject(id)),
     }
   })
 )(Map);

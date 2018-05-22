@@ -32,7 +32,7 @@ export function Inbox({ cards, senseMap, actions }: Props) {
         </Button>
       </div>
       <div className="inbox__add-card-btn">
-        <Button icon="plus" size="tiny" color="grey" onClick={() => actions.createCard(mapId, SC.newCardData())} />
+        <Button icon="plus" size="tiny" color="grey" onClick={() => actions.createCard(mapId, SC.cardData())} />
       </div>
       <Pager data={cards} pageSize={9}>
         {({ data, totalPages, currentPage, handlePageChange }) => {

@@ -1,6 +1,7 @@
 import { ObjectID } from './sense-object';
-import { ActionUnion, emptyAction } from './index';
-import { objectId, TimeStamp } from './utils';
+import { ActionUnion, emptyAction } from './action';
+import { TimeStamp } from './utils';
+import * as moment from 'moment';
 
 // sense card data
 export type CardID = string;
@@ -48,6 +49,20 @@ export interface CardData {
   cardType: CardType;
 }
 
+interface PartialCardData {
+  id?: CardID;
+  createdAt?: TimeStamp;
+  updatedAt?: TimeStamp;
+  title?: string;
+  summary?: string;
+  description?: string;
+  tags?: string;
+  saidBy?: string;
+  stakeholder?: string;
+  url?: string;
+  cardType?: CardType;
+}
+
 export const emptyCardData: CardData = {
   id: '0',
   createdAt: 0,
@@ -63,60 +78,16 @@ export const emptyCardData: CardData = {
   cardType: CardType.NORMAL
 };
 
-export const newCardData: () => CardData =
-  () => {
-    const dateNow = Date.now();
-    return {
-      ...emptyCardData,
-      createdAt: dateNow,
-      updatedAt: dateNow,
-    };
+export const cardData = (partial: PartialCardData = {}): CardData => {
+  const now = +moment();
+
+  return {
+    ...emptyCardData,
+    ...partial,
+    createdAt: now,
+    updatedAt: now,
   };
-
-const now = +Date.now();
-const sampleCardList: CardData[] = [{
-  id: objectId(),
-  createdAt: now,
-  updatedAt: now,
-  objects: {},
-  title: '這是一張卡',
-  summary: '這是卡片的內容',
-  description: '',
-  tags: '',
-  saidBy: '',
-  stakeholder: '',
-  url: 'http://example.com',
-  cardType: CardType.QUESTION
-}, {
-  id: objectId(),
-  createdAt: now,
-  updatedAt: now,
-  objects: {},
-  title: '這是另外一張卡',
-  summary: '這是另外一張卡的內容',
-  description: '',
-  tags: '',
-  saidBy: '',
-  stakeholder: '',
-  url: 'http://example.com',
-  cardType: CardType.ANSWER
-}, {
-  id: objectId(),
-  createdAt: now,
-  updatedAt: now,
-  objects: {},
-  title: '這是一個 Note',
-  summary: '這是 Note 的內容',
-  description: '',
-  tags: '',
-  saidBy: '',
-  stakeholder: '',
-  url: 'http://example.com',
-  cardType: CardType.NOTE
-}];
-
-const sampleCardMap = {};
-sampleCardList.forEach((c) => { sampleCardMap[c.id] = c; });
+};
 
 // sense card actions
 const UPDATE_CARD_TYPE = 'UPDATE_CARD_TYPE';

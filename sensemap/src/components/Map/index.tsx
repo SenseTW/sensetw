@@ -6,8 +6,6 @@ import MapCard from '../MapCard';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
-import * as OE from '../../types/object-editor';
-import * as SO from '../../types/sense-object';
 import * as I from '../../types/input';
 import { Event as KonvaEvent } from '../../types/konva';
 
@@ -33,6 +31,7 @@ export interface DispatchFromProps {
     stageMouseUp(): T.ActionChain,
     stageMouseDown(): T.ActionChain,
     stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
+    focusObject(id: T.ObjectID): T.ActionChain,
   };
 }
 
@@ -78,7 +77,7 @@ function renderObject(o: T.ObjectData, props: Props) {
   const clearSelection = props.actions.clearSelection;
   const moveObject = props.actions.moveObject;
   const openBox = props.actions.openBox;
-  const selectObject = props.actions.selectObject;
+  const focusObject = props.actions.focusObject;
   const isMultiSelectable = I.isMultiSelectable(props.input);
   const isSelected = SL.contains(props.selection, o.id);
   const transform = makeTransform(props);
@@ -95,6 +94,7 @@ function renderObject(o: T.ObjectData, props: Props) {
     } else {
       clearSelection();
       if (!isSelected || props.selection.length > 1) {
+        focusObject(id);
         addObjectToSelection(id);
       }
     }
@@ -117,7 +117,9 @@ function renderObject(o: T.ObjectData, props: Props) {
           selected={isSelected}
           toggleSelection={handleSelection}
           moveObject={moveObject}
-          openCard={(id) => selectObject(OE.editCard(SO.getCard(props as SO.State, id)))}
+          openCard={(id) => {
+            // TODO: double click to edit the card
+          }}
         />);
     }
     case T.ObjectType.BOX: {

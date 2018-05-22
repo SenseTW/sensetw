@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import { Dispatch, GetState } from '.';
 import { client } from './client';
 import * as C from './sense-card';
 import { CardID, CardData, emptyCardData, stringToType as stringToCardType } from './sense-card';
@@ -6,7 +7,7 @@ import * as B from './sense-box';
 import { BoxID, BoxData, emptyBoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp } from './utils';
-import { ActionUnion, Dispatch, GetState } from '.';
+import { ActionUnion, emptyAction } from './action';
 import * as SL from './selection';
 import * as SM from './sense-map';
 
@@ -69,7 +70,7 @@ interface PartialObjectData {
   data?:       CardID | BoxID;
 }
 
-export const objectData = (partial: PartialObjectData): ObjectData => {
+export const objectData = (partial: PartialObjectData = {}): ObjectData => {
   const now = +Date.now();
 
   return {
@@ -95,6 +96,11 @@ export const initial: State = {
 export const getObject = (state: State, id: ObjectID): ObjectData => state.objects[id] || emptyObjectData;
 export const getCard = (state: State, id: CardID): CardData => state.cards[id] || emptyCardData;
 export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
+
+export const getCardOrDefault = (state: State, defaultState: State, id: CardID): CardData =>
+  state.cards[id] || defaultState.cards[id] || emptyCardData;
+export const getBoxOrDefault = (state: State, defaultState: State, id: BoxID): BoxData =>
+  state.boxes[id] || defaultState.boxes[id] || emptyBoxData;
 
 const graphQLObjectFieldsFragment = `
   fragment objectFields on Object {
@@ -192,7 +198,7 @@ interface GraphQLCardFields {
   map?:        HasID;
 }
 
-function toIDMap<T extends HasID>(this: void, objects: T[]): { [key: string]: T } {
+export function toIDMap<T extends HasID>(this: void, objects: T[]): { [key: string]: T } {
   return objects.reduce((acc, o) => { acc[o.id] = o; return acc; }, {});
 }
 
@@ -763,7 +769,7 @@ export const actions = {
 
 export type Action = ActionUnion<typeof syncActions>;
 
-export const reducer = (state: State = initial, action: Action): State => {
+export const reducer = (state: State = initial, action: Action = emptyAction): State => {
   switch (action.type) {
     case UPDATE_OBJECTS: {
       return {

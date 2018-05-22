@@ -1,4 +1,4 @@
-import { ActionUnion } from './index';
+import { ActionUnion } from './action';
 
 const INCREASE = 'INCREASE';
 const increase = () => ({ type: INCREASE as typeof INCREASE });

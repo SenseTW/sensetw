@@ -13,12 +13,6 @@ export { ObjectID, ObjectType, ObjectData } from './sense-object';
 export { CardID, CardType, CardData } from './sense-card';
 export { BoxID, BoxData } from './sense-box';
 
-export const emptyAction = { type: null };
-// tslint:disable-next-line:no-any
-type FunctionType = (...args: any[]) => any;
-type ActionCreatorsMap = { [actionCreator: string]: FunctionType };
-export type ActionUnion<A extends ActionCreatorsMap> = typeof emptyAction | ReturnType<A[keyof A]>;
-
 export type State = {
   senseMap:    SM.State,
   senseObject: SO.State,
@@ -51,8 +45,6 @@ export type Action
   | SG.Action
   ;
 
-export type ActionChain = Action | Promise<Action>;
-
 export const actions = {
   senseMap:    SM.actions,
   senseObject: SO.actions,
@@ -62,6 +54,8 @@ export const actions = {
   viewport:     V.actions,
   stage:       SG.actions,
 };
+
+export type ActionChain = Action | Promise<Action>;
 
 export type Dispatch = ReduxDispatch<State>;
 

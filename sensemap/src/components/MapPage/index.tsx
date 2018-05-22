@@ -9,6 +9,8 @@ import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
 import Inbox from '../../containers/Inbox';
 import * as T from '../../types';
+import * as SB from '../../types/sense-box';
+import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
@@ -18,13 +20,14 @@ const background = require('./background-map.png');
 
 interface StateFromProps {
   senseMap: T.State['senseMap'];
-  editor: OE.Status;
+  senseObject: SO.State;
+  editor: OE.State;
   scope: typeof SM.initial.scope;
 }
 
 interface DispatchFromProps {
   actions: {
-    selectObject(status: OE.Status): T.ActionChain,
+    changeStatus(status: OE.StatusType): T.ActionChain,
     createBoxObject(mapId: T.MapID, box: T.BoxData): T.ActionChain,
     createCardObject(mapID: T.MapID, card: T.CardData): T.ActionChain,
     updateRemoteBox(box: T.BoxData): T.ActionChain,
@@ -33,6 +36,9 @@ interface DispatchFromProps {
     resizeViewpart(dimension: SM.DimensionInMap): T.ActionChain,
     keyPress(key: Key): T.ActionChain,
     keyRelease(key: Key): T.ActionChain,
+    updateBox(id: T.BoxID, action: SB.Action): T.ActionChain;
+    updateCard(id: T.CardID, action: SC.Action): T.ActionChain;
+    clearObject(objectType: T.ObjectType, id: T.BoxID | T.CardID): T.ActionChain;
   };
 }
 
@@ -65,53 +71,91 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions, editor, scope, senseMap } = this.props;
-    const { objectType, data } = editor;
+    const { actions, editor, scope, senseMap, senseObject } = this.props;
+    const { status, focus } = editor;
+
+    const object = SO.getObject(senseObject, focus || '');
+    let data: T.CardData | T.BoxData | null = null;
+    if (object) {
+      switch (object.objectType) {
+        case T.ObjectType.BOX:
+          data = SO.getBoxOrDefault(editor.temp, senseObject, object.data);
+          break;
+        case T.ObjectType.CARD:
+          data = SO.getCardOrDefault(editor.temp, senseObject, object.data);
+          break;
+        default:
+      }
+    }
 
     return (
       <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
         <Sidebar visible={senseMap.inbox === SM.InboxVisibility.VISIBLE} direction="left" width="wide">
           <Inbox />
         </Sidebar>
-        <Sidebar visible={editor.type !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
-          data &&
-            <ObjectContent
-              objectType={objectType}
-              data={data}
-              changeText={editor.type === OE.StatusType.CREATE ? '送出' : '更新'}
-              onChange={async (newData) => {
-                if (editor.type === OE.StatusType.CREATE) {
-                  switch (objectType) {
+        <Sidebar visible={status !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
+          data
+            ? (
+              <ObjectContent
+                objectType={object.objectType}
+                data={data}
+                changeText={status === OE.StatusType.CREATE ? '送出' : '更新'}
+                onUpdate={action => {
+                  if (data === null) {
+                    return;
+                  }
+
+                  switch (object.objectType) {
                     case T.ObjectType.CARD:
-                      const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
-                      const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
-                      if (scope.type === T.MapScopeType.BOX) {
-                        const object = Object.values(objects)[0];
-                        const boxId = scope.box;
-                        await actions.addCardToBox(object.id, boxId);
-                      }
-                      actions.selectObject(OE.hide());
+                      actions.updateCard(data.id, action as SC.Action);
                       break;
                     case T.ObjectType.BOX:
-                      actions.createBoxObject(senseMap.map, newData as T.BoxData);
-                      actions.selectObject(OE.hide());
+                      actions.updateBox(data.id, action as SB.Action);
                       break;
                     default:
                   }
-                } else if (editor.type === OE.StatusType.EDIT) {
-                  switch (objectType) {
-                    case T.ObjectType.CARD:
-                      actions.updateRemoteCard(newData as T.CardData);
-                      break;
-                    case T.ObjectType.BOX:
-                      actions.updateRemoteBox(newData as T.BoxData);
-                      break;
-                    default:
+                }}
+                onChange={async (newData) => {
+                  if (status === OE.StatusType.CREATE) {
+                    switch (object.objectType) {
+                      case T.ObjectType.CARD:
+                        const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
+                        const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
+                        if (scope.type === T.MapScopeType.BOX) {
+                          const obj = Object.values(objects)[0];
+                          const boxId = scope.box;
+                          await actions.addCardToBox(obj.id, boxId);
+                        }
+                        actions.changeStatus(OE.StatusType.HIDE);
+                        break;
+                      case T.ObjectType.BOX:
+                        actions.createBoxObject(senseMap.map, newData as T.BoxData);
+                        actions.changeStatus(OE.StatusType.HIDE);
+                        break;
+                      default:
+                    }
+                  } else if (status === OE.StatusType.EDIT) {
+                    switch (object.objectType) {
+                      case T.ObjectType.CARD:
+                        actions.updateRemoteCard(newData as T.CardData);
+                        break;
+                      case T.ObjectType.BOX:
+                        actions.updateRemoteBox(newData as T.BoxData);
+                        break;
+                      default:
+                    }
                   }
-                }
-              }}
-              onCancel={() => actions.selectObject(OE.hide())}
-            />
+                }}
+                onCancel={() => {
+                  if (data === null) {
+                    return;
+                  }
+
+                  actions.clearObject(object.objectType, data.id);
+                }}
+              />
+            )
+            : <div>請選擇卡片或 Box</div>
         }
         </Sidebar>
         <Sidebar.Pusher>
@@ -130,15 +174,16 @@ class MapPage extends React.Component<Props> {
 export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => {
     const senseMap = state.senseMap;
+    const senseObject = state.senseObject;
     const scope = state.senseMap.scope;
     const { editor } = state;
 
-    return { senseMap, scope, editor };
+    return { senseMap, senseObject, scope, editor };
   },
   (dispatch: T.Dispatch) => ({
     actions: {
-      selectObject: (status: OE.Status) =>
-        dispatch(OE.actions.selectObject(status)),
+      changeStatus: (status: OE.StatusType) =>
+        dispatch(OE.actions.changeStatus(status)),
       createBoxObject: (mapId: T.MapID, box: T.BoxData) =>
         dispatch(T.actions.senseObject.createBoxObject(mapId, box)),
       createCardObject: (mapId: T.MapID, card: T.CardData) =>
@@ -155,6 +200,12 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.input.keyPress(key)),
       keyRelease: (key: Key) =>
         dispatch(T.actions.input.keyRelease(key)),
+      updateBox: (id: T.BoxID, action: SB.Action) =>
+        dispatch(T.actions.editor.updateBox(id, action)),
+      updateCard: (id: T.CardID, action: SC.Action) =>
+        dispatch(T.actions.editor.updateCard(id, action)),
+      clearObject: (objectType: T.ObjectType, id: T.BoxID | T.CardID) =>
+        dispatch(T.actions.editor.clearObject(objectType, id)),
     }
   })
 )(MapPage);
