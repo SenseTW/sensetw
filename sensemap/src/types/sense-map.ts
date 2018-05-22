@@ -1,4 +1,5 @@
-import { ActionUnion, Dispatch } from './index';
+import { Dispatch } from '.';
+import { ActionUnion } from './action';
 import { BoxID } from './sense-box';
 import * as SL from './selection';
 

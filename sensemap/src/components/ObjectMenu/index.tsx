@@ -16,11 +16,13 @@ interface StateFromProps {
   scope:       T.State['senseMap']['scope'];
   senseMap:    T.State['senseMap'];
   input:       T.State['input'];
+  editor:      T.State['editor'];
 }
 
 interface DispatchFromProps {
   actions: {
-    selectObject(status: OE.Status): T.ActionChain,
+    focusObject(focus: SO.ObjectID | null): T.ActionChain,
+    changeStatus(status: OE.StatusType): T.ActionChain,
     addCardsToBox(cards: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     deleteObject(object: T.ObjectID): T.ActionChain,
@@ -62,10 +64,6 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   canCreateBox(): Boolean {
     return this.props.scope.type === T.MapScopeType.FULL_MAP;
-  }
-
-  canEdit(): Boolean {
-    return this.props.selection.length === 1;
   }
 
   canUnbox(): Boolean {
@@ -134,7 +132,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, senseObject, selection, senseMap, input } = this.props;
+    const { actions, senseObject, selection, senseMap, input, editor } = this.props;
     const isMultiSelectable = I.isMultiSelectable(input);
 
     return (
@@ -161,39 +159,39 @@ class ObjectMenu extends React.PureComponent<Props> {
           this.canCreateBox() &&
           <Menu.Item
             name="create-box"
-            onClick={() => actions.selectObject(OE.createBox(SB.emptyBoxData))}
+            onClick={() => {
+              const data = SB.boxData();
+              const object = SO.objectData({ objectType: SO.ObjectType.BOX, data: data.id });
+              actions.focusObject(object.id);
+              actions.changeStatus(OE.StatusType.CREATE);
+            }}
           >
             新增 Box
           </Menu.Item>
         }
         <Menu.Item
           name="create-card"
-          onClick={() => actions.selectObject(OE.createCard(SC.emptyCardData))}
+          onClick={() => {
+            const data = SC.cardData();
+            const object = SO.objectData({ objectType: SO.ObjectType.CARD, data: data.id });
+            actions.focusObject(object.id);
+            actions.changeStatus(OE.StatusType.CREATE);
+          }}
         >
           新增卡片
         </Menu.Item>
-        {
-          this.canEdit() &&
-          <Menu.Item
-            name="edit"
-            onClick={() => {
-              const id = selection[0];
-              const object = SO.getObject(senseObject, id);
-
-              switch (object.objectType) {
-                case T.ObjectType.BOX:
-                  actions.selectObject(OE.editBox(SO.getBox(senseObject, object.data)));
-                  break;
-                case T.ObjectType.CARD:
-                  actions.selectObject(OE.editCard(SO.getCard(senseObject, object.data)));
-                  break;
-                default:
-              }
-            }}
-          >
-            編輯
-          </Menu.Item>
-        }
+        <Menu.Item
+          name="edit"
+          onClick={() => {
+            if (editor.status === OE.StatusType.HIDE) {
+              actions.changeStatus(OE.StatusType.EDIT);
+            } else {
+              actions.changeStatus(OE.StatusType.HIDE);
+            }
+          }}
+        >
+          編輯器
+        </Menu.Item>
         {
           this.canAddCard() &&
           <Menu.Item
@@ -245,10 +243,14 @@ export default connect<StateFromProps, DispatchFromProps>(
     senseObject: state.senseObject,
     senseMap: state.senseMap,
     input: state.input,
+    editor: state.editor,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      selectObject: (status: OE.Status) => dispatch(T.actions.editor.selectObject(status)),
+      focusObject: (focus: SO.ObjectID | null) =>
+        dispatch(T.actions.editor.focusObject(focus)),
+      changeStatus: (status: OE.StatusType) =>
+        dispatch(T.actions.editor.changeStatus(status)),
       addCardsToBox: (cards, box) =>
         dispatch(T.actions.senseObject.addCardsToBox(cards, box)),
       removeCardsFromBox: (cards, box) =>

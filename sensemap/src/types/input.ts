@@ -1,4 +1,4 @@
-import { ActionUnion, emptyAction } from './index';
+import { ActionUnion, emptyAction } from './action';
 import { Key } from 'ts-keycode-enum';
 
 const KEY_PRESS = 'KEY_PRESS';

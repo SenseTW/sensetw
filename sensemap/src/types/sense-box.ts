@@ -1,6 +1,7 @@
 import { ObjectID } from './sense-object';
 import { TimeStamp } from './utils';
-import { ActionUnion, emptyAction } from '.';
+import { ActionUnion, emptyAction } from './action';
+import * as moment from 'moment';
 
 export type BoxID = string;
 
@@ -18,6 +19,15 @@ export interface BoxData {
   contains: { [key: string]: { id: ObjectID } };
 }
 
+interface PartialBoxData {
+  id?: BoxID;
+  createdAt?: TimeStamp;
+  updatedAt?: TimeStamp;
+  title?: string;
+  summary?: string;
+  tags?: string;
+}
+
 export const emptyBoxData: BoxData = {
   id: '0',
   createdAt: 0,
@@ -27,6 +37,17 @@ export const emptyBoxData: BoxData = {
   summary: '',
   tags: '',
   contains: {}
+};
+
+export const boxData = (partial: PartialBoxData = {}): BoxData => {
+  const now = +moment();
+
+  return {
+    ...emptyBoxData,
+    ...partial,
+    createdAt: now,
+    updatedAt: now,
+  };
 };
 
 const UPDATE_BOX_TITLE = 'UPDATE_BOX_TITLE';
