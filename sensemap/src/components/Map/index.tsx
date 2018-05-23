@@ -33,8 +33,10 @@ export interface DispatchFromProps {
 }
 
 export interface OwnProps {
-  width: number;
+  width:  number;
   height: number;
+  top:    number;
+  left:   number;
 }
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;

@@ -117,7 +117,7 @@ class MapPage extends React.Component<Props> {
         <Sidebar.Pusher>
           <ResizeDetector handleWidth handleHeight onResize={this.handleResize} />
           <Viewport>
-            {({ width, height }) => (<Map id={senseMap.map} width={width} height={height} />)}
+            {(props) => (<Map id={senseMap.map} {...props} />)}
           </Viewport>
           <ObjectMenu />
           <Breadcrumb />
