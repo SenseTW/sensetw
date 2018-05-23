@@ -155,6 +155,20 @@ function handleMouseMove(e: any, props: Props) {
   return;
 }
 
+// tslint:disable-next-line:no-any
+function handleMouseDown(e: any, props: Props) {
+  if (e.target && e.target.nodeType === 'Stage') {
+    props.actions.stageMouseDown();
+  }
+}
+
+// tslint:disable-next-line:no-any
+function handleMouseUp(e: any, props: Props) {
+  if (e.target && e.target.nodeType === 'Stage') {
+    props.actions.stageMouseUp();
+  }
+}
+
 export function Map(props: Props) {
   const clearSelection = props.actions.clearSelection;
   const objects = Object.values(props.objects).map(o => renderObject(o, props));
@@ -166,8 +180,9 @@ export function Map(props: Props) {
       width={props.width}
       height={props.height}
       onClick={() => clearSelection()}
-      onMouseDown={props.actions.stageMouseDown}
-      onMouseUp={props.actions.stageMouseUp}
+      // tslint:disable-next-line:no-console
+      onMouseDown={(e: Event) => handleMouseDown(e, props)}
+      onMouseUp={(e: Event) => handleMouseUp(e, props)}
       onMouseMove={(e: Event) => handleMouseMove(e, props)}
     >
       <Layer>
