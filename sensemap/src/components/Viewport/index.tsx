@@ -1,26 +1,30 @@
-// import * as React from 'react';
+import * as V from '../../types/viewport';
 
-interface RenderPropArguments {
-  width:  number;
-  height: number;
-  top:    number;
-  left:   number;
-}
+interface RenderPropArguments extends V.State {}
 
 interface RenderProp {
   (a: RenderPropArguments): JSX.Element;
 }
 
-interface Props {
+export interface StateFromProps extends V.State {}
+export interface DispatchFromProps {
+  actions: {
+    panViewport: typeof V.actions.panViewport,
+  };
+}
+
+export interface OwnProps {
   children: RenderProp;
 }
 
-function Viewport(props: Props) {
+export type Props = StateFromProps & DispatchFromProps & OwnProps;
+
+export function Viewport(props: Props) {
   return props.children({
-    top: 0,
-    left: 0,
-    width: 640,
-    height: 400,
+    top: props.top,
+    left: props.left,
+    width: props.width,
+    height: props.height,
   });
 }
 

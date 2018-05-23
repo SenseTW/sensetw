@@ -1,11 +1,12 @@
 import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } from 'redux';
-import * as C from './counter';
+import * as C  from './counter';
 import * as SM from './sense-map';
 import * as SO from './sense-object';
 import * as SC from './sense-card';
 import * as SL from './selection';
 import * as OE from './object-editor';
-import * as I from './input';
+import * as V  from './viewport';
+import * as I  from './input';
 
 export { MapID, MapScopeType } from './sense-map';
 export { ObjectID, ObjectType, ObjectData } from './sense-object';
@@ -19,21 +20,23 @@ type ActionCreatorsMap = { [actionCreator: string]: FunctionType };
 export type ActionUnion<A extends ActionCreatorsMap> = typeof emptyAction | ReturnType<A[keyof A]>;
 
 export type State = {
-  counter: C.State,
-  senseMap: SM.State,
+  counter:      C.State,
+  senseMap:    SM.State,
   senseObject: SO.State,
-  selection: SL.State,
-  editor: OE.State,
-  input: I.State,
+  selection:   SL.State,
+  editor:      OE.State,
+  input:        I.State,
+  viewport:     V.State,
 };
 
 export const initial: State = {
-  counter: C.initial,
-  senseMap: SM.initial,
+  counter:      C.initial,
+  senseMap:    SM.initial,
   senseObject: SO.initial,
-  selection: SL.initial,
-  editor: OE.initial,
-  input: I.initial,
+  selection:   SL.initial,
+  editor:      OE.initial,
+  input:        I.initial,
+  viewport:     V.initial,
 };
 
 export type Action
@@ -43,17 +46,20 @@ export type Action
   | SC.Action
   | SL.Action
   | OE.Action
-  | I.Action;
+  |  I.Action
+  |  V.Action
+  ;
 
 export type ActionChain = Action | Promise<Action>;
 
 export const actions = {
-  counter: C.actions,
-  senseMap: SM.actions,
+  counter:      C.actions,
+  senseMap:    SM.actions,
   senseObject: SO.actions,
-  selection: SL.actions,
-  editor: OE.actions,
-  input: I.actions,
+  selection:   SL.actions,
+  editor:      OE.actions,
+  input:        I.actions,
+  viewport:     V.actions,
 };
 
 export type Dispatch = ReduxDispatch<State>;
@@ -63,10 +69,11 @@ export type GetState = () => State;
 export type Reducer = ReduxReducer<State>;
 
 export const reducer = combineReducers({
-  counter: C.reducer,
-  senseMap: SM.reducer,
+  counter:      C.reducer,
+  senseMap:    SM.reducer,
   senseObject: SO.reducer,
-  selection: SL.reducer,
-  editor: OE.reducer,
-  input: I.reducer,
+  selection:   SL.reducer,
+  editor:      OE.reducer,
+  input:        I.reducer,
+  viewport:     V.reducer,
 });

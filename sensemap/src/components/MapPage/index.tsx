@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Sidebar } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
-import Viewport from '../Viewport';
+import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
