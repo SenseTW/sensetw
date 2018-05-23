@@ -25,6 +25,9 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     openBox(box: T.BoxID): T.ActionChain,
     selectObject(status: OE.Status): T.ActionChain,
+    stageMouseUp(): T.ActionChain,
+    stageMouseDown(): T.ActionChain,
+    stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
   };
 }
 
@@ -75,6 +78,7 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
     cards: state.senseObject.cards,
     boxes: state.senseObject.boxes,
     input: state.input,
+    stage: state.stage,
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
@@ -100,6 +104,12 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
         dispatch(T.actions.senseMap.openBox(box)),
       selectObject: (status: OE.Status) =>
         dispatch(T.actions.editor.selectObject(status)),
+      stageMouseDown: () =>
+        dispatch(T.actions.stage.stageMouseDown()),
+      stageMouseUp: () =>
+        dispatch(T.actions.stage.stageMouseUp()),
+      stageMouseMove: ({ dx, dy }: { dx: number, dy: number }) =>
+        dispatch(T.actions.stage.stageMouseMove({ dx, dy })),
     }
   })
 )(Map);

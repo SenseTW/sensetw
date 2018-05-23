@@ -1,4 +1,4 @@
-import { ActionUnion } from './index';
+import { ActionUnion } from '.';
 
 type Position = {
   x: number;
@@ -15,8 +15,8 @@ export type State = {
 };
 
 export const initial: State = {
-  width:  640,
-  height: 400,
+  width:  1280,
+  height: 800,
   top:    0,
   left:   0,
 };

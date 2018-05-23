@@ -17,6 +17,7 @@ export interface StateFromProps {
   cards:     T.State['senseObject']['cards'];
   boxes:     T.State['senseObject']['boxes'];
   input:     T.State['input'];
+  stage:     T.State['stage'];
 }
 
 export interface DispatchFromProps {
@@ -29,6 +30,9 @@ export interface DispatchFromProps {
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     openBox(box: T.BoxID): T.ActionChain,
     selectObject(status: OE.Status): T.ActionChain,
+    stageMouseUp(): T.ActionChain,
+    stageMouseDown(): T.ActionChain,
+    stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
   };
 }
 
@@ -48,8 +52,7 @@ interface ViewportProps {
   left:   number;
 }
 
-export interface OwnProps extends ViewportProps {
-}
+export interface OwnProps extends ViewportProps {}
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
@@ -131,6 +134,16 @@ function renderObject(o: T.ObjectData, props: Props) {
   }
 }
 
+// tslint:disable-next-line:no-any
+function handleMouseMove(e: any, props: Props) {
+  if (props.stage.mouseDown) {
+    const dx = e.evt.movementX;
+    const dy = e.evt.movementY;
+    props.actions.stageMouseMove({ dx, dy });
+  }
+  return;
+}
+
 export function Map(props: Props) {
   const clearSelection = props.actions.clearSelection;
   const objects = Object.values(props.objects).map(o => renderObject(o, props));
@@ -142,6 +155,9 @@ export function Map(props: Props) {
       width={props.width}
       height={props.height}
       onClick={() => clearSelection()}
+      onMouseDown={props.actions.stageMouseDown}
+      onMouseUp={props.actions.stageMouseUp}
+      onMouseMove={(e: Event) => handleMouseMove(e, props)}
     >
       <Layer>
         {objects}
