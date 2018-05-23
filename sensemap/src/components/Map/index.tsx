@@ -94,12 +94,15 @@ function renderObject(o: T.ObjectData, props: Props) {
     e.cancelBubble = true;
 
     if (isMultiSelectable) {
+      focusObject(F.focusNothing());
       toggleSelection(data.id);
     } else {
       clearSelection();
       if (!isSelected || props.selection.length > 1) {
         focusObject(SO.toFocus(data));
         addObjectToSelection(data.id);
+      } else {
+        focusObject(F.focusNothing());
       }
     }
   };
@@ -121,7 +124,7 @@ function renderObject(o: T.ObjectData, props: Props) {
           selected={isSelected}
           toggleSelection={handleSelection}
           moveObject={moveObject}
-          openCard={(id) => changeStatus(OE.StatusType.CREATE)}
+          openCard={(id) => changeStatus(OE.StatusType.SHOW)}
         />);
     }
     case T.ObjectType.BOX: {

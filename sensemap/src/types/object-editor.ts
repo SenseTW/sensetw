@@ -7,9 +7,8 @@ import * as F from './focus';
 import { clone } from 'ramda';
 
 export enum StatusType {
-  HIDE   = 'SIDEBAR_HIDE',
-  CREATE = 'SIDEBAR_CREATE',
-  EDIT   = 'SIDEBAR_EDIT',
+  HIDE = 'SIDEBAR_HIDE',
+  SHOW = 'SIDEBAR_SHOW',
 }
 
 const SNAPSHOT_OBJECT = 'SNAPSHOT_OBJECT';

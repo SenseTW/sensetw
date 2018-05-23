@@ -10,6 +10,8 @@ import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
 import * as F from '../../types/focus';
 import * as I from '../../types/input';
+// TODO: use UUID v4
+import { objectId } from '../../types/utils';
 
 interface StateFromProps {
   selection:   SL.State;
@@ -23,6 +25,8 @@ interface StateFromProps {
 interface DispatchFromProps {
   actions: {
     focusObject(focus: F.Focus): T.ActionChain,
+    snapshotObject(objectType: T.ObjectType, data: SB.BoxData | SC.CardData): T.ActionChain,
+    clearObject(objectType: T.ObjectType, id: SB.BoxID | SC.CardID): T.ActionChain,
     changeStatus(status: OE.StatusType): T.ActionChain,
     addCardsToBox(cards: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
@@ -161,9 +165,10 @@ class ObjectMenu extends React.PureComponent<Props> {
           <Menu.Item
             name="create-box"
             onClick={() => {
-              const data = SB.boxData();
+              const data = SB.boxData({ id: objectId() });
+              actions.snapshotObject(SO.ObjectType.BOX, data);
               actions.focusObject(F.focusBox(data.id));
-              actions.changeStatus(OE.StatusType.CREATE);
+              actions.changeStatus(OE.StatusType.SHOW);
             }}
           >
             新增 Box
@@ -172,9 +177,10 @@ class ObjectMenu extends React.PureComponent<Props> {
         <Menu.Item
           name="create-card"
           onClick={() => {
-            const data = SC.cardData();
+            const data = SC.cardData({ id: objectId() });
+            actions.snapshotObject(SO.ObjectType.CARD, data);
             actions.focusObject(F.focusCard(data.id));
-            actions.changeStatus(OE.StatusType.CREATE);
+            actions.changeStatus(OE.StatusType.SHOW);
           }}
         >
           新增卡片
@@ -183,7 +189,7 @@ class ObjectMenu extends React.PureComponent<Props> {
           name="edit"
           onClick={() => {
             if (editor.status === OE.StatusType.HIDE) {
-              actions.changeStatus(OE.StatusType.EDIT);
+              actions.changeStatus(OE.StatusType.SHOW);
             } else {
               actions.changeStatus(OE.StatusType.HIDE);
             }
@@ -213,9 +219,11 @@ class ObjectMenu extends React.PureComponent<Props> {
           this.canDeleteCard() &&
           <Menu.Item
             name="deleteCard"
-            onClick={() => {
-              const { id } = SO.getObject(senseObject, selection[0]);
-              actions.deleteObject(id);
+            onClick={async () => {
+              const { objectType, id } = SO.getObject(senseObject, selection[0]);
+              await actions.deleteObject(id);
+              actions.focusObject(F.focusNothing());
+              actions.clearObject(objectType, id);
             }}
           >
             刪除
@@ -248,6 +256,10 @@ export default connect<StateFromProps, DispatchFromProps>(
     actions: {
       focusObject: (focus: F.Focus) =>
         dispatch(T.actions.editor.focusObject(focus)),
+      snapshotObject: (objectType: T.ObjectType, data: SB.BoxData | SC.CardData) =>
+        dispatch(T.actions.editor.snapshotObject(objectType, data)),
+      clearObject: (objectType: T.ObjectType, id: SB.BoxID | SC.CardID) =>
+        dispatch(T.actions.editor.clearObject(objectType, id)),
       changeStatus: (status: OE.StatusType) =>
         dispatch(T.actions.editor.changeStatus(status)),
       addCardsToBox: (cards, box) =>
