@@ -14,6 +14,7 @@ import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
+import * as F from '../../types/focus';
 import { Key } from 'ts-keycode-enum';
 import './index.css';
 const background = require('./background-map.png');
@@ -38,6 +39,7 @@ interface DispatchFromProps {
     keyRelease(key: Key): T.ActionChain,
     updateBox(id: T.BoxID, action: SB.Action): T.ActionChain;
     updateCard(id: T.CardID, action: SC.Action): T.ActionChain;
+    focusObject(focus: F.Focus): T.ActionChain,
     clearObject(objectType: T.ObjectType, id: T.BoxID | T.CardID): T.ActionChain;
   };
 }
@@ -75,12 +77,18 @@ class MapPage extends React.Component<Props> {
     const { status, focus } = editor;
 
     let data: SB.BoxData | SC.CardData | null = null;
+    let isDirty: boolean = false;
+    let doesDataExist: boolean = false;
     switch (focus.objectType) {
       case T.ObjectType.BOX:
         data = SO.getBoxOrDefault(editor.temp, senseObject, focus.data);
+        isDirty = SO.doesBoxExist(editor.temp, focus.data);
+        doesDataExist = SO.doesBoxExist(senseObject, focus.data);
         break;
       case T.ObjectType.CARD:
         data = SO.getCardOrDefault(editor.temp, senseObject, focus.data);
+        isDirty = SO.doesCardExist(editor.temp, focus.data);
+        doesDataExist = SO.doesCardExist(senseObject, focus.data);
         break;
       default:
     }
@@ -96,7 +104,9 @@ class MapPage extends React.Component<Props> {
               <ObjectContent
                 objectType={focus.objectType}
                 data={data}
-                changeText={status === OE.StatusType.CREATE ? '送出' : '更新'}
+                submitText={doesDataExist ? '更新' : '送出'}
+                submitDisabled={!isDirty}
+                cancelDisabled={!isDirty}
                 onUpdate={action => {
                   if (data === null) {
                     return;
@@ -112,9 +122,22 @@ class MapPage extends React.Component<Props> {
                     default:
                   }
                 }}
-                // XXX: deprecated
-                onChange={async (newData) => {
-                  if (status === OE.StatusType.CREATE) {
+                onSubmit={async (newData) => {
+                  if (doesDataExist) {
+                    // should update the object
+                    switch (focus.objectType) {
+                      case T.ObjectType.CARD:
+                        await actions.updateRemoteCard(newData as T.CardData);
+                        actions.clearObject(focus.objectType, focus.data);
+                        break;
+                      case T.ObjectType.BOX:
+                        await actions.updateRemoteBox(newData as T.BoxData);
+                        actions.clearObject(focus.objectType, focus.data);
+                        break;
+                      default:
+                    }
+                  } else {
+                    // should create an object
                     switch (focus.objectType) {
                       case T.ObjectType.CARD:
                         const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
@@ -125,20 +148,14 @@ class MapPage extends React.Component<Props> {
                           await actions.addCardToBox(obj.id, boxId);
                         }
                         actions.changeStatus(OE.StatusType.HIDE);
+                        actions.clearObject(focus.objectType, focus.data);
+                        actions.focusObject(F.focusNothing());
                         break;
                       case T.ObjectType.BOX:
                         actions.createBoxObject(senseMap.map, newData as T.BoxData);
                         actions.changeStatus(OE.StatusType.HIDE);
-                        break;
-                      default:
-                    }
-                  } else if (status === OE.StatusType.EDIT) {
-                    switch (focus.objectType) {
-                      case T.ObjectType.CARD:
-                        actions.updateRemoteCard(newData as T.CardData);
-                        break;
-                      case T.ObjectType.BOX:
-                        actions.updateRemoteBox(newData as T.BoxData);
+                        actions.clearObject(focus.objectType, focus.data);
+                        actions.focusObject(F.focusNothing());
                         break;
                       default:
                     }
@@ -148,10 +165,16 @@ class MapPage extends React.Component<Props> {
                   if (data) {
                     actions.clearObject(focus.objectType, data.id);
                   }
+                  if (!doesDataExist) {
+                    actions.focusObject(F.focusNothing());
+                    actions.changeStatus(OE.StatusType.HIDE);
+                  }
                 }}
               />
             )
-            : <div>請選擇卡片或 Box</div>
+            : <div className="inspector-empty">
+                <div>請選擇單一卡片或 Box</div>
+              </div>
         }
         </Sidebar>
         <Sidebar.Pusher>
@@ -200,6 +223,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.editor.updateBox(id, action)),
       updateCard: (id: T.CardID, action: SC.Action) =>
         dispatch(T.actions.editor.updateCard(id, action)),
+      focusObject: (focus: F.Focus) =>
+        dispatch(T.actions.editor.focusObject(focus)),
       clearObject: (objectType: T.ObjectType, id: T.BoxID | T.CardID) =>
         dispatch(T.actions.editor.clearObject(objectType, id)),
     }

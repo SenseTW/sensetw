@@ -103,6 +103,9 @@ export const getObject = (state: State, id: ObjectID): ObjectData => state.objec
 export const getCard = (state: State, id: CardID): CardData => state.cards[id] || emptyCardData;
 export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
 
+export const doesCardExist = (state: State, id: CardID): boolean => !!state.cards[id];
+export const doesBoxExist = (state: State, id: BoxID): boolean => !!state.boxes[id];
+
 export const getCardOrDefault = (state: State, defaultState: State, id: CardID): CardData =>
   state.cards[id] || defaultState.cards[id] || emptyCardData;
 export const getBoxOrDefault = (state: State, defaultState: State, id: BoxID): BoxData =>

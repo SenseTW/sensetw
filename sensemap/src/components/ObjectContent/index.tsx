@@ -16,36 +16,40 @@ type Data
 interface Props {
   objectType: T.ObjectType;
   data: Data;
-  changeText?: string;
+  submitText?: string;
+  submitDisabled?: boolean;
+  cancelDisabled?: boolean;
   onUpdate? (action: SB.Action | SC.Action): void;
-  // XXX: deprecated
-  onChange? (value: Data): void;
+  onSubmit? (value: Data): void;
   onCancel? (): void;
 }
 
 class ObjectContent extends React.PureComponent<Props> {
   handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const { data, onSubmit = noop, onCancel = noop } = this.props;
+
     switch (e.keyCode) {
       case Key.Enter:
-        this.handleSave();
+        onSubmit(data);
         break;
       case Key.Escape:
-        this.handleCancel();
+        onCancel();
         break;
       default:
     }
   }
 
-  handleSave = () => {
-    return;
-  }
-
-  handleCancel = () => {
-    return;
-  }
-
   render() {
-    const { objectType, changeText, onUpdate = noop, onCancel, data } = this.props;
+    const {
+      objectType,
+      submitText,
+      submitDisabled = false,
+      cancelDisabled = false,
+      onUpdate = noop,
+      onSubmit = noop,
+      onCancel = noop,
+      data
+    } = this.props;
 
     let content;
     switch (objectType) {
@@ -54,7 +58,7 @@ class ObjectContent extends React.PureComponent<Props> {
           <CardContent
             data={data as SC.CardData}
             onKeyUp={this.handleKey}
-            onChange={action => onUpdate(action)}
+            onChange={onUpdate}
           />
         );
         break;
@@ -63,7 +67,7 @@ class ObjectContent extends React.PureComponent<Props> {
           <BoxContent
             data={data as SB.BoxData}
             onKeyUp={this.handleKey}
-            onChange={action => onUpdate(action)}
+            onChange={onUpdate}
           />
         );
         break;
@@ -77,17 +81,19 @@ class ObjectContent extends React.PureComponent<Props> {
         <div className="object-content__actions">
           <Button.Group>
             <Button
-              onClick={() => {
-                this.handleCancel();
-                if (typeof onCancel === 'function') {
-                  onCancel();
-                }
-              }}
+              disabled={cancelDisabled}
+              onClick={() => onCancel()}
             >
               取消
             </Button>
             <Button.Or />
-            <Button positive onClick={this.handleSave}>{changeText || '送出'}</Button>
+            <Button
+              positive
+              disabled={submitDisabled}
+              onClick={() => onSubmit(data)}
+            >
+               {submitText || '送出'}
+            </Button>
           </Button.Group>
         </div>
       </div>
