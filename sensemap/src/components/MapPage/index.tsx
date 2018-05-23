@@ -74,18 +74,15 @@ class MapPage extends React.Component<Props> {
     const { actions, editor, scope, senseMap, senseObject } = this.props;
     const { status, focus } = editor;
 
-    const object = SO.getObject(senseObject, focus || '');
-    let data: T.CardData | T.BoxData | null = null;
-    if (object) {
-      switch (object.objectType) {
-        case T.ObjectType.BOX:
-          data = SO.getBoxOrDefault(editor.temp, senseObject, object.data);
-          break;
-        case T.ObjectType.CARD:
-          data = SO.getCardOrDefault(editor.temp, senseObject, object.data);
-          break;
-        default:
-      }
+    let data: SB.BoxData | SC.CardData | null = null;
+    switch (focus.objectType) {
+      case T.ObjectType.BOX:
+        data = SO.getBoxOrDefault(editor.temp, senseObject, focus.data);
+        break;
+      case T.ObjectType.CARD:
+        data = SO.getCardOrDefault(editor.temp, senseObject, focus.data);
+        break;
+      default:
     }
 
     return (
@@ -97,7 +94,7 @@ class MapPage extends React.Component<Props> {
           data
             ? (
               <ObjectContent
-                objectType={object.objectType}
+                objectType={focus.objectType}
                 data={data}
                 changeText={status === OE.StatusType.CREATE ? '送出' : '更新'}
                 onUpdate={action => {
@@ -105,7 +102,7 @@ class MapPage extends React.Component<Props> {
                     return;
                   }
 
-                  switch (object.objectType) {
+                  switch (focus.objectType) {
                     case T.ObjectType.CARD:
                       actions.updateCard(data.id, action as SC.Action);
                       break;
@@ -117,7 +114,7 @@ class MapPage extends React.Component<Props> {
                 }}
                 onChange={async (newData) => {
                   if (status === OE.StatusType.CREATE) {
-                    switch (object.objectType) {
+                    switch (focus.objectType) {
                       case T.ObjectType.CARD:
                         const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
                         const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
@@ -135,7 +132,7 @@ class MapPage extends React.Component<Props> {
                       default:
                     }
                   } else if (status === OE.StatusType.EDIT) {
-                    switch (object.objectType) {
+                    switch (focus.objectType) {
                       case T.ObjectType.CARD:
                         actions.updateRemoteCard(newData as T.CardData);
                         break;
@@ -147,11 +144,9 @@ class MapPage extends React.Component<Props> {
                   }
                 }}
                 onCancel={() => {
-                  if (data === null) {
-                    return;
+                  if (data) {
+                    actions.clearObject(focus.objectType, data.id);
                   }
-
-                  actions.clearObject(object.objectType, data.id);
                 }}
               />
             )

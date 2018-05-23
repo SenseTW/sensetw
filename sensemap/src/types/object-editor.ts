@@ -3,6 +3,7 @@ import { ActionUnion, emptyAction } from './action';
 import * as SO from './sense-object';
 import * as SB from './sense-box';
 import * as SC from './sense-card';
+import * as F from './focus';
 import { clone } from 'ramda';
 
 export enum StatusType {
@@ -34,7 +35,7 @@ const changeStatus =
 
 const FOCUS_OBJECT = 'FOCUS_OBJECT';
 const focusObject =
-  (focus: SO.ObjectID | null) => ({
+  (focus: F.Focus) => ({
     type: FOCUS_OBJECT as typeof FOCUS_OBJECT,
     payload: { focus },
   });
@@ -100,34 +101,23 @@ export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
   status: StatusType,
-  focus: SO.ObjectID | null,
   temp: SO.State,
+  focus: F.Focus,
 };
 
 export const initial: State = {
   status: StatusType.HIDE,
-  focus: null,
   temp: SO.reducer(),
+  focus: F.focusNothing(),
 };
 
-export const getFocusedObject = (state: State): { object?: SO.ObjectData, data?: SC.CardData | SB.BoxData } => {
-  if (state.focus === null) {
-    return {};
-  }
+export const getFocusedObject = (state: State): SC.CardData | SB.BoxData | null => {
+  const { focus } = state;
 
-  const object = SO.getObject(state.temp, state.focus);
-
-  switch (object.objectType) {
-    case SO.ObjectType.BOX: {
-      const data = SO.getBox(state.temp, object.data);
-      return { object, data };
-    }
-    case SO.ObjectType.CARD: {
-      const data = SO.getCard(state.temp, object.data);
-      return { object, data };
-    }
-    default:
-      return {};
+  switch (focus.objectType) {
+    case SO.ObjectType.BOX:  return SO.getBox(state.temp, focus.data);
+    case SO.ObjectType.CARD: return SO.getCard(state.temp, focus.data);
+    default:                 return null;
   }
 };
 

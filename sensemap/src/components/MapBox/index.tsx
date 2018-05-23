@@ -18,7 +18,7 @@ interface Props {
   selected?: Boolean;
   transform(g: GeometryProps): GeometryProps;
   inverseTransform(g: GeometryProps): GeometryProps;
-  toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
+  toggleSelection?(e: KonvaEvent.Mouse, data: T.ObjectData): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openBox?(box: T.BoxID): void;
 }
@@ -95,7 +95,7 @@ class MapBox extends React.Component<Props, State> {
         y={y}
         key={id}
         draggable={true}
-        onClick={(e) => toggleSelection(e, id)}
+        onClick={(e) => toggleSelection(e, this.props.mapObject)}
         onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}
         onDragEnd={(e) => {
           const r = moveEnd(id, new Point(e.evt.layerX, e.evt.layerY));

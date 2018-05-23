@@ -8,6 +8,7 @@ import * as SO from '../../types/sense-object';
 import * as SB from '../../types/sense-box';
 import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
+import * as F from '../../types/focus';
 import * as I from '../../types/input';
 
 interface StateFromProps {
@@ -21,7 +22,7 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    focusObject(focus: SO.ObjectID | null): T.ActionChain,
+    focusObject(focus: F.Focus): T.ActionChain,
     changeStatus(status: OE.StatusType): T.ActionChain,
     addCardsToBox(cards: T.ObjectID[], box: SB.BoxID): T.ActionChain,
     removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
@@ -161,8 +162,7 @@ class ObjectMenu extends React.PureComponent<Props> {
             name="create-box"
             onClick={() => {
               const data = SB.boxData();
-              const object = SO.objectData({ objectType: SO.ObjectType.BOX, data: data.id });
-              actions.focusObject(object.id);
+              actions.focusObject(F.focusBox(data.id));
               actions.changeStatus(OE.StatusType.CREATE);
             }}
           >
@@ -173,8 +173,7 @@ class ObjectMenu extends React.PureComponent<Props> {
           name="create-card"
           onClick={() => {
             const data = SC.cardData();
-            const object = SO.objectData({ objectType: SO.ObjectType.CARD, data: data.id });
-            actions.focusObject(object.id);
+            actions.focusObject(F.focusCard(data.id));
             actions.changeStatus(OE.StatusType.CREATE);
           }}
         >
@@ -247,7 +246,7 @@ export default connect<StateFromProps, DispatchFromProps>(
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      focusObject: (focus: SO.ObjectID | null) =>
+      focusObject: (focus: F.Focus) =>
         dispatch(T.actions.editor.focusObject(focus)),
       changeStatus: (status: OE.StatusType) =>
         dispatch(T.actions.editor.changeStatus(status)),

@@ -8,19 +8,17 @@ import { BoxID, BoxData, emptyBoxData } from './sense-box';
 import { MapID } from './sense-map';
 import { TimeStamp } from './utils';
 import { ActionUnion, emptyAction } from './action';
+import { ObjectType } from './object-type';
 import * as SL from './selection';
 import * as SM from './sense-map';
+import * as F from './focus';
+
+export { ObjectType } from './object-type';
 
 export type ObjectID = string;
 
 interface HasID {
   id: string;
-}
-
-export enum ObjectType {
-  NONE = 'NONE',
-  CARD = 'CARD',
-  BOX  = 'BOX',
 }
 
 export const stringToType: (name: string) => ObjectType =
@@ -46,6 +44,14 @@ export interface ObjectData {
   belongsTo?: BoxID;
   data:       CardID | BoxID;
 }
+
+export const toFocus = (object: ObjectData): F.Focus => {
+  switch (object.objectType) {
+    case ObjectType.BOX:  return F.focusBox(object.data);
+    case ObjectType.CARD: return F.focusCard(object.data);
+    default:              return F.focusNothing();
+  }
+};
 
 export const emptyObjectData = {
   id: '0',

@@ -1,4 +1,4 @@
-import { ActionUnion } from '.';
+import { ActionUnion } from './action';
 
 type Position = {
   x: number;

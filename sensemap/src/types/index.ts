@@ -1,4 +1,5 @@
 import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } from 'redux';
+import { emptyAction } from './action';
 import * as SM from './sense-map';
 import * as SO from './sense-object';
 import * as SC from './sense-card';
