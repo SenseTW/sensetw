@@ -8,6 +8,7 @@ import * as SL from '../../types/selection';
 import * as T from '../../types';
 import * as I from '../../types/input';
 import * as SO from '../../types/sense-object';
+import * as OE from '../../types/object-editor';
 import * as F from '../../types/focus';
 import { Event as KonvaEvent } from '../../types/konva';
 
@@ -33,6 +34,7 @@ export interface DispatchFromProps {
     stageMouseDown(): T.ActionChain,
     stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
     focusObject(focus: F.Focus): T.ActionChain,
+    changeStatus(status: OE.StatusType): T.ActionChain,
   };
 }
 
@@ -79,6 +81,7 @@ function renderObject(o: T.ObjectData, props: Props) {
   const moveObject = props.actions.moveObject;
   const openBox = props.actions.openBox;
   const focusObject = props.actions.focusObject;
+  const changeStatus = props.actions.changeStatus;
   const isMultiSelectable = I.isMultiSelectable(props.input);
   const isSelected = SL.contains(props.selection, o.id);
   const transform = makeTransform(props);
@@ -118,9 +121,7 @@ function renderObject(o: T.ObjectData, props: Props) {
           selected={isSelected}
           toggleSelection={handleSelection}
           moveObject={moveObject}
-          openCard={(id) => {
-            // TODO: double click to edit the card
-          }}
+          openCard={(id) => changeStatus(OE.StatusType.CREATE)}
         />);
     }
     case T.ObjectType.BOX: {

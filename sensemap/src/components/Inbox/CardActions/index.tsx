@@ -31,9 +31,7 @@ function CardActions({ card, actions, senseMap }: Props) {
     <div className="card-actions">
       <Button
         icon="edit"
-        onClick={() => {
-          // TODO: use object type instead of the whole object
-        }}
+        onClick={() => actions.focusObject(F.focusCard(card.id))}
       />
       <Button
         icon="plus square outline"

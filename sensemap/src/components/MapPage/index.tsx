@@ -112,6 +112,7 @@ class MapPage extends React.Component<Props> {
                     default:
                   }
                 }}
+                // XXX: deprecated
                 onChange={async (newData) => {
                   if (status === OE.StatusType.CREATE) {
                     switch (focus.objectType) {
