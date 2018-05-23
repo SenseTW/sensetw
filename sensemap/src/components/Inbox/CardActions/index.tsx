@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as T from '../../../types';
+import * as F from '../../../types/focus';
 import { Button } from 'semantic-ui-react';
 import './index.css';
 
@@ -10,7 +11,7 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   actions: {
-    focusObject(focus: T.ObjectID): T.ActionChain,
+    focusObject(focus: F.Focus): T.ActionChain,
     createObjectForCard(mapId: T.MapID, cardId: T.CardID, box?: T.BoxID): T.ActionChain,
   };
 }
@@ -49,7 +50,7 @@ export default connect<StateFromProps, DispatchFromProps>(
   }),
   (dispatch: T.Dispatch) => ({
     actions: {
-      focusObject: (focus: T.ObjectID) =>
+      focusObject: (focus: F.Focus) =>
         dispatch(T.actions.editor.focusObject(focus)),
       createObjectForCard: (mapId: T.MapID, cardId: T.CardID, box?: T.BoxID) =>
         dispatch(T.actions.senseObject.createObjectForCard(mapId, cardId, box)),

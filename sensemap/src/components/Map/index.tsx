@@ -7,6 +7,8 @@ import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
 import * as I from '../../types/input';
+import * as SO from '../../types/sense-object';
+import * as F from '../../types/focus';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
@@ -27,11 +29,10 @@ export interface DispatchFromProps {
     addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     openBox(box: T.BoxID): T.ActionChain,
-    selectObject(status: OE.Status): T.ActionChain,
     stageMouseUp(): T.ActionChain,
     stageMouseDown(): T.ActionChain,
     stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
-    focusObject(id: T.ObjectID): T.ActionChain,
+    focusObject(focus: F.Focus): T.ActionChain,
   };
 }
 
@@ -83,19 +84,19 @@ function renderObject(o: T.ObjectData, props: Props) {
   const transform = makeTransform(props);
   const inverseTransform = makeInverseTransform(props);
 
-  const handleSelection = (e: KonvaEvent.Mouse, id: T.ObjectID) => {
+  const handleSelection = (e: KonvaEvent.Mouse, data: T.ObjectData) => {
     // stop event propagation by setting the e.cancelBubble
     // notice that it's useless to set e.evt.cancelBubble directly
     // check: https://github.com/lavrton/react-konva/issues/139
     e.cancelBubble = true;
 
     if (isMultiSelectable) {
-      toggleSelection(id);
+      toggleSelection(data.id);
     } else {
       clearSelection();
       if (!isSelected || props.selection.length > 1) {
-        focusObject(id);
-        addObjectToSelection(id);
+        focusObject(SO.toFocus(data));
+        addObjectToSelection(data.id);
       }
     }
   };

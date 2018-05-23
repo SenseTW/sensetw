@@ -1,4 +1,5 @@
-import { ActionUnion, Dispatch, GetState, emptyAction } from '.';
+import { Dispatch, GetState } from '.';
+import { ActionUnion, emptyAction } from './action';
 import * as V from './viewport';
 
 export type State = {
