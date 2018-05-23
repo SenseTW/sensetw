@@ -60,7 +60,15 @@ function makeTransform(props: ViewportProps): GeometryTransform {
   const { top, left } = props;
   return ({ x, y }) => ({
     x: x - left,
-    y: y - top
+    y: y - top,
+  });
+}
+
+function makeInverseTransform(props: ViewportProps): GeometryTransform {
+  const { top, left } = props;
+  return ({ x, y }) => ({
+    x: x + left,
+    y: y + top,
   });
 }
 
@@ -74,6 +82,7 @@ function renderObject(o: T.ObjectData, props: Props) {
   const isMultiSelectable = I.isMultiSelectable(props.input);
   const isSelected = SL.contains(props.selection, o.id);
   const transform = makeTransform(props);
+  const inverseTransform = makeInverseTransform(props);
 
   const handleSelection = (e: KonvaEvent.Mouse, id: T.ObjectID) => {
     // stop event propagation by setting the e.cancelBubble
@@ -103,6 +112,7 @@ function renderObject(o: T.ObjectData, props: Props) {
         <MapCard
           mapObject={o}
           transform={transform}
+          inverseTransform={inverseTransform}
           card={props.cards[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
@@ -118,6 +128,7 @@ function renderObject(o: T.ObjectData, props: Props) {
         <MapBox
           mapObject={o}
           transform={transform}
+          inverseTransform={inverseTransform}
           box={props.boxes[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}

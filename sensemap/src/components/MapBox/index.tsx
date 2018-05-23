@@ -5,7 +5,7 @@ import * as T from '../../types';
 import * as B from '../../types/sense-box';
 import { noop, toTags } from '../../types/utils';
 import { Event as KonvaEvent } from '../../types/konva';
-import { moveStart, moveEnd } from '../../graphics/point';
+import { Point, moveStart, moveEnd } from '../../graphics/point';
 
 interface GeometryProps {
   x: number;
@@ -17,6 +17,7 @@ interface Props {
   box: T.BoxData;
   selected?: Boolean;
   transform(g: GeometryProps): GeometryProps;
+  inverseTransform(g: GeometryProps): GeometryProps;
   toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openBox?(box: T.BoxID): void;
@@ -87,8 +88,6 @@ class MapBox extends React.Component<Props, State> {
       />);
 
     const offsetY = sanitizedTitle.length <= titleLineBreak ? titleOffsetY : titleOffsetY - titleFontSize / 2;
-    // tslint:disable-next-line:no-console
-    console.log(titleOffsetY, offsetY, sanitizedTitle.length);
 
     return (
       <Group
@@ -97,12 +96,10 @@ class MapBox extends React.Component<Props, State> {
         key={id}
         draggable={true}
         onClick={(e) => toggleSelection(e, id)}
-        onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
+        onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}
         onDragEnd={(e) => {
-          // XXX TypeScript ought to understand this...
-          // return moveObject(id, ...moveEnd(id, e.evt.layerX, e.evt.layerY));
-          const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
-          return moveObject(id, r[0], r[1]);
+          const r = moveEnd(id, new Point(e.evt.layerX, e.evt.layerY));
+          return moveObject(id, r.x, r.y);
         }}
         onDblClick={() => openBox(boxID)}
       >
