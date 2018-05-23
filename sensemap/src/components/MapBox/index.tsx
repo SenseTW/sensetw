@@ -7,10 +7,16 @@ import { noop, toTags } from '../../types/utils';
 import { Event as KonvaEvent } from '../../types/konva';
 import { moveStart, moveEnd } from '../../graphics/point';
 
+interface GeometryProps {
+  x: number;
+  y: number;
+}
+
 interface Props {
   mapObject: T.ObjectData;
   box: T.BoxData;
   selected?: Boolean;
+  transform(g: GeometryProps): GeometryProps;
   toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openBox?(box: T.BoxID): void;
@@ -55,7 +61,11 @@ class MapBox extends React.Component<Props, State> {
   };
 
   render() {
-    const {id, x, y} = this.props.mapObject;
+    const { id } = this.props.mapObject;
+    const { x, y } = this.props.transform({
+      x: this.props.mapObject.x,
+      y: this.props.mapObject.y,
+    });
     const {title, tags} = this.props.box;
     const sanitizedTitle = title.substr(0, titleLimit);
     const boxID = this.props.box.id;

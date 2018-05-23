@@ -8,10 +8,16 @@ import { noop, toTags } from '../../types/utils';
 import { Event as KonvaEvent } from '../../types/konva';
 import { moveStart, moveEnd } from '../../graphics/point';
 
+interface GeometryProps {
+  x: number;
+  y: number;
+}
+
 interface Props {
   mapObject: T.ObjectData;
   card: T.CardData;
   selected?: Boolean;
+  transform(g: GeometryProps): GeometryProps;
   toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openCard?(id: T.CardID): void;
@@ -78,7 +84,11 @@ class MapCard extends React.Component<Props, State> {
   };
 
   render() {
-    const {id, x, y, data} = this.props.mapObject;
+    const {id, data} = this.props.mapObject;
+    const { x, y } = this.props.transform({
+      x: this.props.mapObject.x,
+      y: this.props.mapObject.y,
+    });
     const {title, summary, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedTitle   = title.substr(0, titleLimit);

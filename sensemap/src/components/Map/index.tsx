@@ -32,16 +32,36 @@ export interface DispatchFromProps {
   };
 }
 
-export interface OwnProps {
+interface GeometryProps {
+  x: number;
+  y: number;
+}
+
+interface GeometryTransform {
+  (g: GeometryProps): GeometryProps;
+}
+
+interface ViewportProps {
   width:  number;
   height: number;
   top:    number;
   left:   number;
 }
 
+export interface OwnProps extends ViewportProps {
+}
+
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
-const renderObject = (o: T.ObjectData, props: Props) => {
+function makeTransform(props: ViewportProps): GeometryTransform {
+  const { top, left } = props;
+  return ({ x, y }) => ({
+    x: x - left,
+    y: y - top
+  });
+}
+
+function renderObject(o: T.ObjectData, props: Props) {
   const addObjectToSelection = props.actions.addObjectToSelection;
   const toggleSelection = props.actions.toggleObjectSelection;
   const clearSelection = props.actions.clearSelection;
@@ -50,6 +70,7 @@ const renderObject = (o: T.ObjectData, props: Props) => {
   const selectObject = props.actions.selectObject;
   const isMultiSelectable = I.isMultiSelectable(props.input);
   const isSelected = SL.contains(props.selection, o.id);
+  const transform = makeTransform(props);
 
   const handleSelection = (e: KonvaEvent.Mouse, id: T.ObjectID) => {
     // stop event propagation by setting the e.cancelBubble
@@ -78,6 +99,7 @@ const renderObject = (o: T.ObjectData, props: Props) => {
       return (
         <MapCard
           mapObject={o}
+          transform={transform}
           card={props.cards[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
@@ -92,6 +114,7 @@ const renderObject = (o: T.ObjectData, props: Props) => {
       return (
         <MapBox
           mapObject={o}
+          transform={transform}
           box={props.boxes[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
@@ -106,7 +129,7 @@ const renderObject = (o: T.ObjectData, props: Props) => {
       throw Error(`Unknown ObjectData type ${o.objectType}`);
     }
   }
-};
+}
 
 export function Map(props: Props) {
   const clearSelection = props.actions.clearSelection;

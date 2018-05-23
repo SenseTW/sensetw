@@ -17,8 +17,8 @@ interface Props {
 
 function Viewport(props: Props) {
   return props.children({
-    top: 100,
-    left: 100,
+    top: 0,
+    left: 0,
     width: 640,
     height: 400,
   });
