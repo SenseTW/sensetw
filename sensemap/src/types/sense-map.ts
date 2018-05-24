@@ -1,6 +1,6 @@
 import { Dispatch } from '.';
 import { ActionUnion, emptyAction } from './action';
-import { BoxID } from './sense-box';
+import { BoxID } from './sense/box';
 import * as SL from './selection';
 
 export type MapID = string;

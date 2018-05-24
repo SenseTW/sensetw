@@ -1,5 +1,5 @@
 import { ActionUnion } from './action';
-import { ObjectID } from './sense-object';
+import { ObjectID } from './sense/object';
 
 const ADD_OBJECT_TO_SELECTION = 'ADD_OBJECT_TO_SELECTION';
 const addObjectToSelection = (id: ObjectID) => ({

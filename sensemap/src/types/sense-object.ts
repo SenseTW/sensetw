@@ -1,91 +1,17 @@
 import * as moment from 'moment';
 import { Dispatch, GetState } from '.';
 import { client } from './client';
-import * as C from './sense-card';
-import { CardID, CardData, emptyCardData, stringToType as stringToCardType } from './sense-card';
-import * as B from './sense-box';
-import { BoxID, BoxData, emptyBoxData } from './sense-box';
+import * as H from './sense/has-id';
+import * as C from './sense/card';
+import { CardID, CardData, emptyCardData, stringToType as stringToCardType } from './sense/card';
+import * as B from './sense/box';
+import { BoxID, BoxData, emptyBoxData } from './sense/box';
+import * as OT from './sense/object-type';
+import { ObjectType, ObjectID, ObjectData, emptyObjectData, objectData } from './sense/object';
 import { MapID } from './sense-map';
-import { TimeStamp } from './utils';
 import { ActionUnion, emptyAction } from './action';
-import { ObjectType } from './object-type';
 import * as SL from './selection';
 import * as SM from './sense-map';
-import * as F from './focus';
-
-export { ObjectType } from './object-type';
-
-export type ObjectID = string;
-
-interface HasID {
-  id: string;
-}
-
-export const stringToType: (name: string) => ObjectType =
-  name => {
-    switch (name) {
-      case 'NONE': return ObjectType.NONE;
-      case 'CARD': return ObjectType.CARD;
-      case 'BOX':  return ObjectType.BOX;
-      default:     return ObjectType.NONE;
-    }
-  };
-
-export interface ObjectData {
-  id:         ObjectID;
-  createdAt:  TimeStamp;
-  updatedAt:  TimeStamp;
-  x:          number;
-  y:          number;
-  width:      number;
-  height:     number;
-  zIndex:     number;
-  objectType: ObjectType;
-  belongsTo?: BoxID;
-  data:       CardID | BoxID;
-}
-
-export const toFocus = (object: ObjectData): F.Focus => {
-  switch (object.objectType) {
-    case ObjectType.BOX:  return F.focusBox(object.data);
-    case ObjectType.CARD: return F.focusCard(object.data);
-    default:              return F.focusNothing();
-  }
-};
-
-export const emptyObjectData = {
-  id: '0',
-  createdAt: 0,
-  updatedAt: 0,
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
-  zIndex: 0,
-  objectType: ObjectType.NONE,
-  data: '0',
-};
-
-interface PartialObjectData {
-  x?:          number;
-  y?:          number;
-  width?:      number;
-  height?:     number;
-  zIndex?:     number;
-  objectType?: ObjectType;
-  data?:       CardID | BoxID;
-}
-
-export const objectData = (partial: PartialObjectData = {}): ObjectData => {
-  const now = +Date.now();
-
-  return {
-    ...emptyObjectData,
-    ...partial,
-    createdAt: now,
-    updatedAt: now,
-  };
-};
 
 export type State = {
   objects: { [key: string]: ObjectData },
@@ -127,40 +53,24 @@ interface GraphQLObjectFields {
   height:     number;
   zIndex:     number;
   objectType: string;
-  card?:      HasID;
-  box?:       HasID;
-  belongsTo?: HasID;
+  card?:      H.HasID<CardID>;
+  box?:       H.HasID<BoxID>;
+  belongsTo?: H.HasID<BoxID>;
 }
-
-const idOrUndefined: (o?: HasID) => string | undefined =
-  (o) => {
-    if (!o) {
-      return undefined;
-    }
-    return o.id;
-  };
-
-const idOrError: (err: string, o?: HasID) => string =
-  (err, o) => {
-    if (!o) {
-      throw Error(err);
-    }
-    return o.id;
-  };
 
 const toObjectDataFieldData: (o: GraphQLObjectFields) => string =
   o => {
-    switch (stringToType(o.objectType)) {
+    switch (OT.fromString(o.objectType)) {
       case ObjectType.NONE: {
         throw Error('Object loaded from backend has no objectType.');
       }
       case ObjectType.CARD: {
-        return idOrError('Object of type CARD does not has Card ID.',
-                         o.card);
+        return H.idOrError('Object of type CARD does not has Card ID.',
+                           o.card);
       }
       case ObjectType.BOX: {
-        return idOrError('Object of type BOX does not has Box ID.',
-                         o.box);
+        return H.idOrError('Object of type BOX does not has Box ID.',
+                           o.box);
       }
       default: {
         throw Error('Object loaded from backend has no objectType.');
@@ -178,9 +88,9 @@ const toObjectData: (o: GraphQLObjectFields) => ObjectData =
     width:      o.width,
     height:     o.height,
     zIndex:     o.zIndex,
-    objectType: stringToType(o.objectType),
+    objectType: OT.fromString(o.objectType),
     data:       toObjectDataFieldData(o),
-    belongsTo:  idOrUndefined(o.belongsTo),
+    belongsTo:  H.idOrUndefined(o.belongsTo),
   });
 
 const graphQLCardFieldsFragment = `
@@ -203,12 +113,8 @@ interface GraphQLCardFields {
   stakeholder: string;
   url:         string;
   cardType:    string;
-  objects:     HasID[];
-  map?:        HasID;
-}
-
-export function toIDMap<T extends HasID>(this: void, objects: T[]): { [key: string]: T } {
-  return objects.reduce((acc, o) => { acc[o.id] = o; return acc; }, {});
+  objects:     H.HasID<ObjectID>[];
+  map?:        H.HasID<MapID>;
 }
 
 const toCardData: (c: GraphQLCardFields) => CardData =
@@ -224,7 +130,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     stakeholder: c.stakeholder,
     url:         c.url,
     cardType:    stringToCardType(c.cardType),
-    objects:     toIDMap(c.objects),
+    objects:     H.toIDMap(c.objects),
   });
 
 const graphQLBoxFieldsFragment = `
@@ -240,9 +146,9 @@ interface GraphQLBoxFields {
   title:     string;
   summary:   string;
   tags:      string;
-  objects:   HasID[];
-  contains:  HasID[];
-  map?:      HasID;
+  objects:   H.HasID<ObjectID>[];
+  contains:  H.HasID<ObjectID>[];
+  map?:      H.HasID<MapID>;
 }
 
 const toBoxData: (b: GraphQLBoxFields) => BoxData =
@@ -253,8 +159,8 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     title:     b.title,
     summary:   b.summary,
     tags:      b.tags || '',
-    objects:   toIDMap(b.objects),
-    contains:  toIDMap(b.contains),
+    objects:   H.toIDMap(b.objects),
+    contains:  H.toIDMap(b.contains),
   });
 
 /**
@@ -360,7 +266,7 @@ const createCard =
       ${graphQLCardFieldsFragment}
     `;
     return client.request(query, { ...card, mapId })
-      .then(({ createCard: newCard }) => dispatch(updateCards(toIDMap<CardData>([
+      .then(({ createCard: newCard }) => dispatch(updateCards(H.toIDMap<CardID, CardData>([
         toCardData(newCard),
       ]))));
   };
@@ -397,7 +303,7 @@ const updateRemoteCard =
       ${graphQLCardFieldsFragment}
     `;
     return client.request(query, card)
-      .then(({ updateCard: newCard }) => dispatch(updateCards(toIDMap<CardData>([
+      .then(({ updateCard: newCard }) => dispatch(updateCards(H.toIDMap<CardID, CardData>([
         toCardData(newCard),
       ]))));
   };
@@ -414,7 +320,7 @@ const createBox =
       ${graphQLBoxFieldsFragment}
     `;
     return client.request(query, { ...box, mapId })
-      .then(({ createBox: newBox }) => dispatch(updateBoxes(toIDMap<BoxData>([
+      .then(({ createBox: newBox }) => dispatch(updateBoxes(H.toIDMap<BoxID, BoxData>([
         toBoxData(newBox),
       ]))));
   };
@@ -431,7 +337,7 @@ const updateRemoteBox =
       ${graphQLBoxFieldsFragment}
     `;
     return client.request(query, box)
-      .then(({ updateBox: newBox }) => dispatch(updateBoxes(toIDMap<BoxData>([
+      .then(({ updateBox: newBox }) => dispatch(updateBoxes(H.toIDMap<BoxID, BoxData>([
         toBoxData(newBox),
       ]))));
   };
@@ -450,7 +356,7 @@ const loadObjects =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allObjects }) => allObjects.map(toObjectData))
-      .then(data => toIDMap<ObjectData>(data))
+      .then(data => H.toIDMap<ObjectID, ObjectData>(data))
       .then(data => dispatch(overwrite ? overwriteObjects(data) : updateObjects(data)));
   };
 
@@ -468,7 +374,7 @@ const loadCards =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData))
-      .then(data => toIDMap<CardData>(data))
+      .then(data => H.toIDMap<CardID, CardData>(data))
       .then(data => dispatch(overwrite ? overwriteCards(data) : updateCards(data)));
   };
 
@@ -486,7 +392,7 @@ const loadBoxes =
     const variables = { id };
     return client.request(query, variables)
       .then(({ allBoxes }) => allBoxes.map(toBoxData))
-      .then(data => toIDMap<BoxData>(data))
+      .then(data => H.toIDMap<BoxID, BoxData>(data))
       .then(data => dispatch(overwrite ? overwriteBoxes(data) : updateBoxes(data)));
   };
 
@@ -552,7 +458,7 @@ const createObject =
       ${graphQLObjectFieldsFragment}
     `;
     return client.request(query, { ...data, mapId })
-      .then(({ createObject: newObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
+      .then(({ createObject: newObject }) => dispatch(updateObjects(H.toIDMap<ObjectID, ObjectData>([
         toObjectData(newObject),
       ]))));
   };
@@ -618,7 +524,7 @@ const moveObject =
     `;
     const variables = { id, x, y };
     return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateObjects(toIDMap<ObjectData>([
+      .then(({ updateObject }) => dispatch(updateObjects(H.toIDMap<ObjectID, ObjectData>([
         toObjectData(updateObject),
       ]))));
   };

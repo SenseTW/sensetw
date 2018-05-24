@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Form, Checkbox } from 'semantic-ui-react';
-import * as SC from '../../../types/sense-card';
+import { CardType } from '../../../types';
 import { noop } from '../../../types/utils';
 import './index.css';
 
 interface Props {
-  cardType: SC.CardType;
-  onChange? (type: SC.CardType): void;
+  cardType: CardType;
+  onChange? (type: CardType): void;
 }
 
 const groupName = 'card-type-selector';
@@ -23,7 +23,7 @@ function CardTypeSelector(props: Props) {
 
   return (
     <div className="card-type-selector">{
-      Object.keys(SC.CardType).map(ty => (
+      Object.keys(CardType).map(ty => (
         <Form.Field>
           <Checkbox
             radio
@@ -32,7 +32,7 @@ function CardTypeSelector(props: Props) {
             name={groupName}
             value={ty}
             checked={cardType === ty}
-            onChange={() => onChange(ty as SC.CardType)}
+            onChange={() => onChange(ty as CardType)}
           />
         </Form.Field>
       ))

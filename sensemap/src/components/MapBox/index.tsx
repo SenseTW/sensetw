@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import MapTagList from '../MapTagList';
 import * as T from '../../types';
-import * as B from '../../types/sense-box';
+import * as B from '../../types/sense/box';
 import { noop, toTags } from '../../types/utils';
 import { Event as KonvaEvent } from '../../types/konva';
 import { Point, moveStart, moveEnd } from '../../graphics/point';

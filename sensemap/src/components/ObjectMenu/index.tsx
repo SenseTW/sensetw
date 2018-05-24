@@ -5,10 +5,10 @@ import * as T from '../../types';
 import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
-import * as SB from '../../types/sense-box';
-import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
-import * as F from '../../types/focus';
+import { cardData } from '../../types/sense/card';
+import { boxData } from '../../types/sense/box';
+import * as F from '../../types/sense/focus';
 import * as I from '../../types/input';
 // TODO: use UUID v4
 import { objectId } from '../../types/utils';
@@ -25,13 +25,13 @@ interface StateFromProps {
 interface DispatchFromProps {
   actions: {
     focusObject(focus: F.Focus): T.ActionChain,
-    snapshotObject(objectType: T.ObjectType, data: SB.BoxData | SC.CardData): T.ActionChain,
-    clearObject(objectType: T.ObjectType, id: SB.BoxID | SC.CardID): T.ActionChain,
+    snapshotObject(objectType: T.ObjectType, data: T.BoxData | T.CardData): T.ActionChain,
+    clearObject(objectType: T.ObjectType, id: T.BoxID | T.CardID): T.ActionChain,
     changeStatus(status: OE.StatusType): T.ActionChain,
-    addCardsToBox(cards: T.ObjectID[], box: SB.BoxID): T.ActionChain,
-    removeCardsFromBox(card: T.ObjectID[], box: SB.BoxID): T.ActionChain,
+    addCardsToBox(cards: T.ObjectID[], box: T.BoxID): T.ActionChain,
+    removeCardsFromBox(card: T.ObjectID[], box: T.BoxID): T.ActionChain,
     deleteObject(object: T.ObjectID): T.ActionChain,
-    unboxCards(box: SB.BoxID): T.ActionChain,
+    unboxCards(box: T.BoxID): T.ActionChain,
     openInbox(): T.ActionChain,
   };
 }
@@ -165,8 +165,8 @@ class ObjectMenu extends React.PureComponent<Props> {
           <Menu.Item
             name="create-box"
             onClick={() => {
-              const data = SB.boxData({ id: objectId() });
-              actions.snapshotObject(SO.ObjectType.BOX, data);
+              const data = boxData({ id: objectId() });
+              actions.snapshotObject(T.ObjectType.BOX, data);
               actions.focusObject(F.focusBox(data.id));
               actions.changeStatus(OE.StatusType.SHOW);
             }}
@@ -177,8 +177,8 @@ class ObjectMenu extends React.PureComponent<Props> {
         <Menu.Item
           name="create-card"
           onClick={() => {
-            const data = SC.cardData({ id: objectId() });
-            actions.snapshotObject(SO.ObjectType.CARD, data);
+            const data = cardData({ id: objectId() });
+            actions.snapshotObject(T.ObjectType.CARD, data);
             actions.focusObject(F.focusCard(data.id));
             actions.changeStatus(OE.StatusType.SHOW);
           }}
@@ -256,9 +256,9 @@ export default connect<StateFromProps, DispatchFromProps>(
     actions: {
       focusObject: (focus: F.Focus) =>
         dispatch(T.actions.editor.focusObject(focus)),
-      snapshotObject: (objectType: T.ObjectType, data: SB.BoxData | SC.CardData) =>
+      snapshotObject: (objectType: T.ObjectType, data: T.BoxData | T.CardData) =>
         dispatch(T.actions.editor.snapshotObject(objectType, data)),
-      clearObject: (objectType: T.ObjectType, id: SB.BoxID | SC.CardID) =>
+      clearObject: (objectType: T.ObjectType, id: T.BoxID | T.CardID) =>
         dispatch(T.actions.editor.clearObject(objectType, id)),
       changeStatus: (status: OE.StatusType) =>
         dispatch(T.actions.editor.changeStatus(status)),
