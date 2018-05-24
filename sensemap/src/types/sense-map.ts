@@ -1,5 +1,5 @@
 import { Dispatch } from '.';
-import { ActionUnion } from './action';
+import { ActionUnion, emptyAction } from './action';
 import { BoxID } from './sense-box';
 import * as SL from './selection';
 
@@ -10,6 +10,28 @@ export enum MapScopeType {
   BOX      = 'BOX',
 }
 
+/**
+ * We are at the top level of a sense map.
+ */
+type FullMapScope = {
+  type: MapScopeType.FULL_MAP,
+};
+
+/**
+ * We are in a box with an id `box`.
+ */
+type BoxScope = {
+  type: MapScopeType.BOX,
+  box: BoxID,
+};
+
+/**
+ * It describes how deep we are in a sense map.
+ */
+type MapScope
+  = FullMapScope
+  | BoxScope;
+
 export enum InboxVisibility {
   VISIBLE = 'VISIBLE',
   HIDDEN  = 'HIDDEN',
@@ -18,31 +40,42 @@ export enum InboxVisibility {
 export type DimensionInMap = [number, number];
 
 const SET_SCOPE_TO_BOX = 'SET_SCOPE_TO_BOX';
-const setScopeToBox = (box: BoxID) => ({
-  type: SET_SCOPE_TO_BOX as typeof SET_SCOPE_TO_BOX,
-  payload: { box },
-});
+/**
+ * A message to set the scope to a box.
+ *
+ * @param {BoxID} box
+ */
+const setScopeToBox =
+  (box: BoxID) => ({
+    type: SET_SCOPE_TO_BOX as typeof SET_SCOPE_TO_BOX,
+    payload: { box },
+  });
 
 const SET_SCOPE_TO_FULL_MAP = 'SET_SCOPE_TO_FULL_MAP';
-const setScopeToFullmap = () => ({
-  type: SET_SCOPE_TO_FULL_MAP as typeof SET_SCOPE_TO_FULL_MAP,
-});
+/**
+ * A message to set the scope to the whole map.
+ */
+const setScopeToFullmap =
+  () => ({
+    type: SET_SCOPE_TO_FULL_MAP as typeof SET_SCOPE_TO_FULL_MAP,
+  });
 
 const OPEN_INBOX = 'OPEN_INBOX';
-const openInbox = () => ({
-  type: OPEN_INBOX as typeof OPEN_INBOX,
-});
+/**
+ * A message to open the inbox.
+ */
+const openInbox =
+  () => ({
+    type: OPEN_INBOX as typeof OPEN_INBOX,
+  });
 
 const CLOSE_INBOX = 'CLOSE_INBOX';
-const closeInbox = () => ({
-  type: CLOSE_INBOX as typeof CLOSE_INBOX,
-});
-
-const RESIZE_VIEWPORT = 'RESIZE_VIEWPORT';
-const resizeViewport =
-  (dimension: DimensionInMap) => ({
-    type: RESIZE_VIEWPORT as typeof RESIZE_VIEWPORT,
-    payload: { dimension }
+/**
+ * A message to close the inbox.
+ */
+const closeInbox =
+  () => ({
+    type: CLOSE_INBOX as typeof CLOSE_INBOX,
   });
 
 const openBox =
@@ -59,6 +92,22 @@ const closeBox =
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
+const RESIZE_VIEWPORT = 'RESIZE_VIEWPORT';
+/**
+ * A message to resize the view port. So we can create objects in the center of
+ * our viewport.
+ *
+ * @param {DimensionInMap} dimension The new dimension(width, height).
+ */
+const resizeViewport =
+  (dimension: DimensionInMap) => ({
+    type: RESIZE_VIEWPORT as typeof RESIZE_VIEWPORT,
+    payload: { dimension }
+  });
+
+/**
+ * The data constructors of map actions.
+ */
 const syncActions = {
   setScopeToBox,
   setScopeToFullmap,
@@ -75,18 +124,9 @@ export const actions = {
 
 export type Action = ActionUnion<typeof syncActions>;
 
-type FullMapScope = {
-  type: MapScopeType.FULL_MAP,
-};
-
-type BoxScope = {
-  type: MapScopeType.BOX,
-  box: BoxID,
-};
-
 export type State = {
   map: MapID,
-  scope: FullMapScope | BoxScope,
+  scope: MapScope,
   dimension: DimensionInMap,
   inbox: InboxVisibility,
 };
@@ -100,7 +140,13 @@ export const initial: State = {
   inbox: InboxVisibility.HIDDEN,
 };
 
-export const reducer = (state: State = initial, action: Action): State => {
+/**
+ * The action dispatcher of map actions.
+ *
+ * @param {State} state The input map.
+ * @param {Action} action A map action.
+ */
+export const reducer = (state: State = initial, action: Action = emptyAction): State => {
   switch (action.type) {
     case SET_SCOPE_TO_BOX: {
       return { ...state, ...{ scope: { type: MapScopeType.BOX, box: action.payload.box } } };
