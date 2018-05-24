@@ -4,10 +4,9 @@ import * as T from '../../../types';
 import { Reveal } from 'semantic-ui-react';
 import CardAction from '../CardActions';
 
-const summaryLimit = 39;
-
 interface Props {
   card: T.CardData;
+  summaryLimit?: number;
 }
 
 function renderCardTags({ tags }: { tags: string }) {
@@ -23,18 +22,27 @@ function renderCardTags({ tags }: { tags: string }) {
   );
 }
 
+function isInMap(card: T.CardData): Boolean {
+  return Object.keys(card.objects).length > 0;
+}
+
+function getClassNames(card: T.CardData): string {
+  return [
+    'card',
+    isInMap(card) ? 'card--in-map' : 'card--not-in-map',
+    `card--${(card.cardType as string).toLowerCase()}`,
+  ].join(' ');
+}
+
 export default function Card(props: Props) {
+  const { summaryLimit = 39 } = props;
   const card = {
     ...props.card,
     summary: props.card.summary.substr(0, summaryLimit),
   };
-  const className = [
-    'card',
-    (Object.keys(card.objects).length > 0 ? 'card--in-map' : 'card--not-in-map'),
-    `card--${(card.cardType as string).toLowerCase()}`,
-  ].join(' ');
+  const classNames = getClassNames(card);
   return (
-    <div className={className}>
+    <div className={classNames}>
       <Reveal animated="fade">
         <Reveal.Content hidden>
           <CardAction card={card} />
