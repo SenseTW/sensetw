@@ -8,6 +8,7 @@ const summaryLimit = 39;
 
 interface Props {
   card: T.CardData;
+}
 
 function renderCardTags({ tags }: { tags: string }) {
   const eachTag = tags.split(',').filter(t => t.length > 0);
