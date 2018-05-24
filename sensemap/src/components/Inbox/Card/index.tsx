@@ -8,10 +8,9 @@ const summaryLimit = 39;
 
 interface Props {
   card: T.CardData;
-}
 
 function renderCardTags({ tags }: { tags: string }) {
-  const eachTag = tags.split(',');
+  const eachTag = tags.split(',').filter(t => t.length > 0);
   return (
     <div className="card__tag-panel">
       {eachTag.map(tagName => (
@@ -45,7 +44,7 @@ export default function Card(props: Props) {
             <div className="card__summary">
               {card.summary}
             </div>
-            {renderCardTags({ tags: '驚爆新歡,感謝上師' })}
+            {renderCardTags({ tags: card.tags })}
           </div>
         </Reveal.Content>
       </Reveal>
