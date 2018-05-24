@@ -1,5 +1,5 @@
 import { Dispatch, GetState } from '.';
-import { client } from './graphql/client';
+import * as G from './graphql';
 import * as GO from './graphql/object';
 import * as GC from './graphql/card';
 import * as GB from './graphql/box';
@@ -172,16 +172,8 @@ const loadBoxes =
 const addCardToBox =
   (cardObject: ObjectID, box: BoxID) =>
   (dispatch: Dispatch) => {
-    const query = `
-      mutation AddCardToBox($cardObject: ID!, $box: ID!) {
-        addToContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
-          containsObject { id } belongsToBox { id }
-        }
-      }
-    `;
-    const variables = { cardObject, box };
-    return client.request(query, variables)
-      .then(({ updateObject }) => dispatch(updateInBox(cardObject, box)))
+    return G.addCardToBox(cardObject, box)
+      .then(() => dispatch(updateInBox(cardObject, box)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
@@ -263,15 +255,7 @@ const moveObject =
 const removeCardFromBox =
   (cardObject: ObjectID, box: BoxID) =>
   (dispatch: Dispatch) => {
-    const query = `
-      mutation RemoveCardFromBox($cardObject: ID!, $box: ID!) {
-        removeFromContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
-          containsObject { id } belongsToBox { id }
-        }
-      }
-    `;
-    const variables = { cardObject, box };
-    return client.request(query, variables)
+    return G.removeCardFromBox(cardObject, box)
       .then(() => dispatch(updateNotInBox(cardObject, box)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
@@ -309,16 +293,7 @@ const deleteCard =
 const deleteCardWithObject =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const query = `
-      query GetCard($cardID: ID!) {
-        Card(id: $cardID) { ...cardFields }
-      }
-      ${GC.graphQLCardFieldsFragment}
-    `;
-    const variables = { cardID };
-    return client.request(query, variables)
-      .then(({ Card }: { Card: { objects: { id: ObjectID }[] } }) =>
-            Promise.all(Card.objects.map(({ id }) => GO.remove(id))))
+    return G.deleteObjectsByCard(cardID)
       .then(() => dispatch(deleteCard(cardID)));
   };
 
@@ -335,15 +310,7 @@ const deleteBox =
 const deleteBoxWithObject =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const query = `
-      query GetBoxObjects($boxID: ID!) {
-        Box(id: $boxID) { objects { id } }
-      }
-    `;
-    const variables = { boxID };
-    return client.request(query, variables)
-      .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
-            Promise.all(Box.objects.map(({ id }) => GO.remove(id))))
+    return G.deleteObjectsByBox(boxID)
       .then(() => dispatch(deleteBox(boxID)));
   };
 
