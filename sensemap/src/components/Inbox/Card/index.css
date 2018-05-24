@@ -28,6 +28,7 @@
   padding-bottom: 6px;
 }
 
+.card.card--dragged .card__body,
 .card.card--not-in-map .card__body {
   background-color: #ffffff;
 }
@@ -36,6 +37,7 @@
   background-color: rgb(176, 176, 176);
 }
 
+.card.card--dragged.card--question .card__body,
 .card.card--not-in-map.card--question .card__body {
   background-color: rgba(255, 236, 239);
 }
@@ -44,6 +46,7 @@
   background-color: rgb(147, 112, 127);
 }
 
+.card.card--dragged.card--answer .card__body,
 .card.card--not-in-map.card--answer .card__body {
   background-color: rgba(222, 255, 245);
 }

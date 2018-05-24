@@ -11,7 +11,7 @@ export default function CardList(props: Props) {
   const cards = props.cards;
   return (
     <div className="card-list">
-      {cards.map((card, i) => <Card card={card} key={card.id} />)}
+      {cards.map((card, i) => <Card card={card} key={card.id} dragged={i === 3} />)}
     </div>
   );
 }

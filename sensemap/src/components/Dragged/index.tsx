@@ -12,6 +12,7 @@ export class Dragged extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
     this.el = document.createElement('div');
+    this.el.className = 'dragged';
   }
 
   componentWillMount() {
