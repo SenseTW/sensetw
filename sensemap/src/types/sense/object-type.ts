@@ -14,7 +14,7 @@ export enum ObjectType {
  * fromString creates a object type from a string.
  * @param {string} str The enum string.
  */
-export function fromString(this: void, str: string): ObjectType {
+export function fromString(this: void, name: string): ObjectType {
   switch (name) {
     case 'NONE': return ObjectType.NONE;
     case 'CARD': return ObjectType.CARD;

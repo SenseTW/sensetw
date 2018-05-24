@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Icon, Pagination, PaginationProps } from 'semantic-ui-react';
 import './index.css';
 import * as T from '../../types';
-import * as SC from '../../types/sense-card';
+import * as C from '../../types/sense/card';
 import CardList from './CardList';
 import { Pager } from '../Pager';
 
@@ -32,7 +32,7 @@ export function Inbox({ cards, senseMap, actions }: Props) {
         </Button>
       </div>
       <div className="inbox__add-card-btn">
-        <Button icon="plus" size="tiny" color="grey" onClick={() => actions.createCard(mapId, SC.cardData())} />
+        <Button icon="plus" size="tiny" color="grey" onClick={() => actions.createCard(mapId, C.cardData())} />
       </div>
       <Pager data={cards} pageSize={9}>
         {({ data, totalPages, currentPage, handlePageChange }) => {

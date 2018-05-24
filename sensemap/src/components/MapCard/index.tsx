@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import MapTagList from '../MapTagList';
 import * as T from '../../types';
-import * as C from '../../types/sense-card';
+import * as C from '../../types/sense/card';
 import { noop, toTags } from '../../types/utils';
 import { Event as KonvaEvent } from '../../types/konva';
 import { Point, moveStart, moveEnd } from '../../graphics/point';

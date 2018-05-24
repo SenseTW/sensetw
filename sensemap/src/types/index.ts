@@ -2,7 +2,6 @@ import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } f
 import { emptyAction } from './action';
 import * as SM from './sense-map';
 import * as SO from './sense-object';
-import * as SC from './sense-card';
 import * as SL from './selection';
 import * as OE from './object-editor';
 import * as V  from './viewport';
@@ -10,9 +9,9 @@ import * as SG from './stage';
 import * as I  from './input';
 
 export { MapID, MapScopeType } from './sense-map';
-export { ObjectID, ObjectType, ObjectData } from './sense-object';
-export { CardID, CardType, CardData } from './sense-card';
-export { BoxID, BoxData } from './sense-box';
+export { ObjectID, ObjectType, ObjectData } from './sense/object';
+export { BoxID, BoxData } from './sense/box';
+export { CardID, CardType, CardData } from './sense/card';
 
 export type State = {
   senseMap:    SM.State,
@@ -38,7 +37,6 @@ export type Action
   = typeof emptyAction
   | SM.Action
   | SO.Action
-  | SC.Action
   | SL.Action
   | OE.Action
   |  I.Action

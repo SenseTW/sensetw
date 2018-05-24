@@ -9,12 +9,12 @@ import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
 import Inbox from '../../containers/Inbox';
 import * as T from '../../types';
-import * as SB from '../../types/sense-box';
-import * as SC from '../../types/sense-card';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
-import * as F from '../../types/focus';
+import { Action as BoxAction } from '../../types/sense/box';
+import { Action as CardAction } from '../../types/sense/card';
+import * as F from '../../types/sense/focus';
 import { Key } from 'ts-keycode-enum';
 import './index.css';
 const background = require('./background-map.png');
@@ -37,8 +37,8 @@ interface DispatchFromProps {
     resizeViewpart(dimension: SM.DimensionInMap): T.ActionChain,
     keyPress(key: Key): T.ActionChain,
     keyRelease(key: Key): T.ActionChain,
-    updateBox(id: T.BoxID, action: SB.Action): T.ActionChain;
-    updateCard(id: T.CardID, action: SC.Action): T.ActionChain;
+    updateBox(id: T.BoxID, action: BoxAction): T.ActionChain;
+    updateCard(id: T.CardID, action: CardAction): T.ActionChain;
     focusObject(focus: F.Focus): T.ActionChain,
     clearObject(objectType: T.ObjectType, id: T.BoxID | T.CardID): T.ActionChain;
   };
@@ -76,7 +76,7 @@ class MapPage extends React.Component<Props> {
     const { actions, editor, scope, senseMap, senseObject } = this.props;
     const { status, focus } = editor;
 
-    let data: SB.BoxData | SC.CardData | null = null;
+    let data: T.BoxData | T.CardData | null = null;
     let isDirty: boolean = false;
     let doesDataExist: boolean = false;
     switch (focus.objectType) {
@@ -114,10 +114,10 @@ class MapPage extends React.Component<Props> {
 
                   switch (focus.objectType) {
                     case T.ObjectType.CARD:
-                      actions.updateCard(data.id, action as SC.Action);
+                      actions.updateCard(data.id, action as CardAction);
                       break;
                     case T.ObjectType.BOX:
-                      actions.updateBox(data.id, action as SB.Action);
+                      actions.updateBox(data.id, action as BoxAction);
                       break;
                     default:
                   }
@@ -219,9 +219,9 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.input.keyPress(key)),
       keyRelease: (key: Key) =>
         dispatch(T.actions.input.keyRelease(key)),
-      updateBox: (id: T.BoxID, action: SB.Action) =>
+      updateBox: (id: T.BoxID, action: BoxAction) =>
         dispatch(T.actions.editor.updateBox(id, action)),
-      updateCard: (id: T.CardID, action: SC.Action) =>
+      updateCard: (id: T.CardID, action: CardAction) =>
         dispatch(T.actions.editor.updateCard(id, action)),
       focusObject: (focus: F.Focus) =>
         dispatch(T.actions.editor.focusObject(focus)),

@@ -4,14 +4,14 @@ import { Divider, Button } from 'semantic-ui-react';
 import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
 import * as T from '../../types';
-import * as SC from '../../types/sense-card';
-import * as SB from '../../types/sense-box';
+import * as C from '../../types/sense/card';
+import * as B from '../../types/sense/box';
 import { noop } from '../../types/utils';
 import './index.css';
 
 type Data
-  = SC.CardData
-  | SB.BoxData;
+  = T.CardData
+  | T.BoxData;
 
 interface Props {
   objectType: T.ObjectType;
@@ -19,7 +19,7 @@ interface Props {
   submitText?: string;
   submitDisabled?: boolean;
   cancelDisabled?: boolean;
-  onUpdate? (action: SB.Action | SC.Action): void;
+  onUpdate? (action: B.Action | C.Action): void;
   onSubmit? (value: Data): void;
   onCancel? (): void;
 }
@@ -56,7 +56,7 @@ class ObjectContent extends React.PureComponent<Props> {
       case T.ObjectType.CARD:
         content = (
           <CardContent
-            data={data as SC.CardData}
+            data={data as T.CardData}
             onKeyUp={this.handleKey}
             onChange={onUpdate}
           />
@@ -65,7 +65,7 @@ class ObjectContent extends React.PureComponent<Props> {
       case T.ObjectType.BOX:
         content = (
           <BoxContent
-            data={data as SB.BoxData}
+            data={data as T.BoxData}
             onKeyUp={this.handleKey}
             onChange={onUpdate}
           />

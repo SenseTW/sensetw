@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import * as T from '../../types';
-import * as F from '../../types/focus';
+import * as F from '../../types/sense/focus';
 import * as OE from '../../types/object-editor';
 
 interface OwnProps extends CO.OwnProps {

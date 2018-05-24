@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { Form, TextArea, Input } from 'semantic-ui-react';
-import * as SB from '../../types/sense-box';
+import * as B from '../../types/sense/box';
 
 interface Props {
-  data: SB.BoxData;
+  data: B.BoxData;
   onKeyUp? (e: React.KeyboardEvent<HTMLElement>): void;
-  onChange? (action: SB.Action): void;
+  onChange? (action: B.Action): void;
 }
 
 class BoxContent extends React.PureComponent<Props> {
   static defaultProps = {
-    data: SB.emptyBoxData,
+    data: B.emptyBoxData,
   };
 
   render() {
@@ -25,7 +25,7 @@ class BoxContent extends React.PureComponent<Props> {
             placeholder="one concept or one argument"
             value={title}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SB.updateTitle(e.currentTarget.value))}
+            onChange={e => onChange && onChange(B.updateTitle(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="box-content__summary">
@@ -33,7 +33,7 @@ class BoxContent extends React.PureComponent<Props> {
           <TextArea
             placeholder="文化部提供的議題分析表"
             value={summary}
-            onChange={e => onChange && onChange(SB.updateSummary(e.currentTarget.value))}
+            onChange={e => onChange && onChange(B.updateSummary(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="box-content__tags">
@@ -42,7 +42,7 @@ class BoxContent extends React.PureComponent<Props> {
             placeholder="tag1, tag2, tag3"
             value={tags}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SB.updateTags(e.currentTarget.value))}
+            onChange={e => onChange && onChange(B.updateTags(e.currentTarget.value))}
           />
         </Form.Field>
         {children}

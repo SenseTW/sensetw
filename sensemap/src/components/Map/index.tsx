@@ -7,9 +7,9 @@ import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
 import * as I from '../../types/input';
-import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
-import * as F from '../../types/focus';
+import * as O from '../../types/sense/object';
+import * as F from '../../types/sense/focus';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
@@ -99,7 +99,7 @@ function renderObject(o: T.ObjectData, props: Props) {
     } else {
       clearSelection();
       if (!isSelected || props.selection.length > 1) {
-        focusObject(SO.toFocus(data));
+        focusObject(O.toFocus(data));
         addObjectToSelection(data.id);
       } else {
         focusObject(F.focusNothing());

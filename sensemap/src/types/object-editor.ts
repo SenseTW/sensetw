@@ -1,9 +1,11 @@
 import { Dispatch, GetState } from '.';
 import { ActionUnion, emptyAction } from './action';
+import * as HasID from './sense/has-id';
+import { ObjectType } from './sense/object';
+import { BoxID, BoxData, Action as BoxAction, emptyBoxData, reducer as boxReducer } from './sense/box';
+import { CardID, CardData, Action as CardAction, emptyCardData, reducer as cardReducer } from './sense/card';
+import * as F from './sense/focus';
 import * as SO from './sense-object';
-import * as SB from './sense-box';
-import * as SC from './sense-card';
-import * as F from './focus';
 import { clone } from 'ramda';
 
 export enum StatusType {
@@ -13,14 +15,14 @@ export enum StatusType {
 
 const SNAPSHOT_OBJECT = 'SNAPSHOT_OBJECT';
 const snapshotObject =
-  (objectType: SO.ObjectType, data: SC.CardData | SB.BoxData) => ({
+  (objectType: ObjectType, data: CardData | BoxData) => ({
     type: SNAPSHOT_OBJECT as typeof SNAPSHOT_OBJECT,
     payload: { objectType, data },
   });
 
 const CLEAR_OBJECT = 'CLEAR_OBJECT';
 const clearObject =
-  (objectType: SO.ObjectType, id: SC.CardID | SB.BoxID) => ({
+  (objectType: ObjectType, id: CardID | BoxID) => ({
     type: CLEAR_OBJECT as typeof CLEAR_OBJECT,
     payload: { objectType, id },
   });
@@ -41,20 +43,20 @@ const focusObject =
 
 const UPDATE_EDITOR_CARD = 'UPDATE_EDITOR_CARD';
 const updateEditorCard =
-  (id: SC.CardID, action: SC.Action) => ({
+  (id: CardID, action: CardAction) => ({
     type: UPDATE_EDITOR_CARD as typeof UPDATE_EDITOR_CARD,
     payload: { id, action },
   });
 
 const updateCard =
-  (id: SC.CardID, action: SC.Action) =>
+  (id: CardID, action: CardAction) =>
   (dispatch: Dispatch, getState: GetState) => {
     const state = getState();
     let card = SO.getCard(state.editor.temp, id);
 
-    if (card.id === SC.emptyCardData.id) {
+    if (card.id === emptyCardData.id) {
       card = SO.getCard(state.senseObject, id);
-      dispatch(snapshotObject(SO.ObjectType.CARD, card));
+      dispatch(snapshotObject(ObjectType.CARD, card));
     }
 
     return Promise.resolve(dispatch(updateEditorCard(id, action)));
@@ -62,20 +64,20 @@ const updateCard =
 
 const UPDATE_EDITOR_BOX = 'UPDATE_EDITOR_BOX';
 const updateEditorBox =
-  (id: SB.BoxID, action: SB.Action) => ({
+  (id: BoxID, action: BoxAction) => ({
     type: UPDATE_EDITOR_BOX as typeof UPDATE_EDITOR_BOX,
     payload: { id, action },
   });
 
 const updateBox =
-  (id: SB.BoxID, action: SB.Action) =>
+  (id: BoxID, action: BoxAction) =>
   (dispatch: Dispatch, getState: GetState) => {
     const state = getState();
     let box = SO.getBox(state.editor.temp, id);
 
-    if (box.id === SB.emptyBoxData.id) {
+    if (box.id === emptyBoxData.id) {
       box = SO.getBox(state.senseObject, id);
-      dispatch(snapshotObject(SO.ObjectType.BOX, box));
+      dispatch(snapshotObject(ObjectType.BOX, box));
     }
 
     return Promise.resolve(dispatch(updateEditorBox(id, action)));
@@ -110,13 +112,13 @@ export const initial: State = {
   focus: F.focusNothing(),
 };
 
-export const getFocusedObject = (state: State): SC.CardData | SB.BoxData | null => {
+export const getFocusedObject = (state: State): CardData | BoxData | null => {
   const { focus } = state;
 
   switch (focus.objectType) {
-    case SO.ObjectType.BOX:  return SO.getBox(state.temp, focus.data);
-    case SO.ObjectType.CARD: return SO.getCard(state.temp, focus.data);
-    default:                 return null;
+    case ObjectType.BOX:  return SO.getBox(state.temp, focus.data);
+    case ObjectType.CARD: return SO.getCard(state.temp, focus.data);
+    default:              return null;
   }
 };
 
@@ -128,11 +130,11 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
       // use the sense-object reducer to update our object map
       let { temp } = state;
       switch (objectType) {
-        case SO.ObjectType.BOX:
-          temp = SO.reducer(temp, SO.actions.updateBoxes(SO.toIDMap<SB.BoxData>([data as SB.BoxData])));
+        case ObjectType.BOX:
+          temp = SO.reducer(temp, SO.actions.updateBoxes(HasID.toIDMap<BoxID, BoxData>([data as BoxData])));
           break;
-        case SO.ObjectType.CARD:
-          temp = SO.reducer(temp, SO.actions.updateCards(SO.toIDMap<SC.CardData>([data as SC.CardData])));
+        case ObjectType.CARD:
+          temp = SO.reducer(temp, SO.actions.updateCards(HasID.toIDMap<CardID, CardData>([data as CardData])));
           break;
         default:
       }
@@ -144,10 +146,10 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
 
       let temp = clone(state.temp);
       switch (objectType) {
-        case SO.ObjectType.BOX:
+        case ObjectType.BOX:
           delete temp.boxes[id];
           break;
-        case SO.ObjectType.CARD:
+        case ObjectType.CARD:
           delete temp.cards[id];
           break;
         default:
@@ -175,7 +177,7 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
           ...temp,
           cards: {
             ...temp.cards,
-            [id]: SC.reducer(SO.getCard(temp, id), act)
+            [id]: cardReducer(SO.getCard(temp, id), act)
           }
         }
       };
@@ -190,7 +192,7 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
           ...temp,
           boxes: {
             ...temp.boxes,
-            [id]: SB.reducer(SO.getBox(temp, id), act)
+            [id]: boxReducer(SO.getBox(temp, id), act)
           }
         }
       };

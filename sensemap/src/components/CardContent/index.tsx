@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { Form, TextArea, Input } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
-import * as SC from '../../types/sense-card';
+import * as C from '../../types/sense/card';
 
 interface Props {
-  data: SC.CardData;
+  data: C.CardData;
   onKeyUp? (e: React.KeyboardEvent<HTMLInputElement>): void;
-  onChange? (action: SC.Action): void;
+  onChange? (action: C.Action): void;
 }
 
 class CardContent extends React.PureComponent<Props> {
   static defaultProps = {
-    data: SC.emptyCardData,
+    data: C.emptyCardData,
   };
 
   render() {
@@ -25,7 +25,7 @@ class CardContent extends React.PureComponent<Props> {
           <TextArea
             placeholder="說重點"
             value={summary}
-            onChange={e => onChange && onChange(SC.updateSummary(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateSummary(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__tags">
@@ -34,7 +34,7 @@ class CardContent extends React.PureComponent<Props> {
             placeholder="tag1, tag2, tag3"
             value={tags}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SC.updateTags(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateTags(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__title">
@@ -42,7 +42,7 @@ class CardContent extends React.PureComponent<Props> {
           <TextArea
             placeholder="資料來源，e.g. 【AI全面啟動Ⅱ：台灣企業行不行？關鍵在老闆｜天下雜誌】"
             value={title}
-            onChange={e => onChange && onChange(SC.updateTitle(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateTitle(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__description">
@@ -50,7 +50,7 @@ class CardContent extends React.PureComponent<Props> {
           <TextArea
             placeholder="資料原文摘錄與補充資訊"
             value={description}
-            onChange={e => onChange && onChange(SC.updateDescription(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__url">
@@ -58,7 +58,7 @@ class CardContent extends React.PureComponent<Props> {
             placeholder="https://o.sense.tw/abcd"
             value={url}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SC.updateUrl(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateUrl(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__said-by" inline>
@@ -67,7 +67,7 @@ class CardContent extends React.PureComponent<Props> {
             placeholder="誰提出的意見？ e.g. XX 大學校長 XXX"
             value={saidBy}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SC.updateSaidBy(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateSaidBy(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__stakeholder" inline>
@@ -76,14 +76,14 @@ class CardContent extends React.PureComponent<Props> {
             placeholder="誰會被影響？（用逗號隔開）e.g. 經濟部, 半導體廠商, 大學"
             value={stakeholder}
             onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(SC.updateStakeholder(e.currentTarget.value))}
+            onChange={e => onChange && onChange(C.updateStakeholder(e.currentTarget.value))}
           />
         </Form.Field>
         <Form.Field className="card-content__card-type">
           <label>Card Type</label>
           <CardTypeSelector
             cardType={cardType}
-            onChange={type => onChange && onChange(SC.updateCardType(type))}
+            onChange={type => onChange && onChange(C.updateCardType(type))}
           />
         </Form.Field>
         {children}
