@@ -164,9 +164,7 @@ function handleMouseDown(e: any, props: Props) {
 
 // tslint:disable-next-line:no-any
 function handleMouseUp(e: any, props: Props) {
-  if (e.target && e.target.nodeType === 'Stage') {
-    props.actions.stageMouseUp();
-  }
+  props.actions.stageMouseUp();
 }
 
 export function Map(props: Props) {
