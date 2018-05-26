@@ -6,12 +6,19 @@ import * as T from '../../types';
 import * as C from '../../types/sense-card';
 import { noop, toTags } from '../../types/utils';
 import { Event as KonvaEvent } from '../../types/konva';
-import { moveStart, moveEnd } from '../../graphics/point';
+import { Point, moveStart, moveEnd } from '../../graphics/point';
+
+interface GeometryProps {
+  x: number;
+  y: number;
+}
 
 interface Props {
   mapObject: T.ObjectData;
   card: T.CardData;
   selected?: Boolean;
+  transform(g: GeometryProps): GeometryProps;
+  inverseTransform(g: GeometryProps): GeometryProps;
   toggleSelection?(e: KonvaEvent.Mouse, id: T.ObjectID): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openCard?(id: T.CardID): void;
@@ -78,7 +85,11 @@ class MapCard extends React.Component<Props, State> {
   };
 
   render() {
-    const {id, x, y, data} = this.props.mapObject;
+    const {id, data} = this.props.mapObject;
+    const { x, y } = this.props.transform({
+      x: this.props.mapObject.x,
+      y: this.props.mapObject.y,
+    });
     const {title, summary, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedTitle   = title.substr(0, titleLimit);
@@ -108,12 +119,10 @@ class MapCard extends React.Component<Props, State> {
         draggable={true}
         // tslint:disable-next-line
         onClick={(e) => toggleSelection(e, id)}
-        onDragStart={(e) => moveStart(id, x, y, e.evt.layerX, e.evt.layerY)}
+        onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}
         onDragEnd={(e) => {
-          // XXX TypeScript ought to understand this...
-          // return moveObject(id, ...moveEnd(id, e.evt.layerX, e.evt.layerY));
-          const r = moveEnd(id, e.evt.layerX, e.evt.layerY);
-          return moveObject(id, r[0], r[1]);
+          const r = moveEnd(id, new Point(e.evt.layerX, e.evt.layerY));
+          return moveObject(id, r.x, r.y);
         }}
         onDblClick={() => openCard(data)}
       >

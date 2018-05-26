@@ -17,6 +17,7 @@ export interface StateFromProps {
   cards:     T.State['senseObject']['cards'];
   boxes:     T.State['senseObject']['boxes'];
   input:     T.State['input'];
+  stage:     T.State['stage'];
 }
 
 export interface DispatchFromProps {
@@ -29,17 +30,49 @@ export interface DispatchFromProps {
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     openBox(box: T.BoxID): T.ActionChain,
     selectObject(status: OE.Status): T.ActionChain,
+    stageMouseUp(): T.ActionChain,
+    stageMouseDown(): T.ActionChain,
+    stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
   };
 }
 
-export interface OwnProps {
-  width: number;
-  height: number;
+interface GeometryProps {
+  x: number;
+  y: number;
 }
+
+interface GeometryTransform {
+  (g: GeometryProps): GeometryProps;
+}
+
+interface ViewportProps {
+  width:  number;
+  height: number;
+  top:    number;
+  left:   number;
+}
+
+export interface OwnProps extends ViewportProps {}
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
-const renderObject = (o: T.ObjectData, props: Props) => {
+function makeTransform(props: ViewportProps): GeometryTransform {
+  const { top, left } = props;
+  return ({ x, y }) => ({
+    x: x - left,
+    y: y - top,
+  });
+}
+
+function makeInverseTransform(props: ViewportProps): GeometryTransform {
+  const { top, left } = props;
+  return ({ x, y }) => ({
+    x: x + left,
+    y: y + top,
+  });
+}
+
+function renderObject(o: T.ObjectData, props: Props) {
   const addObjectToSelection = props.actions.addObjectToSelection;
   const toggleSelection = props.actions.toggleObjectSelection;
   const clearSelection = props.actions.clearSelection;
@@ -48,6 +81,8 @@ const renderObject = (o: T.ObjectData, props: Props) => {
   const selectObject = props.actions.selectObject;
   const isMultiSelectable = I.isMultiSelectable(props.input);
   const isSelected = SL.contains(props.selection, o.id);
+  const transform = makeTransform(props);
+  const inverseTransform = makeInverseTransform(props);
 
   const handleSelection = (e: KonvaEvent.Mouse, id: T.ObjectID) => {
     // stop event propagation by setting the e.cancelBubble
@@ -76,6 +111,8 @@ const renderObject = (o: T.ObjectData, props: Props) => {
       return (
         <MapCard
           mapObject={o}
+          transform={transform}
+          inverseTransform={inverseTransform}
           card={props.cards[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
@@ -90,6 +127,8 @@ const renderObject = (o: T.ObjectData, props: Props) => {
       return (
         <MapBox
           mapObject={o}
+          transform={transform}
+          inverseTransform={inverseTransform}
           box={props.boxes[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
@@ -104,7 +143,29 @@ const renderObject = (o: T.ObjectData, props: Props) => {
       throw Error(`Unknown ObjectData type ${o.objectType}`);
     }
   }
-};
+}
+
+// tslint:disable-next-line:no-any
+function handleMouseMove(e: any, props: Props) {
+  if (props.stage.mouseDown) {
+    const dx = e.evt.movementX;
+    const dy = e.evt.movementY;
+    props.actions.stageMouseMove({ dx, dy });
+  }
+  return;
+}
+
+// tslint:disable-next-line:no-any
+function handleMouseDown(e: any, props: Props) {
+  if (e.target && e.target.nodeType === 'Stage') {
+    props.actions.stageMouseDown();
+  }
+}
+
+// tslint:disable-next-line:no-any
+function handleMouseUp(e: any, props: Props) {
+  props.actions.stageMouseUp();
+}
 
 export function Map(props: Props) {
   const clearSelection = props.actions.clearSelection;
@@ -117,6 +178,10 @@ export function Map(props: Props) {
       width={props.width}
       height={props.height}
       onClick={() => clearSelection()}
+      // tslint:disable-next-line:no-console
+      onMouseDown={(e: Event) => handleMouseDown(e, props)}
+      onMouseUp={(e: Event) => handleMouseUp(e, props)}
+      onMouseMove={(e: Event) => handleMouseMove(e, props)}
     >
       <Layer>
         {objects}

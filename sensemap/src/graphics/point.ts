@@ -83,24 +83,21 @@ const accumulator = new Accumulator;
  *    can place the object onto the new position.
  *
  * @param id        string key to the object
- * @param anchorX   x anchor of the object
- * @param anchorY   y anchor of the object
- * @param cursorX   x-axis of cursor starting position
- * @param cursorY   y-axis of cursor starting position
+ * @param anchor    anchor of the object
+ * @param cursor    cursor starting position
  */
-export function moveStart(id: string, anchorX: number, anchorY: number, cursorX: number, cursorY: number): void {
-  accumulator.set(id, new Point(anchorX - cursorX, anchorY - cursorY));
+export function moveStart(id: string, anchor: Point, cursor: Point): void {
+  accumulator.set(id, cursor.subtract(anchor));
 }
 
 /**
  * Helper function to calculate moving distance.  Use with `moveStart`.
  *
  * @param id        string key to the object
- * @param cursorX   x-axis of cursor ending position
- * @param cursorY   y-axis of cursor ending position
+ * @param cursor    cursor ending position
  */
-export function moveEnd(id: string, cursorX: number, cursorY: number): [number, number] {
-  const r = accumulator.add(id, new Point(cursorX, cursorY)).toTuple();
+export function moveEnd(id: string, cursor: Point): Point {
+  const r = accumulator.add(id, cursor);
   accumulator.delete(id);
   return r;
 }
