@@ -8,6 +8,7 @@ import * as C from './sense/card';
 import { CardID, CardData, emptyCardData } from './sense/card';
 import * as B from './sense/box';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
+import * as O from './sense/object';
 import { ObjectType, ObjectID, ObjectData, emptyObjectData, objectData } from './sense/object';
 import { MapID } from './sense-map';
 import { ActionUnion, emptyAction } from './action';
@@ -245,8 +246,18 @@ const createCardObject =
 
 const moveObject =
   (id: ObjectID, x: number, y: number) =>
-  (dispatch: Dispatch) => {
-    return GO.move(id, x, y)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseObject } = getState();
+    // compute the local object position
+    const o = O.reducer(getObject(senseObject, id), O.updatePosition(x, y));
+    return Promise.resolve(o)
+      // optimistic update
+      .then((object) => dispatch(updateObjects(H.toIDMap<ObjectID, ObjectData>([
+        object
+      ]))))
+      // update the remote object
+      .then(() => GO.move(id, x, y))
+      // sync the local object
       .then((object) => dispatch(updateObjects(H.toIDMap<ObjectID, ObjectData>([
         object
       ]))));
