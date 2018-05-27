@@ -29,10 +29,11 @@ interface GraphQLObjectFields {
   belongsTo?: H.HasID<BoxID>;
 }
 
-const toObjectDataFieldData: (o: GraphQLObjectFields) => string =
-  o => {
+const toObjectDataFieldData: (o: GraphQLObjectFields, isDeleted: boolean) => string =
+  (o, isDeleted) => {
     switch (OT.fromString(o.objectType)) {
       case ObjectType.NONE: {
+        if (isDeleted) { return ''; }
         throw Error('Object loaded from backend has no objectType.');
       }
       case ObjectType.CARD: {
@@ -49,8 +50,8 @@ const toObjectDataFieldData: (o: GraphQLObjectFields) => string =
     }
   };
 
-const toObjectData: (o: GraphQLObjectFields) => ObjectData =
-  o => ({
+const toObjectData: (o: GraphQLObjectFields, isDeleted?: boolean) => ObjectData =
+  (o, isDeleted = false) => ({
     id:         o.id,
     createdAt:  +moment(o.createdAt),
     updatedAt:  +moment(o.updatedAt),
@@ -60,7 +61,7 @@ const toObjectData: (o: GraphQLObjectFields) => ObjectData =
     height:     o.height,
     zIndex:     o.zIndex,
     objectType: OT.fromString(o.objectType),
-    data:       toObjectDataFieldData(o),
+    data:       toObjectDataFieldData(o, isDeleted),
     belongsTo:  H.idOrUndefined(o.belongsTo),
   });
 
@@ -143,5 +144,10 @@ export const remove =
     `;
     const variables = { objectID };
     return client.request(query, variables)
-      .then(({ deleteObject }) => toObjectData(deleteObject));
+      .then(({ deleteObject }) => {
+        // patch the object type, because Graphcool will not sync it with the
+        // box/card field for us
+        deleteObject.objectType = 'NONE';
+        return toObjectData(deleteObject, true);
+      });
   };
