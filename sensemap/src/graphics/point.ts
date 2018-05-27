@@ -87,7 +87,7 @@ const accumulator = new Accumulator;
  * @param cursor    cursor starting position
  */
 export function moveStart(id: string, anchor: Point, cursor: Point): void {
-  accumulator.set(id, cursor.subtract(anchor));
+  accumulator.set(id, anchor.subtract(cursor));
 }
 
 /**

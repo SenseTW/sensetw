@@ -99,7 +99,8 @@ class MapBox extends React.Component<Props, State> {
         onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}
         onDragEnd={(e) => {
           const r = moveEnd(id, new Point(e.evt.layerX, e.evt.layerY));
-          return moveObject(id, r.x, r.y);
+          const p = this.props.inverseTransform({ x: r.x, y: r.y });
+          return moveObject(id, p.x, p.y);
         }}
         onDblClick={() => openBox(boxID)}
       >
