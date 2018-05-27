@@ -12,6 +12,7 @@ import * as T from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
+import * as V from '../../types/viewport';
 import { Action as BoxAction } from '../../types/sense/box';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
@@ -34,7 +35,7 @@ interface DispatchFromProps {
     updateRemoteBox(box: T.BoxData): T.ActionChain,
     updateRemoteCard(card: T.CardData): T.ActionChain,
     addCardToBox(cardObject: T.ObjectID, box: T.BoxID): T.ActionChain,
-    resizeViewpart(dimension: SM.DimensionInMap): T.ActionChain,
+    resizeViewpart(dimension: V.Dimension): T.ActionChain,
     keyPress(key: Key): T.ActionChain,
     keyRelease(key: Key): T.ActionChain,
     updateBox(id: T.BoxID, action: BoxAction): T.ActionChain;
@@ -49,7 +50,7 @@ type Props = StateFromProps & DispatchFromProps;
 class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions } = this.props;
-    actions.resizeViewpart([width, height]);
+    actions.resizeViewpart({ width, height });
   }
 
   handleKeyUp = (e: KeyboardEvent) => {
@@ -213,8 +214,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.updateRemoteCard(card)),
       addCardToBox: (cardObject: T.ObjectID, box: T.BoxID) =>
         dispatch(T.actions.senseObject.addCardToBox(cardObject, box)),
-      resizeViewpart: (dimension: SM.DimensionInMap) =>
-        dispatch(T.actions.senseMap.resizeViewport(dimension)),
+      resizeViewpart: (dimension: V.Dimension) =>
+        dispatch(T.actions.viewport.resizeViewport(dimension)),
       keyPress: (key: Key) =>
         dispatch(T.actions.input.keyPress(key)),
       keyRelease: (key: Key) =>

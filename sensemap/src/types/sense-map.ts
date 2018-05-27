@@ -37,8 +37,6 @@ export enum InboxVisibility {
   HIDDEN  = 'HIDDEN',
 }
 
-export type DimensionInMap = [number, number];
-
 const SET_SCOPE_TO_BOX = 'SET_SCOPE_TO_BOX';
 /**
  * A message to set the scope to a box.
@@ -92,26 +90,12 @@ const closeBox =
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
-const RESIZE_VIEWPORT = 'RESIZE_VIEWPORT';
-/**
- * A message to resize the view port. So we can create objects in the center of
- * our viewport.
- *
- * @param {DimensionInMap} dimension The new dimension(width, height).
- */
-const resizeViewport =
-  (dimension: DimensionInMap) => ({
-    type: RESIZE_VIEWPORT as typeof RESIZE_VIEWPORT,
-    payload: { dimension }
-  });
-
 /**
  * The data constructors of map actions.
  */
 const syncActions = {
   setScopeToBox,
   setScopeToFullmap,
-  resizeViewport,
   openInbox,
   closeInbox,
 };
@@ -127,7 +111,6 @@ export type Action = ActionUnion<typeof syncActions>;
 export type State = {
   map: MapID,
   scope: MapScope,
-  dimension: DimensionInMap,
   inbox: InboxVisibility,
 };
 
@@ -136,7 +119,6 @@ export const initial: State = {
   scope: {
     type: MapScopeType.FULL_MAP,
   },
-  dimension: [0, 0],
   inbox: InboxVisibility.HIDDEN,
 };
 
@@ -159,10 +141,6 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     }
     case CLOSE_INBOX: {
       return { ...state, inbox: InboxVisibility.HIDDEN };
-    }
-    case RESIZE_VIEWPORT: {
-      const { dimension } = action.payload;
-      return { ...state, dimension };
     }
     default:
       return state;

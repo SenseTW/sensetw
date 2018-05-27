@@ -201,9 +201,9 @@ const createBoxObject =
   async (dispatch: Dispatch, getState: GetState) => {
     const action = await createBox(mapId, box)(dispatch);
     const { id = '' } = Object.values(action.payload)[0] || {};
-    const { senseMap: { dimension } } = getState();
-    const x = (dimension[0] - B.DEFAULT_WIDTH) / 2;
-    const y = (dimension[1] - B.DEFAULT_HEIGHT) / 2;
+    const { viewport: { width, height, top, left } } = getState();
+    const x = left + (width - B.DEFAULT_WIDTH) / 2;
+    const y = top + (height - B.DEFAULT_HEIGHT) / 2;
     return createObject(
       mapId,
       objectData({
@@ -217,9 +217,9 @@ const createBoxObject =
 const createObjectForCard =
   (mapId: MapID, cardId: CardID, box?: BoxID) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { dimension } } = getState();
-    const x = (dimension[0] - C.DEFAULT_WIDTH) / 2;
-    const y = (dimension[1] - C.DEFAULT_HEIGHT) / 2;
+    const { viewport: { width, height, top, left } } = getState();
+    const x = left + (width - C.DEFAULT_WIDTH) / 2;
+    const y = top + (height - C.DEFAULT_HEIGHT) / 2;
     const action = await createObject(
       mapId,
       objectData({

@@ -5,6 +5,11 @@ type Position = {
   y: number;
 };
 
+export type Dimension = {
+  width: number;
+  height: number;
+};
+
 type ZoomLevel = number;
 
 export type State = {
@@ -35,9 +40,23 @@ const zoomViewport =
     payload: { level }
   });
 
+const RESIZE_VIEWPORT = 'RESIZE_VIEWPORT';
+/**
+ * A message to resize the view port. So we can create objects in the center of
+ * our viewport.
+ *
+ * @param {DimensionInMap} dimension The new dimension(width, height).
+ */
+const resizeViewport =
+  (dimension: Dimension) => ({
+    type: RESIZE_VIEWPORT as typeof RESIZE_VIEWPORT,
+    payload: { dimension }
+  });
+
 export const actions = {
   panViewport,
   zoomViewport,
+  resizeViewport,
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -53,6 +72,10 @@ export const reducer = (state: State = initial, action: Action): State => {
     }
     case ZOOM_VIEWPORT: {
       return state;
+    }
+    case RESIZE_VIEWPORT: {
+      const { width, height } = action.payload.dimension;
+      return { ...state, width, height };
     }
     default: return state;
   }
