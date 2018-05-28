@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import * as T from '../../types';
 import * as F from '../../types/sense/focus';
+import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
 
 interface OwnProps extends CO.OwnProps {
@@ -45,44 +46,13 @@ class Map extends React.Component<Props> {
   }
 
   render() {
-    let componentProps = this.props;
-    if (this.props.scope.type === T.MapScopeType.BOX && !!this.props.scope.box) {
-      const box = this.props.senseObject.boxes[this.props.scope.box];
-      if (!!box) {
-        const objects = Object.keys(box.contains).reduce(
-          (acc, id) => {
-            if (!!this.props.senseObject.objects[id]) {
-              acc[id] = this.props.senseObject.objects[id];
-            }
-            return acc;
-          },
-          {});
-        componentProps = {
-          ...this.props,
-          senseObject: {
-            ...this.props.senseObject,
-            objects,
-          },
-        };
-      }
-    } else {
-      const objects = Object.values(this.props.senseObject.objects)
-        .filter(o => !o.belongsTo)
-        .reduce(
-          (acc, o) => {
-            acc[o.id] = o;
-            return acc;
-          },
-          {});
-      componentProps = {
-        ...this.props,
-        senseObject: {
-          ...this.props.senseObject,
-          objects,
-        },
-      };
-    }
-    return <CO.Map {...componentProps} />;
+    const senseObject =
+      (this.props.scope.type === T.MapScopeType.BOX
+      && !!this.props.scope.box
+      && SO.doesBoxExist(this.props.senseObject, this.props.scope.box))
+        ? SO.scopedToBox(this.props.senseObject, this.props.scope.box)
+        : SO.scopedToMap(this.props.senseObject);
+    return <CO.Map {...this.props} senseObject={senseObject} />;
   }
 }
 

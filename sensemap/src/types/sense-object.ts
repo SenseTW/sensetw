@@ -36,6 +36,7 @@ export const getCard = (state: State, id: CardID): CardData => state.cards[id] |
 export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
 export const getEdge = (state: State, id: EdgeID): Edge => state.edges[id] || emptyEdge;
 
+export const doesObjectExist = (state: State, id: ObjectID): boolean => !!state.objects[id];
 export const doesCardExist = (state: State, id: CardID): boolean => !!state.cards[id];
 export const doesBoxExist = (state: State, id: BoxID): boolean => !!state.boxes[id];
 export const doesEdgeExist = (state: State, id: EdgeID): boolean => !!state.edges[id];
@@ -46,6 +47,38 @@ export const getBoxOrDefault = (state: State, defaultState: State, id: BoxID): B
   state.boxes[id] || defaultState.boxes[id] || emptyBoxData;
 export const getEdgeOrDefault = (state: State, defaultState: State, id: EdgeID): Edge =>
   state.edges[id] || defaultState.edges[id] || emptyEdge;
+
+export const scoped = (state: State, filter: (key: ObjectID) => boolean): State => {
+  const objects = Object.keys(state.objects)
+    .filter(filter)
+    .reduce(
+      (acc, key) => {
+        acc[key] = getObject(state, key);
+        return acc;
+      },
+      {});
+  const edges = Object.values(state.edges)
+    .filter(g => !!objects[g.from] && !!objects[g.to])
+    .reduce(
+      (acc, g) => {
+        acc[g.id] = g;
+        return acc;
+      },
+      {});
+  const { cards, boxes } = state;
+  return { objects, cards, boxes, edges };
+};
+
+export const scopedToBox = (state: State, id: BoxID): State => {
+  const { contains } = getBox(state, id);
+  const filter = (key: ObjectID): boolean => !!contains[key];
+  return scoped(state, filter);
+};
+
+export const scopedToMap = (state: State): State => {
+  const filter = (key: ObjectID): boolean => !getObject(state, key).belongsTo;
+  return scoped(state, filter);
+};
 
 /**
  * Partially update `objects` state.
