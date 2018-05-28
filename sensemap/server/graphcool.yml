@@ -25,8 +25,14 @@ permissions:
 - operation: Object.create
 - operation: Object.update
 - operation: Object.delete
+- operation: Edge.read
+- operation: Edge.create
+- operation: Edge.update
+- operation: Edge.delete
 - operation: MapObjects.connect
 - operation: MapObjects.disconnect
+- operation: MapEdges.connect
+- operation: MapEdges.disconnect
 - operation: MapCards.connect
 - operation: MapCards.disconnect
 - operation: MapBoxes.connect
@@ -37,4 +43,8 @@ permissions:
 - operation: ObjectBox.disconnect
 - operation: ContainCards.connect
 - operation: ContainCards.disconnect
+- operation: EdgeFrom.connect
+- operation: EdgeFrom.disconnect
+- operation: EdgeTo.connect
+- operation: EdgeTo.disconnect
 rootTokens: []

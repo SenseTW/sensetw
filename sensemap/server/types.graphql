@@ -3,6 +3,7 @@ type Map @model {
   createdAt: DateTime!
   updatedAt: DateTime!
   objects: [Object!]! @relation(name: "MapObjects")
+  edges: [Edge!]! @relation(name: "MapEdges")
   cards: [Card!]! @relation(name: "MapCards")
   boxes: [Box!]! @relation(name: "MapBoxes")
 }
@@ -33,6 +34,17 @@ type Object @model {
   card: Card @relation(name: "ObjectCard")
   box: Box @relation(name: "ObjectBox")
   belongsTo: Box @relation(name: "ContainCards")
+  outgoing: [Edge!]! @relation(name: "EdgeFrom")
+  incoming: [Edge!]! @relation(name: "EdgeTo")
+}
+
+type Edge @model {
+  id: ID! @isUnique
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  map: Map! @relation(name: "MapEdges")
+  from: Object! @relation(name: "EdgeFrom")
+  to: Object! @relation(name: "EdgeTo")
 }
 
 type Card @model {
