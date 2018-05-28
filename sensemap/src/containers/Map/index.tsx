@@ -47,20 +47,26 @@ class Map extends React.Component<Props> {
   render() {
     let componentProps = this.props;
     if (this.props.scope.type === T.MapScopeType.BOX && !!this.props.scope.box) {
-      const box = this.props.boxes[this.props.scope.box];
+      const box = this.props.senseObject.boxes[this.props.scope.box];
       if (!!box) {
         const objects = Object.keys(box.contains).reduce(
           (acc, id) => {
-            if (!!this.props.objects[id]) {
-              acc[id] = this.props.objects[id];
+            if (!!this.props.senseObject.objects[id]) {
+              acc[id] = this.props.senseObject.objects[id];
             }
             return acc;
           },
           {});
-        componentProps = { ...this.props, objects };
+        componentProps = {
+          ...this.props,
+          senseObject: {
+            ...this.props.senseObject,
+            objects,
+          },
+        };
       }
     } else {
-      const objects = Object.values(this.props.objects)
+      const objects = Object.values(this.props.senseObject.objects)
         .filter(o => !o.belongsTo)
         .reduce(
           (acc, o) => {
@@ -68,7 +74,13 @@ class Map extends React.Component<Props> {
             return acc;
           },
           {});
-      componentProps = { ...this.props, objects };
+      componentProps = {
+        ...this.props,
+        senseObject: {
+          ...this.props.senseObject,
+          objects,
+        },
+      };
     }
     return <CO.Map {...componentProps} />;
   }
@@ -77,11 +89,8 @@ class Map extends React.Component<Props> {
 export default connect<StateFromProps, DispatchFromProps, OwnProps>(
   (state: T.State) => ({
     selection: state.selection,
+    senseObject: state.senseObject,
     scope: state.senseMap.scope,
-    objects: state.senseObject.objects,
-    cards: state.senseObject.cards,
-    boxes: state.senseObject.boxes,
-    edges: state.senseObject.edges,
     input: state.input,
     stage: state.stage,
   }),

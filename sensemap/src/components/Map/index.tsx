@@ -15,10 +15,7 @@ import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
   selection: T.State['selection'];
-  objects:   T.State['senseObject']['objects'];
-  cards:     T.State['senseObject']['cards'];
-  boxes:     T.State['senseObject']['boxes'];
-  edges:     T.State['senseObject']['edges'];
+  senseObject: T.State['senseObject'];
   input:     T.State['input'];
   stage:     T.State['stage'];
 }
@@ -77,8 +74,9 @@ function makeInverseTransform(props: ViewportProps): GeometryTransform {
 }
 
 function renderEdge(e: T.Edge, props: Props) {
-  const from = props.objects[e.from];
-  const to = props.objects[e.to];
+  const { senseObject: { objects } } = props;
+  const from = objects[e.from];
+  const to = objects[e.to];
   return <Edge key={e.id} from={from} to={to} />;
 }
 
@@ -120,7 +118,7 @@ function renderObject(o: T.ObjectData, props: Props) {
       return <Group key={o.id} />;
     }
     case T.ObjectType.CARD: {
-      if (!props.cards[o.data]) {
+      if (!props.senseObject.cards[o.data]) {
         return <Group key={o.id} />;
       }
       return (
@@ -129,7 +127,7 @@ function renderObject(o: T.ObjectData, props: Props) {
           mapObject={o}
           transform={transform}
           inverseTransform={inverseTransform}
-          card={props.cards[o.data]}
+          card={props.senseObject.cards[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
           moveObject={moveObject}
@@ -137,7 +135,7 @@ function renderObject(o: T.ObjectData, props: Props) {
         />);
     }
     case T.ObjectType.BOX: {
-      if (!props.boxes[o.data]) {
+      if (!props.senseObject.boxes[o.data]) {
         return <Group key={o.id} />;
       }
       return (
@@ -146,7 +144,7 @@ function renderObject(o: T.ObjectData, props: Props) {
           mapObject={o}
           transform={transform}
           inverseTransform={inverseTransform}
-          box={props.boxes[o.data]}
+          box={props.senseObject.boxes[o.data]}
           selected={isSelected}
           toggleSelection={handleSelection}
           moveObject={moveObject}
@@ -186,8 +184,8 @@ function handleMouseUp(e: any, props: Props) {
 
 export function Map(props: Props) {
   const clearSelection = props.actions.clearSelection;
-  const objects = Object.values(props.objects).map(o => renderObject(o, props));
-  const edges = Object.values(props.edges).map(g => renderEdge(g, props));
+  const objects = Object.values(props.senseObject.objects).map(o => renderObject(o, props));
+  const edges = Object.values(props.senseObject.edges).map(g => renderEdge(g, props));
   let stage: Stage | null = null;
 
   return (
