@@ -21,6 +21,7 @@ interface DispatchFromProps extends CO.DispatchFromProps {
     loadObjects(id: T.MapID): T.ActionChain,
     loadCards(id: T.MapID): T.ActionChain,
     loadBoxes(id: T.MapID): T.ActionChain,
+    loadEdges(id: T.MapID): T.ActionChain,
     moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
     addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
@@ -40,6 +41,7 @@ class Map extends React.Component<Props> {
     this.props.actions.loadObjects(this.props.id);
     this.props.actions.loadCards(this.props.id);
     this.props.actions.loadBoxes(this.props.id);
+    this.props.actions.loadEdges(this.props.id);
   }
 
   render() {
@@ -96,6 +98,8 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
         dispatch(T.actions.senseObject.loadCards(id)),
       loadBoxes: (id: T.MapID) =>
         dispatch(T.actions.senseObject.loadBoxes(id)),
+      loadEdges: (id: T.MapID) =>
+        dispatch(T.actions.senseObject.loadEdges(id)),
       moveObject: (id: T.ObjectID, x: number, y: number) =>
         dispatch(T.actions.senseObject.moveObject(id, x, y)),
       addCardToBox: (card: T.ObjectID, box: T.BoxID) =>
