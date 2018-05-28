@@ -3,6 +3,7 @@ import * as G from './graphql';
 import * as GO from './graphql/object';
 import * as GC from './graphql/card';
 import * as GB from './graphql/box';
+import * as GE from './graphql/edge';
 import * as H from './sense/has-id';
 import * as C from './sense/card';
 import { CardID, CardData, emptyCardData } from './sense/card';
@@ -10,6 +11,7 @@ import * as B from './sense/box';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
 import * as O from './sense/object';
 import { ObjectType, ObjectID, ObjectData, emptyObjectData, objectData } from './sense/object';
+import { Edge, EdgeID, emptyEdge } from './sense/edge';
 import { MapID } from './sense-map';
 import { ActionUnion, emptyAction } from './action';
 import * as SL from './selection';
@@ -19,25 +21,31 @@ export type State = {
   objects: { [key: string]: ObjectData },
   cards:   { [key: string]: CardData },
   boxes:   { [key: string]: BoxData },
+  edges:   { [key: string]: Edge },
 };
 
 export const initial: State = {
   objects: {},
   cards:   {},
   boxes:   {},
+  edges:   {},
 };
 
 export const getObject = (state: State, id: ObjectID): ObjectData => state.objects[id] || emptyObjectData;
 export const getCard = (state: State, id: CardID): CardData => state.cards[id] || emptyCardData;
 export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
+export const getEdge = (state: State, id: EdgeID): Edge => state.edges[id] || emptyEdge;
 
 export const doesCardExist = (state: State, id: CardID): boolean => !!state.cards[id];
 export const doesBoxExist = (state: State, id: BoxID): boolean => !!state.boxes[id];
+export const doesEdgeExist = (state: State, id: EdgeID): boolean => !!state.edges[id];
 
 export const getCardOrDefault = (state: State, defaultState: State, id: CardID): CardData =>
   state.cards[id] || defaultState.cards[id] || emptyCardData;
 export const getBoxOrDefault = (state: State, defaultState: State, id: BoxID): BoxData =>
   state.boxes[id] || defaultState.boxes[id] || emptyBoxData;
+export const getEdgeOrDefault = (state: State, defaultState: State, id: EdgeID): Edge =>
+  state.edges[id] || defaultState.edges[id] || emptyEdge;
 
 /**
  * Partially update `objects` state.
@@ -88,6 +96,20 @@ const overwriteBoxes =
   (boxes: State['boxes']) => ({
     type: OVERWRITE_BOXES as typeof OVERWRITE_BOXES,
     payload: boxes,
+  });
+
+const UPDATE_EDGES = 'UPDATE_EDGES';
+const updateEdges =
+  (edges: State['edges']) => ({
+    type: UPDATE_EDGES as typeof UPDATE_EDGES,
+    payload: edges,
+  });
+
+const OVERWRITE_EDGES = 'OVERWRITE_EDGES';
+const overwriteEdges =
+  (edges: State['edges']) => ({
+    type: OVERWRITE_EDGES as typeof OVERWRITE_EDGES,
+    payload: edges,
   });
 
 /**
@@ -168,6 +190,14 @@ const loadBoxes =
     return GB.loadBoxes(id)
       .then(data => H.toIDMap<BoxID, BoxData>(data))
       .then(data => dispatch(overwrite ? overwriteBoxes(data) : updateBoxes(data)));
+  };
+
+const loadEdges =
+  (id: MapID, overwrite: Boolean = false) =>
+  (dispatch: Dispatch) => {
+    return GE.load(id)
+      .then(data => H.toIDMap<EdgeID, Edge>(data))
+      .then(data => dispatch(overwrite ? overwriteEdges(data) : updateEdges(data)));
   };
 
 const addCardToBox =
@@ -339,6 +369,8 @@ export const syncActions = {
   overwriteCards,
   updateBoxes,
   overwriteBoxes,
+  updateEdges,
+  overwriteEdges,
   updateNotInBox,
   updateInBox,
 };
@@ -350,6 +382,7 @@ export const actions = {
   loadObjects,
   loadCards,
   loadBoxes,
+  loadEdges,
   createCard,
   createBoxObject,
   createObjectForCard,
@@ -404,6 +437,12 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
         ...state,
         boxes: action.payload,
       };
+    }
+    case UPDATE_EDGES: {
+      return { ...state, edges: { ...state.edges, ...action.payload } };
+    }
+    case OVERWRITE_EDGES: {
+      return { ...state, edges: action.payload };
     }
     case UPDATE_NOT_IN_BOX: {
       const box        = state.boxes[action.payload.box];
