@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import MapTagList from '../MapTagList';
-import * as T from '../../types';
-import * as B from '../../types/sense/box';
-import { noop, toTags } from '../../types/utils';
-import { Event as KonvaEvent } from '../../types/konva';
-import { Point, moveStart, moveEnd } from '../../graphics/point';
+import TagList from '../TagList';
+import * as T from '../../../types';
+import * as B from '../../../types/sense/box';
+import { noop, toTags } from '../../../types/utils';
+import { Event as KonvaEvent } from '../../../types/konva';
+import { Point, moveStart, moveEnd } from '../../../graphics/point';
 
 interface GeometryProps {
   x: number;
@@ -56,7 +56,7 @@ const selectedStrokeWidth = 2;
 const tagLeft = 8;
 const tagBottom = 8;
 
-class MapBox extends React.Component<Props, State> {
+class Box extends React.Component<Props, State> {
   state = {
     tagHeight: 0
   };
@@ -124,7 +124,7 @@ class MapBox extends React.Component<Props, State> {
           padding={titlePadding}
           text={title}
         />
-        <MapTagList
+        <TagList
           x={tagLeft}
           y={height - tagBottom - tagHeight}
           tags={toTags(tags)}
@@ -135,4 +135,4 @@ class MapBox extends React.Component<Props, State> {
   }
 }
 
-export default MapBox;
+export default Box;

@@ -1,8 +1,8 @@
 
 import * as React from 'react';
 import { Stage, Layer } from 'react-konva';
-import MapBox from '../MapBox';
-import MapCard from '../MapCard';
+import Box from './Box';
+import Card from './Card';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
@@ -116,7 +116,7 @@ function renderObject(o: T.ObjectData, props: Props) {
         return <Group key={o.id} />;
       }
       return (
-        <MapCard
+        <Card
           key={o.id}
           mapObject={o}
           transform={transform}
@@ -133,7 +133,7 @@ function renderObject(o: T.ObjectData, props: Props) {
         return <Group key={o.id} />;
       }
       return (
-        <MapBox
+        <Box
           key={o.id}
           mapObject={o}
           transform={transform}

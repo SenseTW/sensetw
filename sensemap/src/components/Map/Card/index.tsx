@@ -1,12 +1,11 @@
-
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import MapTagList from '../MapTagList';
-import * as T from '../../types';
-import * as C from '../../types/sense/card';
-import { noop, toTags } from '../../types/utils';
-import { Event as KonvaEvent } from '../../types/konva';
-import { Point, moveStart, moveEnd } from '../../graphics/point';
+import TagList from '../TagList';
+import * as T from '../../../types';
+import * as C from '../../../types/sense/card';
+import { noop, toTags } from '../../../types/utils';
+import { Event as KonvaEvent } from '../../../types/konva';
+import { Point, moveStart, moveEnd } from '../../../graphics/point';
 
 interface GeometryProps {
   x: number;
@@ -79,7 +78,7 @@ const selectedStrokeWidth = 3;
 const tagLeft = 8;
 const tagBottom = 8;
 
-class MapCard extends React.Component<Props, State> {
+class Card extends React.Component<Props, State> {
   state = {
     tagHeight: 0
   };
@@ -160,7 +159,7 @@ class MapCard extends React.Component<Props, State> {
           fill={titleColor}
           text={sanitizedTitle}
         />
-        <MapTagList
+        <TagList
           x={tagLeft}
           y={height - tagBottom - tagHeight}
           tags={toTags(tags)}
@@ -171,4 +170,4 @@ class MapCard extends React.Component<Props, State> {
   }
 }
 
-export default MapCard;
+export default Card;

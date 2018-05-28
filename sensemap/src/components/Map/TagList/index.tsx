@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Group } from 'react-konva';
-import MapTag from '../MapTag';
-import { noop } from '../../types/utils';
+import Tag from '../Tag';
+import { noop } from '../../../types/utils';
 
 interface Props {
   x?: number;
@@ -17,7 +17,7 @@ interface State {
 
 const tagMargin = 4;
 
-class MapTagList extends React.Component<Props, State> {
+class TagList extends React.Component<Props, State> {
   state = {
     w: 0,
     h: 0,
@@ -54,13 +54,13 @@ class MapTagList extends React.Component<Props, State> {
 
     return (
       <Group x={x} y={y}>
-        <MapTag
+        <Tag
           text={t}
           onResize={this.handleResize}
         />
         {
           ts.length !== 0 &&
-          <MapTagList
+          <TagList
             x={width + tagMargin}
             tags={ts}
             onResize={this.handleRestResize}
@@ -71,4 +71,4 @@ class MapTagList extends React.Component<Props, State> {
   }
 }
 
-export default MapTagList;
+export default TagList;

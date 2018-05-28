@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text as TextNode } from 'konva';
 import { Group, Rect, Text } from 'react-konva';
-import { noop } from '../../types/utils';
+import { noop } from '../../../types/utils';
 
 const tagPadding = 4;
 const tagBackground = '#d8d8d8';
@@ -21,7 +21,7 @@ interface State {
   h: number;
 }
 
-class MapTag extends React.Component<Props, State> {
+class Tag extends React.Component<Props, State> {
   state = {
     w: 0,
     h: 0,
@@ -72,4 +72,4 @@ class MapTag extends React.Component<Props, State> {
   }
 }
 
-export default MapTag;
+export default Tag;
