@@ -81,6 +81,7 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
     objects: state.senseObject.objects,
     cards: state.senseObject.cards,
     boxes: state.senseObject.boxes,
+    edges: state.senseObject.edges,
     input: state.input,
     stage: state.stage,
   }),

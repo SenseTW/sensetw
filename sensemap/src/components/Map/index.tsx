@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Stage, Layer } from 'react-konva';
 import Box from './Box';
 import Card from './Card';
+import Edge from './Edge';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import * as T from '../../types';
@@ -17,6 +18,7 @@ export interface StateFromProps {
   objects:   T.State['senseObject']['objects'];
   cards:     T.State['senseObject']['cards'];
   boxes:     T.State['senseObject']['boxes'];
+  edges:     T.State['senseObject']['edges'];
   input:     T.State['input'];
   stage:     T.State['stage'];
 }
@@ -72,6 +74,12 @@ function makeInverseTransform(props: ViewportProps): GeometryTransform {
     x: x + left,
     y: y + top,
   });
+}
+
+function renderEdge(e: T.Edge, props: Props) {
+  const from = props.objects[e.from];
+  const to = props.objects[e.to];
+  return <Edge key={e.id} from={from} to={to} />;
 }
 
 function renderObject(o: T.ObjectData, props: Props) {
@@ -179,6 +187,7 @@ function handleMouseUp(e: any, props: Props) {
 export function Map(props: Props) {
   const clearSelection = props.actions.clearSelection;
   const objects = Object.values(props.objects).map(o => renderObject(o, props));
+  const edges = Object.values(props.edges).map(g => renderEdge(g, props));
   let stage: Stage | null = null;
 
   return (
@@ -193,6 +202,7 @@ export function Map(props: Props) {
       onMouseMove={(e: Event) => handleMouseMove(e, props)}
     >
       <Layer>
+        {edges}
         {objects}
       </Layer>
     </Stage>
