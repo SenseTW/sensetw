@@ -115,9 +115,7 @@ class MapCard extends React.Component<Props, State> {
       <Group
         x={x}
         y={y}
-        key={id}
         draggable={true}
-        // tslint:disable-next-line
         onClick={(e) => toggleSelection(e, this.props.mapObject)}
         onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}
         onDragEnd={(e) => {

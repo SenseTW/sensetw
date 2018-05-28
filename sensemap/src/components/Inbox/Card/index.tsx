@@ -14,8 +14,8 @@ function renderCardTags({ tags }: { tags: string }) {
   const eachTag = tags.split(',').filter(t => t.length > 0);
   return (
     <div className="card__tag-panel">
-      {eachTag.map(tagName => (
-        <div className="card__tag">
+      {eachTag.map((tagName, i) => (
+        <div className="card__tag" key={i}>
           {tagName}
         </div>
       ))}

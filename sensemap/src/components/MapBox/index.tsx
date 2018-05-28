@@ -93,7 +93,6 @@ class MapBox extends React.Component<Props, State> {
       <Group
         x={x}
         y={y}
-        key={id}
         draggable={true}
         onClick={(e) => toggleSelection(e, this.props.mapObject)}
         onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}

@@ -109,14 +109,15 @@ function renderObject(o: T.ObjectData, props: Props) {
 
   switch (o.objectType) {
     case T.ObjectType.NONE: {
-      return <Group />;
+      return <Group key={o.id} />;
     }
     case T.ObjectType.CARD: {
       if (!props.cards[o.data]) {
-        return <Group />;
+        return <Group key={o.id} />;
       }
       return (
         <MapCard
+          key={o.id}
           mapObject={o}
           transform={transform}
           inverseTransform={inverseTransform}
@@ -129,10 +130,11 @@ function renderObject(o: T.ObjectData, props: Props) {
     }
     case T.ObjectType.BOX: {
       if (!props.boxes[o.data]) {
-        return <Group />;
+        return <Group key={o.id} />;
       }
       return (
         <MapBox
+          key={o.id}
           mapObject={o}
           transform={transform}
           inverseTransform={inverseTransform}
