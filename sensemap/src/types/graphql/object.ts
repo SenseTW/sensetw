@@ -37,7 +37,7 @@ const toObjectDataFieldData: (o: GraphQLObjectFields, isDeleted: boolean) => str
         throw Error('Object loaded from backend has no objectType.');
       }
       case ObjectType.CARD: {
-        return H.idOrError('Object of type CARD does not has Card ID.',
+        return H.idOrError(`Object <id=${o.id}> of type CARD does not has Card ID.`,
                            o.card);
       }
       case ObjectType.BOX: {
