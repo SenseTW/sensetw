@@ -1,3 +1,4 @@
+import { Key } from 'ts-keycode-enum';
 import { Dispatch, GetState } from '.';
 import { ActionUnion, emptyAction } from './action';
 import * as V from './viewport';
@@ -24,7 +25,7 @@ const stageMouseMove =
   ({ dx, dy }: { dx: number, dy: number }) =>
   async (dispatch: Dispatch, getState: GetState) => {
     const { stage: { mouseDown }, input: { keyStatus } } = getState();
-    if (mouseDown && keyStatus[32]) {
+    if (mouseDown && keyStatus[Key.Space]) {
       return dispatch(V.actions.panViewport({ x: dx, y: dy }));
     }
     return dispatch(emptyAction);
