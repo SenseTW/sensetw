@@ -23,8 +23,8 @@ const stageMouseUp = () => ({
 const stageMouseMove =
   ({ dx, dy }: { dx: number, dy: number }) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const { stage: { mouseDown } } = getState();
-    if (mouseDown) {
+    const { stage: { mouseDown }, input: { keyStatus } } = getState();
+    if (mouseDown && keyStatus[32]) {
       return dispatch(V.actions.panViewport({ x: dx, y: dy }));
     }
     return dispatch(emptyAction);
