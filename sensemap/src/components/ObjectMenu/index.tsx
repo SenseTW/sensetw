@@ -33,6 +33,7 @@ interface DispatchFromProps {
     deleteObject(object: T.ObjectID): T.ActionChain,
     unboxCards(box: T.BoxID): T.ActionChain,
     openInbox(): T.ActionChain,
+    createEdge(map: T.MapID, from: T.ObjectID, to: T.ObjectID): T.ActionChain,
   };
 }
 
@@ -134,6 +135,20 @@ class ObjectMenu extends React.PureComponent<Props> {
       case T.MapScopeType.FULL_MAP:
       default:
     }
+  }
+
+  canCreateEdge(): boolean {
+    return this.props.selection.length === 2;
+  }
+
+  handleCreateEdge(): void {
+    if (!this.canCreateEdge()) {
+      return;
+    }
+    const map  = this.props.senseMap.map;
+    const from = this.props.selection[0];
+    const to   = this.props.selection[1];
+    this.props.actions.createEdge(map, from, to);
   }
 
   render() {
@@ -238,6 +253,15 @@ class ObjectMenu extends React.PureComponent<Props> {
             Unbox
           </Menu.Item>
         }
+        {
+          this.canCreateEdge() &&
+          <Menu.Item
+            name="createEdge"
+            onClick={() => this.handleCreateEdge()}
+          >
+            連線
+          </Menu.Item>
+        }
       </Menu>
     );
   }
@@ -272,6 +296,8 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.unboxCards(box)),
       openInbox: () =>
         dispatch(T.actions.senseMap.openInbox()),
+      createEdge: (map, from, to) =>
+        dispatch(T.actions.senseObject.createEdge(map, from, to)),
     }
   })
 )(ObjectMenu);
