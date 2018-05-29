@@ -38,3 +38,22 @@ export const load =
     return client.request(query, variables)
       .then(({ allEdges }) => allEdges.map(toEdge));
   };
+
+export const create =
+  (map: MapID, from: ObjectID, to: ObjectID) => {
+    const query = `
+      mutation CreateEdge(
+        $map: ID,
+        $from: ID,
+        $to: ID
+      ) {
+        createEdge(mapId: $map, fromId: $from, toId: $to) {
+          ...edgeFields
+        }
+      }
+      ${graphQLEdgeFieldsFragment}
+    `;
+    const variables = { map, from, to };
+    return client.request(query, variables)
+      .then(({ createEdge }) => toEdge(createEdge));
+  };
