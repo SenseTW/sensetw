@@ -9,7 +9,7 @@ export interface Props {
 
 export function Edge(props: Props) {
   return (
-    <Line points={[100, 100, 200, 200]} stroke="black" />
+    <Line points={[300, 100, 500, 700]} stroke="black" />
   );
 }
 

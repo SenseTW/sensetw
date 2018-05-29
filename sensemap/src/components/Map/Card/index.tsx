@@ -5,19 +5,14 @@ import * as T from '../../../types';
 import * as C from '../../../types/sense/card';
 import { noop, toTags } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
-import { Point, moveStart, moveEnd } from '../../../graphics/point';
-
-interface GeometryProps {
-  x: number;
-  y: number;
-}
+import * as G from '../../../graphics/point';
 
 interface Props {
   mapObject: T.ObjectData;
   card: T.CardData;
   selected?: Boolean;
-  transform(g: GeometryProps): GeometryProps;
-  inverseTransform(g: GeometryProps): GeometryProps;
+  transform: G.Transform;
+  inverseTransform: G.Transform;
   toggleSelection?(e: KonvaEvent.Mouse, object: T.ObjectData): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openCard?(id: T.CardID): void;
@@ -116,9 +111,9 @@ class Card extends React.Component<Props, State> {
         y={y}
         draggable={true}
         onClick={(e) => toggleSelection(e, this.props.mapObject)}
-        onDragStart={(e) => moveStart(id, new Point(x, y), new Point(e.evt.layerX, e.evt.layerY))}
+        onDragStart={(e) => G.moveStart(id, { x, y }, { x: e.evt.layerX, y: e.evt.layerY })}
         onDragEnd={(e) => {
-          const r = moveEnd(id, new Point(e.evt.layerX, e.evt.layerY));
+          const r = G.moveEnd(id, { x: e.evt.layerX, y: e.evt.layerY });
           const p = this.props.inverseTransform({ x: r.x, y: r.y });
           return moveObject(id, p.x, p.y);
         }}

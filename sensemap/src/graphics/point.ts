@@ -1,28 +1,23 @@
 
-export class Point {
+export interface Point {
   x: number;
   y: number;
+}
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
+export function negate(p: Point): Point {
+  return { x: -p.x, y: -p.y };
+}
 
-  toTuple(): [number, number] {
-    return [this.x, this.y];
-  }
+export function add(a: Point, b: Point): Point {
+  return { x: a.x + b.x, y: a.y + b.y };
+}
 
-  negate(): Point {
-    return new Point(-this.x, -this.y);
-  }
+export function subtract(a: Point, b: Point): Point {
+  return add(a, negate(b));
+}
 
-  add(other: Point): Point {
-    return new Point(this.x + other.x, this.y + other.y);
-  }
-
-  subtract(other: Point): Point {
-    return this.add(other.negate());
-  }
+export interface Transform {
+  (p: Point): Point;
 }
 
 /**
@@ -54,7 +49,7 @@ class Accumulator {
    * @param p     point to add
    */
   add(key: string, p: Point): Point {
-    this.store[key] = this.store[key].add(p);
+    this.store[key] = add(this.store[key], p);
     return this.store[key];
   }
 
@@ -87,7 +82,7 @@ const accumulator = new Accumulator;
  * @param cursor    cursor starting position
  */
 export function moveStart(id: string, anchor: Point, cursor: Point): void {
-  accumulator.set(id, anchor.subtract(cursor));
+  accumulator.set(id, subtract(anchor, cursor));
 }
 
 /**
