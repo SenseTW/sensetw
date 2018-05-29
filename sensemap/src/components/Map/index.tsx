@@ -13,6 +13,9 @@ import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
 import * as SO from '../../types/sense-object';
 import * as V from '../../types/viewport';
+import * as G from '../../graphics/point';
+import * as B from '../../types/sense/box';
+import * as C from '../../types/sense/card';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
@@ -61,6 +64,20 @@ const makeTransform: V.StateToTransform =
 
 const makeInverseTransform: V.StateToTransform =
   ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
+
+function getCenter(o: T.ObjectData, props: Props): G.Point {
+  switch (o.objectType) {
+    case T.ObjectType.CARD: {
+      return { x: o.x + C.DEFAULT_WIDTH / 2, y: o.y + C.DEFAULT_HEIGHT / 2 };
+    }
+    case T.ObjectType.BOX: {
+      return { x: o.x + B.DEFAULT_WIDTH / 2, y: o.y + B.DEFAULT_HEIGHT / 2 };
+    }
+    default: {
+      return { x: o.x, y: o.y };
+    }
+  }
+}
 
 export class Map extends React.Component<Props, State> {
 
@@ -250,8 +267,8 @@ export class Map extends React.Component<Props, State> {
 
   renderEdge(e: T.Edge) {
     const edgeProps = {
-      from: SO.getObject(this.props.senseObject, e.from),
-      to: SO.getObject(this.props.senseObject, e.to),
+      from: getCenter(SO.getObject(this.props.senseObject, e.from), this.props),
+      to: getCenter(SO.getObject(this.props.senseObject, e.to), this.props),
       transform: makeTransform(this.props),
       inverseTransform: makeInverseTransform(this.props),
     };

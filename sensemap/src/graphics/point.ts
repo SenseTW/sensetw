@@ -4,6 +4,10 @@ export interface Point {
   y: number;
 }
 
+export function toTuple(p: Point): [number, number] {
+  return [p.x, p.y];
+}
+
 export function negate(p: Point): Point {
   return { x: -p.x, y: -p.y };
 }
