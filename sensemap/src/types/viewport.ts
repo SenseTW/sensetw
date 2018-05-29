@@ -1,4 +1,5 @@
 import { ActionUnion } from './action';
+import * as G from '../graphics/point';
 
 type Position = {
   x: number;
@@ -18,6 +19,8 @@ export type State = {
   top:    number;
   left:   number;
 };
+
+export type StateToTransform = (s: State) => G.Transform;
 
 export const initial: State = {
   width:  1280,

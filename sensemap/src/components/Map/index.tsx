@@ -11,6 +11,8 @@ import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
 import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
+import * as SO from '../../types/sense-object';
+import * as V from '../../types/viewport';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
@@ -37,47 +39,26 @@ export interface DispatchFromProps {
   };
 }
 
-interface GeometryProps {
-  x: number;
-  y: number;
-}
+type ViewportState = T.State['viewport'];
 
-interface GeometryTransform {
-  (g: GeometryProps): GeometryProps;
-}
-
-interface ViewportProps {
-  width:  number;
-  height: number;
-  top:    number;
-  left:   number;
-}
-
-export interface OwnProps extends ViewportProps {}
+export interface OwnProps extends ViewportState {}
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
-function makeTransform(props: ViewportProps): GeometryTransform {
-  const { top, left } = props;
-  return ({ x, y }) => ({
-    x: x - left,
-    y: y - top,
-  });
-}
+const makeTransform: V.StateToTransform =
+  ({ top, left }) => ({ x, y }) => ({ x: x - left, y: y - top });
 
-function makeInverseTransform(props: ViewportProps): GeometryTransform {
-  const { top, left } = props;
-  return ({ x, y }) => ({
-    x: x + left,
-    y: y + top,
-  });
-}
+const makeInverseTransform: V.StateToTransform =
+  ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
 
 function renderEdge(e: T.Edge, props: Props) {
-  const { senseObject: { objects } } = props;
-  const from = objects[e.from];
-  const to = objects[e.to];
-  return <Edge key={e.id} from={from} to={to} />;
+  const edgeProps = {
+    from: SO.getObject(props.senseObject, e.from),
+    to: SO.getObject(props.senseObject, e.to),
+    transform: makeTransform(props),
+    inverseTransform: makeInverseTransform(props),
+  };
+  return <Edge key={e.id} {...edgeProps} />;
 }
 
 function renderObject(o: T.ObjectData, props: Props) {
@@ -183,7 +164,7 @@ function handleMouseUp(e: any, props: Props) {
 }
 
 export function Map(props: Props) {
-  const clearSelection = props.actions.clearSelection;
+  const { clearSelection } = props.actions;
   const objects = Object.values(props.senseObject.objects).map(o => renderObject(o, props));
   const edges = Object.values(props.senseObject.edges).map(g => renderEdge(g, props));
   let stage: Stage | null = null;
@@ -194,7 +175,6 @@ export function Map(props: Props) {
       width={props.width}
       height={props.height}
       onClick={() => clearSelection()}
-      // tslint:disable-next-line:no-console
       onMouseDown={(e: Event) => handleMouseDown(e, props)}
       onMouseUp={(e: Event) => handleMouseUp(e, props)}
       onMouseMove={(e: Event) => handleMouseMove(e, props)}
