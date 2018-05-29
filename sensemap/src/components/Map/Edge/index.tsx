@@ -1,15 +1,19 @@
 import * as React from 'react';
-import * as T from '../../../types';
 import { Line } from 'react-konva';
+import * as G from '../../../graphics/point';
 
 export interface Props {
-  from: T.ObjectData;
-  to:   T.ObjectData;
+  from:             G.Point;
+  to:               G.Point;
+  transform:        G.Transform;
+  inverseTransform: G.Transform;
 }
 
 export function Edge(props: Props) {
+  const from = G.toTuple(props.transform(props.from));
+  const to = G.toTuple(props.transform(props.to));
   return (
-    <Line points={[0, 0, 0, 0]} stroke="black" />
+    <Line points={[...from, ...to]} stroke="black" />
   );
 }
 
