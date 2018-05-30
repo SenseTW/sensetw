@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/history": "^4.6.2",
+    "axios": "^0.18.0",
     "graphql-request": "^1.5.1",
     "konva": "^2.0.2",
     "moment": "^2.22.1",
