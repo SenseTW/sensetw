@@ -24,7 +24,6 @@ interface StateFromProps {
   senseMap: T.State['senseMap'];
   senseObject: SO.State;
   editor: OE.State;
-  scope: typeof SM.initial.scope;
 }
 
 interface DispatchFromProps {
@@ -35,7 +34,7 @@ interface DispatchFromProps {
     updateRemoteBox(box: T.BoxData): T.ActionChain,
     updateRemoteCard(card: T.CardData): T.ActionChain,
     addCardToBox(cardObject: T.ObjectID, box: T.BoxID): T.ActionChain,
-    resizeViewpart(dimension: V.Dimension): T.ActionChain,
+    resizeViewport(dimension: V.Dimension): T.ActionChain,
     updateBox(id: T.BoxID, action: BoxAction): T.ActionChain;
     updateCard(id: T.CardID, action: CardAction): T.ActionChain;
     focusObject(focus: F.Focus): T.ActionChain,
@@ -48,11 +47,11 @@ type Props = StateFromProps & DispatchFromProps;
 class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions } = this.props;
-    actions.resizeViewpart({ width, height });
+    actions.resizeViewport({ width, height });
   }
 
   render() {
-    const { actions, editor, scope, senseMap, senseObject } = this.props;
+    const { actions, editor, senseMap, senseObject } = this.props;
     const { status, focus } = editor;
 
     let data: T.BoxData | T.CardData | null = null;
@@ -122,9 +121,9 @@ class MapPage extends React.Component<Props> {
                       case T.ObjectType.CARD:
                         const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
                         const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
-                        if (scope.type === T.MapScopeType.BOX) {
+                        if (senseMap.scope.type === T.MapScopeType.BOX) {
                           const obj = Object.values(objects)[0];
-                          const boxId = scope.box;
+                          const boxId = senseMap.scope.box;
                           await actions.addCardToBox(obj.id, boxId);
                         }
                         actions.changeStatus(OE.StatusType.HIDE);
@@ -171,14 +170,9 @@ class MapPage extends React.Component<Props> {
 }
 
 export default connect<StateFromProps, DispatchFromProps>(
-  (state: T.State) => {
-    const senseMap = state.senseMap;
-    const senseObject = state.senseObject;
-    const scope = state.senseMap.scope;
-    const { editor } = state;
-
-    return { senseMap, senseObject, scope, editor };
-  },
+  ({ senseMap, senseObject, editor }: T.State) => ({
+    senseMap, senseObject, editor
+  }),
   (dispatch: T.Dispatch) => ({
     actions: {
       changeStatus: (status: OE.StatusType) =>
@@ -193,7 +187,7 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.updateRemoteCard(card)),
       addCardToBox: (cardObject: T.ObjectID, box: T.BoxID) =>
         dispatch(T.actions.senseObject.addCardToBox(cardObject, box)),
-      resizeViewpart: (dimension: V.Dimension) =>
+      resizeViewport: (dimension: V.Dimension) =>
         dispatch(T.actions.viewport.resizeViewport(dimension)),
       updateBox: (id: T.BoxID, action: BoxAction) =>
         dispatch(T.actions.editor.updateBox(id, action)),
