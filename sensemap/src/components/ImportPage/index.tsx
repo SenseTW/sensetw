@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Container, Header, Form, Input, Divider } from 'semantic-ui-react';
+// import { Hypothesis } from '../../types/hypothesis/api';
 
 interface Props {}
 
