@@ -50,6 +50,10 @@ export type Props = StateFromProps & DispatchFromProps & OwnProps;
 interface State {
   objects: T.State['senseObject']['objects'];
   edges:   T.State['senseObject']['edges'];
+  objectDragStart: {
+    x: number,
+    y: number,
+  };
 }
 
 const makeTransform: V.StateToTransform =
@@ -70,14 +74,18 @@ export class Map extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.handleClick     = this.handleClick.bind(this);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseMove = this.handleMouseMove.bind(this);
-    this.handleMouseUp   = this.handleMouseUp.bind(this);
+    this.handleClick           = this.handleClick.bind(this);
+    this.handleMouseDown       = this.handleMouseDown.bind(this);
+    this.handleMouseMove       = this.handleMouseMove.bind(this);
+    this.handleMouseUp         = this.handleMouseUp.bind(this);
+    this.handleObjectDragStart = this.handleObjectDragStart.bind(this);
+    this.handleObjectDragMove  = this.handleObjectDragMove.bind(this);
+    this.handleObjectDragEnd   = this.handleObjectDragEnd.bind(this);
 
     this.state = {
       objects: this.props.senseObject.objects,
       edges:   this.props.senseObject.edges,
+      objectDragStart: { x: 0, y: 0 },
     };
   }
 
@@ -108,9 +116,35 @@ export class Map extends React.Component<Props, State> {
     }
   }
 
+  handleObjectDragStart(e: KonvaEvent.Mouse) {
+    const x = e.evt.layerX;
+    const y = e.evt.layerY;
+    this.setState({ objectDragStart: { x, y } });
+  }
+
+  handleObjectDragMove(e: KonvaEvent.Mouse) {
+    const dx = e.evt.layerX - this.state.objectDragStart.x;
+    const dy = e.evt.layerY - this.state.objectDragStart.y;
+    const objects = this.props.selection.map(id => {
+      const o = SO.getObject(this.props.senseObject, id);
+      return { ...o, x: o.x + dx, y: o.y + dy };
+    }).reduce((a, o) => { a[o.id] = o; return a; }, {});
+    this.setState({ objects: { ...this.state.objects, ...objects } });
+  }
+
+  handleObjectDragEnd(e: KonvaEvent.Mouse) {
+    const dx = e.evt.layerX - this.state.objectDragStart.x;
+    const dy = e.evt.layerY - this.state.objectDragStart.y;
+    this.props.selection.forEach(id => {
+      const o = SO.getObject(this.props.senseObject, id);
+      this.props.actions.moveObject(id, o.x + dx, o.y + dy);
+    });
+    this.setState({ objectDragStart: { x: 0, y: 0 } });
+  }
+
   render() {
     const objects = Object.values(this.state.objects).map(o => this.renderObject(o));
-    const edges = Object.values(this.state.edges).map(e => this.renderEdge(e));
+    const edges =   Object.values(this.state.edges).map(e => this.renderEdge(e));
     let stage: Stage | null = null;
 
     return (
@@ -133,8 +167,7 @@ export class Map extends React.Component<Props, State> {
 
   renderObject(o: T.ObjectData) {
     const {
-      addObjectToSelection, toggleObjectSelection, clearSelection, moveObject,
-      openBox, focusObject, changeStatus
+      addObjectToSelection, toggleObjectSelection, clearSelection, openBox, focusObject, changeStatus
     } = this.props.actions;
 
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
@@ -179,7 +212,9 @@ export class Map extends React.Component<Props, State> {
             card={this.props.senseObject.cards[o.data]}
             selected={isSelected}
             handleMouseDown={handleObjectMouseDown}
-            moveObject={moveObject}
+            handleDragStart={this.handleObjectDragStart}
+            handleDragMove={this.handleObjectDragMove}
+            handleDragEnd={this.handleObjectDragEnd}
             openCard={(id) => changeStatus(OE.StatusType.SHOW)}
           />);
       }
@@ -196,7 +231,9 @@ export class Map extends React.Component<Props, State> {
             box={this.props.senseObject.boxes[o.data]}
             selected={isSelected}
             handleMouseDown={handleObjectMouseDown}
-            moveObject={moveObject}
+            handleDragStart={this.handleObjectDragStart}
+            handleDragMove={this.handleObjectDragMove}
+            handleDragEnd={this.handleObjectDragEnd}
             openBox={(id) => {
               clearSelection();
               openBox(id);

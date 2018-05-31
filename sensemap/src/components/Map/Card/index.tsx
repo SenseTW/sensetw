@@ -14,7 +14,9 @@ interface Props {
   transform: G.Transform;
   inverseTransform: G.Transform;
   handleMouseDown?(e: KonvaEvent.Mouse, object: T.ObjectData): void;
-  moveObject?(id: T.ObjectID, x: number, y: number): void;
+  handleDragStart?(e: KonvaEvent.Mouse): void;
+  handleDragMove?(e: KonvaEvent.Mouse): void;
+  handleDragEnd?(e: KonvaEvent.Mouse): void;
   openCard?(id: T.CardID): void;
 }
 
@@ -79,7 +81,7 @@ class Card extends React.Component<Props, State> {
   };
 
   render() {
-    const {id, data} = this.props.mapObject;
+    const { data } = this.props.mapObject;
     const { x, y } = this.props.transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
@@ -90,7 +92,9 @@ class Card extends React.Component<Props, State> {
     const tagHeight = this.state.tagHeight;
 
     const handleMouseDown = this.props.handleMouseDown || noop;
-    const moveObject      = this.props.moveObject      || noop;
+    const handleDragStart = this.props.handleDragStart || noop;
+    const handleDragMove  = this.props.handleDragMove  || noop;
+    const handleDragEnd   = this.props.handleDragEnd   || noop;
     const openCard        = this.props.openCard        || noop;
     const bgColor         = color[cardType];
 
@@ -111,12 +115,9 @@ class Card extends React.Component<Props, State> {
         y={y}
         draggable={true}
         onMouseDown={(e) => handleMouseDown(e, this.props.mapObject)}
-        onDragStart={(e) => G.moveStart(id, { x, y }, { x: e.evt.layerX, y: e.evt.layerY })}
-        onDragEnd={(e) => {
-          const r = G.moveEnd(id, { x: e.evt.layerX, y: e.evt.layerY });
-          const p = this.props.inverseTransform({ x: r.x, y: r.y });
-          return moveObject(id, p.x, p.y);
-        }}
+        onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
+        onDragEnd={handleDragEnd}
         onDblClick={() => openCard(data)}
       >
         {this.props.selected ? selected : null}
