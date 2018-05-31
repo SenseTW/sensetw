@@ -7,12 +7,14 @@ import * as OE from './object-editor';
 import * as V  from './viewport';
 import * as SG from './stage';
 import * as I  from './input';
+import * as IP from './importer';
 
 export { MapID, MapScopeType } from './sense-map';
 export { ObjectID, ObjectType, ObjectData } from './sense/object';
 export { BoxID, BoxData } from './sense/box';
 export { CardID, CardType, CardData } from './sense/card';
 export { EdgeID, Edge } from './sense/edge';
+export { mapDispatch } from './map-dispatch';
 
 export type State = {
   senseMap:    SM.State,
@@ -22,6 +24,7 @@ export type State = {
   input:        I.State,
   viewport:     V.State,
   stage:       SG.State,
+  importer:    IP.State,
 };
 
 export const initial: State = {
@@ -32,6 +35,7 @@ export const initial: State = {
   input:        I.initial,
   viewport:     V.initial,
   stage:       SG.initial,
+  importer:    IP.initial,
 };
 
 export type Action
@@ -43,6 +47,7 @@ export type Action
   |  I.Action
   |  V.Action
   | SG.Action
+  | IP.Action
   ;
 
 export const actions = {
@@ -53,6 +58,11 @@ export const actions = {
   input:        I.actions,
   viewport:     V.actions,
   stage:       SG.actions,
+  importer:    IP.actions,
+};
+
+export type ActionProps = {
+  actions: typeof actions,
 };
 
 export type ActionChain = Action | Promise<Action>;
@@ -71,4 +81,5 @@ export const reducer = combineReducers({
   input:        I.reducer,
   viewport:     V.reducer,
   stage:       SG.reducer,
+  importer:    IP.reducer,
 });
