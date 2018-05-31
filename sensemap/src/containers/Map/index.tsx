@@ -16,6 +16,7 @@ interface StateFromProps extends CO.StateFromProps {
 
 interface DispatchFromProps extends CO.DispatchFromProps {
   actions: {
+    removeObjectFromSelection: typeof T.actions.selection.removeObjectFromSelection,
     addObjectToSelection(id: T.ObjectID): T.ActionChain,
     toggleObjectSelection(id: T.ObjectID): T.ActionChain,
     clearSelection(): T.ActionChain,
@@ -68,6 +69,8 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
     actions: {
       addObjectToSelection: (id: T.ObjectID) =>
         dispatch(T.actions.selection.addObjectToSelection(id)),
+      removeObjectFromSelection: (id: T.ObjectID) =>
+        dispatch(T.actions.selection.removeObjectFromSelection(id)),
       toggleObjectSelection: (id: T.ObjectID) =>
         dispatch(T.actions.selection.toggleObjectSelection(id)),
       clearSelection: () =>

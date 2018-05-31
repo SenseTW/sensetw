@@ -24,6 +24,7 @@ export interface StateFromProps {
 
 export interface DispatchFromProps {
   actions: {
+    removeObjectFromSelection: typeof T.actions.selection.removeObjectFromSelection,
     addObjectToSelection(id: T.ObjectID): T.ActionChain,
     toggleObjectSelection(id: T.ObjectID): T.ActionChain,
     clearSelection(): T.ActionChain,
@@ -62,19 +63,17 @@ function renderEdge(e: T.Edge, props: Props) {
 }
 
 function renderObject(o: T.ObjectData, props: Props) {
-  const addObjectToSelection = props.actions.addObjectToSelection;
-  const toggleSelection = props.actions.toggleObjectSelection;
-  const clearSelection = props.actions.clearSelection;
-  const moveObject = props.actions.moveObject;
-  const openBox = props.actions.openBox;
-  const focusObject = props.actions.focusObject;
-  const changeStatus = props.actions.changeStatus;
+  const {
+    addObjectToSelection, toggleObjectSelection, clearSelection, moveObject,
+    openBox, focusObject, changeStatus
+  } = props.actions;
+
   const isMultiSelectable = I.isMultiSelectable(props.input);
   const isSelected = SL.contains(props.selection, o.id);
   const transform = makeTransform(props);
   const inverseTransform = makeInverseTransform(props);
 
-  const handleSelection = (e: KonvaEvent.Mouse, data: T.ObjectData) => {
+  const handleObjectMouseDown = (e: KonvaEvent.Mouse, data: T.ObjectData) => {
     // stop event propagation by setting the e.cancelBubble
     // notice that it's useless to set e.evt.cancelBubble directly
     // check: https://github.com/lavrton/react-konva/issues/139
@@ -82,7 +81,7 @@ function renderObject(o: T.ObjectData, props: Props) {
 
     if (isMultiSelectable) {
       focusObject(F.focusNothing());
-      toggleSelection(data.id);
+      toggleObjectSelection(data.id);
     } else {
       clearSelection();
       if (!isSelected || props.selection.length > 1) {
@@ -110,7 +109,7 @@ function renderObject(o: T.ObjectData, props: Props) {
           inverseTransform={inverseTransform}
           card={props.senseObject.cards[o.data]}
           selected={isSelected}
-          toggleSelection={handleSelection}
+          handleMouseDown={handleObjectMouseDown}
           moveObject={moveObject}
           openCard={(id) => changeStatus(OE.StatusType.SHOW)}
         />);
@@ -127,7 +126,7 @@ function renderObject(o: T.ObjectData, props: Props) {
           inverseTransform={inverseTransform}
           box={props.senseObject.boxes[o.data]}
           selected={isSelected}
-          toggleSelection={handleSelection}
+          handleMouseDown={handleObjectMouseDown}
           moveObject={moveObject}
           openBox={(id) => {
             clearSelection();
@@ -141,8 +140,7 @@ function renderObject(o: T.ObjectData, props: Props) {
   }
 }
 
-// tslint:disable-next-line:no-any
-function handleMouseMove(e: any, props: Props) {
+function handleMouseMove(props: Props, e: KonvaEvent.Mouse) {
   if (props.stage.mouseDown) {
     const dx = e.evt.movementX;
     const dy = e.evt.movementY;
@@ -152,19 +150,24 @@ function handleMouseMove(e: any, props: Props) {
 }
 
 // tslint:disable-next-line:no-any
-function handleMouseDown(e: any, props: Props) {
+function handleMouseDown(props: Props, e: any) {
   if (e.target && e.target.nodeType === 'Stage') {
     props.actions.stageMouseDown();
   }
 }
 
-// tslint:disable-next-line:no-any
-function handleMouseUp(e: any, props: Props) {
+function handleMouseUp(props: Props, e: KonvaEvent.Mouse) {
   props.actions.stageMouseUp();
 }
 
+// tslint:disable-next-line:no-any
+function handleClick(props: Props, e: any) {
+  if (e.target && e.target.nodeType === 'Stage') {
+    props.actions.clearSelection();
+  }
+}
+
 export function Map(props: Props) {
-  const { clearSelection } = props.actions;
   const objects = Object.values(props.senseObject.objects).map(o => renderObject(o, props));
   const edges = Object.values(props.senseObject.edges).map(g => renderEdge(g, props));
   let stage: Stage | null = null;
@@ -174,10 +177,10 @@ export function Map(props: Props) {
       ref={(node) => stage = node as (Stage | null)}
       width={props.width}
       height={props.height}
-      onClick={() => clearSelection()}
-      onMouseDown={(e: Event) => handleMouseDown(e, props)}
-      onMouseUp={(e: Event) => handleMouseUp(e, props)}
-      onMouseMove={(e: Event) => handleMouseMove(e, props)}
+      onClick={handleClick.bind(undefined, props)}
+      onMouseDown={handleMouseDown.bind(undefined, props)}
+      onMouseUp={handleMouseUp.bind(undefined, props)}
+      onMouseMove={handleMouseMove.bind(undefined, props)}
     >
       <Layer>
         {edges}

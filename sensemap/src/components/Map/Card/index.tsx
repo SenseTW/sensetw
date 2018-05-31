@@ -13,7 +13,7 @@ interface Props {
   selected?: Boolean;
   transform: G.Transform;
   inverseTransform: G.Transform;
-  toggleSelection?(e: KonvaEvent.Mouse, object: T.ObjectData): void;
+  handleMouseDown?(e: KonvaEvent.Mouse, object: T.ObjectData): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openCard?(id: T.CardID): void;
 }
@@ -89,7 +89,7 @@ class Card extends React.Component<Props, State> {
     const sanitizedTitle   = title.substr(0, titleLimit);
     const tagHeight = this.state.tagHeight;
 
-    const toggleSelection = this.props.toggleSelection || noop;
+    const handleMouseDown = this.props.handleMouseDown || noop;
     const moveObject      = this.props.moveObject      || noop;
     const openCard        = this.props.openCard        || noop;
     const bgColor         = color[cardType];
@@ -110,7 +110,7 @@ class Card extends React.Component<Props, State> {
         x={x}
         y={y}
         draggable={true}
-        onClick={(e) => toggleSelection(e, this.props.mapObject)}
+        onMouseDown={(e) => handleMouseDown(e, this.props.mapObject)}
         onDragStart={(e) => G.moveStart(id, { x, y }, { x: e.evt.layerX, y: e.evt.layerY })}
         onDragEnd={(e) => {
           const r = G.moveEnd(id, { x: e.evt.layerX, y: e.evt.layerY });

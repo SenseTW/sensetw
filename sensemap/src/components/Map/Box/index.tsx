@@ -13,7 +13,7 @@ interface Props {
   selected?: Boolean;
   transform: G.Transform;
   inverseTransform: G.Transform;
-  toggleSelection?(e: KonvaEvent.Mouse, data: T.ObjectData): void;
+  handleMouseDown?(e: KonvaEvent.Mouse, data: T.ObjectData): void;
   moveObject?(id: T.ObjectID, x: number, y: number): void;
   openBox?(box: T.BoxID): void;
 }
@@ -67,7 +67,7 @@ class Box extends React.Component<Props, State> {
     const boxID = this.props.box.id;
     const tagHeight = this.state.tagHeight;
 
-    const toggleSelection = this.props.toggleSelection || noop;
+    const handleMouseDown = this.props.handleMouseDown || noop;
     const moveObject      = this.props.moveObject      || noop;
     const openBox         = this.props.openBox         || noop;
 
@@ -89,7 +89,7 @@ class Box extends React.Component<Props, State> {
         x={x}
         y={y}
         draggable={true}
-        onClick={(e) => toggleSelection(e, this.props.mapObject)}
+        onMouseDown={(e) => handleMouseDown(e, this.props.mapObject)}
         onDragStart={(e) => G.moveStart(id, { x, y }, { x: e.evt.layerX, y: e.evt.layerY })}
         onDragEnd={(e) => {
           const r = G.moveEnd(id, { x: e.evt.layerX, y: e.evt.layerY });
