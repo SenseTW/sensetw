@@ -16,18 +16,19 @@ import * as V from '../../types/viewport';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
-  selection: T.State['selection'];
+  selection:   T.State['selection'];
   senseObject: T.State['senseObject'];
-  input:     T.State['input'];
-  stage:     T.State['stage'];
+  input:       T.State['input'];
+  stage:       T.State['stage'];
 }
 
 export interface DispatchFromProps {
   actions: {
     removeObjectFromSelection: typeof T.actions.selection.removeObjectFromSelection,
-    addObjectToSelection(id: T.ObjectID): T.ActionChain,
-    toggleObjectSelection(id: T.ObjectID): T.ActionChain,
-    clearSelection(): T.ActionChain,
+    addObjectToSelection:      typeof T.actions.selection.addObjectToSelection,
+    toggleObjectSelection:     typeof T.actions.selection.toggleObjectSelection,
+    clearSelection:            typeof T.actions.selection.clearSelection,
+
     moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
     addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
     removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,

@@ -15,24 +15,11 @@ interface StateFromProps extends CO.StateFromProps {
 }
 
 interface DispatchFromProps extends CO.DispatchFromProps {
-  actions: {
-    removeObjectFromSelection: typeof T.actions.selection.removeObjectFromSelection,
-    addObjectToSelection(id: T.ObjectID): T.ActionChain,
-    toggleObjectSelection(id: T.ObjectID): T.ActionChain,
-    clearSelection(): T.ActionChain,
+  actions: CO.DispatchFromProps['actions'] & {
     loadObjects(id: T.MapID): T.ActionChain,
-    loadCards(id: T.MapID): T.ActionChain,
-    loadBoxes(id: T.MapID): T.ActionChain,
-    loadEdges(id: T.MapID): T.ActionChain,
-    moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
-    addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
-    removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
-    openBox(box: T.BoxID): T.ActionChain,
-    stageMouseUp(): T.ActionChain,
-    stageMouseDown(): T.ActionChain,
-    stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
-    focusObject(focus: F.Focus): T.ActionChain,
-    changeStatus(status: OE.StatusType): T.ActionChain,
+    loadCards(id: T.MapID):   T.ActionChain,
+    loadBoxes(id: T.MapID):   T.ActionChain,
+    loadEdges(id: T.MapID):   T.ActionChain,
   };
 }
 
