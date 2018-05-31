@@ -1,10 +1,20 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { Container, Header, Form, Input, Divider } from 'semantic-ui-react';
-// import { Hypothesis } from '../../types/hypothesis/api';
+import { State, ActionProps, actions, mapDispatch } from '../../types';
 
-interface Props {}
+interface StateFromProps {
+  url: string;
+}
+
+type Props = StateFromProps & ActionProps;
 
 class ImportPage extends React.PureComponent<Props> {
+  componentDidMount() {
+    const { actions: acts } = this.props;
+
+    acts.importer.changeUrl('http://example.com/');
+  }
   render() {
     return (
       <Container text>
@@ -21,4 +31,10 @@ class ImportPage extends React.PureComponent<Props> {
   }
 }
 
-export default ImportPage;
+export default connect<StateFromProps, ActionProps>(
+  (state: State) => {
+    const { url } = state.importer;
+    return { url };
+  },
+  mapDispatch({ actions })
+)(ImportPage);
