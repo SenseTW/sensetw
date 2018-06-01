@@ -395,6 +395,20 @@ const unboxCards =
       .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 
+const createEdge =
+  (map: MapID, from: ObjectID, to: ObjectID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    return GE.create(map, from, to)
+      .then((edge) => dispatch(updateEdges(H.toIDMap<EdgeID, Edge>([ edge ]))));
+  };
+
+const deleteEdge =
+  (map: MapID, edge: EdgeID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    return GE.remove(edge)
+      .then(() => dispatch(loadEdges(map, true)));
+  };
+
 export const syncActions = {
   updateObjects,
   overwriteObjects,
@@ -420,6 +434,7 @@ export const actions = {
   createBoxObject,
   createObjectForCard,
   createCardObject,
+  createEdge,
   moveObject,
   addCardToBox,
   addCardsToBox,
@@ -429,6 +444,7 @@ export const actions = {
   deleteObject,
   deleteCardWithObject,
   deleteBoxWithObject,
+  deleteEdge,
 };
 
 export type Action = ActionUnion<typeof syncActions>;

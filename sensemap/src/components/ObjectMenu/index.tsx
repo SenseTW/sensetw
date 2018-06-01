@@ -33,6 +33,8 @@ interface DispatchFromProps {
     deleteObject(object: T.ObjectID): T.ActionChain,
     unboxCards(box: T.BoxID): T.ActionChain,
     openInbox(): T.ActionChain,
+    createEdge(map: T.MapID, from: T.ObjectID, to: T.ObjectID): T.ActionChain,
+    deleteEdge(map: T.MapID, edge: T.EdgeID): T.ActionChain,
   };
 }
 
@@ -134,6 +136,46 @@ class ObjectMenu extends React.PureComponent<Props> {
       case T.MapScopeType.FULL_MAP:
       default:
     }
+  }
+
+  canCreateEdge(): boolean {
+    return this.props.selection.length === 2
+      && this.findEdgeID(this.props.selection[0], this.props.selection[1]) === null;
+  }
+
+  handleCreateEdge(): void {
+    if (!this.canCreateEdge()) {
+      return;
+    }
+    const map  = this.props.senseMap.map;
+    const from = this.props.selection[0];
+    const to   = this.props.selection[1];
+    this.props.actions.createEdge(map, from, to);
+  }
+
+  findEdgeID(from: T.ObjectID, to: T.ObjectID): T.EdgeID[] | null {
+    const r = Object.values(this.props.senseObject.edges)
+      .filter(edge => (edge.from === from && edge.to === to) || (edge.from === to && edge.to === from))
+      .map(edge => edge.id);
+    return r.length === 0 ? null : r;
+  }
+
+  canRemoveEdge(): boolean {
+    if (this.props.selection.length !== 2) {
+      return false;
+    }
+    return this.findEdgeID(this.props.selection[0], this.props.selection[1]) !== null;
+  }
+
+  handleRemoveEdge(): void {
+    const map  = this.props.senseMap.map;
+    const from = this.props.selection[0];
+    const to   = this.props.selection[1];
+    const r    = this.findEdgeID(from, to);
+    if (r === null) {
+      return;
+    }
+    r.forEach(edge => this.props.actions.deleteEdge(map, edge));
   }
 
   render() {
@@ -238,6 +280,24 @@ class ObjectMenu extends React.PureComponent<Props> {
             Unbox
           </Menu.Item>
         }
+        {
+          this.canCreateEdge() &&
+          <Menu.Item
+            name="createEdge"
+            onClick={() => this.handleCreateEdge()}
+          >
+            連線
+          </Menu.Item>
+        }
+        {
+          this.canRemoveEdge() &&
+          <Menu.Item
+            name="deleteEdge"
+            onClick={() => this.handleRemoveEdge()}
+          >
+            刪除連線
+          </Menu.Item>
+        }
       </Menu>
     );
   }
@@ -272,6 +332,10 @@ export default connect<StateFromProps, DispatchFromProps>(
         dispatch(T.actions.senseObject.unboxCards(box)),
       openInbox: () =>
         dispatch(T.actions.senseMap.openInbox()),
+      createEdge: (map, from, to) =>
+        dispatch(T.actions.senseObject.createEdge(map, from, to)),
+      deleteEdge: (map, edge) =>
+        dispatch(T.actions.senseObject.deleteEdge(map, edge)),
     }
   })
 )(ObjectMenu);

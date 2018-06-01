@@ -13,6 +13,9 @@ import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
 import * as SO from '../../types/sense-object';
 import * as V from '../../types/viewport';
+import * as G from '../../graphics/point';
+import * as B from '../../types/sense/box';
+import * as C from '../../types/sense/card';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
@@ -48,8 +51,7 @@ export interface OwnProps extends ViewportState {}
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 interface State {
-  objects: T.State['senseObject']['objects'];
-  edges:   T.State['senseObject']['edges'];
+  senseObject: T.State['senseObject'];
   objectDragStart: {
     x: number,
     y: number,
@@ -62,13 +64,24 @@ const makeTransform: V.StateToTransform =
 const makeInverseTransform: V.StateToTransform =
   ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
 
+function getCenter(o: T.ObjectData): G.Point {
+  switch (o.objectType) {
+    case T.ObjectType.CARD: {
+      return { x: o.x + C.DEFAULT_WIDTH / 2, y: o.y + C.DEFAULT_HEIGHT / 2 };
+    }
+    case T.ObjectType.BOX: {
+      return { x: o.x + B.DEFAULT_WIDTH / 2, y: o.y + B.DEFAULT_HEIGHT / 2 };
+    }
+    default: {
+      return { x: o.x, y: o.y };
+    }
+  }
+}
+
 export class Map extends React.Component<Props, State> {
 
   static getDerivedStateFromProps(props: Props, state: State) {
-    return {
-      objects: props.senseObject.objects,
-      edges:   props.senseObject.edges,
-    };
+    return { senseObject: props.senseObject };
   }
 
   constructor(props: Props) {
@@ -83,8 +96,7 @@ export class Map extends React.Component<Props, State> {
     this.handleObjectDragEnd   = this.handleObjectDragEnd.bind(this);
 
     this.state = {
-      objects: this.props.senseObject.objects,
-      edges:   this.props.senseObject.edges,
+      senseObject: this.props.senseObject,
       objectDragStart: { x: 0, y: 0 },
     };
   }
@@ -129,7 +141,14 @@ export class Map extends React.Component<Props, State> {
       const o = SO.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
-    this.setState({ objects: { ...this.state.objects, ...objects } });
+    this.setState({
+      senseObject: {
+        ...this.state.senseObject,
+        objects: {
+          ...this.state.senseObject.objects, ...objects
+        },
+      },
+    });
   }
 
   handleObjectDragEnd(e: KonvaEvent.Mouse) {
@@ -143,8 +162,8 @@ export class Map extends React.Component<Props, State> {
   }
 
   render() {
-    const objects = Object.values(this.state.objects).map(o => this.renderObject(o));
-    const edges =   Object.values(this.state.edges).map(e => this.renderEdge(e));
+    const objects = Object.values(this.state.senseObject.objects).map(o => this.renderObject(o));
+    const edges =   Object.values(this.state.senseObject.edges).map(e => this.renderEdge(e));
     let stage: Stage | null = null;
 
     return (
@@ -250,8 +269,8 @@ export class Map extends React.Component<Props, State> {
 
   renderEdge(e: T.Edge) {
     const edgeProps = {
-      from: SO.getObject(this.props.senseObject, e.from),
-      to: SO.getObject(this.props.senseObject, e.to),
+      from: getCenter(SO.getObject(this.state.senseObject, e.from)),
+      to: getCenter(SO.getObject(this.state.senseObject, e.to)),
       transform: makeTransform(this.props),
       inverseTransform: makeInverseTransform(this.props),
     };
