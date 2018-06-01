@@ -19,3 +19,26 @@ export function toTags(str: string): string[] {
 export function fromTags(tags: string[]): string {
   return tags.join(', ');
 }
+
+export namespace Arr {
+  export function replaceOrAppend<T>(array: T[], index: number, element: T): T[] {
+    const i = index === -1 ? array.length : index;
+
+    return [
+      ...array.slice(0, i),
+      element,
+      ...array.slice(i + 1),
+    ];
+  }
+
+  export function remove<T>(array: T[], index: number): T[] {
+    if (index < 0 || index >= array.length) {
+      return array;
+    }
+
+    return [
+      ...array.slice(0, index),
+      ...array.slice(index + 1),
+    ];
+  }
+}
