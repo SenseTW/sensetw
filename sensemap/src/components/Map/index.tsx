@@ -167,7 +167,7 @@ export class Map extends React.Component<Props, State> {
 
   renderObject(o: T.ObjectData) {
     const {
-      addObjectToSelection, toggleObjectSelection, clearSelection, openBox, focusObject, changeStatus
+      addObjectToSelection, removeObjectFromSelection, clearSelection, openBox, focusObject, changeStatus
     } = this.props.actions;
 
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
@@ -175,23 +175,23 @@ export class Map extends React.Component<Props, State> {
     const transform = makeTransform(this.props);
     const inverseTransform = makeInverseTransform(this.props);
 
-    const handleObjectMouseDown = (e: KonvaEvent.Mouse, data: T.ObjectData) => {
-      // stop event propagation by setting the e.cancelBubble
-      // notice that it's useless to set e.evt.cancelBubble directly
-      // check: https://github.com/lavrton/react-konva/issues/139
-      e.cancelBubble = true;
-
+    const handleObjectSelect = (data: T.ObjectData) => {
       if (isMultiSelectable) {
         focusObject(F.focusNothing());
-        toggleObjectSelection(data.id);
+        addObjectToSelection(data.id);
       } else {
         clearSelection();
-        if (!isSelected || this.props.selection.length > 1) {
-          focusObject(O.toFocus(data));
-          addObjectToSelection(data.id);
-        } else {
-          focusObject(F.focusNothing());
-        }
+        focusObject(O.toFocus(data));
+        addObjectToSelection(data.id);
+      }
+    };
+
+    const handleObjectDeselect = (data: T.ObjectData) => {
+      removeObjectFromSelection(data.id);
+      if (this.props.selection.length === 1) {
+        focusObject(O.toFocus(SO.getObject(this.props.senseObject, this.props.selection[0])));
+      } else {
+        focusObject(F.focusNothing());
       }
     };
 
@@ -211,7 +211,8 @@ export class Map extends React.Component<Props, State> {
             inverseTransform={inverseTransform}
             card={this.props.senseObject.cards[o.data]}
             selected={isSelected}
-            handleMouseDown={handleObjectMouseDown}
+            handleSelect={handleObjectSelect}
+            handleDeselect={handleObjectDeselect}
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}
@@ -230,7 +231,8 @@ export class Map extends React.Component<Props, State> {
             inverseTransform={inverseTransform}
             box={this.props.senseObject.boxes[o.data]}
             selected={isSelected}
-            handleMouseDown={handleObjectMouseDown}
+            handleSelect={handleObjectSelect}
+            handleDeselect={handleObjectDeselect}
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}

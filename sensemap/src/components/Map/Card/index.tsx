@@ -13,7 +13,8 @@ interface Props {
   selected?: Boolean;
   transform: G.Transform;
   inverseTransform: G.Transform;
-  handleMouseDown?(e: KonvaEvent.Mouse, object: T.ObjectData): void;
+  handleSelect?(object: T.ObjectData): void;
+  handleDeselect?(object: T.ObjectData): void;
   handleDragStart?(e: KonvaEvent.Mouse): void;
   handleDragMove?(e: KonvaEvent.Mouse): void;
   handleDragEnd?(e: KonvaEvent.Mouse): void;
@@ -22,6 +23,7 @@ interface Props {
 
 interface State {
   tagHeight: number;
+  newlySelected: boolean;
 }
 
 const width = C.DEFAULT_WIDTH;
@@ -77,7 +79,8 @@ const tagBottom = 8;
 
 class Card extends React.Component<Props, State> {
   state = {
-    tagHeight: 0
+    tagHeight: 0,
+    newlySelected: false,
   };
 
   render() {
@@ -91,7 +94,8 @@ class Card extends React.Component<Props, State> {
     const sanitizedTitle   = title.substr(0, titleLimit);
     const tagHeight = this.state.tagHeight;
 
-    const handleMouseDown = this.props.handleMouseDown || noop;
+    const handleSelect    = this.props.handleSelect    || noop;
+    const handleDeselect  = this.props.handleDeselect  || noop;
     const handleDragStart = this.props.handleDragStart || noop;
     const handleDragMove  = this.props.handleDragMove  || noop;
     const handleDragEnd   = this.props.handleDragEnd   || noop;
@@ -114,11 +118,31 @@ class Card extends React.Component<Props, State> {
         x={x}
         y={y}
         draggable={true}
-        onMouseDown={(e) => handleMouseDown(e, this.props.mapObject)}
+        onMouseDown={(e) => {
+          e.cancelBubble = true;
+          if (this.props.selected) {
+            return;
+          }
+          this.setState({ newlySelected: true });
+          handleSelect(this.props.mapObject);
+        }}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          if (!this.state.newlySelected) {
+            handleDeselect(this.props.mapObject);
+          }
+          this.setState({ newlySelected: false });
+        }}
+        onDblClick={() => {
+          handleSelect(this.props.mapObject);
+          openCard(data);
+        }}
+        onMouseUp={(e) => {
+          e.cancelBubble = true;
+        }}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
-        onDblClick={() => openCard(data)}
       >
         {this.props.selected ? selected : null}
         <Rect
