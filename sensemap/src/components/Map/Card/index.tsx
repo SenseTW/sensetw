@@ -13,13 +13,17 @@ interface Props {
   selected?: Boolean;
   transform: G.Transform;
   inverseTransform: G.Transform;
-  handleMouseDown?(e: KonvaEvent.Mouse, object: T.ObjectData): void;
-  moveObject?(id: T.ObjectID, x: number, y: number): void;
+  handleSelect?(object: T.ObjectData): void;
+  handleDeselect?(object: T.ObjectData): void;
+  handleDragStart?(e: KonvaEvent.Mouse): void;
+  handleDragMove?(e: KonvaEvent.Mouse): void;
+  handleDragEnd?(e: KonvaEvent.Mouse): void;
   openCard?(id: T.CardID): void;
 }
 
 interface State {
   tagHeight: number;
+  newlySelected: boolean;
 }
 
 const width = C.DEFAULT_WIDTH;
@@ -75,11 +79,12 @@ const tagBottom = 8;
 
 class Card extends React.Component<Props, State> {
   state = {
-    tagHeight: 0
+    tagHeight: 0,
+    newlySelected: false,
   };
 
   render() {
-    const {id, data} = this.props.mapObject;
+    const { data } = this.props.mapObject;
     const { x, y } = this.props.transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
@@ -89,8 +94,11 @@ class Card extends React.Component<Props, State> {
     const sanitizedTitle   = title.substr(0, titleLimit);
     const tagHeight = this.state.tagHeight;
 
-    const handleMouseDown = this.props.handleMouseDown || noop;
-    const moveObject      = this.props.moveObject      || noop;
+    const handleSelect    = this.props.handleSelect    || noop;
+    const handleDeselect  = this.props.handleDeselect  || noop;
+    const handleDragStart = this.props.handleDragStart || noop;
+    const handleDragMove  = this.props.handleDragMove  || noop;
+    const handleDragEnd   = this.props.handleDragEnd   || noop;
     const openCard        = this.props.openCard        || noop;
     const bgColor         = color[cardType];
 
@@ -110,14 +118,31 @@ class Card extends React.Component<Props, State> {
         x={x}
         y={y}
         draggable={true}
-        onMouseDown={(e) => handleMouseDown(e, this.props.mapObject)}
-        onDragStart={(e) => G.moveStart(id, { x, y }, { x: e.evt.layerX, y: e.evt.layerY })}
-        onDragEnd={(e) => {
-          const r = G.moveEnd(id, { x: e.evt.layerX, y: e.evt.layerY });
-          const p = this.props.inverseTransform({ x: r.x, y: r.y });
-          return moveObject(id, p.x, p.y);
+        onMouseDown={(e) => {
+          e.cancelBubble = true;
+          if (this.props.selected) {
+            return;
+          }
+          this.setState({ newlySelected: true });
+          handleSelect(this.props.mapObject);
         }}
-        onDblClick={() => openCard(data)}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          if (!this.state.newlySelected) {
+            handleDeselect(this.props.mapObject);
+          }
+          this.setState({ newlySelected: false });
+        }}
+        onDblClick={() => {
+          handleSelect(this.props.mapObject);
+          openCard(data);
+        }}
+        onMouseUp={(e) => {
+          e.cancelBubble = true;
+        }}
+        onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
+        onDragEnd={handleDragEnd}
       >
         {this.props.selected ? selected : null}
         <Rect

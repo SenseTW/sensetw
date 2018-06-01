@@ -47,148 +47,216 @@ export interface OwnProps extends ViewportState {}
 
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
+interface State {
+  objects: T.State['senseObject']['objects'];
+  edges:   T.State['senseObject']['edges'];
+  objectDragStart: {
+    x: number,
+    y: number,
+  };
+}
+
 const makeTransform: V.StateToTransform =
   ({ top, left }) => ({ x, y }) => ({ x: x - left, y: y - top });
 
 const makeInverseTransform: V.StateToTransform =
   ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
 
-function renderEdge(e: T.Edge, props: Props) {
-  const edgeProps = {
-    from: SO.getObject(props.senseObject, e.from),
-    to: SO.getObject(props.senseObject, e.to),
-    transform: makeTransform(props),
-    inverseTransform: makeInverseTransform(props),
-  };
-  return <Edge key={e.id} {...edgeProps} />;
-}
+export class Map extends React.Component<Props, State> {
 
-function renderObject(o: T.ObjectData, props: Props) {
-  const {
-    addObjectToSelection, toggleObjectSelection, clearSelection, moveObject,
-    openBox, focusObject, changeStatus
-  } = props.actions;
+  static getDerivedStateFromProps(props: Props, state: State) {
+    return {
+      objects: props.senseObject.objects,
+      edges:   props.senseObject.edges,
+    };
+  }
 
-  const isMultiSelectable = I.isMultiSelectable(props.input);
-  const isSelected = SL.contains(props.selection, o.id);
-  const transform = makeTransform(props);
-  const inverseTransform = makeInverseTransform(props);
+  constructor(props: Props) {
+    super(props);
 
-  const handleObjectMouseDown = (e: KonvaEvent.Mouse, data: T.ObjectData) => {
-    // stop event propagation by setting the e.cancelBubble
-    // notice that it's useless to set e.evt.cancelBubble directly
-    // check: https://github.com/lavrton/react-konva/issues/139
-    e.cancelBubble = true;
+    this.handleClick           = this.handleClick.bind(this);
+    this.handleMouseDown       = this.handleMouseDown.bind(this);
+    this.handleMouseMove       = this.handleMouseMove.bind(this);
+    this.handleMouseUp         = this.handleMouseUp.bind(this);
+    this.handleObjectDragStart = this.handleObjectDragStart.bind(this);
+    this.handleObjectDragMove  = this.handleObjectDragMove.bind(this);
+    this.handleObjectDragEnd   = this.handleObjectDragEnd.bind(this);
 
-    if (isMultiSelectable) {
-      focusObject(F.focusNothing());
-      toggleObjectSelection(data.id);
-    } else {
-      clearSelection();
-      if (!isSelected || props.selection.length > 1) {
+    this.state = {
+      objects: this.props.senseObject.objects,
+      edges:   this.props.senseObject.edges,
+      objectDragStart: { x: 0, y: 0 },
+    };
+  }
+
+  handleMouseMove(e: KonvaEvent.Mouse) {
+    if (this.props.stage.mouseDown) {
+      const dx = e.evt.movementX;
+      const dy = e.evt.movementY;
+      this.props.actions.stageMouseMove({ dx, dy });
+    }
+    return;
+  }
+
+  // tslint:disable-next-line:no-any
+  handleMouseDown(e: any) {
+    if (e.target && e.target.nodeType === 'Stage') {
+      this.props.actions.stageMouseDown();
+    }
+  }
+
+  handleMouseUp(e: KonvaEvent.Mouse) {
+    this.props.actions.stageMouseUp();
+  }
+
+  // tslint:disable-next-line:no-any
+  handleClick(e: any) {
+    if (e.target && e.target.nodeType === 'Stage') {
+      this.props.actions.clearSelection();
+    }
+  }
+
+  handleObjectDragStart(e: KonvaEvent.Mouse) {
+    const x = e.evt.layerX;
+    const y = e.evt.layerY;
+    this.setState({ objectDragStart: { x, y } });
+  }
+
+  handleObjectDragMove(e: KonvaEvent.Mouse) {
+    const dx = e.evt.layerX - this.state.objectDragStart.x;
+    const dy = e.evt.layerY - this.state.objectDragStart.y;
+    const objects = this.props.selection.map(id => {
+      const o = SO.getObject(this.props.senseObject, id);
+      return { ...o, x: o.x + dx, y: o.y + dy };
+    }).reduce((a, o) => { a[o.id] = o; return a; }, {});
+    this.setState({ objects: { ...this.state.objects, ...objects } });
+  }
+
+  handleObjectDragEnd(e: KonvaEvent.Mouse) {
+    const dx = e.evt.layerX - this.state.objectDragStart.x;
+    const dy = e.evt.layerY - this.state.objectDragStart.y;
+    this.props.selection.forEach(id => {
+      const o = SO.getObject(this.props.senseObject, id);
+      this.props.actions.moveObject(id, o.x + dx, o.y + dy);
+    });
+    this.setState({ objectDragStart: { x: 0, y: 0 } });
+  }
+
+  render() {
+    const objects = Object.values(this.state.objects).map(o => this.renderObject(o));
+    const edges =   Object.values(this.state.edges).map(e => this.renderEdge(e));
+    let stage: Stage | null = null;
+
+    return (
+      <Stage
+        ref={(node) => stage = node as (Stage | null)}
+        width={this.props.width}
+        height={this.props.height}
+        onClick={this.handleClick}
+        onMouseDown={this.handleMouseDown}
+        onMouseUp={this.handleMouseUp}
+        onMouseMove={this.handleMouseMove}
+      >
+        <Layer>
+          {edges}
+          {objects}
+        </Layer>
+      </Stage>
+    );
+  }
+
+  renderObject(o: T.ObjectData) {
+    const {
+      addObjectToSelection, removeObjectFromSelection, clearSelection, openBox, focusObject, changeStatus
+    } = this.props.actions;
+
+    const isMultiSelectable = I.isMultiSelectable(this.props.input);
+    const isSelected = SL.contains(this.props.selection, o.id);
+    const transform = makeTransform(this.props);
+    const inverseTransform = makeInverseTransform(this.props);
+
+    const handleObjectSelect = (data: T.ObjectData) => {
+      if (isMultiSelectable) {
+        focusObject(F.focusNothing());
+        addObjectToSelection(data.id);
+      } else {
+        clearSelection();
         focusObject(O.toFocus(data));
         addObjectToSelection(data.id);
+      }
+    };
+
+    const handleObjectDeselect = (data: T.ObjectData) => {
+      removeObjectFromSelection(data.id);
+      if (this.props.selection.length === 1) {
+        focusObject(O.toFocus(SO.getObject(this.props.senseObject, this.props.selection[0])));
       } else {
         focusObject(F.focusNothing());
       }
-    }
-  };
+    };
 
-  switch (o.objectType) {
-    case T.ObjectType.NONE: {
-      return <Group key={o.id} />;
-    }
-    case T.ObjectType.CARD: {
-      if (!props.senseObject.cards[o.data]) {
+    switch (o.objectType) {
+      case T.ObjectType.NONE: {
         return <Group key={o.id} />;
       }
-      return (
-        <Card
-          key={o.id}
-          mapObject={o}
-          transform={transform}
-          inverseTransform={inverseTransform}
-          card={props.senseObject.cards[o.data]}
-          selected={isSelected}
-          handleMouseDown={handleObjectMouseDown}
-          moveObject={moveObject}
-          openCard={(id) => changeStatus(OE.StatusType.SHOW)}
-        />);
-    }
-    case T.ObjectType.BOX: {
-      if (!props.senseObject.boxes[o.data]) {
-        return <Group key={o.id} />;
+      case T.ObjectType.CARD: {
+        if (!this.props.senseObject.cards[o.data]) {
+          return <Group key={o.id} />;
+        }
+        return (
+          <Card
+            key={o.id}
+            mapObject={o}
+            transform={transform}
+            inverseTransform={inverseTransform}
+            card={this.props.senseObject.cards[o.data]}
+            selected={isSelected}
+            handleSelect={handleObjectSelect}
+            handleDeselect={handleObjectDeselect}
+            handleDragStart={this.handleObjectDragStart}
+            handleDragMove={this.handleObjectDragMove}
+            handleDragEnd={this.handleObjectDragEnd}
+            openCard={(id) => changeStatus(OE.StatusType.SHOW)}
+          />);
       }
-      return (
-        <Box
-          key={o.id}
-          mapObject={o}
-          transform={transform}
-          inverseTransform={inverseTransform}
-          box={props.senseObject.boxes[o.data]}
-          selected={isSelected}
-          handleMouseDown={handleObjectMouseDown}
-          moveObject={moveObject}
-          openBox={(id) => {
-            clearSelection();
-            openBox(id);
-          }}
-        />);
+      case T.ObjectType.BOX: {
+        if (!this.props.senseObject.boxes[o.data]) {
+          return <Group key={o.id} />;
+        }
+        return (
+          <Box
+            key={o.id}
+            mapObject={o}
+            transform={transform}
+            inverseTransform={inverseTransform}
+            box={this.props.senseObject.boxes[o.data]}
+            selected={isSelected}
+            handleSelect={handleObjectSelect}
+            handleDeselect={handleObjectDeselect}
+            handleDragStart={this.handleObjectDragStart}
+            handleDragMove={this.handleObjectDragMove}
+            handleDragEnd={this.handleObjectDragEnd}
+            openBox={(id) => {
+              clearSelection();
+              openBox(id);
+            }}
+          />);
+      }
+      default: {
+        throw Error(`Unknown ObjectData type ${o.objectType}`);
+      }
     }
-    default: {
-      throw Error(`Unknown ObjectData type ${o.objectType}`);
-    }
   }
-}
 
-function handleMouseMove(props: Props, e: KonvaEvent.Mouse) {
-  if (props.stage.mouseDown) {
-    const dx = e.evt.movementX;
-    const dy = e.evt.movementY;
-    props.actions.stageMouseMove({ dx, dy });
+  renderEdge(e: T.Edge) {
+    const edgeProps = {
+      from: SO.getObject(this.props.senseObject, e.from),
+      to: SO.getObject(this.props.senseObject, e.to),
+      transform: makeTransform(this.props),
+      inverseTransform: makeInverseTransform(this.props),
+    };
+    return <Edge key={e.id} {...edgeProps} />;
   }
-  return;
-}
-
-// tslint:disable-next-line:no-any
-function handleMouseDown(props: Props, e: any) {
-  if (e.target && e.target.nodeType === 'Stage') {
-    props.actions.stageMouseDown();
-  }
-}
-
-function handleMouseUp(props: Props, e: KonvaEvent.Mouse) {
-  props.actions.stageMouseUp();
-}
-
-// tslint:disable-next-line:no-any
-function handleClick(props: Props, e: any) {
-  if (e.target && e.target.nodeType === 'Stage') {
-    props.actions.clearSelection();
-  }
-}
-
-export function Map(props: Props) {
-  const objects = Object.values(props.senseObject.objects).map(o => renderObject(o, props));
-  const edges = Object.values(props.senseObject.edges).map(g => renderEdge(g, props));
-  let stage: Stage | null = null;
-
-  return (
-    <Stage
-      ref={(node) => stage = node as (Stage | null)}
-      width={props.width}
-      height={props.height}
-      onClick={handleClick.bind(undefined, props)}
-      onMouseDown={handleMouseDown.bind(undefined, props)}
-      onMouseUp={handleMouseUp.bind(undefined, props)}
-      onMouseMove={handleMouseMove.bind(undefined, props)}
-    >
-      <Layer>
-        {edges}
-        {objects}
-      </Layer>
-    </Stage>
-  );
 }
 
 export default Map;
