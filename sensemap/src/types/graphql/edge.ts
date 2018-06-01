@@ -57,3 +57,17 @@ export const create =
     return client.request(query, variables)
       .then(({ createEdge }) => toEdge(createEdge));
   };
+
+export const remove =
+  (edge: EdgeID) => {
+    const query = `
+      mutation DeleteEdge($edge: ID!) {
+        deleteEdge(id: $edge) {
+          id
+        }
+      }
+    `;
+    const variables = { edge };
+    // XXX Graphcool return value lacks map, from, to?
+    return client.request(query, variables);
+  };
