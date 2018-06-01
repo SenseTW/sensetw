@@ -1,13 +1,43 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { Container, Header, Form, Input, Divider } from 'semantic-ui-react';
-import { State, ActionProps, actions, mapDispatch } from '../../types';
+import { Container, Header, Form, Input, Divider, List, Button } from 'semantic-ui-react';
+import { MapID, State, ActionProps, actions, mapDispatch } from '../../types';
+import * as HA from '../../types/hypothesis/annotation';
+import * as IP from '../../types/importer';
+import { noop } from '../../types/utils';
+import { map } from 'ramda';
 
 interface StateFromProps {
+  mapId: MapID;
   url: string;
+  logs: IP.ImportLog[];
 }
 
 type Props = StateFromProps & ActionProps;
+
+const ImportedItem = (
+  props: IP.ImportLog &
+  { onImport?: (e: React.FormEvent<HTMLButtonElement>, annotations: HA.Annotation[]) => void }
+) => {
+  const { onImport = noop } = props;
+
+  return (
+    <List.Item key={props.url}>
+      <List.Content floated="right">
+        <Button
+          primary
+          onClick={e => onImport(e, props.annotations)}
+        >
+          匯入
+        </Button>
+      </List.Content>
+      <List.Content>
+        <List.Header>{props.url}</List.Header>
+        <List.Description>發現 {props.annotations.length} 條註記</List.Description>
+      </List.Content>
+    </List.Item>
+  );
+};
 
 class ImportPage extends React.PureComponent<Props> {
   handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -22,15 +52,30 @@ class ImportPage extends React.PureComponent<Props> {
     importer.fetchAnnotations(url);
   }
 
+  handleImport = async (e: React.FormEvent<HTMLButtonElement>, annotations: HA.Annotation[]) => {
+    const { actions: { senseObject }, mapId } = this.props;
+
+    for (const ann of annotations) {
+      try {
+        await senseObject.createCard(mapId, HA.toCardData(ann));
+      } catch (error) {
+        // tslint:disable-next-line:no-console
+        console.error('Fail to create card from annotation:', ann);
+      }
+    }
+
+    // tslint:disable-next-line:no-console
+    alert('匯入完畢');
+  }
+
   render() {
-    const { url } = this.props;
+    const { url, logs } = this.props;
 
     return (
       <Container text>
         <Header as="h1">Hypothesis Annotation Importer</Header>
         <Form>
           <Form.Field>
-            <label>文章地址</label>
             <Input
               action={{ icon: 'search', onClick: this.handleInputSubmit }}
               placeholder="文章地址"
@@ -40,6 +85,9 @@ class ImportPage extends React.PureComponent<Props> {
           </Form.Field>
         </Form>
         <Divider />
+        <List verticalAlign="middle">
+          {map(log => <ImportedItem {...log} onImport={this.handleImport} />, logs)}
+        </List>
       </Container>
     );
   }
@@ -47,8 +95,9 @@ class ImportPage extends React.PureComponent<Props> {
 
 export default connect<StateFromProps, ActionProps>(
   (state: State) => {
-    const { url } = state.importer;
-    return { url };
+    const { map: mapId } = state.senseMap;
+    const { url, logs } = state.importer;
+    return { mapId, url, logs };
   },
   mapDispatch({ actions })
 )(ImportPage);

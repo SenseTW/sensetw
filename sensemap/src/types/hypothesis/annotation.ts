@@ -1,3 +1,5 @@
+import { CardData, cardData } from '../sense/card';
+
 export interface BaseSelector {
   type: string;
   refinedBy?: Selector;
@@ -100,3 +102,16 @@ export interface Annotation extends AnnotationOption {
     incontext: string;
   };
 }
+
+export const toCardData = (ann: Annotation): CardData => {
+  const title = ann.document.title;
+
+  return cardData({
+    title: (title && title[0]) || ann.uri,
+    summary: ann.text,
+    description: ann.text,
+    tags: ann.tags.join(','),
+    saidBy: ann.user,
+    url: ann.uri,
+  });
+};
