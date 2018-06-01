@@ -27,7 +27,7 @@ const annotationLog = (url: string): AnnotationLog => ({
 /**
  * The sum of our logs. Maybe we will have more sources in the future.
  */
-type ImportLog
+export type ImportLog
   = AnnotationLog;
 
 const findByUrl = (url: string) => findIndex((a: ImportLog) => a.url === url);
