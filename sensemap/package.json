@@ -30,7 +30,8 @@
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject",
     "predeploy": "yarn run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "docs" : "typedoc --tsconfig tsconfig.json -out docs --ignoreCompilerErrors"
   },
   "devDependencies": {
     "@types/jest": "^22.2.2",
@@ -44,6 +45,7 @@
     "@types/redux-logger": "^3.0.5",
     "@types/redux-thunk": "^2.1.0",
     "gh-pages": "^1.1.0",
+    "typedoc": "^0.11.1",
     "typescript": "^2.8.1"
   }
 }
