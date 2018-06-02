@@ -1,57 +1,43 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import * as T from '../../../types';
+import { CardData, MapScopeType, State, actions, ActionProps, mapDispatch } from '../../../types';
 import * as F from '../../../types/sense/focus';
 import { Button } from 'semantic-ui-react';
 import './index.css';
 
 interface StateFromProps {
-  senseMap: T.State['senseMap'];
-}
-
-interface DispatchFromProps {
-  actions: {
-    focusObject(focus: F.Focus): T.ActionChain,
-    createObjectForCard(mapId: T.MapID, cardId: T.CardID, box?: T.BoxID): T.ActionChain,
-  };
+  senseMap: State['senseMap'];
 }
 
 interface OwnProps {
-  card: T.CardData;
+  card: CardData;
 }
 
-type Props = StateFromProps & DispatchFromProps & OwnProps;
+type Props = StateFromProps & ActionProps & OwnProps;
 
-function CardActions({ card, actions, senseMap }: Props) {
+function CardActions({ card, actions: acts, senseMap }: Props) {
   const box =
-    senseMap.scope.type === T.MapScopeType.BOX
+    senseMap.scope.type === MapScopeType.BOX
       ? senseMap.scope.box
       : undefined;
   return (
     <div className="card-actions">
       <Button
         icon="edit"
-        onClick={() => actions.focusObject(F.focusCard(card.id))}
+        onClick={() => acts.editor.focusObject(F.focusCard(card.id))}
       />
       <Button
         icon="plus square outline"
-        onClick={() => actions.createObjectForCard(senseMap.map, card.id, box)}
+        onClick={() => acts.senseObject.createObjectForCard(senseMap.map, card.id, box)}
       />
       <Button icon="trash" />
     </div>
   );
 }
 
-export default connect<StateFromProps, DispatchFromProps>(
-  (state: T.State) => ({
+export default connect<StateFromProps, ActionProps>(
+  (state: State) => ({
     senseMap: state.senseMap,
   }),
-  (dispatch: T.Dispatch) => ({
-    actions: {
-      focusObject: (focus: F.Focus) =>
-        dispatch(T.actions.editor.focusObject(focus)),
-      createObjectForCard: (mapId: T.MapID, cardId: T.CardID, box?: T.BoxID) =>
-        dispatch(T.actions.senseObject.createObjectForCard(mapId, cardId, box)),
-    }
-  })
+  mapDispatch({ actions }),
 )(CardActions);
