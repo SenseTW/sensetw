@@ -4,6 +4,7 @@ import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Segment, Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../types';
+import { actions, ActionProps, mapDispatch } from '../../types';
 import * as R from '../../types/routes';
 
 interface StateFromProps {
@@ -13,27 +14,19 @@ interface StateFromProps {
   bid: string;
 }
 
-interface DispatchFromProps {
-  actions: {
-    setScopeToBox(box: T.BoxID): T.ActionChain;
-    setScopeToFullmap(): T.ActionChain;
-    clearSelection(): T.ActionChain;
-  };
-}
-
 type RouterProps = RouteComponentProps<{ bid: string }>;
 
-type Props = StateFromProps & DispatchFromProps & RouterProps;
+type Props = StateFromProps & ActionProps & RouterProps;
 
 class Breadcrumb extends React.PureComponent<Props> {
   componentWillMount() {
-    const { actions, bid } = this.props;
+    const { actions: { senseMap }, bid } = this.props;
 
     // sync the route to the scope
     if (bid) {
-      actions.setScopeToBox(bid);
+      senseMap.setScopeToBox(bid);
     } else {
-      actions.setScopeToFullmap();
+      senseMap.setScopeToFullmap();
     }
   }
 
@@ -53,7 +46,7 @@ class Breadcrumb extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, scope, boxes, bid } = this.props;
+    const { actions: { senseMap, selection }, scope, boxes, bid } = this.props;
     let box = { title: bid };
     if (scope.type === T.MapScopeType.BOX) {
       box = boxes[scope.box] || box;
@@ -79,8 +72,8 @@ class Breadcrumb extends React.PureComponent<Props> {
                   as={Link}
                   to={R.index}
                   onClick={() => {
-                    actions.clearSelection();
-                    actions.setScopeToFullmap();
+                    selection.clearSelection();
+                    senseMap.setScopeToFullmap();
                   }}
                 >
                   Map
@@ -94,7 +87,7 @@ class Breadcrumb extends React.PureComponent<Props> {
   }
 }
 
-export default withRouter(connect<StateFromProps, DispatchFromProps, RouterProps>(
+export default withRouter(connect<StateFromProps, ActionProps, RouterProps>(
   (state: T.State, router) => {
     const { boxes } = state.senseObject;
     const { scope } = state.senseMap;
@@ -103,11 +96,5 @@ export default withRouter(connect<StateFromProps, DispatchFromProps, RouterProps
 
     return { history, scope, boxes, bid };
   },
-  (dispatch: T.Dispatch) => ({
-    actions: {
-      setScopeToBox: (box: T.BoxID) => dispatch(T.actions.senseMap.setScopeToBox(box)),
-      setScopeToFullmap: () => dispatch(T.actions.senseMap.setScopeToFullmap()),
-      clearSelection: () => dispatch(T.actions.selection.clearSelection()),
-    }
-  })
+  mapDispatch({ actions })
 )(Breadcrumb));
