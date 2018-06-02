@@ -8,59 +8,39 @@ import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
 import Inbox from '../../containers/Inbox';
-import * as T from '../../types';
+import { CardData, BoxData, ObjectType, MapScopeType, State, actions, ActionProps, mapDispatch } from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
-import * as V from '../../types/viewport';
 import { Action as BoxAction } from '../../types/sense/box';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
-import { Key } from 'ts-keycode-enum';
 import './index.css';
 const background = require('./background-map.png');
 
 interface StateFromProps {
-  senseMap: T.State['senseMap'];
+  senseMap: State['senseMap'];
   senseObject: SO.State;
   editor: OE.State;
   scope: typeof SM.initial.scope;
 }
 
-interface DispatchFromProps {
-  actions: {
-    changeStatus(status: OE.StatusType): T.ActionChain,
-    createBoxObject(mapId: T.MapID, box: T.BoxData): T.ActionChain,
-    createCardObject(mapID: T.MapID, card: T.CardData): T.ActionChain,
-    updateRemoteBox(box: T.BoxData): T.ActionChain,
-    updateRemoteCard(card: T.CardData): T.ActionChain,
-    addCardToBox(cardObject: T.ObjectID, box: T.BoxID): T.ActionChain,
-    resizeViewpart(dimension: V.Dimension): T.ActionChain,
-    keyPress(key: Key): T.ActionChain,
-    keyRelease(key: Key): T.ActionChain,
-    updateBox(id: T.BoxID, action: BoxAction): T.ActionChain;
-    updateCard(id: T.CardID, action: CardAction): T.ActionChain;
-    focusObject(focus: F.Focus): T.ActionChain,
-    clearObject(objectType: T.ObjectType, id: T.BoxID | T.CardID): T.ActionChain;
-  };
-}
-
-type Props = StateFromProps & DispatchFromProps;
+type Props = StateFromProps & ActionProps;
 
 class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
-    const { actions } = this.props;
-    actions.resizeViewpart({ width, height });
+    const { actions: acts } = this.props;
+    acts.viewport.resizeViewport({ width, height });
   }
 
   handleKeyUp = (e: KeyboardEvent) => {
-    const { actions } = this.props;
-    actions.keyRelease(e.which);
+    const { actions: acts } = this.props;
+    acts.input.keyRelease(e.which);
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
-    const { actions } = this.props;
-    actions.keyPress(e.which);
+    const { actions: acts } = this.props;
+    acts.input.keyPress(e.which);
   }
 
   componentDidMount() {
@@ -74,19 +54,19 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions, editor, scope, senseMap, senseObject } = this.props;
+    const { actions: acts, editor, scope, senseMap, senseObject } = this.props;
     const { status, focus } = editor;
 
-    let data: T.BoxData | T.CardData | null = null;
+    let data: BoxData | CardData | null = null;
     let isDirty: boolean = false;
     let doesDataExist: boolean = false;
     switch (focus.objectType) {
-      case T.ObjectType.BOX:
+      case ObjectType.BOX:
         data = SO.getBoxOrDefault(editor.temp, senseObject, focus.data);
         isDirty = SO.doesBoxExist(editor.temp, focus.data);
         doesDataExist = SO.doesBoxExist(senseObject, focus.data);
         break;
-      case T.ObjectType.CARD:
+      case ObjectType.CARD:
         data = SO.getCardOrDefault(editor.temp, senseObject, focus.data);
         isDirty = SO.doesCardExist(editor.temp, focus.data);
         doesDataExist = SO.doesCardExist(senseObject, focus.data);
@@ -114,11 +94,11 @@ class MapPage extends React.Component<Props> {
                   }
 
                   switch (focus.objectType) {
-                    case T.ObjectType.CARD:
-                      actions.updateCard(data.id, action as CardAction);
+                    case ObjectType.CARD:
+                      acts.editor.updateCard(data.id, action as CardAction);
                       break;
-                    case T.ObjectType.BOX:
-                      actions.updateBox(data.id, action as BoxAction);
+                    case ObjectType.BOX:
+                      acts.editor.updateBox(data.id, action as BoxAction);
                       break;
                     default:
                   }
@@ -127,36 +107,38 @@ class MapPage extends React.Component<Props> {
                   if (doesDataExist) {
                     // should update the object
                     switch (focus.objectType) {
-                      case T.ObjectType.CARD:
-                        await actions.updateRemoteCard(newData as T.CardData);
-                        actions.clearObject(focus.objectType, focus.data);
+                      case ObjectType.CARD:
+                        await acts.senseObject.updateRemoteCard(newData as CardData);
+                        acts.editor.clearObject(focus.objectType, focus.data);
                         break;
-                      case T.ObjectType.BOX:
-                        await actions.updateRemoteBox(newData as T.BoxData);
-                        actions.clearObject(focus.objectType, focus.data);
+                      case ObjectType.BOX:
+                        await acts.senseObject.updateRemoteBox(newData as BoxData);
+                        acts.editor.clearObject(focus.objectType, focus.data);
                         break;
                       default:
                     }
                   } else {
                     // should create an object
                     switch (focus.objectType) {
-                      case T.ObjectType.CARD:
-                        const action = await actions.createCardObject(senseMap.map, newData as T.CardData);
+                      case ObjectType.CARD:
+                        const action =
+                          // tslint:disable-next-line:no-any
+                          await acts.senseObject.createCardObject(senseMap.map, newData as CardData) as any;
                         const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
-                        if (scope.type === T.MapScopeType.BOX) {
+                        if (scope.type === MapScopeType.BOX) {
                           const obj = Object.values(objects)[0];
                           const boxId = scope.box;
-                          await actions.addCardToBox(obj.id, boxId);
+                          await acts.senseObject.addCardToBox(obj.id, boxId);
                         }
-                        actions.changeStatus(OE.StatusType.HIDE);
-                        actions.clearObject(focus.objectType, focus.data);
-                        actions.focusObject(F.focusNothing());
+                        acts.editor.changeStatus(OE.StatusType.HIDE);
+                        acts.editor.clearObject(focus.objectType, focus.data);
+                        acts.editor.focusObject(F.focusNothing());
                         break;
-                      case T.ObjectType.BOX:
-                        actions.createBoxObject(senseMap.map, newData as T.BoxData);
-                        actions.changeStatus(OE.StatusType.HIDE);
-                        actions.clearObject(focus.objectType, focus.data);
-                        actions.focusObject(F.focusNothing());
+                      case ObjectType.BOX:
+                        acts.senseObject.createBoxObject(senseMap.map, newData as BoxData);
+                        acts.editor.changeStatus(OE.StatusType.HIDE);
+                        acts.editor.clearObject(focus.objectType, focus.data);
+                        acts.editor.focusObject(F.focusNothing());
                         break;
                       default:
                     }
@@ -164,11 +146,11 @@ class MapPage extends React.Component<Props> {
                 }}
                 onCancel={() => {
                   if (data) {
-                    actions.clearObject(focus.objectType, data.id);
+                    acts.editor.clearObject(focus.objectType, data.id);
                   }
                   if (!doesDataExist) {
-                    actions.focusObject(F.focusNothing());
-                    actions.changeStatus(OE.StatusType.HIDE);
+                    acts.editor.focusObject(F.focusNothing());
+                    acts.editor.changeStatus(OE.StatusType.HIDE);
                   }
                 }}
               />
@@ -191,8 +173,8 @@ class MapPage extends React.Component<Props> {
   }
 }
 
-export default connect<StateFromProps, DispatchFromProps>(
-  (state: T.State) => {
+export default connect<StateFromProps, ActionProps>(
+  (state: State) => {
     const senseMap = state.senseMap;
     const senseObject = state.senseObject;
     const scope = state.senseMap.scope;
@@ -200,34 +182,5 @@ export default connect<StateFromProps, DispatchFromProps>(
 
     return { senseMap, senseObject, scope, editor };
   },
-  (dispatch: T.Dispatch) => ({
-    actions: {
-      changeStatus: (status: OE.StatusType) =>
-        dispatch(OE.actions.changeStatus(status)),
-      createBoxObject: (mapId: T.MapID, box: T.BoxData) =>
-        dispatch(T.actions.senseObject.createBoxObject(mapId, box)),
-      createCardObject: (mapId: T.MapID, card: T.CardData) =>
-        dispatch(T.actions.senseObject.createCardObject(mapId, card)),
-      updateRemoteBox: (box: T.BoxData) =>
-        dispatch(T.actions.senseObject.updateRemoteBox(box)),
-      updateRemoteCard: (card: T.CardData) =>
-        dispatch(T.actions.senseObject.updateRemoteCard(card)),
-      addCardToBox: (cardObject: T.ObjectID, box: T.BoxID) =>
-        dispatch(T.actions.senseObject.addCardToBox(cardObject, box)),
-      resizeViewpart: (dimension: V.Dimension) =>
-        dispatch(T.actions.viewport.resizeViewport(dimension)),
-      keyPress: (key: Key) =>
-        dispatch(T.actions.input.keyPress(key)),
-      keyRelease: (key: Key) =>
-        dispatch(T.actions.input.keyRelease(key)),
-      updateBox: (id: T.BoxID, action: BoxAction) =>
-        dispatch(T.actions.editor.updateBox(id, action)),
-      updateCard: (id: T.CardID, action: CardAction) =>
-        dispatch(T.actions.editor.updateCard(id, action)),
-      focusObject: (focus: F.Focus) =>
-        dispatch(T.actions.editor.focusObject(focus)),
-      clearObject: (objectType: T.ObjectType, id: T.BoxID | T.CardID) =>
-        dispatch(T.actions.editor.clearObject(objectType, id)),
-    }
-  })
+  mapDispatch({ actions }),
 )(MapPage);

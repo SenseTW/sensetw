@@ -299,10 +299,9 @@ const createObjectForCard =
     )(dispatch);
     const { id = '' } = Object.values(action.payload)[0] || {};
     if (box) {
-      return addCardToBox(id, box)(dispatch);
-    } else {
-      return action;
+      addCardToBox(id, box)(dispatch);
     }
+    return action;
   };
 
 const createCardObject =
