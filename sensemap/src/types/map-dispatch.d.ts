@@ -40,5 +40,10 @@ export type Dispatch = ReduxDispatch<State>;
  *  mapDispatch({ actions })
  * )(Component);
  * ```
+ *
+ * @todo Fix thunk action types. They should be
+ * `(...args: Args) => Promise<B>` instead of
+ * `(...args: Args) => (Dispatch) => Promise<B>` after we map the dispatch
+ * function.
  */
 export declare const mapDispatch: <T>(obj: T) => (dispatch: Dispatch) => T;
