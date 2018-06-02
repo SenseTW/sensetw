@@ -36,6 +36,12 @@ export const getCard = (state: State, id: CardID): CardData => state.cards[id] |
 export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
 export const getEdge = (state: State, id: EdgeID): Edge => state.edges[id] || emptyEdge;
 
+export const getCardsInBox = (state: State, id: BoxID): State['cards'] =>
+  Object.keys(getBox(state, id).contains)
+    .map(oid => getObject(state, oid).data )
+    .map(cid => getCard(state, cid))
+    .reduce((a, c) => { a[c.id] = c; return a; }, {});
+
 export const doesObjectExist = (state: State, id: ObjectID): boolean => !!state.objects[id];
 export const doesCardExist = (state: State, id: CardID): boolean => !!state.cards[id];
 export const doesBoxExist = (state: State, id: BoxID): boolean => !!state.boxes[id];

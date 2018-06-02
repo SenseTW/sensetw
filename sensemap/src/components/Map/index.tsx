@@ -219,7 +219,7 @@ export class Map extends React.Component<Props, State> {
         return <Group key={o.id} />;
       }
       case T.ObjectType.CARD: {
-        if (!this.props.senseObject.cards[o.data]) {
+        if (!SO.doesCardExist(this.props.senseObject, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -228,7 +228,7 @@ export class Map extends React.Component<Props, State> {
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
-            card={this.props.senseObject.cards[o.data]}
+            card={SO.getCard(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
             handleDeselect={handleObjectDeselect}
@@ -239,7 +239,7 @@ export class Map extends React.Component<Props, State> {
           />);
       }
       case T.ObjectType.BOX: {
-        if (!this.props.senseObject.boxes[o.data]) {
+        if (!SO.doesBoxExist(this.props.senseObject, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -248,7 +248,8 @@ export class Map extends React.Component<Props, State> {
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
-            box={this.props.senseObject.boxes[o.data]}
+            box={SO.getBox(this.props.senseObject, o.data)}
+            cards={SO.getCardsInBox(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
             handleDeselect={handleObjectDeselect}

@@ -1,15 +1,17 @@
 import * as React from 'react';
-import { Group, Rect, Text } from 'react-konva';
-import TagList from '../TagList';
+import { Group, Rect } from 'react-konva';
+import Card from './Card';
+import Header from './Header';
 import * as T from '../../../types';
 import * as B from '../../../types/sense/box';
-import { noop, toTags } from '../../../types/utils';
+import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 import * as G from '../../../graphics/point';
 
 interface Props {
   mapObject: T.ObjectData;
   box: T.BoxData;
+  cards: T.State['senseObject']['cards'];
   selected?: Boolean;
   transform: G.Transform;
   inverseTransform: G.Transform;
@@ -22,27 +24,11 @@ interface Props {
 }
 
 interface State {
-  tagHeight: number;
   newlySelected: boolean;
 }
 
 const width = B.DEFAULT_WIDTH;
 const height = B.DEFAULT_HEIGHT;
-const borderColor = '#707070';
-const borderWidth = 8;
-const bgColor = '#ffffff';
-const cornerRadius = 2;
-
-const titlePadding = 0;
-const titleWidth = 180;
-const titleOffsetX = (width - (titleWidth + titlePadding)) / 2;
-const titleFontFamily = 'sans-serif';
-const titleColor = '#000000';
-const titleFontSize = 20;
-const titleLineHeight = 22 / titleFontSize;
-const titleOffsetY = (height - titleFontSize) / 2;
-const titleLineBreak = 9;
-const titleLimit = 18;
 
 const selectedOffsetX = -8;
 const selectedOffsetY = -8;
@@ -52,12 +38,20 @@ const selectedCornerRadius = 10;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 2;
 
-const tagLeft = 8;
-const tagBottom = 8;
+function boxCards(props: Props) {
+  const cards = Object.values(props.cards);
+  console.log(cards);
+  const cardHeight = Card.style.height;
+  const top = Header.style.height;
+  return (
+    <Group x={0} y={top}>
+      {cards.map((card, i) => <Card card={card} x={0} y={i * cardHeight} key={card.id} />)}
+    </Group>
+  );
+}
 
 class Box extends React.Component<Props, State> {
   state = {
-    tagHeight: 0,
     newlySelected: false,
   };
 
@@ -66,10 +60,7 @@ class Box extends React.Component<Props, State> {
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
     });
-    const {title, tags} = this.props.box;
-    const sanitizedTitle = title.substr(0, titleLimit);
-    const boxID = this.props.box.id;
-    const tagHeight = this.state.tagHeight;
+    const { box } = this.props;
 
     const handleSelect    = this.props.handleSelect    || noop;
     const handleDeselect  = this.props.handleDeselect  || noop;
@@ -88,8 +79,6 @@ class Box extends React.Component<Props, State> {
         stroke={selectedColor}
         strokeWidth={selectedStrokeWidth}
       />);
-
-    const offsetY = sanitizedTitle.length <= titleLineBreak ? titleOffsetY : titleOffsetY - titleFontSize / 2;
 
     return (
       <Group
@@ -113,7 +102,7 @@ class Box extends React.Component<Props, State> {
         }}
         onDblClick={() => {
           handleSelect(this.props.mapObject);
-          openBox(boxID);
+          openBox(box.id);
         }}
         onMouseUp={(e) => {
           e.cancelBubble = true;
@@ -123,32 +112,8 @@ class Box extends React.Component<Props, State> {
         onDragEnd={handleDragEnd}
       >
         {this.props.selected ? selected : null}
-        <Rect
-          fill={bgColor}
-          width={width}
-          height={height}
-          stroke={borderColor}
-          strokeWidth={borderWidth}
-          cornerRadius={cornerRadius}
-        />
-        <Text
-          x={titleOffsetX}
-          y={offsetY}
-          align="center"
-          width={titleWidth}
-          fill={titleColor}
-          fontFamily={titleFontFamily}
-          fontSize={titleFontSize}
-          lineHeight={titleLineHeight}
-          padding={titlePadding}
-          text={title}
-        />
-        <TagList
-          x={tagLeft}
-          y={height - tagBottom - tagHeight}
-          tags={toTags(tags)}
-          onResize={(w, h) => this.setState({ tagHeight: h })}
-        />
+        <Header box={box} x={0} y={0} />
+        {boxCards(this.props)}
       </Group>
     );
   }

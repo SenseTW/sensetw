@@ -11,13 +11,13 @@ export type BoxID = string;
  *
  * @todo Move it to the map.
  */
-export const DEFAULT_WIDTH  = 240;
+export const DEFAULT_WIDTH  = 320;
 /**
  * The default height of a box on the sense map.
  *
  * @todo Move it to the map.
  */
-export const DEFAULT_HEIGHT = 114; // 90px + 24px for tags
+export const DEFAULT_HEIGHT = 130; // 90px + 24px for tags
 
 /**
  * It describes a box.

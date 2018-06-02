@@ -15,7 +15,7 @@ interface State {
   h: number;
 }
 
-const tagMargin = 4;
+const tagMargin = 9;
 
 class TagList extends React.Component<Props, State> {
   state = {
