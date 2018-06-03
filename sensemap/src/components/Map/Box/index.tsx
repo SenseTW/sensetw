@@ -1,12 +1,21 @@
 import * as React from 'react';
 import { Group, Rect } from 'react-konva';
-import Card from './Card';
 import Header from './Header';
+import Card from './Card';
+import Toggle from './Toggle';
 import * as T from '../../../types';
 import * as B from '../../../types/sense/box';
 import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 import * as G from '../../../graphics/point';
+
+export enum ListDisplay {
+  EXPANDED  = 'EXPANDED',
+  COLLAPSED = 'COLLAPSED',
+}
+
+const toggleListDisplay = (d: ListDisplay) =>
+  d === ListDisplay.EXPANDED ? ListDisplay.COLLAPSED : ListDisplay.EXPANDED;
 
 interface Props {
   mapObject: T.ObjectData;
@@ -25,6 +34,7 @@ interface Props {
 
 interface State {
   newlySelected: boolean;
+  listDisplay: ListDisplay;
 }
 
 const width = B.DEFAULT_WIDTH;
@@ -38,8 +48,7 @@ const selectedCornerRadius = 10;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 2;
 
-function boxCards(props: Props) {
-  const cards = Object.values(props.cards);
+function boxCards(props: Props, cards: T.CardData[]) {
   const cardHeight = Card.style.height;
   const top = Header.style.height;
   return (
@@ -52,7 +61,17 @@ function boxCards(props: Props) {
 class Box extends React.Component<Props, State> {
   state = {
     newlySelected: false,
+    listDisplay: ListDisplay.COLLAPSED,
   };
+
+  constructor(props: Props) {
+    super(props);
+    this.handleToggleListDisplay = this.handleToggleListDisplay.bind(this);
+  }
+
+  handleToggleListDisplay() {
+    this.setState({ listDisplay: toggleListDisplay(this.state.listDisplay) });
+  }
 
   render() {
     const { x, y } = this.props.transform({
@@ -60,6 +79,7 @@ class Box extends React.Component<Props, State> {
       y: this.props.mapObject.y,
     });
     const { box } = this.props;
+    const cards = Object.values(this.props.cards);
 
     const handleSelect    = this.props.handleSelect    || noop;
     const handleDeselect  = this.props.handleDeselect  || noop;
@@ -112,7 +132,20 @@ class Box extends React.Component<Props, State> {
       >
         {this.props.selected ? selected : null}
         <Header box={box} x={0} y={0} />
-        {boxCards(this.props)}
+        {this.state.listDisplay === ListDisplay.COLLAPSED
+          ? null : boxCards(this.props, cards)}
+        <Toggle
+          x={0}
+          y={
+            Header.style.height
+            + (this.state.listDisplay === ListDisplay.COLLAPSED
+               ? 0
+               : Card.style.height * cards.length
+              )
+          }
+          show={this.state.listDisplay === ListDisplay.EXPANDED}
+          action={this.handleToggleListDisplay}
+        />
       </Group>
     );
   }
