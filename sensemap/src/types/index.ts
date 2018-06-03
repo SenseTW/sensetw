@@ -15,7 +15,6 @@ export {
   Dispatch,
   mapDispatch,
   ActionProps,
-  ActionChain,
   GetState,
   Reducer,
   reducer,

@@ -1,38 +1,31 @@
 import * as React from 'react';
 import { Button, Icon, Pagination, PaginationProps } from 'semantic-ui-react';
 import './index.css';
-import * as T from '../../types';
+import { CardData, State, ActionProps } from '../../types';
 import * as C from '../../types/sense/card';
 import CardList from './CardList';
 import { Pager } from '../Pager';
 
 export interface StateFromProps {
-  cards: T.CardData[];
-  senseMap: T.State['senseMap'];
-}
-
-export interface DispatchFromProps {
-  actions: {
-    closeInbox(): T.ActionChain,
-    createCard(mapId: T.MapID, card: T.CardData): T.ActionChain,
-  };
+  cards: CardData[];
+  senseMap: State['senseMap'];
 }
 
 export interface OwnProps {}
 
-export type Props = StateFromProps & DispatchFromProps & OwnProps;
+export type Props = StateFromProps & ActionProps & OwnProps;
 
-export function Inbox({ cards, senseMap, actions }: Props) {
+export function Inbox({ cards, senseMap, actions: acts }: Props) {
   const mapId = senseMap.map;
   return (
     <div className="inbox">
       <div className="inbox__close-btn">
-        <Button icon labelPosition="right" onClick={actions.closeInbox}>
+        <Button icon labelPosition="right" onClick={acts.senseMap.closeInbox}>
           INBOX <Icon name="arrow left" />
         </Button>
       </div>
       <div className="inbox__add-card-btn">
-        <Button icon="plus" size="tiny" color="grey" onClick={() => actions.createCard(mapId, C.cardData())} />
+        <Button icon="plus" size="tiny" color="grey" onClick={() => acts.senseObject.createCard(mapId, C.cardData())} />
       </div>
       <Pager data={cards} pageSize={9}>
         {({ data, totalPages, currentPage, handlePageChange }) => {

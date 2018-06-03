@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
-import * as T from '../../types';
+import { State, actions, ActionProps, mapDispatch } from '../../types';
 import * as CO from '../../components/Inbox';
 
-export default connect<CO.StateFromProps, CO.DispatchFromProps, CO.OwnProps>(
-  (state: T.State) => {
+export default connect<CO.StateFromProps, ActionProps, CO.OwnProps>(
+  (state: State) => {
     const cards = Array(...Object.values(state.senseObject.cards))
       .sort((a, b) => b.updatedAt - a.updatedAt);
     return {
@@ -11,12 +11,5 @@ export default connect<CO.StateFromProps, CO.DispatchFromProps, CO.OwnProps>(
       senseMap: state.senseMap,
     };
   },
-  (dispatch: T.Dispatch) => ({
-    actions: {
-      closeInbox: () =>
-        dispatch(T.actions.senseMap.closeInbox()),
-      createCard: (mapId: T.MapID, card: T.CardData) =>
-        dispatch(T.actions.senseObject.createCard(mapId, card)),
-    }
-  })
+  mapDispatch({ actions }),
 )(CO.Inbox);

@@ -6,7 +6,7 @@ import Card from './Card';
 import Edge from './Edge';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
-import * as T from '../../types';
+import { Edge as EdgeData, ObjectType, ObjectData, State, ActionProps } from '../../types';
 import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
 import * as O from '../../types/sense/object';
@@ -19,45 +19,26 @@ import * as C from '../../types/sense/card';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
-  selection:   T.State['selection'];
-  senseObject: T.State['senseObject'];
-  inScope:     T.State['senseObject'];
-  input:       T.State['input'];
-  stage:       T.State['stage'];
+  selection:   State['selection'];
+  senseObject: State['senseObject'];
+  inScope:     State['senseObject'];
+  input:       State['input'];
+  stage:       State['stage'];
 }
 
-export interface DispatchFromProps {
-  actions: {
-    removeObjectFromSelection: typeof T.actions.selection.removeObjectFromSelection,
-    addObjectToSelection:      typeof T.actions.selection.addObjectToSelection,
-    toggleObjectSelection:     typeof T.actions.selection.toggleObjectSelection,
-    clearSelection:            typeof T.actions.selection.clearSelection,
-
-    moveObject(id: T.ObjectID, x: number, y: number): T.ActionChain,
-    addCardToBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
-    removeCardFromBox(card: T.ObjectID, box: T.BoxID): T.ActionChain,
-    openBox(box: T.BoxID): T.ActionChain,
-    stageMouseUp(): T.ActionChain,
-    stageMouseDown(): T.ActionChain,
-    stageMouseMove({ dx, dy }: { dx: number, dy: number }): T.ActionChain,
-    focusObject(focus: F.Focus): T.ActionChain,
-    changeStatus(status: OE.StatusType): T.ActionChain,
-  };
-}
-
-type ViewportState = T.State['viewport'];
+type ViewportState = State['viewport'];
 
 export interface OwnProps extends ViewportState {}
 
-export type Props = StateFromProps & DispatchFromProps & OwnProps;
+export type Props = StateFromProps & ActionProps & OwnProps;
 
-interface State {
-  inScope: T.State['senseObject'];
+interface MapState {
+  inScope: State['senseObject'];
   objectDragStart: {
     x: number,
     y: number,
   };
-  dropTarget: T.State['senseObject']['objects'];
+  dropTarget: State['senseObject']['objects'];
 }
 
 const makeTransform: V.StateToTransform =
@@ -66,12 +47,12 @@ const makeTransform: V.StateToTransform =
 const makeInverseTransform: V.StateToTransform =
   ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
 
-function getCenter(o: T.ObjectData): G.Point {
+function getCenter(o: ObjectData): G.Point {
   switch (o.objectType) {
-    case T.ObjectType.CARD: {
+    case ObjectType.CARD: {
       return { x: o.x + C.DEFAULT_WIDTH / 2, y: o.y + C.DEFAULT_HEIGHT / 2 };
     }
-    case T.ObjectType.BOX: {
+    case ObjectType.BOX: {
       return { x: o.x + B.DEFAULT_WIDTH / 2, y: o.y + B.DEFAULT_HEIGHT / 2 };
     }
     default: {
@@ -80,7 +61,7 @@ function getCenter(o: T.ObjectData): G.Point {
   }
 }
 
-export class Map extends React.Component<Props, State> {
+export class Map extends React.Component<Props, MapState> {
 
   static getDerivedStateFromProps(props: Props, state: State) {
     return { inScope: props.inScope };
@@ -110,7 +91,7 @@ export class Map extends React.Component<Props, State> {
     if (this.props.stage.mouseDown) {
       const dx = e.evt.movementX;
       const dy = e.evt.movementY;
-      this.props.actions.stageMouseMove({ dx, dy });
+      this.props.actions.stage.stageMouseMove({ dx, dy });
     }
     return;
   }
@@ -118,26 +99,26 @@ export class Map extends React.Component<Props, State> {
   // tslint:disable-next-line:no-any
   handleMouseDown(e: any) {
     if (e.target && e.target.nodeType === 'Stage') {
-      this.props.actions.stageMouseDown();
+      this.props.actions.stage.stageMouseDown();
     }
   }
 
   handleMouseUp(e: KonvaEvent.Mouse) {
-    this.props.actions.stageMouseUp();
+    this.props.actions.stage.stageMouseUp();
   }
 
   // tslint:disable-next-line:no-any
   handleClick(e: any) {
     if (e.target && e.target.nodeType === 'Stage') {
-      this.props.actions.clearSelection();
+      this.props.actions.selection.clearSelection();
     }
   }
 
-  handleObjectSetDropTarget(data: T.ObjectData) {
+  handleObjectSetDropTarget(data: ObjectData) {
     this.setState({ dropTarget: { [data.id]: data } });
   }
 
-  handleObjectUnsetDropTarget(data: T.ObjectData) {
+  handleObjectUnsetDropTarget(data: ObjectData) {
     this.setState({ dropTarget: {} });
   }
 
@@ -169,7 +150,7 @@ export class Map extends React.Component<Props, State> {
     const dy = e.evt.layerY - this.state.objectDragStart.y;
     this.props.selection.forEach(id => {
       const o = SO.getObject(this.props.senseObject, id);
-      this.props.actions.moveObject(id, o.x + dx, o.y + dy);
+      this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
     this.setState({ objectDragStart: { x: 0, y: 0 } });
   }
@@ -195,41 +176,39 @@ export class Map extends React.Component<Props, State> {
     );
   }
 
-  renderObject(o: T.ObjectData) {
-    const {
-      addObjectToSelection, removeObjectFromSelection, clearSelection, openBox, focusObject, changeStatus
-    } = this.props.actions;
+  renderObject(o: ObjectData) {
+    const acts = this.props.actions;
 
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
     const isSelected = SL.contains(this.props.selection, o.id);
     const transform = makeTransform(this.props);
     const inverseTransform = makeInverseTransform(this.props);
 
-    const handleObjectSelect = (data: T.ObjectData) => {
+    const handleObjectSelect = (data: ObjectData) => {
       if (isMultiSelectable) {
-        focusObject(F.focusNothing());
-        addObjectToSelection(data.id);
+        acts.editor.focusObject(F.focusNothing());
+        acts.selection.addObjectToSelection(data.id);
       } else {
-        clearSelection();
-        focusObject(O.toFocus(data));
-        addObjectToSelection(data.id);
+        acts.selection.clearSelection();
+        acts.editor.focusObject(O.toFocus(data));
+        acts.selection.addObjectToSelection(data.id);
       }
     };
 
-    const handleObjectDeselect = (data: T.ObjectData) => {
-      removeObjectFromSelection(data.id);
+    const handleObjectDeselect = (data: ObjectData) => {
+      acts.selection.removeObjectFromSelection(data.id);
       if (this.props.selection.length === 1) {
-        focusObject(O.toFocus(SO.getObject(this.props.senseObject, this.props.selection[0])));
+        acts.editor.focusObject(O.toFocus(SO.getObject(this.props.senseObject, this.props.selection[0])));
       } else {
-        focusObject(F.focusNothing());
+        acts.editor.focusObject(F.focusNothing());
       }
     };
 
     switch (o.objectType) {
-      case T.ObjectType.NONE: {
+      case ObjectType.NONE: {
         return <Group key={o.id} />;
       }
-      case T.ObjectType.CARD: {
+      case ObjectType.CARD: {
         if (!SO.doesCardExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
@@ -246,10 +225,10 @@ export class Map extends React.Component<Props, State> {
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}
-            openCard={(id) => changeStatus(OE.StatusType.SHOW)}
+            openCard={(id) => acts.editor.changeStatus(OE.StatusType.SHOW)}
           />);
       }
-      case T.ObjectType.BOX: {
+      case ObjectType.BOX: {
         if (!SO.doesBoxExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
@@ -270,8 +249,8 @@ export class Map extends React.Component<Props, State> {
             handleSetDropTarget={this.handleObjectSetDropTarget}
             handleUnsetDropTarget={this.handleObjectUnsetDropTarget}
             openBox={(id) => {
-              clearSelection();
-              openBox(id);
+              acts.selection.clearSelection();
+              acts.senseMap.openBox(id);
             }}
           />);
       }
@@ -281,7 +260,7 @@ export class Map extends React.Component<Props, State> {
     }
   }
 
-  renderEdge(e: T.Edge) {
+  renderEdge(e: EdgeData) {
     const edgeProps = {
       from: getCenter(SO.getObject(this.state.inScope, e.from)),
       to: getCenter(SO.getObject(this.state.inScope, e.to)),
