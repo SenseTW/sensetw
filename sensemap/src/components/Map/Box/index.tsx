@@ -40,7 +40,6 @@ const selectedStrokeWidth = 2;
 
 function boxCards(props: Props) {
   const cards = Object.values(props.cards);
-  console.log(cards);
   const cardHeight = Card.style.height;
   const top = Header.style.height;
   return (

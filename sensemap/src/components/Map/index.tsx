@@ -21,6 +21,7 @@ import { Event as KonvaEvent } from '../../types/konva';
 export interface StateFromProps {
   selection:   T.State['selection'];
   senseObject: T.State['senseObject'];
+  inScope:     T.State['senseObject'];
   input:       T.State['input'];
   stage:       T.State['stage'];
 }
@@ -51,7 +52,7 @@ export interface OwnProps extends ViewportState {}
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 interface State {
-  senseObject: T.State['senseObject'];
+  inScope: T.State['senseObject'];
   objectDragStart: {
     x: number,
     y: number,
@@ -81,7 +82,7 @@ function getCenter(o: T.ObjectData): G.Point {
 export class Map extends React.Component<Props, State> {
 
   static getDerivedStateFromProps(props: Props, state: State) {
-    return { senseObject: props.senseObject };
+    return { inScope: props.inScope };
   }
 
   constructor(props: Props) {
@@ -96,7 +97,7 @@ export class Map extends React.Component<Props, State> {
     this.handleObjectDragEnd   = this.handleObjectDragEnd.bind(this);
 
     this.state = {
-      senseObject: this.props.senseObject,
+      inScope: this.props.inScope,
       objectDragStart: { x: 0, y: 0 },
     };
   }
@@ -142,10 +143,10 @@ export class Map extends React.Component<Props, State> {
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
     this.setState({
-      senseObject: {
-        ...this.state.senseObject,
+      inScope: {
+        ...this.state.inScope,
         objects: {
-          ...this.state.senseObject.objects, ...objects
+          ...this.state.inScope.objects, ...objects
         },
       },
     });
@@ -162,8 +163,8 @@ export class Map extends React.Component<Props, State> {
   }
 
   render() {
-    const objects = Object.values(this.state.senseObject.objects).map(o => this.renderObject(o));
-    const edges =   Object.values(this.state.senseObject.edges).map(e => this.renderEdge(e));
+    const objects = Object.values(this.state.inScope.objects).map(o => this.renderObject(o));
+    const edges =   Object.values(this.state.inScope.edges).map(e => this.renderEdge(e));
     let stage: Stage | null = null;
 
     return (
@@ -219,7 +220,7 @@ export class Map extends React.Component<Props, State> {
         return <Group key={o.id} />;
       }
       case T.ObjectType.CARD: {
-        if (!SO.doesCardExist(this.props.senseObject, o.data)) {
+        if (!SO.doesCardExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -239,7 +240,7 @@ export class Map extends React.Component<Props, State> {
           />);
       }
       case T.ObjectType.BOX: {
-        if (!SO.doesBoxExist(this.props.senseObject, o.data)) {
+        if (!SO.doesBoxExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -270,8 +271,8 @@ export class Map extends React.Component<Props, State> {
 
   renderEdge(e: T.Edge) {
     const edgeProps = {
-      from: getCenter(SO.getObject(this.state.senseObject, e.from)),
-      to: getCenter(SO.getObject(this.state.senseObject, e.to)),
+      from: getCenter(SO.getObject(this.state.inScope, e.from)),
+      to: getCenter(SO.getObject(this.state.inScope, e.to)),
       transform: makeTransform(this.props),
       inverseTransform: makeInverseTransform(this.props),
     };

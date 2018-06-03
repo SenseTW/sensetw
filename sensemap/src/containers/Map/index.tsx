@@ -6,10 +6,6 @@ import * as F from '../../types/sense/focus';
 import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
 
-interface OwnProps extends CO.OwnProps {
-  id: T.MapID;
-}
-
 interface StateFromProps extends CO.StateFromProps {
   scope: { type: T.MapScopeType, box?: T.BoxID };
 }
@@ -23,6 +19,10 @@ interface DispatchFromProps extends CO.DispatchFromProps {
   };
 }
 
+interface OwnProps extends CO.OwnProps {
+  id: T.MapID;
+}
+
 type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 class Map extends React.Component<Props> {
@@ -34,13 +34,13 @@ class Map extends React.Component<Props> {
   }
 
   render() {
-    const senseObject =
+    const inScope =
       (this.props.scope.type === T.MapScopeType.BOX
       && !!this.props.scope.box
       && SO.doesBoxExist(this.props.senseObject, this.props.scope.box))
         ? SO.scopedToBox(this.props.senseObject, this.props.scope.box)
         : SO.scopedToMap(this.props.senseObject);
-    return <CO.Map {...this.props} senseObject={senseObject} />;
+    return <CO.Map {...this.props} inScope={inScope} />;
   }
 }
 
@@ -48,6 +48,7 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
   (state: T.State) => ({
     selection: state.selection,
     senseObject: state.senseObject,
+    inScope: state.senseObject,
     scope: state.senseMap.scope,
     input: state.input,
     stage: state.stage,
