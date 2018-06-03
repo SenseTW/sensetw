@@ -1,41 +1,30 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
-import * as T from '../../types';
-import * as F from '../../types/sense/focus';
+import { MapScopeType, MapID, BoxID, State, actions, ActionProps, mapDispatch } from '../../types';
 import * as SO from '../../types/sense-object';
-import * as OE from '../../types/object-editor';
 
 interface StateFromProps extends CO.StateFromProps {
-  scope: { type: T.MapScopeType, box?: T.BoxID };
-}
-
-interface DispatchFromProps extends CO.DispatchFromProps {
-  actions: CO.DispatchFromProps['actions'] & {
-    loadObjects(id: T.MapID): T.ActionChain,
-    loadCards(id: T.MapID):   T.ActionChain,
-    loadBoxes(id: T.MapID):   T.ActionChain,
-    loadEdges(id: T.MapID):   T.ActionChain,
-  };
+  scope: { type: MapScopeType, box?: BoxID };
 }
 
 interface OwnProps extends CO.OwnProps {
-  id: T.MapID;
+  id: MapID;
 }
 
-type Props = StateFromProps & DispatchFromProps & OwnProps;
+type Props = StateFromProps & ActionProps & OwnProps;
 
 class Map extends React.Component<Props> {
   componentDidMount() {
-    this.props.actions.loadObjects(this.props.id);
-    this.props.actions.loadCards(this.props.id);
-    this.props.actions.loadBoxes(this.props.id);
-    this.props.actions.loadEdges(this.props.id);
+    this.props.actions.senseObject.loadObjects(this.props.id);
+    this.props.actions.senseObject.loadCards(this.props.id);
+    this.props.actions.senseObject.loadBoxes(this.props.id);
+    this.props.actions.senseObject.loadEdges(this.props.id);
   }
 
   render() {
     const inScope =
-      (this.props.scope.type === T.MapScopeType.BOX
+      (this.props.scope.type === MapScopeType.BOX
       && !!this.props.scope.box
       && SO.doesBoxExist(this.props.senseObject, this.props.scope.box))
         ? SO.scopedToBox(this.props.senseObject, this.props.scope.box)
@@ -44,8 +33,8 @@ class Map extends React.Component<Props> {
   }
 }
 
-export default connect<StateFromProps, DispatchFromProps, OwnProps>(
-  (state: T.State) => ({
+export default connect<StateFromProps, ActionProps, OwnProps>(
+  (state: State) => ({
     selection: state.selection,
     senseObject: state.senseObject,
     inScope: state.senseObject,
@@ -53,42 +42,5 @@ export default connect<StateFromProps, DispatchFromProps, OwnProps>(
     input: state.input,
     stage: state.stage,
   }),
-  (dispatch: T.Dispatch) => ({
-    actions: {
-      addObjectToSelection: (id: T.ObjectID) =>
-        dispatch(T.actions.selection.addObjectToSelection(id)),
-      removeObjectFromSelection: (id: T.ObjectID) =>
-        dispatch(T.actions.selection.removeObjectFromSelection(id)),
-      toggleObjectSelection: (id: T.ObjectID) =>
-        dispatch(T.actions.selection.toggleObjectSelection(id)),
-      clearSelection: () =>
-        dispatch(T.actions.selection.clearSelection()),
-      loadObjects: (id: T.MapID) =>
-        dispatch(T.actions.senseObject.loadObjects(id)),
-      loadCards: (id: T.MapID) =>
-        dispatch(T.actions.senseObject.loadCards(id)),
-      loadBoxes: (id: T.MapID) =>
-        dispatch(T.actions.senseObject.loadBoxes(id)),
-      loadEdges: (id: T.MapID) =>
-        dispatch(T.actions.senseObject.loadEdges(id)),
-      moveObject: (id: T.ObjectID, x: number, y: number) =>
-        dispatch(T.actions.senseObject.moveObject(id, x, y)),
-      addCardToBox: (card: T.ObjectID, box: T.BoxID) =>
-        dispatch(T.actions.senseObject.addCardToBox(card, box)),
-      removeCardFromBox: (card: T.ObjectID, box: T.BoxID) =>
-        dispatch(T.actions.senseObject.removeCardFromBox(card, box)),
-      openBox: (box: T.BoxID) =>
-        dispatch(T.actions.senseMap.openBox(box)),
-      stageMouseDown: () =>
-        dispatch(T.actions.stage.stageMouseDown()),
-      stageMouseUp: () =>
-        dispatch(T.actions.stage.stageMouseUp()),
-      stageMouseMove: ({ dx, dy }: { dx: number, dy: number }) =>
-        dispatch(T.actions.stage.stageMouseMove({ dx, dy })),
-      focusObject: (focus: F.Focus) =>
-        dispatch(T.actions.editor.focusObject(focus)),
-      changeStatus: (status: OE.StatusType) =>
-        dispatch(T.actions.editor.changeStatus(status)),
-    }
-  })
+  mapDispatch({ actions }),
 )(Map);

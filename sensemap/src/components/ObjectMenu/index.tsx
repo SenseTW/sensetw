@@ -2,6 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Menu } from 'semantic-ui-react';
 import * as T from '../../types';
+import { actions, ActionProps, mapDispatch } from '../../types';
 import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
@@ -22,23 +23,7 @@ interface StateFromProps {
   editor:      T.State['editor'];
 }
 
-interface DispatchFromProps {
-  actions: {
-    focusObject(focus: F.Focus): T.ActionChain,
-    snapshotObject(objectType: T.ObjectType, data: T.BoxData | T.CardData): T.ActionChain,
-    clearObject(objectType: T.ObjectType, id: T.BoxID | T.CardID): T.ActionChain,
-    changeStatus(status: OE.StatusType): T.ActionChain,
-    addCardsToBox(cards: T.ObjectID[], box: T.BoxID): T.ActionChain,
-    removeCardsFromBox(card: T.ObjectID[], box: T.BoxID): T.ActionChain,
-    deleteObject(object: T.ObjectID): T.ActionChain,
-    unboxCards(box: T.BoxID): T.ActionChain,
-    openInbox(): T.ActionChain,
-    createEdge(map: T.MapID, from: T.ObjectID, to: T.ObjectID): T.ActionChain,
-    deleteEdge(map: T.MapID, edge: T.EdgeID): T.ActionChain,
-  };
-}
-
-type Props = StateFromProps & DispatchFromProps;
+type Props = StateFromProps & ActionProps;
 
 const selectedCardsAndBoxes:
   (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
@@ -84,7 +69,7 @@ class ObjectMenu extends React.PureComponent<Props> {
         if (!box) {
           throw Error('Scope BOX without a box ID.');
         }
-        this.props.actions.unboxCards(box);
+        this.props.actions.senseObject.unboxCards(box);
         break;
       }
       case T.MapScopeType.FULL_MAP:
@@ -105,7 +90,7 @@ class ObjectMenu extends React.PureComponent<Props> {
       return;
     }
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    this.props.actions.addCardsToBox(cards, this.props.senseObject.objects[boxes[0]].data);
+    this.props.actions.senseObject.addCardsToBox(cards, this.props.senseObject.objects[boxes[0]].data);
     return;
   }
 
@@ -130,7 +115,7 @@ class ObjectMenu extends React.PureComponent<Props> {
         if (!box) {
           throw Error('This cannot happen: map scope has type BOX with null box ID.');
         }
-        this.props.actions.removeCardsFromBox(cards, box);
+        this.props.actions.senseObject.removeCardsFromBox(cards, box);
         break;
       }
       case T.MapScopeType.FULL_MAP:
@@ -150,7 +135,7 @@ class ObjectMenu extends React.PureComponent<Props> {
     const map  = this.props.senseMap.map;
     const from = this.props.selection[0];
     const to   = this.props.selection[1];
-    this.props.actions.createEdge(map, from, to);
+    this.props.actions.senseObject.createEdge(map, from, to);
   }
 
   findEdgeID(from: T.ObjectID, to: T.ObjectID): T.EdgeID[] | null {
@@ -175,11 +160,11 @@ class ObjectMenu extends React.PureComponent<Props> {
     if (r === null) {
       return;
     }
-    r.forEach(edge => this.props.actions.deleteEdge(map, edge));
+    r.forEach(edge => this.props.actions.senseObject.deleteEdge(map, edge));
   }
 
   render() {
-    const { actions, senseObject, selection, senseMap, input, editor } = this.props;
+    const { actions: acts, senseObject, selection, senseMap, input, editor } = this.props;
     const isMultiSelectable = I.isMultiSelectable(input);
 
     return (
@@ -197,7 +182,7 @@ class ObjectMenu extends React.PureComponent<Props> {
           senseMap.inbox === SM.InboxVisibility.HIDDEN &&
           <Menu.Item
             name="open-inbox"
-            onClick={actions.openInbox}
+            onClick={acts.senseMap.openInbox}
           >
             Inbox
           </Menu.Item>
@@ -208,9 +193,9 @@ class ObjectMenu extends React.PureComponent<Props> {
             name="create-box"
             onClick={() => {
               const data = boxData({ id: objectId() });
-              actions.snapshotObject(T.ObjectType.BOX, data);
-              actions.focusObject(F.focusBox(data.id));
-              actions.changeStatus(OE.StatusType.SHOW);
+              acts.editor.snapshotObject(T.ObjectType.BOX, data);
+              acts.editor.focusObject(F.focusBox(data.id));
+              acts.editor.changeStatus(OE.StatusType.SHOW);
             }}
           >
             新增 Box
@@ -220,9 +205,9 @@ class ObjectMenu extends React.PureComponent<Props> {
           name="create-card"
           onClick={() => {
             const data = cardData({ id: objectId() });
-            actions.snapshotObject(T.ObjectType.CARD, data);
-            actions.focusObject(F.focusCard(data.id));
-            actions.changeStatus(OE.StatusType.SHOW);
+            acts.editor.snapshotObject(T.ObjectType.CARD, data);
+            acts.editor.focusObject(F.focusCard(data.id));
+            acts.editor.changeStatus(OE.StatusType.SHOW);
           }}
         >
           新增卡片
@@ -231,9 +216,9 @@ class ObjectMenu extends React.PureComponent<Props> {
           name="edit"
           onClick={() => {
             if (editor.status === OE.StatusType.HIDE) {
-              actions.changeStatus(OE.StatusType.SHOW);
+              acts.editor.changeStatus(OE.StatusType.SHOW);
             } else {
-              actions.changeStatus(OE.StatusType.HIDE);
+              acts.editor.changeStatus(OE.StatusType.HIDE);
             }
           }}
         >
@@ -263,9 +248,9 @@ class ObjectMenu extends React.PureComponent<Props> {
             name="deleteCard"
             onClick={async () => {
               const { objectType, id } = SO.getObject(senseObject, selection[0]);
-              await actions.deleteObject(id);
-              actions.focusObject(F.focusNothing());
-              actions.clearObject(objectType, id);
+              await acts.senseObject.deleteObject(id);
+              acts.editor.focusObject(F.focusNothing());
+              acts.editor.clearObject(objectType, id);
             }}
           >
             刪除
@@ -303,7 +288,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 }
 
-export default connect<StateFromProps, DispatchFromProps>(
+export default connect<StateFromProps, ActionProps>(
   (state: T.State) => ({
     selection: state.selection,
     scope: state.senseMap.scope,
@@ -312,30 +297,5 @@ export default connect<StateFromProps, DispatchFromProps>(
     input: state.input,
     editor: state.editor,
   }),
-  (dispatch: T.Dispatch) => ({
-    actions: {
-      focusObject: (focus: F.Focus) =>
-        dispatch(T.actions.editor.focusObject(focus)),
-      snapshotObject: (objectType: T.ObjectType, data: T.BoxData | T.CardData) =>
-        dispatch(T.actions.editor.snapshotObject(objectType, data)),
-      clearObject: (objectType: T.ObjectType, id: T.BoxID | T.CardID) =>
-        dispatch(T.actions.editor.clearObject(objectType, id)),
-      changeStatus: (status: OE.StatusType) =>
-        dispatch(T.actions.editor.changeStatus(status)),
-      addCardsToBox: (cards, box) =>
-        dispatch(T.actions.senseObject.addCardsToBox(cards, box)),
-      removeCardsFromBox: (cards, box) =>
-        dispatch(T.actions.senseObject.removeCardsFromBox(cards, box)),
-      deleteObject: (object) =>
-        dispatch(T.actions.senseObject.deleteObject(object)),
-      unboxCards: (box) =>
-        dispatch(T.actions.senseObject.unboxCards(box)),
-      openInbox: () =>
-        dispatch(T.actions.senseMap.openInbox()),
-      createEdge: (map, from, to) =>
-        dispatch(T.actions.senseObject.createEdge(map, from, to)),
-      deleteEdge: (map, edge) =>
-        dispatch(T.actions.senseObject.deleteEdge(map, edge)),
-    }
-  })
+  mapDispatch({ actions }),
 )(ObjectMenu);

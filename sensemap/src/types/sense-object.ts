@@ -251,7 +251,7 @@ const addCardsToBox =
   (cardObjects: ObjectID[], box: BoxID) =>
   async (dispatch: Dispatch) => {
     await Promise.all(
-      cardObjects.map(id => dispatch(addCardToBox(id, box)))
+      cardObjects.map(id => addCardToBox(id, box)(dispatch))
     );
     return dispatch(SL.actions.clearSelection());
   };
@@ -343,7 +343,7 @@ const removeCardsFromBox =
   (cardObjects: ObjectID[], box: BoxID) =>
   async (dispatch: Dispatch) => {
     await Promise.all(
-      cardObjects.map(id => dispatch(removeCardFromBox(id, box)))
+      cardObjects.map(id => removeCardFromBox(id, box)(dispatch))
     );
     return dispatch(SL.actions.clearSelection());
   };
@@ -354,9 +354,9 @@ const deleteObject =
     const { senseMap: { map } } = getState();
     return GO.remove(objectID)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => dispatch(loadObjects(map, true)))
-      .then(() => dispatch(loadCards(map, true)))
-      .then(() => dispatch(loadBoxes(map, true)));
+      .then(() => loadObjects(map, true)(dispatch))
+      .then(() => loadCards(map, true)(dispatch))
+      .then(() => loadBoxes(map, true)(dispatch));
   };
 
 const deleteCard =
@@ -365,15 +365,15 @@ const deleteCard =
     const { senseMap: { map } } = getState();
     return GC.remove(cardID)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => dispatch(loadCards(map, true)))
-      .then(() => dispatch(loadObjects(map, true)));
+      .then(() => loadCards(map, true)(dispatch))
+      .then(() => loadObjects(map, true)(dispatch));
   };
 
 const deleteCardWithObject =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return G.deleteObjectsByCard(cardID)
-      .then(() => dispatch(deleteCard(cardID)));
+      .then(() => deleteCard(cardID)(dispatch, getState));
   };
 
 const deleteBox =
@@ -382,21 +382,21 @@ const deleteBox =
     const { senseMap: { map } } = getState();
     return GB.remove(boxID)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => dispatch(loadBoxes(map, true)))
-      .then(() => dispatch(loadObjects(map, true)));
+      .then(() => loadBoxes(map, true)(dispatch))
+      .then(() => loadObjects(map, true)(dispatch));
   };
 
 const deleteBoxWithObject =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return G.deleteObjectsByBox(boxID)
-      .then(() => dispatch(deleteBox(boxID)));
+      .then(() => deleteBox(boxID)(dispatch, getState));
   };
 
 const unboxCards =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    return dispatch(deleteBoxWithObject(boxID))
+    return deleteBoxWithObject(boxID)(dispatch, getState)
       .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 
@@ -411,7 +411,7 @@ const deleteEdge =
   (map: MapID, edge: EdgeID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return GE.remove(edge)
-      .then(() => dispatch(loadEdges(map, true)));
+      .then(() => loadEdges(map, true)(dispatch));
   };
 
 export const syncActions = {

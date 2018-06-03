@@ -1,6 +1,5 @@
-import { Reducer as ReduxReducer, combineReducers } from 'redux';
+import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } from 'redux';
 import { emptyAction } from './action';
-import { State } from './map-dispatch';
 import * as SM from './sense-map';
 import * as SO from './sense-object';
 import * as SL from './selection';
@@ -10,9 +9,22 @@ import * as SG from './stage';
 import * as I  from './input';
 import * as IP from './importer';
 
-export { State, Dispatch, mapDispatch } from './map-dispatch';
+export { mapDispatch } from './map-dispatch';
+
+export type State = {
+  senseMap:    SM.State,
+  senseObject: SO.State,
+  selection:   SL.State,
+  editor:      OE.State,
+  input:        I.State,
+  viewport:     V.State,
+  stage:       SG.State,
+  importer:    IP.State,
+};
 
 export type ActionChain = Action | Promise<Action>;
+
+export type Dispatch = ReduxDispatch<Action>;
 
 export type GetState = () => State;
 
@@ -52,9 +64,7 @@ export const actions = {
   importer:    IP.actions,
 };
 
-export type ActionProps = {
-  actions: typeof actions,
-};
+export type ActionProps = { actions: typeof actions };
 
 export const reducer = combineReducers({
   senseMap:    SM.reducer,
