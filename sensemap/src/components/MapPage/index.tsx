@@ -96,7 +96,12 @@ class MapPage extends React.Component<Props> {
 
     return (
       <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
-        <Sidebar visible={senseMap.inbox === SM.InboxVisibility.VISIBLE} direction="left" width="wide">
+        <Sidebar
+          visible={senseMap.inbox === SM.InboxVisibility.VISIBLE}
+          animation="overlay"
+          direction="left"
+          width="wide"
+        >
           <Inbox />
         </Sidebar>
         <Sidebar visible={status !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{

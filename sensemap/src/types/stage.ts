@@ -5,10 +5,16 @@ import * as V from './viewport';
 
 export type State = {
   mouseDown: Boolean,
+  inbox: {
+    rect: DOMRect | ClientRect,
+  },
 };
 
 export const initial: State = {
   mouseDown: false,
+  inbox: {
+    rect: new DOMRect(),
+  },
 };
 
 const STAGE_MOUSEDOWN = 'STAGE_MOUSEDOWN';
@@ -19,6 +25,12 @@ const stageMouseDown = () => ({
 const STAGE_MOUSEUP = 'STAGE_MOUSEUP';
 const stageMouseUp = () => ({
   type: STAGE_MOUSEUP as typeof STAGE_MOUSEUP,
+});
+
+const STAGE_INBOX_RECT = 'STAGE_INBOX_RECT';
+const stageInboxRect = (rect: DOMRect | ClientRect) => ({
+  type: STAGE_INBOX_RECT as typeof STAGE_INBOX_RECT,
+  payload: { rect },
 });
 
 const stageMouseMove =
@@ -34,6 +46,7 @@ const stageMouseMove =
 const syncActions = {
   stageMouseDown,
   stageMouseUp,
+  stageInboxRect,
 };
 
 export const actions = {
@@ -55,6 +68,17 @@ export const reducer = (state: State = initial, action: Action): State => {
       return {
         ...state,
         mouseDown: true,
+      };
+    }
+    case STAGE_INBOX_RECT: {
+      const { rect } = action.payload;
+
+      return {
+        ...state,
+        inbox: {
+          ...state.inbox,
+          rect,
+        },
       };
     }
     default: return state;

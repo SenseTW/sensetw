@@ -14,6 +14,7 @@ import * as I from '../../types/input';
 import { objectId } from '../../types/utils';
 
 interface StateFromProps {
+  stage:       T.State['stage'];
   selection:   SL.State;
   senseObject: T.State['senseObject'];
   scope:       T.State['senseMap']['scope'];
@@ -179,11 +180,14 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions, senseObject, selection, senseMap, input, editor } = this.props;
+    const { actions, stage, senseObject, selection, senseMap, input, editor } = this.props;
     const isMultiSelectable = I.isMultiSelectable(input);
+    const { inbox: { rect } } = stage;
+    const top = 16;
+    const left = rect.left + rect.width + 26;
 
     return (
-      <Menu vertical>
+      <Menu vertical style={{ left, top }}>
         <Menu.Item>{
           selection.length === 0
             ? '功能選單'
@@ -305,6 +309,7 @@ class ObjectMenu extends React.PureComponent<Props> {
 
 export default connect<StateFromProps, DispatchFromProps>(
   (state: T.State) => ({
+    stage: state.stage,
     selection: state.selection,
     scope: state.senseMap.scope,
     senseObject: state.senseObject,
