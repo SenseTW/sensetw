@@ -1,8 +1,9 @@
 import * as React from 'react';
+import * as T from '../../../../types';
 import { Group, Rect, Text } from 'react-konva';
 
 interface Props {
-  card: { title: string };
+  card: T.CardData;
   x: number;
   y: number;
 }
@@ -39,7 +40,8 @@ class Card extends React.Component<Props> {
 
   render() {
     const { x = 0, y = 0 } = this.props;
-    const title = this.props.card.title.substr(0, Card.style.contents.title.textLimit);
+    const text = (this.props.card.title || this.props.card.summary || '')
+      .substr(0, Card.style.contents.title.textLimit);
     return (
       <Group x={x} y={y}>
         <Rect
@@ -59,7 +61,7 @@ class Card extends React.Component<Props> {
           fontFamily={Card.style.contents.title.font.family}
           fontSize={Card.style.contents.title.font.size}
           lineHeight={Card.style.contents.title.lineHeight}
-          text={title}
+          text={text}
         />
       </Group>
     );
