@@ -17,6 +17,8 @@ export default connect<CO.StateFromProps, CO.DispatchFromProps, CO.OwnProps>(
         dispatch(T.actions.senseMap.closeInbox()),
       createCard: (mapId: T.MapID, card: T.CardData) =>
         dispatch(T.actions.senseObject.createCard(mapId, card)),
+      stageInboxRect: (rect: DOMRect | ClientRect) =>
+        dispatch(T.actions.stage.stageInboxRect(rect)),
     }
   })
 )(CO.Inbox);
