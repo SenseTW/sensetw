@@ -25,6 +25,8 @@ interface Props {
   transform: G.Transform;
   inverseTransform: G.Transform;
   handleSelect?(data: T.ObjectData): void;
+  handleSetDropTarget?(data: T.ObjectData): void;
+  handleUnsetDropTarget?(data: T.ObjectData): void;
   handleDeselect?(data: T.ObjectData): void;
   handleDragStart?(e: KonvaEvent.Mouse): void;
   handleDragMove?(e: KonvaEvent.Mouse): void;
@@ -86,6 +88,8 @@ class Box extends React.Component<Props, State> {
     const handleDragStart = this.props.handleDragStart || noop;
     const handleDragMove  = this.props.handleDragMove  || noop;
     const handleDragEnd   = this.props.handleDragEnd   || noop;
+    const handleSetDropTarget   = this.props.handleSetDropTarget   || noop;
+    const handleUnsetDropTarget = this.props.handleUnsetDropTarget || noop;
     const openBox         = this.props.openBox         || noop;
 
     const selected = (
@@ -129,6 +133,8 @@ class Box extends React.Component<Props, State> {
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
+        onMouseEnter={handleSetDropTarget}
+        onMouseLeave={handleUnsetDropTarget}
       >
         {this.props.selected ? selected : null}
         <Header box={box} x={0} y={0} />

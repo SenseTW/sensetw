@@ -57,6 +57,7 @@ interface State {
     x: number,
     y: number,
   };
+  dropTarget: T.State['senseObject']['objects'];
 }
 
 const makeTransform: V.StateToTransform =
@@ -95,10 +96,13 @@ export class Map extends React.Component<Props, State> {
     this.handleObjectDragStart = this.handleObjectDragStart.bind(this);
     this.handleObjectDragMove  = this.handleObjectDragMove.bind(this);
     this.handleObjectDragEnd   = this.handleObjectDragEnd.bind(this);
+    this.handleObjectSetDropTarget   = this.handleObjectSetDropTarget.bind(this);
+    this.handleObjectUnsetDropTarget = this.handleObjectUnsetDropTarget.bind(this);
 
     this.state = {
       inScope: this.props.inScope,
       objectDragStart: { x: 0, y: 0 },
+      dropTarget: {},
     };
   }
 
@@ -127,6 +131,14 @@ export class Map extends React.Component<Props, State> {
     if (e.target && e.target.nodeType === 'Stage') {
       this.props.actions.clearSelection();
     }
+  }
+
+  handleObjectSetDropTarget(data: T.ObjectData) {
+    this.setState({ dropTarget: { [data.id]: data } });
+  }
+
+  handleObjectUnsetDropTarget(data: T.ObjectData) {
+    this.setState({ dropTarget: {} });
   }
 
   handleObjectDragStart(e: KonvaEvent.Mouse) {
@@ -257,6 +269,8 @@ export class Map extends React.Component<Props, State> {
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}
+            handleSetDropTarget={this.handleObjectSetDropTarget}
+            handleUnsetDropTarget={this.handleObjectUnsetDropTarget}
             openBox={(id) => {
               clearSelection();
               openBox(id);
