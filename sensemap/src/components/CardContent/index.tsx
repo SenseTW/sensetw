@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Form, TextArea, Input } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import * as C from '../../types/sense/card';
+import { isURL } from 'validator';
 
 interface Props {
   data: C.CardData;
@@ -17,6 +18,7 @@ class CardContent extends React.PureComponent<Props> {
   render() {
     const { children, data, onKeyUp, onChange } = this.props;
     const { title, summary, description, tags, url, saidBy, stakeholder, cardType } = data;
+    const isURLValid = isURL(url, { require_protocol: true });
 
     return (
       <Form className="card-content">
@@ -57,6 +59,22 @@ class CardContent extends React.PureComponent<Props> {
           <Input
             placeholder="https://o.sense.tw/abcd"
             value={url}
+            action={{
+              icon: 'share square',
+              disabled: !isURLValid,
+              /**
+               * Remove window.opener for older browsers.
+               * @see https://mathiasbynens.github.io/rel-noopener/
+               */
+              onClick: () => {
+                // tslint:disable-next-line:no-any
+                const w: any | null = window.open(url);
+                if (w) {
+                  w.opener = null;
+                  w.location = url;
+                }
+              },
+            }}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(C.updateUrl(e.currentTarget.value))}
           />
