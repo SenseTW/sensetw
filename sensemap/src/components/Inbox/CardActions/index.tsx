@@ -42,7 +42,7 @@ function CardActions({ card, actions, senseMap }: Props) {
   );
 }
 
-export default connect<StateFromProps, DispatchFromProps>(
+export default connect<StateFromProps, DispatchFromProps, OwnProps>(
   (state: T.State) => ({
     senseMap: state.senseMap,
   }),
