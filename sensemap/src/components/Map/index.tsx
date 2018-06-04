@@ -177,11 +177,9 @@ export class Map extends React.Component<Props, State> {
   render() {
     const objects = Object.values(this.state.inScope.objects).map(o => this.renderObject(o));
     const edges =   Object.values(this.state.inScope.edges).map(e => this.renderEdge(e));
-    let stage: Stage | null = null;
 
     return (
       <Stage
-        ref={(node) => stage = node as (Stage | null)}
         width={this.props.width}
         height={this.props.height}
         onClick={this.handleClick}
