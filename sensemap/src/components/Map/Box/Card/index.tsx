@@ -40,7 +40,7 @@ class Card extends React.Component<Props> {
 
   render() {
     const { x = 0, y = 0 } = this.props;
-    const text = (this.props.card.title || this.props.card.summary || '')
+    const text = (this.props.card.summary || this.props.card.description || '')
       .substr(0, Card.style.contents.title.textLimit);
     return (
       <Group x={x} y={y}>
