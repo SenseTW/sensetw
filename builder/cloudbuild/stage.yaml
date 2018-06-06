@@ -7,3 +7,7 @@ steps:
   args: ['cp', '-r', '-a', 'public-read', '/workspace/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
 - name: gcr.io/cloud-builders/gsutil
   args: ['cp', '-r', '-a', 'public-read', '/workspace/gcs-build/*', 'gs://sensetw/$BRANCH_NAME/']
+substitutions:
+    _SUB_VALUE: URLs
+options:
+    substitution_option: 'ALLOW_LOOSE'
