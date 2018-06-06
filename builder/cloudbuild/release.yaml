@@ -8,10 +8,6 @@ steps:
 - name: gcr.io/cloud-builders/docker
   args: ['run', '-v', '/workspace/sensemap:/workspace', 'gcr.io/$PROJECT_ID/sense-builder', "release", '$COMMIT_SHA']
 - name: gcr.io/cloud-builders/gsutil
-  args: ['cp', '-r', '/workspace/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
+  args: ['cp', '-r','-a', 'public-read', '/workspace/sensemap/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
 - name: gcr.io/cloud-builders/gsutil
-  args: ['cp', '-r', '-a', 'public-read', '/workspace/gcs-build/*', 'gs://sensetw/']
-substitutions:
-    _SUB_VALUE: URLs
-options:
-    substitution_option: 'ALLOW_LOOSE'
+  args: ['cp', '-r', '-a', 'public-read', '/workspace/sensemap/gcs-build/*', 'gs://sensetw/']
