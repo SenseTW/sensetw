@@ -14,7 +14,7 @@ const graphQLObjectFieldsFragment = `
     objectType, card { id } , box { id }, belongsTo { id }
   }`;
 
-interface GraphQLObjectFields {
+export interface GraphQLObjectFields {
   id:         string;
   createdAt:  string;
   updatedAt:  string;
@@ -65,8 +65,8 @@ const toObjectData: (o: GraphQLObjectFields, isDeleted?: boolean) => ObjectData 
     belongsTo:  H.idOrUndefined(o.belongsTo),
   });
 
-export const loadObjects =
-  (id: MapID) => {
+export const loadRawObjects =
+  (id: MapID): Promise<GraphQLObjectFields[]> => {
     const query = `
       query AllObjects($id: ID!) {
         allObjects(filter: { map: { id: $id } }) {
@@ -77,8 +77,12 @@ export const loadObjects =
     `;
     const variables = { id };
     return client.request(query, variables)
-      .then(({ allObjects }) => allObjects.map(toObjectData));
+      .then(({ allObjects }) => allObjects);
   };
+
+export const loadObjects =
+  (id: MapID): Promise<ObjectData[]> =>
+    loadRawObjects(id).then(os => os.map(o => toObjectData(o)));
 
 export const create =
   (mapId: MapID, data: ObjectData) => {
@@ -130,6 +134,21 @@ export const move =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id, x, y };
+    return client.request(query, variables)
+      .then(({ updateObject }) => toObjectData(updateObject));
+  };
+
+export const updateObjectType =
+  (id: ObjectID, objectType: ObjectType) => {
+    const query = `
+      mutation MoveObject($id: ID!, $objectType: ObjectType!) {
+        updateObject(id: $id, objectType: $objectType) {
+          ...objectFields
+        }
+      }
+      ${graphQLObjectFieldsFragment}
+    `;
+    const variables = { id, objectType };
     return client.request(query, variables)
       .then(({ updateObject }) => toObjectData(updateObject));
   };
