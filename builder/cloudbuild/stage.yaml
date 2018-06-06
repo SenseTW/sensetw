@@ -1,13 +1,9 @@
 steps:
 - name: gcr.io/cloud-builders/gsutil
-  args: ['cp', '-r', 'gs://sensetw/$COMMIT_SHA/*', '/workspace/gcs-build/']
+  args: ['cp', '-r', 'gs://sensetw/$COMMIT_SHA/*', '/workspace/gcs-build/', '||', 'exit', '0']
 - name: gcr.io/cloud-builders/docker
   args: ['run', '-v', '/workspace:/workspace', 'gcr.io/$PROJECT_ID/sense-builder', "stage", '$BRANCH_NAME', '$COMMIT_SHA']
 - name: gcr.io/cloud-builders/gsutil
   args: ['cp', '-r', '-a', 'public-read', '/workspace/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
 - name: gcr.io/cloud-builders/gsutil
   args: ['cp', '-r', '-a', 'public-read', '/workspace/gcs-build/*', 'gs://sensetw/$BRANCH_NAME/']
-substitutions:
-    _SUB_VALUE: URLs
-options:
-    substitution_option: 'ALLOW_LOOSE'

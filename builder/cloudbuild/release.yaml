@@ -1,6 +1,6 @@
 steps:
 - name: gcr.io/cloud-builders/gsutil
-  args: ['cp', '-r', 'gs://sensetw/$COMMIT_SHA/*', '/workspace/gcs-build/']
+  args: ['cp', '-r', 'gs://sensetw/$COMMIT_SHA/*', '/workspace/gcs-build/', '||', 'exit', '0']
 - name: gcr.io/cloud-builders/docker
   args: ['run', '-v', '/workspace:/workspace', 'gcr.io/$PROJECT_ID/sense-builder', "release", '$COMMIT_SHA']
 - name: gcr.io/cloud-builders/gsutil
