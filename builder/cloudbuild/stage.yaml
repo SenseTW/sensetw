@@ -6,7 +6,7 @@ steps:
   - |
     gsutil cp -r gs://sensetw/$COMMIT_SHA/* /workspace/gcs-build/ || exit 0
 - name: gcr.io/cloud-builders/docker
-  args: ['run', '-v', '/workspace:/workspace', 'gcr.io/$PROJECT_ID/sense-builder', "stage", '$BRANCH_NAME', '$COMMIT_SHA']
+  args: ['run', '-v', '/workspace/sensemap:/workspace', 'gcr.io/$PROJECT_ID/sense-builder', "stage", '$BRANCH_NAME', '$COMMIT_SHA']
 - name: gcr.io/cloud-builders/gsutil
   args: ['cp', '-r', '-a', 'public-read', '/workspace/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
 - name: gcr.io/cloud-builders/gsutil
