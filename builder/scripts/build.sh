@@ -26,5 +26,6 @@ fi
 echo "${URL}" >> ./gcs-build/build-url
 
 yarn
-PUBLIC_URL=https://${URL}/ yarn run build
+#PUBLIC_URL=https://${URL}/ yarn run build
+PUBLIC_URL="" yarn run build
 cp -r ./build/* ./gcs-build/
