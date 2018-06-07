@@ -2,7 +2,6 @@
   "name": "sensemap",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://sensetw.github.io/sensetw",
   "license": "MIT",
   "dependencies": {
     "@types/history": "^4.6.2",
