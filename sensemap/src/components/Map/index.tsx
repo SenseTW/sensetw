@@ -11,7 +11,7 @@ import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
 import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
-import * as SO from '../../types/sense-object';
+import * as S from '../../types/storage';
 import * as V from '../../types/viewport';
 import * as G from '../../graphics/point';
 import * as B from '../../types/sense/box';
@@ -132,7 +132,7 @@ export class Map extends React.Component<Props, MapState> {
     const dx = e.evt.layerX - this.state.objectDragStart.x;
     const dy = e.evt.layerY - this.state.objectDragStart.y;
     const objects = this.props.selection.map(id => {
-      const o = SO.getObject(this.props.senseObject, id);
+      const o = S.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
     this.setState({
@@ -149,7 +149,7 @@ export class Map extends React.Component<Props, MapState> {
     const dx = e.evt.layerX - this.state.objectDragStart.x;
     const dy = e.evt.layerY - this.state.objectDragStart.y;
     this.props.selection.forEach(id => {
-      const o = SO.getObject(this.props.senseObject, id);
+      const o = S.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
     this.setState({ objectDragStart: { x: 0, y: 0 } });
@@ -198,7 +198,7 @@ export class Map extends React.Component<Props, MapState> {
     const handleObjectDeselect = (data: ObjectData) => {
       acts.selection.removeObjectFromSelection(data.id);
       if (this.props.selection.length === 1) {
-        acts.editor.focusObject(O.toFocus(SO.getObject(this.props.senseObject, this.props.selection[0])));
+        acts.editor.focusObject(O.toFocus(S.getObject(this.props.senseObject, this.props.selection[0])));
       } else {
         acts.editor.focusObject(F.focusNothing());
       }
@@ -209,7 +209,7 @@ export class Map extends React.Component<Props, MapState> {
         return <Group key={o.id} />;
       }
       case ObjectType.CARD: {
-        if (!SO.doesCardExist(this.props.inScope, o.data)) {
+        if (!S.doesCardExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -218,7 +218,7 @@ export class Map extends React.Component<Props, MapState> {
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
-            card={SO.getCard(this.props.senseObject, o.data)}
+            card={S.getCard(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
             handleDeselect={handleObjectDeselect}
@@ -229,7 +229,7 @@ export class Map extends React.Component<Props, MapState> {
           />);
       }
       case ObjectType.BOX: {
-        if (!SO.doesBoxExist(this.props.inScope, o.data)) {
+        if (!S.doesBoxExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -238,8 +238,8 @@ export class Map extends React.Component<Props, MapState> {
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
-            box={SO.getBox(this.props.senseObject, o.data)}
-            cards={SO.getCardsInBox(this.props.senseObject, o.data)}
+            box={S.getBox(this.props.senseObject, o.data)}
+            cards={S.getCardsInBox(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
             handleDeselect={handleObjectDeselect}
@@ -262,8 +262,8 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(e: EdgeData) {
     const edgeProps = {
-      from: getCenter(SO.getObject(this.state.inScope, e.from)),
-      to: getCenter(SO.getObject(this.state.inScope, e.to)),
+      from: getCenter(S.getObject(this.state.inScope, e.from)),
+      to: getCenter(S.getObject(this.state.inScope, e.to)),
       transform: makeTransform(this.props),
       inverseTransform: makeInverseTransform(this.props),
     };

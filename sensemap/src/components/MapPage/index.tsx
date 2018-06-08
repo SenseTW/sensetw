@@ -12,6 +12,7 @@ import { CardData, BoxData, ObjectType, MapScopeType, State, actions, ActionProp
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
+import * as S from '../../types/storage';
 import { Action as BoxAction } from '../../types/sense/box';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
@@ -62,14 +63,14 @@ class MapPage extends React.Component<Props> {
     let doesDataExist: boolean = false;
     switch (focus.objectType) {
       case ObjectType.BOX:
-        data = SO.getBoxOrDefault(editor.temp, senseObject, focus.data);
-        isDirty = SO.doesBoxExist(editor.temp, focus.data);
-        doesDataExist = SO.doesBoxExist(senseObject, focus.data);
+        data = S.getBoxOrDefault(editor.temp, senseObject, focus.data);
+        isDirty = S.doesBoxExist(editor.temp, focus.data);
+        doesDataExist = S.doesBoxExist(senseObject, focus.data);
         break;
       case ObjectType.CARD:
-        data = SO.getCardOrDefault(editor.temp, senseObject, focus.data);
-        isDirty = SO.doesCardExist(editor.temp, focus.data);
-        doesDataExist = SO.doesCardExist(senseObject, focus.data);
+        data = S.getCardOrDefault(editor.temp, senseObject, focus.data);
+        isDirty = S.doesCardExist(editor.temp, focus.data);
+        doesDataExist = S.doesCardExist(senseObject, focus.data);
         break;
       default:
     }

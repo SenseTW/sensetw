@@ -5,7 +5,7 @@ import * as T from '../../types';
 import { actions, ActionProps, mapDispatch } from '../../types';
 import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
-import * as SO from '../../types/sense-object';
+import * as S from '../../types/storage';
 import * as OE from '../../types/object-editor';
 import { cardData } from '../../types/sense/card';
 import { boxData } from '../../types/sense/box';
@@ -29,7 +29,7 @@ const selectedCardsAndBoxes:
   (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
   props => props.selection.reduce(
     (acc, id) => {
-      switch (SO.getObject(props.senseObject, id).objectType) {
+      switch (S.getObject(props.senseObject, id).objectType) {
         case T.ObjectType.CARD: {
           return { ...acc, cards: [ ...acc.cards, id ] };
         }
@@ -247,7 +247,7 @@ class ObjectMenu extends React.PureComponent<Props> {
           <Menu.Item
             name="deleteCard"
             onClick={async () => {
-              const { objectType, id } = SO.getObject(senseObject, selection[0]);
+              const { objectType, id } = S.getObject(senseObject, selection[0]);
               await acts.senseObject.deleteObject(id);
               acts.editor.focusObject(F.focusNothing());
               acts.editor.clearObject(objectType, id);

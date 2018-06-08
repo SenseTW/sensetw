@@ -6,85 +6,22 @@ import * as GB from './graphql/box';
 import * as GE from './graphql/edge';
 import * as H from './sense/has-id';
 import * as C from './sense/card';
-import { CardID, CardData, emptyCardData } from './sense/card';
+import { CardID, CardData } from './sense/card';
 import * as B from './sense/box';
-import { BoxID, BoxData, emptyBoxData } from './sense/box';
+import { BoxID, BoxData } from './sense/box';
 import * as O from './sense/object';
-import { ObjectType, ObjectID, ObjectData, emptyObjectData, objectData } from './sense/object';
-import { Edge, EdgeID, emptyEdge } from './sense/edge';
+import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
+import { Edge, EdgeID } from './sense/edge';
+import * as S from './storage';
+import { Storage } from './storage';
 import { MapID } from './sense-map';
 import { ActionUnion, emptyAction } from './action';
 import * as SL from './selection';
 import * as SM from './sense-map';
 
-export type State = {
-  objects: { [key: string]: ObjectData },
-  cards:   { [key: string]: CardData },
-  boxes:   { [key: string]: BoxData },
-  edges:   { [key: string]: Edge },
-};
+export type State = Storage;
 
-export const initial: State = {
-  objects: {},
-  cards:   {},
-  boxes:   {},
-  edges:   {},
-};
-
-export const getObject = (state: State, id: ObjectID): ObjectData => state.objects[id] || emptyObjectData;
-export const getCard = (state: State, id: CardID): CardData => state.cards[id] || emptyCardData;
-export const getBox = (state: State, id: BoxID): BoxData => state.boxes[id] || emptyBoxData;
-export const getEdge = (state: State, id: EdgeID): Edge => state.edges[id] || emptyEdge;
-
-export const getCardsInBox = (state: State, id: BoxID): State['cards'] =>
-  Object.keys(getBox(state, id).contains)
-    .map(oid => getObject(state, oid).data )
-    .map(cid => getCard(state, cid))
-    .reduce((a, c) => { a[c.id] = c; return a; }, {});
-
-export const doesObjectExist = (state: State, id: ObjectID): boolean => !!state.objects[id];
-export const doesCardExist = (state: State, id: CardID): boolean => !!state.cards[id];
-export const doesBoxExist = (state: State, id: BoxID): boolean => !!state.boxes[id];
-export const doesEdgeExist = (state: State, id: EdgeID): boolean => !!state.edges[id];
-
-export const getCardOrDefault = (state: State, defaultState: State, id: CardID): CardData =>
-  state.cards[id] || defaultState.cards[id] || emptyCardData;
-export const getBoxOrDefault = (state: State, defaultState: State, id: BoxID): BoxData =>
-  state.boxes[id] || defaultState.boxes[id] || emptyBoxData;
-export const getEdgeOrDefault = (state: State, defaultState: State, id: EdgeID): Edge =>
-  state.edges[id] || defaultState.edges[id] || emptyEdge;
-
-export const scoped = (state: State, filter: (key: ObjectID) => boolean): State => {
-  const objects = Object.keys(state.objects)
-    .filter(filter)
-    .reduce(
-      (acc, key) => {
-        acc[key] = getObject(state, key);
-        return acc;
-      },
-      {});
-  const edges = Object.values(state.edges)
-    .filter(g => !!objects[g.from] && !!objects[g.to])
-    .reduce(
-      (acc, g) => {
-        acc[g.id] = g;
-        return acc;
-      },
-      {});
-  const { cards, boxes } = state;
-  return { objects, cards, boxes, edges };
-};
-
-export const scopedToBox = (state: State, id: BoxID): State => {
-  const { contains } = getBox(state, id);
-  const filter = (key: ObjectID): boolean => !!contains[key];
-  return scoped(state, filter);
-};
-
-export const scopedToMap = (state: State): State => {
-  const filter = (key: ObjectID): boolean => !getObject(state, key).belongsTo;
-  return scoped(state, filter);
-};
+export const initial: State = S.initial;
 
 /**
  * Partially update `objects` state.
@@ -317,7 +254,7 @@ const moveObject =
   (dispatch: Dispatch, getState: GetState) => {
     const { senseObject } = getState();
     // compute the local object position
-    const o = O.reducer(getObject(senseObject, id), O.updatePosition(x, y));
+    const o = O.reducer(S.getObject(senseObject, id), O.updatePosition(x, y));
     return Promise.resolve(o)
       // optimistic update
       .then((object) => dispatch(updateObjects(H.toIDMap<ObjectID, ObjectData>([

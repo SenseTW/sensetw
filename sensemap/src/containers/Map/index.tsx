@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import { MapScopeType, MapID, BoxID, State, actions, ActionProps, mapDispatch } from '../../types';
-import * as SO from '../../types/sense-object';
+import * as S from '../../types/storage';
 
 interface StateFromProps extends CO.StateFromProps {
   scope: { type: MapScopeType, box?: BoxID };
@@ -26,9 +26,9 @@ class Map extends React.Component<Props> {
     const inScope =
       (this.props.scope.type === MapScopeType.BOX
       && !!this.props.scope.box
-      && SO.doesBoxExist(this.props.senseObject, this.props.scope.box))
-        ? SO.scopedToBox(this.props.senseObject, this.props.scope.box)
-        : SO.scopedToMap(this.props.senseObject);
+      && S.doesBoxExist(this.props.senseObject, this.props.scope.box))
+        ? S.scopedToBox(this.props.senseObject, this.props.scope.box)
+        : S.scopedToMap(this.props.senseObject);
     return <CO.Map {...this.props} inScope={inScope} />;
   }
 }
