@@ -7,4 +7,4 @@ const PORT = 8000;
 
 const server = new ApolloServer({ typeDefs, resolvers });
 registerServer({ server, app });
-app.listen(PORT);
+app.listen(PORT, () => console.log(`Listening at port ${PORT}`));
