@@ -6,6 +6,7 @@ import { BoxID, BoxData, Action as BoxAction, emptyBoxData, reducer as boxReduce
 import { CardID, CardData, Action as CardAction, emptyCardData, reducer as cardReducer } from './sense/card';
 import * as F from './sense/focus';
 import * as SO from './sense-object';
+import * as S from './storage';
 import { clone } from 'ramda';
 
 export enum StatusType {
@@ -52,10 +53,10 @@ const updateCard =
   (id: CardID, action: CardAction) =>
   (dispatch: Dispatch, getState: GetState) => {
     const state = getState();
-    let card = SO.getCard(state.editor.temp, id);
+    let card = S.getCard(state.editor.temp, id);
 
     if (card.id === emptyCardData.id) {
-      card = SO.getCard(state.senseObject, id);
+      card = S.getCard(state.senseObject, id);
       dispatch(snapshotObject(ObjectType.CARD, card));
     }
 
@@ -73,10 +74,10 @@ const updateBox =
   (id: BoxID, action: BoxAction) =>
   (dispatch: Dispatch, getState: GetState) => {
     const state = getState();
-    let box = SO.getBox(state.editor.temp, id);
+    let box = S.getBox(state.editor.temp, id);
 
     if (box.id === emptyBoxData.id) {
-      box = SO.getBox(state.senseObject, id);
+      box = S.getBox(state.senseObject, id);
       dispatch(snapshotObject(ObjectType.BOX, box));
     }
 
@@ -102,13 +103,13 @@ export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
   status: StatusType,
-  temp: SO.State,
+  temp: S.Storage,
   focus: F.Focus,
 };
 
 export const initial: State = {
   status: StatusType.HIDE,
-  temp: SO.reducer(),
+  temp: S.initial, // S.reducer()
   focus: F.focusNothing(),
 };
 
@@ -116,8 +117,8 @@ export const getFocusedObject = (state: State): CardData | BoxData | null => {
   const { focus } = state;
 
   switch (focus.objectType) {
-    case ObjectType.BOX:  return SO.getBox(state.temp, focus.data);
-    case ObjectType.CARD: return SO.getCard(state.temp, focus.data);
+    case ObjectType.BOX:  return S.getBox(state.temp, focus.data);
+    case ObjectType.CARD: return S.getCard(state.temp, focus.data);
     default:              return null;
   }
 };
@@ -177,7 +178,7 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
           ...temp,
           cards: {
             ...temp.cards,
-            [id]: cardReducer(SO.getCard(temp, id), act)
+            [id]: cardReducer(S.getCard(temp, id), act)
           }
         }
       };
@@ -192,7 +193,7 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
           ...temp,
           boxes: {
             ...temp.boxes,
-            [id]: boxReducer(SO.getBox(temp, id), act)
+            [id]: boxReducer(S.getBox(temp, id), act)
           }
         }
       };

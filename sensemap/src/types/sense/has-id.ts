@@ -6,6 +6,13 @@ export interface HasID<T> {
 }
 
 /**
+ * ObjectMap indexes objects by strings.
+ */
+export interface ObjectMap<T> {
+  [key: string]: T;
+}
+
+/**
  * idOrUndefined returns the id or undefined of an object.
  * @param {HasID<T>} o The object.
  */
@@ -34,6 +41,6 @@ export const idOrError: <T>(err: string, o?: HasID<T>) => T =
  * toIDMap transforms an object list into an object map.
  * @param {HasID<T>} objects The object list.
  */
-export function toIDMap<T extends string, U extends HasID<T>>(this: void, objects: U[]): { [key: string]: U } {
+export function toIDMap<T extends string, U extends HasID<T>>(this: void, objects: U[]): ObjectMap<U> {
   return objects.reduce((acc, o) => { acc[o.id as string] = o; return acc; }, {});
 }
