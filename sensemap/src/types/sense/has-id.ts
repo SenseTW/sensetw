@@ -7,6 +7,8 @@ export interface HasID<T> {
 
 /**
  * ObjectMap indexes objects by strings.
+ *
+ * @todo Move to another file.
  */
 export interface ObjectMap<T> {
   [key: string]: T;

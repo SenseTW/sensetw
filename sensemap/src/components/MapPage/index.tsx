@@ -125,7 +125,7 @@ class MapPage extends React.Component<Props> {
                         const action =
                           // tslint:disable-next-line:no-any
                           await acts.senseObject.createCardObject(senseMap.map, newData as CardData) as any;
-                        const { payload: objects } = action as ReturnType<typeof SO.actions.updateObjects>;
+                        const { payload: objects } = action as ReturnType<typeof S.actions.updateObjects>;
                         if (scope.type === MapScopeType.BOX) {
                           const obj = Object.values(objects)[0];
                           const boxId = scope.box;

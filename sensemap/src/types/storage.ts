@@ -1,3 +1,4 @@
+import { ActionUnion, emptyAction } from './action';
 import { ObjectMap } from './sense/has-id';
 import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
@@ -177,4 +178,285 @@ export const scopedToBox = (storage: Storage, id: BoxID): Storage => {
 export const scopedToMap = (storage: Storage): Storage => {
   const filter = (key: ObjectID): boolean => !getObject(storage, key).belongsTo;
   return scoped(storage, filter);
+};
+
+/**
+ * Partially update `objects` state.
+ */
+export const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
+export const updateObjects =
+  (objects: ObjectMap<ObjectData>) => ({
+    type: UPDATE_OBJECTS as typeof UPDATE_OBJECTS,
+    payload: objects,
+  });
+
+/**
+ * Overwrite `objects`.
+ */
+export const OVERWRITE_OBJECTS = 'OVERWRITE_OBJECTS';
+export const overwriteObjects =
+  (objects: ObjectMap<ObjectData>) => ({
+    type: OVERWRITE_OBJECTS as typeof OVERWRITE_OBJECTS,
+    payload: objects,
+  });
+
+/**
+ * Remove listed `objects`.
+ */
+export const REMOVE_OBJECTS = 'REMOVE_OBJECTS';
+export const removeObjects =
+  (objects: ObjectMap<ObjectData>) => ({
+    type: REMOVE_OBJECTS as typeof REMOVE_OBJECTS,
+    payload: objects,
+  });
+
+/**
+ * Partially update `cards` state.
+ */
+export const UPDATE_CARDS = 'UPDATE_CARDS';
+export const updateCards =
+  (cards: ObjectMap<CardData>) => ({
+    type: UPDATE_CARDS as typeof UPDATE_CARDS,
+    payload: cards,
+  });
+
+/**
+ * Overwirte `objects`.
+ */
+export const OVERWRITE_CARDS = 'OVERWRITE_CARDS';
+export const overwriteCards =
+  (cards: ObjectMap<CardData>) => ({
+    type: OVERWRITE_CARDS as typeof OVERWRITE_CARDS,
+    payload: cards,
+  });
+
+/**
+ * Remove listed `cards`.
+ */
+export const REMOVE_CARDS = 'REMOVE_CARDS';
+export const removeCards =
+  (cards: ObjectMap<CardData>) => ({
+    type: REMOVE_CARDS as typeof REMOVE_CARDS,
+    payload: cards,
+  });
+
+/**
+ * Partially update `boxes` state.
+ */
+export const UPDATE_BOXES = 'UPDATE_BOXES';
+export const updateBoxes =
+  (boxes: ObjectMap<BoxData>) => ({
+    type: UPDATE_BOXES as typeof UPDATE_BOXES,
+    payload: boxes,
+  });
+
+/**
+ * Overwrite `boxes`.
+ */
+export const OVERWRITE_BOXES = 'OVERWRITE_BOXES';
+export const overwriteBoxes =
+  (boxes: ObjectMap<BoxData>) => ({
+    type: OVERWRITE_BOXES as typeof OVERWRITE_BOXES,
+    payload: boxes,
+  });
+
+/**
+ * Remove listed `boxes`.
+ */
+export const REMOVE_BOXES = 'REMOVE_BOXES';
+export const removeBoxes =
+  (boxes: ObjectMap<BoxData>) => ({
+    type: REMOVE_BOXES as typeof REMOVE_BOXES,
+    payload: boxes,
+  });
+
+/**
+ * Partially update `edges` state.
+ */
+export const UPDATE_EDGES = 'UPDATE_EDGES';
+export const updateEdges =
+  (edges: ObjectMap<Edge>) => ({
+    type: UPDATE_EDGES as typeof UPDATE_EDGES,
+    payload: edges,
+  });
+
+/**
+ * Overwrite `edges`.
+ */
+export const OVERWRITE_EDGES = 'OVERWRITE_EDGES';
+export const overwriteEdges =
+  (edges: ObjectMap<Edge>) => ({
+    type: OVERWRITE_EDGES as typeof OVERWRITE_EDGES,
+    payload: edges,
+  });
+
+/**
+ * Remove listed `edges`.
+ */
+export const REMOVE_EDGES = 'REMOVE_EDGES';
+export const removeEdges =
+  (edges: ObjectMap<Edge>) => ({
+    type: REMOVE_EDGES as typeof REMOVE_EDGES,
+    payload: edges,
+  });
+
+/**
+ * Remove card from Box.contains bidirectional relation.
+ */
+export const UPDATE_NOT_IN_BOX = 'UPDATE_NOT_IN_BOX';
+export const updateNotInBox =
+  (cardObject: ObjectID, box: BoxID) => ({
+    type: UPDATE_NOT_IN_BOX as typeof UPDATE_NOT_IN_BOX,
+    payload: { cardObject, box }
+  });
+
+/**
+ * Add card to Box.contains bidirectional relation.
+ */
+export const UPDATE_IN_BOX = 'UPDATE_IN_BOX';
+export const updateInBox =
+  (cardObject: ObjectID, box: BoxID) => ({
+    type: UPDATE_IN_BOX as typeof UPDATE_IN_BOX,
+    payload: { cardObject, box }
+  });
+
+export const actions = {
+  updateObjects,
+  overwriteObjects,
+  removeObjects,
+  updateCards,
+  overwriteCards,
+  removeCards,
+  updateBoxes,
+  overwriteBoxes,
+  removeBoxes,
+  updateEdges,
+  overwriteEdges,
+  removeEdges,
+  updateNotInBox,
+  updateInBox,
+};
+
+export type Action = ActionUnion<typeof actions>;
+
+export const reducer = (state: Storage = initial, action: Action = emptyAction): Storage => {
+  switch (action.type) {
+    case UPDATE_OBJECTS: {
+      return {
+        ...state,
+        objects: { ...state.objects, ...action.payload },
+      };
+    }
+    case OVERWRITE_OBJECTS: {
+      return {
+        ...state,
+        objects: action.payload,
+      };
+    }
+    case REMOVE_OBJECTS: {
+      const objects = { ...state.objects };
+      Object.keys(action.payload).forEach(key => delete objects[key]);
+
+      return {
+        ...state,
+        objects,
+      };
+    }
+    case UPDATE_CARDS: {
+      return {
+        ...state,
+        cards: { ...state.cards, ...action.payload },
+      };
+    }
+    case OVERWRITE_CARDS: {
+      return {
+        ...state,
+        cards: action.payload,
+      };
+    }
+    case REMOVE_CARDS: {
+      const cards = { ...state.cards };
+      Object.keys(action.payload).forEach(key => delete cards[key]);
+
+      return {
+        ...state,
+        cards,
+      };
+    }
+    case UPDATE_BOXES: {
+      return {
+        ...state,
+        boxes: { ...state.boxes, ...action.payload },
+      };
+    }
+    case OVERWRITE_BOXES: {
+      return {
+        ...state,
+        boxes: action.payload,
+      };
+    }
+    case REMOVE_BOXES: {
+      const boxes = { ...state.boxes };
+      Object.keys(action.payload).forEach(key => delete boxes[key]);
+
+      return {
+        ...state,
+        boxes,
+      };
+    }
+    case UPDATE_EDGES: {
+      return { ...state, edges: { ...state.edges, ...action.payload } };
+    }
+    case OVERWRITE_EDGES: {
+      return { ...state, edges: action.payload };
+    }
+    case REMOVE_EDGES: {
+      const edges = { ...state.edges };
+      Object.keys(action.payload).forEach(key => delete edges[key]);
+
+      return {
+        ...state,
+        edges,
+      };
+    }
+    case UPDATE_NOT_IN_BOX: {
+      const box        = state.boxes[action.payload.box];
+      const cardObject = state.objects[action.payload.cardObject];
+      let { contains } = box;
+      delete(contains[cardObject.id]);
+      return {
+        ...state,
+        boxes: {
+          ...state.boxes,
+          [box.id]: { ...box, contains },
+        },
+        objects: {
+          ...state.objects,
+          [cardObject.id]: { ...cardObject, belongsTo: undefined },
+        }
+      };
+    }
+    case UPDATE_IN_BOX: {
+      const box        = state.boxes[action.payload.box];
+      const cardObject = state.objects[action.payload.cardObject];
+      const contains   = {
+        ...box.contains,
+        [cardObject.id]: { id: cardObject.id },
+      };
+      return {
+        ...state,
+        boxes: {
+          ...state.boxes,
+          [box.id]: { ...box, contains },
+        },
+        objects: {
+          ...state.objects,
+          [cardObject.id]: { ...cardObject, belongsTo: box.id },
+        },
+      };
+    }
+    default: {
+      return state;
+    }
+  }
 };

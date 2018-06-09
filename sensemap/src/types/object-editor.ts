@@ -132,10 +132,10 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
       let { temp } = state;
       switch (objectType) {
         case ObjectType.BOX:
-          temp = SO.reducer(temp, SO.actions.updateBoxes(HasID.toIDMap<BoxID, BoxData>([data as BoxData])));
+          temp = SO.reducer(temp, S.actions.updateBoxes(HasID.toIDMap<BoxID, BoxData>([data as BoxData])));
           break;
         case ObjectType.CARD:
-          temp = SO.reducer(temp, SO.actions.updateCards(HasID.toIDMap<CardID, CardData>([data as CardData])));
+          temp = SO.reducer(temp, S.actions.updateCards(HasID.toIDMap<CardID, CardData>([data as CardData])));
           break;
         default:
       }
