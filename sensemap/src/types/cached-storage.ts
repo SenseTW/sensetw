@@ -6,57 +6,62 @@ import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
 import { EdgeID, Edge, emptyEdge } from './sense/edge';
 
+export enum TargetType {
+  PERMANENT = 'PERMANENT',
+  TEMPORARY = 'TEMPORARY',
+}
+
 /**
  * It is a storage with delayed updates.
  *
  * @todo Should model it with class-based OO?
  */
 export type CachedStorage = {
-  s: S.Storage,
-  _: S.Storage,
+  [TargetType.PERMANENT]: S.Storage,
+  [TargetType.TEMPORARY]: S.Storage,
 };
 
 export const initial = {
-  s: S.initial,
-  _: S.initial,
+  [TargetType.PERMANENT]: S.initial,
+  [TargetType.TEMPORARY]: S.initial,
 };
 
 export const toStorage = (storage: CachedStorage): S.Storage => {
   return {
     objects: {
-      ...storage.s.objects,
-      ...storage._.objects,
+      ...storage[TargetType.PERMANENT].objects,
+      ...storage[TargetType.TEMPORARY].objects,
     },
     cards: {
-      ...storage.s.cards,
-      ...storage._.cards,
+      ...storage[TargetType.PERMANENT].cards,
+      ...storage[TargetType.TEMPORARY].cards,
     },
     boxes: {
-      ...storage.s.boxes,
-      ...storage._.boxes,
+      ...storage[TargetType.PERMANENT].boxes,
+      ...storage[TargetType.TEMPORARY].boxes,
     },
     edges: {
-      ...storage.s.edges,
-      ...storage._.edges,
+      ...storage[TargetType.PERMANENT].edges,
+      ...storage[TargetType.TEMPORARY].edges,
     },
   };
 };
 
 export const getObject =
   (storage: CachedStorage, id: ObjectID): ObjectData =>
-  storage._.objects[id] || storage.s.objects[id] || emptyObjectData;
+  storage[TargetType.TEMPORARY].objects[id] || storage[TargetType.PERMANENT].objects[id] || emptyObjectData;
 
 export const getCard =
   (storage: CachedStorage, id: CardID): CardData =>
-  storage._.cards[id] || storage.s.cards[id] || emptyCardData;
+  storage[TargetType.TEMPORARY].cards[id] || storage[TargetType.PERMANENT].cards[id] || emptyCardData;
 
 export const getBox =
   (storage: CachedStorage, id: BoxID): BoxData =>
-  storage._.boxes[id] || storage.s.boxes[id] || emptyBoxData;
+  storage[TargetType.TEMPORARY].boxes[id] || storage[TargetType.PERMANENT].boxes[id] || emptyBoxData;
 
 export const getEdge =
   (storage: CachedStorage, id: EdgeID): Edge =>
-  storage._.edges[id] || storage.s.edges[id] || emptyEdge;
+  storage[TargetType.TEMPORARY].edges[id] || storage[TargetType.PERMANENT].edges[id] || emptyEdge;
 
 // XXX: duplicated
 export const getCardsInBox = (storage: CachedStorage, id: BoxID): ObjectMap<CardData> =>
@@ -66,40 +71,40 @@ export const getCardsInBox = (storage: CachedStorage, id: BoxID): ObjectMap<Card
     .reduce((a, c) => { a[c.id] = c; return a; }, {});
 
 export const doesObjectExist = (storage: CachedStorage, id: ObjectID): boolean =>
-  S.doesObjectExist(storage._, id) || S.doesObjectExist(storage.s, id);
+  S.doesObjectExist(storage[TargetType.TEMPORARY], id) || S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
 export const doesCardExist = (storage: CachedStorage, id: CardID): boolean =>
-  S.doesCardExist(storage._, id) || S.doesCardExist(storage.s, id);
+  S.doesCardExist(storage[TargetType.TEMPORARY], id) || S.doesCardExist(storage[TargetType.PERMANENT], id);
 
 export const doesBoxExist = (storage: CachedStorage, id: BoxID): boolean =>
-  S.doesBoxExist(storage._, id) || S.doesBoxExist(storage.s, id);
+  S.doesBoxExist(storage[TargetType.TEMPORARY], id) || S.doesBoxExist(storage[TargetType.PERMANENT], id);
 
 export const doesEdgeExist = (storage: CachedStorage, id: EdgeID): boolean =>
-  S.doesEdgeExist(storage._, id) || S.doesEdgeExist(storage.s, id);
+  S.doesEdgeExist(storage[TargetType.TEMPORARY], id) || S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
 export const isObjectNew = (storage: CachedStorage, id: ObjectID): boolean =>
-  S.doesObjectExist(storage._, id) && !S.doesObjectExist(storage.s, id);
+  S.doesObjectExist(storage[TargetType.TEMPORARY], id) && !S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
 export const isCardNew = (storage: CachedStorage, id: CardID): boolean =>
-  S.doesCardExist(storage._, id) && !S.doesCardExist(storage.s, id);
+  S.doesCardExist(storage[TargetType.TEMPORARY], id) && !S.doesCardExist(storage[TargetType.PERMANENT], id);
 
 export const isBoxNew = (storage: CachedStorage, id: BoxID): boolean =>
-  S.doesBoxExist(storage._, id) && !S.doesBoxExist(storage.s, id);
+  S.doesBoxExist(storage[TargetType.TEMPORARY], id) && !S.doesBoxExist(storage[TargetType.PERMANENT], id);
 
 export const isEdgeNew = (storage: CachedStorage, id: EdgeID): boolean =>
-  S.doesEdgeExist(storage._, id) && !S.doesEdgeExist(storage.s, id);
+  S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && !S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
 export const isObjectDirty = (storage: CachedStorage, id: ObjectID): boolean =>
-  S.doesObjectExist(storage._, id) && S.doesObjectExist(storage.s, id);
+  S.doesObjectExist(storage[TargetType.TEMPORARY], id) && S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
 export const isCardDirty = (storage: CachedStorage, id: CardID): boolean =>
-  S.doesCardExist(storage._, id) && S.doesCardExist(storage.s, id);
+  S.doesCardExist(storage[TargetType.TEMPORARY], id) && S.doesCardExist(storage[TargetType.PERMANENT], id);
 
 export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
-  S.doesBoxExist(storage._, id) && S.doesBoxExist(storage.s, id);
+  S.doesBoxExist(storage[TargetType.TEMPORARY], id) && S.doesBoxExist(storage[TargetType.PERMANENT], id);
 
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
-  S.doesEdgeExist(storage._, id) && S.doesEdgeExist(storage.s, id);
+  S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
 export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolean): S.Storage =>
   S.scoped(toStorage(storage), filter);
@@ -116,6 +121,78 @@ export const scopedToMap = (storage: CachedStorage): S.Storage => {
   const filter = (key: ObjectID): boolean => !getObject(storage, key).belongsTo;
   return scoped(storage, filter);
 };
+
+const updateObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_OBJECTS as typeof S.UPDATE_OBJECTS,
+  payload: { objects, target },
+});
+
+const overwriteObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_OBJECTS as typeof S.OVERWRITE_OBJECTS,
+  payload: { objects, target },
+});
+
+const removeObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_OBJECTS as typeof S.REMOVE_OBJECTS,
+  payload: { objects, target },
+});
+
+const updateCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_CARDS as typeof S.UPDATE_CARDS,
+  payload: { cards, target },
+});
+
+const overwriteCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_CARDS as typeof S.OVERWRITE_CARDS,
+  payload: { cards, target },
+});
+
+const removeCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_CARDS as typeof S.REMOVE_CARDS,
+  payload: { cards, target },
+});
+
+const updateBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_BOXES as typeof S.UPDATE_BOXES,
+  payload: { boxes, target },
+});
+
+const overwriteBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_BOXES as typeof S.OVERWRITE_BOXES,
+  payload: { boxes, target },
+});
+
+const removeBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_BOXES as typeof S.REMOVE_BOXES,
+  payload: { boxes, target },
+});
+
+const updateEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_EDGES as typeof S.UPDATE_EDGES,
+  payload: { edges, target },
+});
+
+const overwriteEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_EDGES as typeof S.OVERWRITE_EDGES,
+  payload: { edges, target },
+});
+
+const removeEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_EDGES as typeof S.REMOVE_EDGES,
+  payload: { edges, target },
+});
+
+export const updateNotInBox =
+  (cardObject: ObjectID, box: BoxID, target: TargetType = TargetType.TEMPORARY) => ({
+    type: S.UPDATE_NOT_IN_BOX as typeof S.UPDATE_NOT_IN_BOX,
+    payload: { cardObject, box, target },
+  });
+
+export const updateInBox =
+  (cardObject: ObjectID, box: BoxID, target: TargetType = TargetType.TEMPORARY) => ({
+    type: S.UPDATE_IN_BOX as typeof S.UPDATE_IN_BOX,
+    payload: { cardObject, box, target },
+  });
 
 const FLUSH = 'FLUSH';
 const flush = () => ({
@@ -143,7 +220,20 @@ const flushEdges = () => ({
 });
 
 export const actions = {
-  ...S.actions,
+  updateObjects,
+  overwriteObjects,
+  removeObjects,
+  updateCards,
+  overwriteCards,
+  removeCards,
+  updateBoxes,
+  overwriteBoxes,
+  removeBoxes,
+  updateEdges,
+  overwriteEdges,
+  removeEdges,
+  updateInBox,
+  updateNotInBox,
   flush,
   flushObjects,
   flushCards,
@@ -169,64 +259,66 @@ export const reducer = (state: CachedStorage = initial, action: Action = emptyAc
     case S.REMOVE_EDGES:
     case S.UPDATE_NOT_IN_BOX:
     case S.UPDATE_IN_BOX: {
+      const { target } = action.payload;
+
       return {
-        s: state.s,
-        _: S.reducer(state._, action),
+        ...state,
+        [target]: S.reducer(state[target], action),
       };
     }
     case FLUSH: {
       return {
-        s: toStorage(state),
-        _: S.initial,
+        [TargetType.PERMANENT]: toStorage(state),
+        [TargetType.TEMPORARY]: S.initial,
       };
     }
     case FLUSH_OBJECTS: {
       return {
-        s: {
-          ...state.s,
+        [TargetType.PERMANENT]: {
+          ...state[TargetType.PERMANENT],
           objects: {
-            ...state.s.objects,
-            ...state._.objects,
+            ...state[TargetType.PERMANENT].objects,
+            ...state[TargetType.TEMPORARY].objects,
           }
         },
-        _: S.initial,
+        [TargetType.TEMPORARY]: S.initial,
       };
     }
     case FLUSH_CARDS: {
       return {
-        s: {
-          ...state.s,
+        [TargetType.PERMANENT]: {
+          ...state[TargetType.PERMANENT],
           cards: {
-            ...state.s.cards,
-            ...state._.cards,
+            ...state[TargetType.PERMANENT].cards,
+            ...state[TargetType.TEMPORARY].cards,
           }
         },
-        _: S.initial,
+        [TargetType.TEMPORARY]: S.initial,
       };
 
     }
     case FLUSH_BOXES: {
       return {
-        s: {
-          ...state.s,
+        [TargetType.PERMANENT]: {
+          ...state[TargetType.PERMANENT],
           boxes: {
-            ...state.s.boxes,
-            ...state._.boxes,
+            ...state[TargetType.PERMANENT].boxes,
+            ...state[TargetType.TEMPORARY].boxes,
           }
         },
-        _: S.initial,
+        [TargetType.TEMPORARY]: S.initial,
       };
     }
     case FLUSH_EDGES: {
       return {
-        s: {
-          ...state.s,
+        [TargetType.PERMANENT]: {
+          ...state[TargetType.PERMANENT],
           edges: {
-            ...state.s.edges,
-            ...state._.edges,
+            ...state[TargetType.PERMANENT].edges,
+            ...state[TargetType.TEMPORARY].edges,
           }
         },
-        _: S.initial,
+        [TargetType.TEMPORARY]: S.initial,
       };
     }
     default: {
