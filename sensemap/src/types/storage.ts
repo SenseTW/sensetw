@@ -187,7 +187,7 @@ export const UPDATE_OBJECTS = 'UPDATE_OBJECTS';
 export const updateObjects =
   (objects: ObjectMap<ObjectData>) => ({
     type: UPDATE_OBJECTS as typeof UPDATE_OBJECTS,
-    payload: objects,
+    payload: { objects },
   });
 
 /**
@@ -197,7 +197,7 @@ export const OVERWRITE_OBJECTS = 'OVERWRITE_OBJECTS';
 export const overwriteObjects =
   (objects: ObjectMap<ObjectData>) => ({
     type: OVERWRITE_OBJECTS as typeof OVERWRITE_OBJECTS,
-    payload: objects,
+    payload: { objects },
   });
 
 /**
@@ -207,7 +207,7 @@ export const REMOVE_OBJECTS = 'REMOVE_OBJECTS';
 export const removeObjects =
   (objects: ObjectMap<ObjectData>) => ({
     type: REMOVE_OBJECTS as typeof REMOVE_OBJECTS,
-    payload: objects,
+    payload: { objects },
   });
 
 /**
@@ -217,7 +217,7 @@ export const UPDATE_CARDS = 'UPDATE_CARDS';
 export const updateCards =
   (cards: ObjectMap<CardData>) => ({
     type: UPDATE_CARDS as typeof UPDATE_CARDS,
-    payload: cards,
+    payload: { cards },
   });
 
 /**
@@ -227,7 +227,7 @@ export const OVERWRITE_CARDS = 'OVERWRITE_CARDS';
 export const overwriteCards =
   (cards: ObjectMap<CardData>) => ({
     type: OVERWRITE_CARDS as typeof OVERWRITE_CARDS,
-    payload: cards,
+    payload: { cards },
   });
 
 /**
@@ -237,7 +237,7 @@ export const REMOVE_CARDS = 'REMOVE_CARDS';
 export const removeCards =
   (cards: ObjectMap<CardData>) => ({
     type: REMOVE_CARDS as typeof REMOVE_CARDS,
-    payload: cards,
+    payload: { cards },
   });
 
 /**
@@ -247,7 +247,7 @@ export const UPDATE_BOXES = 'UPDATE_BOXES';
 export const updateBoxes =
   (boxes: ObjectMap<BoxData>) => ({
     type: UPDATE_BOXES as typeof UPDATE_BOXES,
-    payload: boxes,
+    payload: { boxes },
   });
 
 /**
@@ -257,7 +257,7 @@ export const OVERWRITE_BOXES = 'OVERWRITE_BOXES';
 export const overwriteBoxes =
   (boxes: ObjectMap<BoxData>) => ({
     type: OVERWRITE_BOXES as typeof OVERWRITE_BOXES,
-    payload: boxes,
+    payload: { boxes },
   });
 
 /**
@@ -267,7 +267,7 @@ export const REMOVE_BOXES = 'REMOVE_BOXES';
 export const removeBoxes =
   (boxes: ObjectMap<BoxData>) => ({
     type: REMOVE_BOXES as typeof REMOVE_BOXES,
-    payload: boxes,
+    payload: { boxes },
   });
 
 /**
@@ -277,7 +277,7 @@ export const UPDATE_EDGES = 'UPDATE_EDGES';
 export const updateEdges =
   (edges: ObjectMap<Edge>) => ({
     type: UPDATE_EDGES as typeof UPDATE_EDGES,
-    payload: edges,
+    payload: { edges },
   });
 
 /**
@@ -287,7 +287,7 @@ export const OVERWRITE_EDGES = 'OVERWRITE_EDGES';
 export const overwriteEdges =
   (edges: ObjectMap<Edge>) => ({
     type: OVERWRITE_EDGES as typeof OVERWRITE_EDGES,
-    payload: edges,
+    payload: { edges },
   });
 
 /**
@@ -297,7 +297,7 @@ export const REMOVE_EDGES = 'REMOVE_EDGES';
 export const removeEdges =
   (edges: ObjectMap<Edge>) => ({
     type: REMOVE_EDGES as typeof REMOVE_EDGES,
-    payload: edges,
+    payload: { edges },
   });
 
 /**
@@ -344,18 +344,18 @@ export const reducer = (state: Storage = initial, action: Action = emptyAction):
     case UPDATE_OBJECTS: {
       return {
         ...state,
-        objects: { ...state.objects, ...action.payload },
+        objects: { ...state.objects, ...action.payload.objects },
       };
     }
     case OVERWRITE_OBJECTS: {
       return {
         ...state,
-        objects: action.payload,
+        objects: action.payload.objects,
       };
     }
     case REMOVE_OBJECTS: {
       const objects = { ...state.objects };
-      Object.keys(action.payload).forEach(key => delete objects[key]);
+      Object.keys(action.payload.objects).forEach(key => delete objects[key]);
 
       return {
         ...state,
@@ -365,18 +365,18 @@ export const reducer = (state: Storage = initial, action: Action = emptyAction):
     case UPDATE_CARDS: {
       return {
         ...state,
-        cards: { ...state.cards, ...action.payload },
+        cards: { ...state.cards, ...action.payload.cards },
       };
     }
     case OVERWRITE_CARDS: {
       return {
         ...state,
-        cards: action.payload,
+        cards: action.payload.cards,
       };
     }
     case REMOVE_CARDS: {
       const cards = { ...state.cards };
-      Object.keys(action.payload).forEach(key => delete cards[key]);
+      Object.keys(action.payload.cards).forEach(key => delete cards[key]);
 
       return {
         ...state,
@@ -386,18 +386,18 @@ export const reducer = (state: Storage = initial, action: Action = emptyAction):
     case UPDATE_BOXES: {
       return {
         ...state,
-        boxes: { ...state.boxes, ...action.payload },
+        boxes: { ...state.boxes, ...action.payload.boxes },
       };
     }
     case OVERWRITE_BOXES: {
       return {
         ...state,
-        boxes: action.payload,
+        boxes: action.payload.boxes,
       };
     }
     case REMOVE_BOXES: {
       const boxes = { ...state.boxes };
-      Object.keys(action.payload).forEach(key => delete boxes[key]);
+      Object.keys(action.payload.boxes).forEach(key => delete boxes[key]);
 
       return {
         ...state,
@@ -405,14 +405,14 @@ export const reducer = (state: Storage = initial, action: Action = emptyAction):
       };
     }
     case UPDATE_EDGES: {
-      return { ...state, edges: { ...state.edges, ...action.payload } };
+      return { ...state, edges: { ...state.edges, ...action.payload.edges } };
     }
     case OVERWRITE_EDGES: {
-      return { ...state, edges: action.payload };
+      return { ...state, edges: action.payload.edges };
     }
     case REMOVE_EDGES: {
       const edges = { ...state.edges };
-      Object.keys(action.payload).forEach(key => delete edges[key]);
+      Object.keys(action.payload.edges).forEach(key => delete edges[key]);
 
       return {
         ...state,
