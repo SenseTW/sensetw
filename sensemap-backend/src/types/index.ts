@@ -1,4 +1,10 @@
-import { gql } from 'apollo-server';
+import { gql, IResolvers } from 'apollo-server';
+import { reduce, mergeDeepRight } from 'ramda';
+import * as M from './map';
+import * as C from './card';
+import * as B from './box';
+import * as O from './object';
+import * as E from './edge';
 
 
 export const typeDefs = gql`
@@ -90,19 +96,12 @@ export const typeDefs = gql`
       mapId: ID,
       toId: ID,
     ): Edge
-    updateMap(
-      id: ID!,
-      boxesIds: [ID!],
-      cardsIds: [ID!],
-      edgesIds: [ID!],
-      objectsIds: [ID!]
-    ): Map
     updateObject(
       id: ID!,
-      objectType: ObjectType!,
-      x: Float!,
-      y: Float!,
-      zIndex: Float!,
+      objectType: ObjectType,
+      x: Float,
+      y: Float,
+      zIndex: Float,
       belongsToId: ID,
       boxId: ID,
       cardId: ID,
@@ -163,13 +162,15 @@ export const typeDefs = gql`
     updatedAt: DateTime!
     x: Float!
     y: Float!
-    width: Float!
-    height: Float!
     zIndex: Float!
+    mapId: ID,
     map: Map @relation(name: "MapObjects")
     objectType: ObjectType! @migrationValue(value: CARD)
+    cardId: ID,
     card: Card @relation(name: "ObjectCard")
+    boxId: ID,
     box: Box @relation(name: "ObjectBox")
+    belongsToId: ID,
     belongsTo: Box @relation(name: "ContainCards")
     outgoing: [Edge!]! @relation(name: "EdgeFrom")
     incoming: [Edge!]! @relation(name: "EdgeTo")
@@ -179,8 +180,11 @@ export const typeDefs = gql`
     id: ID! @isUnique
     createdAt: DateTime!
     updatedAt: DateTime!
+    mapId: ID
     map: Map! @relation(name: "MapEdges")
+    fromId: ID
     from: Object! @relation(name: "EdgeFrom")
+    toId: ID
     to: Object! @relation(name: "EdgeTo")
   }
 
@@ -197,6 +201,7 @@ export const typeDefs = gql`
     url: String
     cardType: CardType @migrationValue(value: NORMAL)
     objects: [Object!]! @relation(name: "ObjectCard")
+    mapId: ID
     map: Map @relation(name: "MapCards")
   }
 
@@ -209,6 +214,7 @@ export const typeDefs = gql`
     tags: String
     objects: [Object!]! @relation(name: "ObjectBox")
     contains: [Object!]! @relation(name: "ContainCards")
+    mapId: ID
     map: Map @relation(name: "MapBoxes")
   }
 
@@ -243,8 +249,18 @@ export const typeDefs = gql`
   }
 `;
 
-export const resolvers = {
-  Query: {
-    ping: (parent, args, context, info) => 'pong',
-  }
-}
+export const resolvers =
+  reduce(
+    mergeDeepRight,
+    {
+      Query: { ping: (parent, args, context, info) => 'pong' },
+      Mutation: {},
+    },
+    [
+      M.resolvers,
+      C.resolvers,
+      B.resolvers,
+      O.resolvers,
+      E.resolvers,
+    ]
+  ) as IResolvers<any, any>;

@@ -4,6 +4,7 @@ export const shorthands = {
   id: {
     type: 'uuid',
     primaryKey: true,
+    default: new PgLiteral('uuid_generate_v4()'),
   },
   createdAt: {
     type: 'timestamp',
@@ -45,6 +46,7 @@ export const shorthands = {
 };
 
 export const up = (pgm: MigrationBuilder) => {
+  pgm.createExtension('uuid-ossp');
   pgm.createTable('map', {
     id: 'id',
     createdAt: 'createdAt',
@@ -70,11 +72,11 @@ export const up = (pgm: MigrationBuilder) => {
       notNull: true,
       default: 'NORMAL',
     },
-    map: 'mapReference',
+    mapId: 'mapReference',
   }, {
     'comment': 'Card data',
   });
-  pgm.createIndex('card', ['map']);
+  pgm.createIndex('card', ['mapId']);
 
   pgm.createTable('box', {
     id: 'id',
@@ -83,18 +85,18 @@ export const up = (pgm: MigrationBuilder) => {
     title: 'string',
     summary: 'string',
     tags: 'string',
-    map: 'mapReference',
+    mapId: 'mapReference',
   }, {
     comment: 'Box data',
   });
-  pgm.createIndex('box', ['map']);
+  pgm.createIndex('box', ['mapId']);
 
   pgm.createType('objecttype', ['NONE', 'CARD', 'BOX']);
   pgm.createTable('object', {
     id: 'id',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    map: 'mapReference',
+    mapId: 'mapReference',
     x: 'coordinate',
     y: 'coordinate',
     zIndex: {
@@ -106,29 +108,29 @@ export const up = (pgm: MigrationBuilder) => {
       type: 'objecttype',
       notNull: true,
     },
-    box: 'boxReference',
-    card: 'cardReference',
-    belongsTo: 'boxReference',
+    boxId: 'boxReference',
+    cardId: 'cardReference',
+    belongsToId: 'boxReference',
   }, {
     comment: 'Object data',
   });
-  pgm.createIndex('object', ['map', 'objectType']);
-  pgm.createIndex('object', ['card']);
-  pgm.createIndex('object', ['box']);
-  pgm.createIndex('object', ['belongsTo']);
+  pgm.createIndex('object', ['mapId', 'objectType']);
+  pgm.createIndex('object', ['cardId']);
+  pgm.createIndex('object', ['boxId']);
+  pgm.createIndex('object', ['belongsToId']);
 
   pgm.createTable('edge', {
     id: 'id',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    map: 'mapReference',
-    from: 'objectReference',
-    to: 'objectReference',
+    mapId: 'mapReference',
+    fromId: 'objectReference',
+    toId: 'objectReference',
   }, {
     comment: 'Edge data',
   });
-  pgm.createIndex('edge', ['map', 'from']);
-  pgm.createIndex('edge', ['map', 'to']);
+  pgm.createIndex('edge', ['mapId', 'fromId']);
+  pgm.createIndex('edge', ['mapId', 'toId']);
 };
 
 // auto down migration

@@ -12,16 +12,21 @@
     "dev": "rimraf dist && tsc -w",
     "prestart": "npm run build",
     "start": "node dist",
+    "debug": "DEBUG=knex:query,sensemap:* yarn start",
+    "db:create": "docker run -it --rm --link sensemap-pg:postgres postgres psql -h postgres -U postgres -c 'CREATE DATABASE \"sensemap\" with owner \"postgres\";'",
+    "db:up": "docker run --name sensemap-pg -e POSTGRES_PASSWORD=mysecret -p 5432:5432 -d postgres",
     "test": "jest"
   },
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",
   "devDependencies": {
     "@types/cors": "^2.8.4",
+    "@types/dotenv": "^4.0.3",
     "@types/express": "^4.16.0",
     "@types/graphql": "^0.13.1",
+    "@types/knex": "^0.14.14",
     "@types/node": "^8.10.18",
-    "@types/pg": "^7.4.9",
+    "@types/ramda": "^0.25.32",
     "dotenv": "^6.0.0",
     "jest": "^23.1.0",
     "node-pg-migrate": "^3.5.0",
@@ -36,7 +41,9 @@
     "express": "^4.16.3",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
-    "pg": "^7.4.3"
+    "knex": "^0.14.6",
+    "pg": "^7.4.3",
+    "ramda": "^0.25.0"
   },
   "jest": {
     "transform": {
