@@ -12,51 +12,76 @@ import { BoxID, BoxData } from './sense/box';
 import * as O from './sense/object';
 import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
 import { Edge, EdgeID } from './sense/edge';
-import * as S from './storage';
-import { Storage } from './storage';
+import * as CS from './cached-storage';
+import { TargetType, CachedStorage } from './cached-storage';
 import { MapID } from './sense-map';
-import { emptyAction } from './action';
 import * as SL from './selection';
 import * as SM from './sense-map';
 
-export type State = Storage;
+export type State = CachedStorage;
 
-export const initial: State = S.initial;
+export const initial: State = CS.initial;
 
 const createCard =
   (mapId: MapID, card: CardData) =>
   async (dispatch: Dispatch) => {
     return GC.create(mapId, card)
-      .then((newCard) => dispatch(S.updateCards(H.toIDMap<CardID, CardData>([
-        newCard
-      ]))));
+      .then((newCard) => dispatch(
+        CS.updateCards(
+          H.toIDMap<CardID, CardData>([newCard]),
+          TargetType.PERMANENT,
+        )
+      ));
   };
 
 const updateCard =
   (card: CardData) =>
+  (dispatch: Dispatch) =>
+    // edit the card cache
+    dispatch(CS.updateCards(H.toIDMap<CardID, CardData>([card])));
+
+const saveCard =
+  (card: CardData) =>
   (dispatch: Dispatch) => {
     return GC.update(card)
-      .then((newCard) => dispatch(S.updateCards(H.toIDMap<CardID, CardData>([
-        newCard
-      ]))));
+      .then((newCard) => {
+        const cardMap = H.toIDMap<CardID, CardData>([newCard]);
+        // update the card
+        dispatch(CS.updateCards(cardMap, TargetType.PERMANENT));
+        // remove the card from the cache storage
+        dispatch(CS.removeCards(cardMap));
+      });
   };
 
 const createBox =
   (mapId: MapID, box: BoxData) =>
   async (dispatch: Dispatch) => {
     return GB.create(mapId, box)
-      .then((newBox) => dispatch(S.updateBoxes(H.toIDMap<BoxID, BoxData>([
-        newBox
-      ]))));
+      .then((newBox) => dispatch(
+        CS.updateBoxes(
+          H.toIDMap<BoxID, BoxData>([newBox]),
+          TargetType.PERMANENT,
+        )
+      ));
   };
 
 const updateBox =
   (box: BoxData) =>
+  (dispatch: Dispatch) =>
+    // edit the box cache
+    dispatch(CS.updateBoxes(H.toIDMap<BoxID, BoxData>([box])));
+
+const saveBox =
+  (box: BoxData) =>
   (dispatch: Dispatch) => {
     return GB.update(box)
-      .then((newBox) => dispatch(S.updateBoxes(H.toIDMap<BoxID, BoxData>([
-        newBox
-      ]))));
+      .then((newBox) => {
+        const boxMap = H.toIDMap<BoxID, BoxData>([newBox]);
+        // update the box
+        dispatch(CS.updateBoxes(boxMap, TargetType.PERMANENT));
+        // remove the box from the cache storage
+        dispatch(CS.removeBoxes(boxMap));
+      });
   };
 
 const loadObjects =
@@ -64,7 +89,11 @@ const loadObjects =
   (dispatch: Dispatch) => {
     return GO.loadObjects(id)
       .then(data => H.toIDMap<ObjectID, ObjectData>(data))
-      .then(data => dispatch(overwrite ? S.overwriteObjects(data) : S.updateObjects(data)));
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteObjects(data, TargetType.PERMANENT)
+          : CS.updateObjects(data, TargetType.PERMANENT)
+      ));
   };
 
 const loadCards =
@@ -72,7 +101,11 @@ const loadCards =
   (dispatch: Dispatch) => {
     return GC.loadCards(id)
       .then(data => H.toIDMap<CardID, CardData>(data))
-      .then(data => dispatch(overwrite ? S.overwriteCards(data) : S.updateCards(data)));
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteCards(data, TargetType.PERMANENT)
+          : CS.updateCards(data, TargetType.PERMANENT)
+      ));
   };
 
 const loadBoxes =
@@ -80,7 +113,11 @@ const loadBoxes =
   (dispatch: Dispatch) => {
     return GB.loadBoxes(id)
       .then(data => H.toIDMap<BoxID, BoxData>(data))
-      .then(data => dispatch(overwrite ? S.overwriteBoxes(data) : S.updateBoxes(data)));
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteBoxes(data, TargetType.PERMANENT)
+          : CS.updateBoxes(data, TargetType.PERMANENT)
+      ));
   };
 
 const loadEdges =
@@ -88,14 +125,18 @@ const loadEdges =
   (dispatch: Dispatch) => {
     return GE.load(id)
       .then(data => H.toIDMap<EdgeID, Edge>(data))
-      .then(data => dispatch(overwrite ? S.overwriteEdges(data) : S.updateEdges(data)));
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteEdges(data, TargetType.PERMANENT)
+          : CS.updateEdges(data, TargetType.PERMANENT)
+      ));
   };
 
 const addCardToBox =
   (cardObject: ObjectID, box: BoxID) =>
   (dispatch: Dispatch) => {
     return G.addCardToBox(cardObject, box)
-      .then(() => dispatch(S.updateInBox(cardObject, box)))
+      .then(() => dispatch(CS.updateInBox(cardObject, box, TargetType.PERMANENT)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
@@ -112,9 +153,12 @@ const createObject =
   (mapId: MapID, data: ObjectData) =>
   (dispatch: Dispatch) => {
     return GO.create(mapId, data)
-      .then((object) => dispatch(S.updateObjects(H.toIDMap<ObjectID, ObjectData>([
-        object
-      ]))));
+      .then((object) => dispatch(
+        CS.updateObjects(
+          H.toIDMap<ObjectID, ObjectData>([object]),
+          TargetType.PERMANENT,
+        )
+      ));
   };
 
 const createBoxObject =
@@ -169,25 +213,29 @@ const moveObject =
   (dispatch: Dispatch, getState: GetState) => {
     const { senseObject } = getState();
     // compute the local object position
-    const o = O.reducer(S.getObject(senseObject, id), O.updatePosition(x, y));
+    const o = O.reducer(CS.getObject(senseObject, id), O.updatePosition(x, y));
     return Promise.resolve(o)
       // optimistic update
-      .then((object) => dispatch(S.updateObjects(H.toIDMap<ObjectID, ObjectData>([
+      .then((object) => dispatch(CS.updateObjects(H.toIDMap<ObjectID, ObjectData>([
         object
       ]))))
       // update the remote object
       .then(() => GO.move(id, x, y))
       // sync the local object
-      .then((object) => dispatch(S.updateObjects(H.toIDMap<ObjectID, ObjectData>([
-        object
-      ]))));
+      .then((object) => {
+        const objectMap = H.toIDMap<ObjectID, ObjectData>([object]);
+        // update the object
+        dispatch(CS.updateObjects(objectMap, TargetType.PERMANENT));
+        // remove the object from the cached storage
+        dispatch(CS.removeObjects(objectMap));
+      });
   };
 
 const removeCardFromBox =
   (cardObject: ObjectID, box: BoxID) =>
   (dispatch: Dispatch) => {
     return G.removeCardFromBox(cardObject, box)
-      .then(() => dispatch(S.updateNotInBox(cardObject, box)))
+      .then(() => dispatch(CS.updateNotInBox(cardObject, box, TargetType.PERMANENT)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
@@ -256,7 +304,12 @@ const createEdge =
   (map: MapID, from: ObjectID, to: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return GE.create(map, from, to)
-      .then((edge) => dispatch(S.updateEdges(H.toIDMap<EdgeID, Edge>([ edge ]))));
+      .then((edge) => dispatch(
+        CS.updateEdges(
+          H.toIDMap<EdgeID, Edge>([ edge ]),
+          TargetType.PERMANENT,
+        )
+      ));
   };
 
 const removeEdge =
@@ -268,7 +321,11 @@ const removeEdge =
 
 export const actions = {
   updateCard,
+  saveCard,
+  removeCard,
   updateBox,
+  saveBox,
+  removeBox,
   loadObjects,
   loadCards,
   loadBoxes,
@@ -290,23 +347,6 @@ export const actions = {
   removeEdge,
 };
 
-export type Action = S.Action;
+export type Action = CS.Action;
 
-export const reducer = (state: State = initial, action: S.Action = emptyAction): State => {
-  switch (action.type) {
-    case S.UPDATE_OBJECTS:
-    case S.OVERWRITE_OBJECTS:
-    case S.UPDATE_CARDS:
-    case S.OVERWRITE_CARDS:
-    case S.UPDATE_BOXES:
-    case S.OVERWRITE_BOXES:
-    case S.UPDATE_EDGES:
-    case S.OVERWRITE_EDGES:
-    case S.UPDATE_NOT_IN_BOX:
-    case S.UPDATE_IN_BOX:
-      return S.reducer(state, action);
-    default: {
-      return state;
-    }
-  }
-};
+export const reducer = CS.reducer;

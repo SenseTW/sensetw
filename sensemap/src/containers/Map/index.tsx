@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import { MapScopeType, MapID, BoxID, State, actions, ActionProps, mapDispatch } from '../../types';
 import * as S from '../../types/storage';
+import * as CS from '../../types/cached-storage';
 
 interface StateFromProps extends CO.StateFromProps {
   scope: { type: MapScopeType, box?: BoxID };
@@ -36,8 +37,8 @@ class Map extends React.Component<Props> {
 export default connect<StateFromProps, ActionProps, OwnProps>(
   (state: State) => ({
     selection: state.selection,
-    senseObject: state.senseObject,
-    inScope: state.senseObject,
+    senseObject: CS.toStorage(state.senseObject),
+    inScope: CS.toStorage(state.senseObject),
     scope: state.senseMap.scope,
     input: state.input,
     stage: state.stage,

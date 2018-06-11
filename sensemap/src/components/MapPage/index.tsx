@@ -8,12 +8,23 @@ import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Breadcrumb from '../Breadcrumb';
 import Inbox from '../../containers/Inbox';
-import { CardData, BoxData, ObjectType, MapScopeType, State, actions, ActionProps, mapDispatch } from '../../types';
+import {
+  CardData,
+  BoxData,
+  ObjectType,
+  MapScopeType,
+  State,
+  actions,
+  ActionProps,
+  mapDispatch,
+} from '../../types';
 import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
-import * as S from '../../types/storage';
+import * as CS from '../../types/cached-storage';
+import * as B from '../../types/sense/box';
 import { Action as BoxAction } from '../../types/sense/box';
+import * as C from '../../types/sense/card';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
 import './index.css';
@@ -63,14 +74,14 @@ class MapPage extends React.Component<Props> {
     let doesDataExist: boolean = false;
     switch (focus.objectType) {
       case ObjectType.BOX:
-        data = S.getBoxOrDefault(editor.temp, senseObject, focus.data);
-        isDirty = S.doesBoxExist(editor.temp, focus.data);
-        doesDataExist = S.doesBoxExist(senseObject, focus.data);
+        data = CS.getBox(senseObject, focus.data);
+        isDirty = CS.isBoxDirty(senseObject, focus.data);
+        doesDataExist = CS.doesBoxExist(senseObject, focus.data);
         break;
       case ObjectType.CARD:
-        data = S.getCardOrDefault(editor.temp, senseObject, focus.data);
-        isDirty = S.doesCardExist(editor.temp, focus.data);
-        doesDataExist = S.doesCardExist(senseObject, focus.data);
+        data = CS.getCard(senseObject, focus.data);
+        isDirty = CS.isCardDirty(senseObject, focus.data);
+        doesDataExist = CS.doesCardExist(senseObject, focus.data);
         break;
       default:
     }
@@ -95,12 +106,16 @@ class MapPage extends React.Component<Props> {
                   }
 
                   switch (focus.objectType) {
-                    case ObjectType.CARD:
-                      acts.editor.updateCard(data.id, action as CardAction);
+                    case ObjectType.CARD: {
+                      const card = C.reducer(data as CardData, action as CardAction);
+                      acts.senseObject.updateCard(card);
                       break;
-                    case ObjectType.BOX:
-                      acts.editor.updateBox(data.id, action as BoxAction);
+                    }
+                    case ObjectType.BOX: {
+                      const box = B.reducer(data as BoxData, action as BoxAction);
+                      acts.senseObject.updateBox(box);
                       break;
+                    }
                     default:
                   }
                 }}
@@ -109,12 +124,10 @@ class MapPage extends React.Component<Props> {
                     // should update the object
                     switch (focus.objectType) {
                       case ObjectType.CARD:
-                        await acts.senseObject.updateCard(newData as CardData);
-                        acts.editor.clearObject(focus.objectType, focus.data);
+                        await acts.senseObject.saveCard(newData as CardData);
                         break;
                       case ObjectType.BOX:
-                        await acts.senseObject.updateBox(newData as BoxData);
-                        acts.editor.clearObject(focus.objectType, focus.data);
+                        await acts.senseObject.saveBox(newData as BoxData);
                         break;
                       default:
                     }
@@ -125,20 +138,20 @@ class MapPage extends React.Component<Props> {
                         const action =
                           // tslint:disable-next-line:no-any
                           await acts.senseObject.createCardObject(senseMap.map, newData as CardData) as any;
-                        const { payload: { objects } } = action as ReturnType<typeof S.actions.updateObjects>;
+                        const { payload: { objects } } = action as ReturnType<typeof CS.actions.updateObjects>;
                         if (scope.type === MapScopeType.BOX) {
                           const obj = Object.values(objects)[0];
                           const boxId = scope.box;
                           await acts.senseObject.addCardToBox(obj.id, boxId);
                         }
+                        acts.cachedStorage.removeCard(data as CardData);
                         acts.editor.changeStatus(OE.StatusType.HIDE);
-                        acts.editor.clearObject(focus.objectType, focus.data);
                         acts.editor.focusObject(F.focusNothing());
                         break;
                       case ObjectType.BOX:
                         acts.senseObject.createBoxObject(senseMap.map, newData as BoxData);
+                        acts.cachedStorage.removeBox(data as BoxData);
                         acts.editor.changeStatus(OE.StatusType.HIDE);
-                        acts.editor.clearObject(focus.objectType, focus.data);
                         acts.editor.focusObject(F.focusNothing());
                         break;
                       default:
@@ -147,7 +160,15 @@ class MapPage extends React.Component<Props> {
                 }}
                 onCancel={() => {
                   if (data) {
-                    acts.editor.clearObject(focus.objectType, data.id);
+                    switch (focus.objectType) {
+                      case ObjectType.CARD:
+                        acts.cachedStorage.removeCard(data as CardData);
+                        break;
+                      case ObjectType.BOX:
+                        acts.cachedStorage.removeBox(data as BoxData);
+                        break;
+                      default:
+                    }
                   }
                   if (!doesDataExist) {
                     acts.editor.focusObject(F.focusNothing());

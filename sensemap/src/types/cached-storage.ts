@@ -1,6 +1,6 @@
 import { ActionUnion, emptyAction } from './action';
 import * as S from './storage';
-import { ObjectMap } from './sense/has-id';
+import { ObjectMap, toIDMap } from './sense/has-id';
 import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
@@ -122,65 +122,77 @@ export const scopedToMap = (storage: CachedStorage): S.Storage => {
   return scoped(storage, filter);
 };
 
-const updateObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const updateObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_OBJECTS as typeof S.UPDATE_OBJECTS,
   payload: { objects, target },
 });
 
-const overwriteObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const overwriteObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_OBJECTS as typeof S.OVERWRITE_OBJECTS,
   payload: { objects, target },
 });
 
-const removeObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_OBJECTS as typeof S.REMOVE_OBJECTS,
   payload: { objects, target },
 });
 
-const updateCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeObject = (object: ObjectData, target: TargetType = TargetType.TEMPORARY) =>
+  removeObjects(toIDMap<ObjectID, ObjectData>([object]));
+
+export const updateCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_CARDS as typeof S.UPDATE_CARDS,
   payload: { cards, target },
 });
 
-const overwriteCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const overwriteCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_CARDS as typeof S.OVERWRITE_CARDS,
   payload: { cards, target },
 });
 
-const removeCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_CARDS as typeof S.REMOVE_CARDS,
   payload: { cards, target },
 });
 
-const updateBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeCard = (card: CardData, target: TargetType = TargetType.TEMPORARY) =>
+  removeCards(toIDMap<CardID, CardData>([card]));
+
+export const updateBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_BOXES as typeof S.UPDATE_BOXES,
   payload: { boxes, target },
 });
 
-const overwriteBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const overwriteBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_BOXES as typeof S.OVERWRITE_BOXES,
   payload: { boxes, target },
 });
 
-const removeBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_BOXES as typeof S.REMOVE_BOXES,
   payload: { boxes, target },
 });
 
-const updateEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeBox = (box: BoxData, target: TargetType = TargetType.TEMPORARY) =>
+  removeBoxes(toIDMap<BoxID, BoxData>([box]));
+
+export const updateEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_EDGES as typeof S.UPDATE_EDGES,
   payload: { edges, target },
 });
 
-const overwriteEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+export const overwriteEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_EDGES as typeof S.OVERWRITE_EDGES,
   payload: { edges, target },
 });
 
-const removeEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_EDGES as typeof S.REMOVE_EDGES,
   payload: { edges, target },
 });
+
+export const removeEdge = (edge: Edge, target: TargetType = TargetType.TEMPORARY) =>
+  removeEdges(toIDMap<EdgeID, Edge>([edge]));
 
 export const updateNotInBox =
   (cardObject: ObjectID, box: BoxID, target: TargetType = TargetType.TEMPORARY) => ({
@@ -195,27 +207,27 @@ export const updateInBox =
   });
 
 const FLUSH = 'FLUSH';
-const flush = () => ({
+export const flush = () => ({
   type: FLUSH as typeof FLUSH,
 });
 
 const FLUSH_OBJECTS = 'FLUSH_OBJECTS';
-const flushObjects = () => ({
+export const flushObjects = () => ({
   type: FLUSH_OBJECTS as typeof FLUSH_OBJECTS,
 });
 
 const FLUSH_CARDS = 'FLUSH_CARDS';
-const flushCards = () => ({
+export const flushCards = () => ({
   type: FLUSH_CARDS as typeof FLUSH_CARDS,
 });
 
 const FLUSH_BOXES = 'FLUSH_BOXES';
-const flushBoxes = () => ({
+export const flushBoxes = () => ({
   type: FLUSH_BOXES as typeof FLUSH_BOXES,
 });
 
 const FLUSH_EDGES = 'FLUSH_EDGES';
-const flushEdges = () => ({
+export const flushEdges = () => ({
   type: FLUSH_EDGES as typeof FLUSH_EDGES,
 });
 
@@ -223,15 +235,19 @@ export const actions = {
   updateObjects,
   overwriteObjects,
   removeObjects,
+  removeObject,
   updateCards,
   overwriteCards,
   removeCards,
+  removeCard,
   updateBoxes,
   overwriteBoxes,
   removeBoxes,
+  removeBox,
   updateEdges,
   overwriteEdges,
   removeEdges,
+  removeEdge,
   updateInBox,
   updateNotInBox,
   flush,

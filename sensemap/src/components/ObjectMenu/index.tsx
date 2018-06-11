@@ -5,7 +5,7 @@ import * as T from '../../types';
 import { actions, ActionProps, mapDispatch } from '../../types';
 import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
-import * as S from '../../types/storage';
+import * as CS from '../../types/cached-storage';
 import * as OE from '../../types/object-editor';
 import { cardData } from '../../types/sense/card';
 import { boxData } from '../../types/sense/box';
@@ -29,7 +29,7 @@ const selectedCardsAndBoxes:
   (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
   props => props.selection.reduce(
     (acc, id) => {
-      switch (S.getObject(props.senseObject, id).objectType) {
+      switch (CS.getObject(props.senseObject, id).objectType) {
         case T.ObjectType.CARD: {
           return { ...acc, cards: [ ...acc.cards, id ] };
         }
@@ -90,7 +90,8 @@ class ObjectMenu extends React.PureComponent<Props> {
       return;
     }
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    this.props.actions.senseObject.addCardsToBox(cards, this.props.senseObject.objects[boxes[0]].data);
+    const object = CS.getObject(this.props.senseObject, boxes[0]);
+    this.props.actions.senseObject.addCardsToBox(cards, object.data);
     return;
   }
 
@@ -139,7 +140,7 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   findEdgeID(from: T.ObjectID, to: T.ObjectID): T.EdgeID[] | null {
-    const r = Object.values(this.props.senseObject.edges)
+    const r = Object.values(CS.toStorage(this.props.senseObject).edges)
       .filter(edge => (edge.from === from && edge.to === to) || (edge.from === to && edge.to === from))
       .map(edge => edge.id);
     return r.length === 0 ? null : r;
@@ -193,7 +194,7 @@ class ObjectMenu extends React.PureComponent<Props> {
             name="create-box"
             onClick={() => {
               const data = boxData({ id: objectId() });
-              acts.editor.snapshotObject(T.ObjectType.BOX, data);
+              acts.senseObject.updateBox(data);
               acts.editor.focusObject(F.focusBox(data.id));
               acts.editor.changeStatus(OE.StatusType.SHOW);
             }}
@@ -205,7 +206,7 @@ class ObjectMenu extends React.PureComponent<Props> {
           name="create-card"
           onClick={() => {
             const data = cardData({ id: objectId() });
-            acts.editor.snapshotObject(T.ObjectType.CARD, data);
+            acts.senseObject.updateCard(data);
             acts.editor.focusObject(F.focusCard(data.id));
             acts.editor.changeStatus(OE.StatusType.SHOW);
           }}
@@ -247,10 +248,13 @@ class ObjectMenu extends React.PureComponent<Props> {
           <Menu.Item
             name="deleteCard"
             onClick={async () => {
-              const { objectType, id } = S.getObject(senseObject, selection[0]);
+              const { id, data } = CS.getObject(senseObject, selection[0]);
+              const card = CS.getCard(senseObject, data);
+              // remove the card container object
               await acts.senseObject.removeObject(id);
+              // clear any local modifications
+              acts.cachedStorage.removeCard(card);
               acts.editor.focusObject(F.focusNothing());
-              acts.editor.clearObject(objectType, id);
             }}
           >
             刪除
