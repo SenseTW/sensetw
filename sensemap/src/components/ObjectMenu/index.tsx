@@ -160,7 +160,7 @@ class ObjectMenu extends React.PureComponent<Props> {
     if (r === null) {
       return;
     }
-    r.forEach(edge => this.props.actions.senseObject.deleteEdge(map, edge));
+    r.forEach(edge => this.props.actions.senseObject.removeEdge(map, edge));
   }
 
   render() {
@@ -248,7 +248,7 @@ class ObjectMenu extends React.PureComponent<Props> {
             name="deleteCard"
             onClick={async () => {
               const { objectType, id } = S.getObject(senseObject, selection[0]);
-              await acts.senseObject.deleteObject(id);
+              await acts.senseObject.removeObject(id);
               acts.editor.focusObject(F.focusNothing());
               acts.editor.clearObject(objectType, id);
             }}
