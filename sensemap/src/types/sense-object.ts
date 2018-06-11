@@ -32,7 +32,7 @@ const createCard =
       ]))));
   };
 
-const updateRemoteCard =
+const updateCard =
   (card: CardData) =>
   (dispatch: Dispatch) => {
     return GC.update(card)
@@ -50,7 +50,7 @@ const createBox =
       ]))));
   };
 
-const updateRemoteBox =
+const updateBox =
   (box: BoxData) =>
   (dispatch: Dispatch) => {
     return GB.update(box)
@@ -121,7 +121,7 @@ const createBoxObject =
   (mapId: MapID, box: BoxData) =>
   async (dispatch: Dispatch, getState: GetState) => {
     const action = await createBox(mapId, box)(dispatch);
-    const { id = '' } = Object.values(action.payload)[0] || {};
+    const { id = '' } = Object.values(action.payload.boxes)[0] || {};
     const { viewport: { width, height, top, left } } = getState();
     const x = left + (width - B.DEFAULT_WIDTH) / 2;
     const y = top + (height - B.DEFAULT_HEIGHT) / 2;
@@ -149,7 +149,7 @@ const createObjectForCard =
         data: cardId,
       })
     )(dispatch);
-    const { id = '' } = Object.values(action.payload)[0] || {};
+    const { id = '' } = Object.values(action.payload.objects)[0] || {};
     if (box) {
       addCardToBox(id, box)(dispatch);
     }
@@ -160,7 +160,7 @@ const createCardObject =
   (mapId: MapID, card: CardData) =>
   async (dispatch: Dispatch, getState: GetState) => {
     const action = await createCard(mapId, card)(dispatch);
-    const { id = '' } = Object.values(action.payload)[0] || {};
+    const { id = '' } = Object.values(action.payload.cards)[0] || {};
     return createObjectForCard(mapId, id)(dispatch, getState);
   };
 
@@ -200,7 +200,7 @@ const removeCardsFromBox =
     return dispatch(SL.actions.clearSelection());
   };
 
-const deleteObject =
+const removeObject =
   (objectID: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
@@ -211,7 +211,7 @@ const deleteObject =
       .then(() => loadBoxes(map, true)(dispatch));
   };
 
-const deleteCard =
+const removeCard =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
@@ -221,14 +221,14 @@ const deleteCard =
       .then(() => loadObjects(map, true)(dispatch));
   };
 
-const deleteCardWithObject =
+const removeCardWithObject =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return G.deleteObjectsByCard(cardID)
-      .then(() => deleteCard(cardID)(dispatch, getState));
+      .then(() => removeCard(cardID)(dispatch, getState));
   };
 
-const deleteBox =
+const removeBox =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
@@ -238,17 +238,17 @@ const deleteBox =
       .then(() => loadObjects(map, true)(dispatch));
   };
 
-const deleteBoxWithObject =
+const removeBoxWithObject =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return G.deleteObjectsByBox(boxID)
-      .then(() => deleteBox(boxID)(dispatch, getState));
+      .then(() => removeBox(boxID)(dispatch, getState));
   };
 
 const unboxCards =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    return deleteBoxWithObject(boxID)(dispatch, getState)
+    return removeBoxWithObject(boxID)(dispatch, getState)
       .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 
@@ -259,7 +259,7 @@ const createEdge =
       .then((edge) => dispatch(S.updateEdges(H.toIDMap<EdgeID, Edge>([ edge ]))));
   };
 
-const deleteEdge =
+const removeEdge =
   (map: MapID, edge: EdgeID) =>
   (dispatch: Dispatch, getState: GetState) => {
     return GE.remove(edge)
@@ -267,8 +267,8 @@ const deleteEdge =
   };
 
 export const actions = {
-  updateRemoteCard,
-  updateRemoteBox,
+  updateCard,
+  updateBox,
   loadObjects,
   loadCards,
   loadBoxes,
@@ -284,10 +284,10 @@ export const actions = {
   removeCardFromBox,
   removeCardsFromBox,
   unboxCards,
-  deleteObject,
-  deleteCardWithObject,
-  deleteBoxWithObject,
-  deleteEdge,
+  removeObject,
+  removeCardWithObject,
+  removeBoxWithObject,
+  removeEdge,
 };
 
 export type Action = S.Action;
