@@ -1,6 +1,7 @@
 import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } from 'redux';
 import { emptyAction } from './action';
 import * as SM from './sense-map';
+import * as CS from './cached-storage';
 import * as SO from './sense-object';
 import * as SL from './selection';
 import * as OE from './object-editor';
@@ -44,6 +45,7 @@ export const initial = {
 export type Action
   = typeof emptyAction
   | SM.Action
+  | CS.Action
   | SO.Action
   | SL.Action
   | OE.Action
@@ -54,14 +56,16 @@ export type Action
   ;
 
 export const actions = {
-  senseMap:    SM.actions,
-  senseObject: SO.actions,
-  selection:   SL.actions,
-  editor:      OE.actions,
-  input:        I.actions,
-  viewport:     V.actions,
-  stage:       SG.actions,
-  importer:    IP.actions,
+  senseMap:      SM.actions,
+  // senseObject also handles cachedStorage actions
+  cachedStorage: CS.actions,
+  senseObject:   SO.actions,
+  selection:     SL.actions,
+  editor:        OE.actions,
+  input:          I.actions,
+  viewport:       V.actions,
+  stage:         SG.actions,
+  importer:      IP.actions,
 };
 
 export type ActionProps = { actions: typeof actions };

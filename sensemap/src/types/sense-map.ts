@@ -28,7 +28,7 @@ type BoxScope = {
 /**
  * It describes how deep we are in a sense map.
  */
-type MapScope
+export type MapScope
   = FullMapScope
   | BoxScope;
 

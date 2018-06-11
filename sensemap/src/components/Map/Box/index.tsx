@@ -4,6 +4,7 @@ import Header from './Header';
 import Card from './Card';
 import Toggle from './Toggle';
 import * as T from '../../../types';
+import { ObjectMap } from '../../../types/sense/has-id';
 import * as B from '../../../types/sense/box';
 import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
@@ -20,7 +21,7 @@ const toggleListDisplay = (d: ListDisplay) =>
 interface Props {
   mapObject: T.ObjectData;
   box: T.BoxData;
-  cards: T.State['senseObject']['cards'];
+  cards: ObjectMap<T.CardData>;
   selected?: Boolean;
   transform: G.Transform;
   inverseTransform: G.Transform;

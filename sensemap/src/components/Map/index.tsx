@@ -7,6 +7,7 @@ import Edge from './Edge';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import { Edge as EdgeData, ObjectType, ObjectData, State, ActionProps } from '../../types';
+import { ObjectMap } from '../../types/sense/has-id';
 import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
 import * as O from '../../types/sense/object';
@@ -20,8 +21,8 @@ import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
   selection:   State['selection'];
-  senseObject: State['senseObject'];
-  inScope:     State['senseObject'];
+  senseObject: S.Storage;
+  inScope:     S.Storage;
   input:       State['input'];
   stage:       State['stage'];
 }
@@ -33,12 +34,12 @@ export interface OwnProps extends ViewportState {}
 export type Props = StateFromProps & ActionProps & OwnProps;
 
 interface MapState {
-  inScope: State['senseObject'];
+  inScope: S.Storage;
   objectDragStart: {
     x: number,
     y: number,
   };
-  dropTarget: State['senseObject']['objects'];
+  dropTarget: ObjectMap<ObjectData>;
 }
 
 const makeTransform: V.StateToTransform =
