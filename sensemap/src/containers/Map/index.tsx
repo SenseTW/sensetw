@@ -2,7 +2,6 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
 import { MapScopeType, MapID, BoxID, State, actions, ActionProps, mapDispatch } from '../../types';
-import * as S from '../../types/storage';
 import * as CS from '../../types/cached-storage';
 
 interface StateFromProps extends CO.StateFromProps {
@@ -27,9 +26,9 @@ class Map extends React.Component<Props> {
     const inScope =
       (this.props.scope.type === MapScopeType.BOX
       && !!this.props.scope.box
-      && S.doesBoxExist(this.props.senseObject, this.props.scope.box))
-        ? S.scopedToBox(this.props.senseObject, this.props.scope.box)
-        : S.scopedToMap(this.props.senseObject);
+      && CS.doesBoxExist(this.props.senseObject, this.props.scope.box))
+        ? CS.scopedToBox(this.props.senseObject, this.props.scope.box)
+        : CS.scopedToMap(this.props.senseObject);
     return <CO.Map {...this.props} inScope={inScope} />;
   }
 }
@@ -37,8 +36,8 @@ class Map extends React.Component<Props> {
 export default connect<StateFromProps, ActionProps, OwnProps>(
   (state: State) => ({
     selection: state.selection,
-    senseObject: CS.toStorage(state.senseObject),
-    inScope: CS.toStorage(state.senseObject),
+    senseObject: state.senseObject,
+    inScope: state.senseObject,
     scope: state.senseMap.scope,
     input: state.input,
     stage: state.stage,
