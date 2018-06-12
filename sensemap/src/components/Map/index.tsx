@@ -206,6 +206,7 @@ export class Map extends React.Component<Props, MapState> {
         return (
           <Card
             key={o.id}
+            isDirty={CS.isCardDirty(this.props.inScope, o.data)}
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
@@ -226,6 +227,7 @@ export class Map extends React.Component<Props, MapState> {
         return (
           <Box
             key={o.id}
+            isDirty={CS.isBoxDirty(this.props.inScope, o.data)}
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Group, Rect, Text } from 'react-konva';
+import { Group, Rect, Circle, Text } from 'react-konva';
 import TagList from '../TagList';
 import * as T from '../../../types';
 import * as C from '../../../types/sense/card';
@@ -8,6 +8,7 @@ import { Event as KonvaEvent } from '../../../types/konva';
 import * as G from '../../../graphics/point';
 
 interface Props {
+  isDirty?: boolean;
   mapObject: T.ObjectData;
   card: T.CardData;
   selected?: Boolean;
@@ -29,6 +30,10 @@ interface State {
 const width = C.DEFAULT_WIDTH;
 const height = C.DEFAULT_HEIGHT;
 const cornerRadius = 4;
+
+const dirtyRadius = 5;
+const dirtyPadding = 10;
+const dirtyColor = '#3ad8fa';
 
 const summaryPadding = 0;
 const summaryOffsetX = 10 - summaryPadding;
@@ -84,6 +89,7 @@ class Card extends React.Component<Props, State> {
   };
 
   render() {
+    const { isDirty = false } = this.props;
     const { data } = this.props.mapObject;
     const { x, y } = this.props.transform({
       x: this.props.mapObject.x,
@@ -155,6 +161,15 @@ class Card extends React.Component<Props, State> {
           shadowOffsetY={shadowOffsetY}
           shadowColor={shadowColor}
         />
+        {
+          isDirty &&
+          <Circle
+            x={width - dirtyPadding}
+            y={dirtyPadding}
+            radius={dirtyRadius}
+            fill={dirtyColor}
+          />
+        }
         <Text
           x={summaryOffsetX}
           y={summaryOffsetY}

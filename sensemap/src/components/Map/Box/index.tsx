@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Group, Rect } from 'react-konva';
+import { Group, Rect, Circle } from 'react-konva';
 import Header from './Header';
 import Card from './Card';
 import Toggle from './Toggle';
@@ -19,6 +19,7 @@ const toggleListDisplay = (d: ListDisplay) =>
   d === ListDisplay.EXPANDED ? ListDisplay.COLLAPSED : ListDisplay.EXPANDED;
 
 interface Props {
+  isDirty?: boolean;
   mapObject: T.ObjectData;
   box: T.BoxData;
   cards: ObjectMap<T.CardData>;
@@ -42,6 +43,10 @@ interface State {
 
 const width = B.DEFAULT_WIDTH;
 const height = B.DEFAULT_HEIGHT;
+
+const dirtyRadius = 5;
+const dirtyPadding = 10;
+const dirtyColor = '#3ad8fa';
 
 const selectedOffsetX = -8;
 const selectedOffsetY = -8;
@@ -81,7 +86,7 @@ class Box extends React.Component<Props, State> {
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
     });
-    const { box } = this.props;
+    const { box, isDirty = false } = this.props;
     const cards = Object.values(this.props.cards);
 
     const handleSelect    = this.props.handleSelect    || noop;
@@ -139,6 +144,15 @@ class Box extends React.Component<Props, State> {
       >
         {this.props.selected ? selected : null}
         <Header box={box} x={0} y={0} />
+        {
+          isDirty &&
+          <Circle
+            x={width - dirtyPadding}
+            y={dirtyPadding}
+            radius={dirtyRadius}
+            fill={dirtyColor}
+          />
+        }
         {this.state.listDisplay === ListDisplay.COLLAPSED
           ? null : boxCards(this.props, cards)}
         <Toggle
