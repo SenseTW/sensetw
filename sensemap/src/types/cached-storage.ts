@@ -106,18 +106,20 @@ export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
-export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolean): S.Storage =>
-  S.scoped(toStorage(storage), filter);
+export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolean): CachedStorage => ({
+  [TargetType.PERMANENT]: S.scoped(storage[TargetType.PERMANENT], filter),
+  [TargetType.TEMPORARY]: S.scoped(storage[TargetType.TEMPORARY], filter),
+});
 
 // XXX: duplicated
-export const scopedToBox = (storage: CachedStorage, id: BoxID): S.Storage => {
+export const scopedToBox = (storage: CachedStorage, id: BoxID): CachedStorage => {
   const { contains } = getBox(storage, id);
   const filter = (key: ObjectID): boolean => !!contains[key];
   return scoped(storage, filter);
 };
 
 // XXX: duplicated
-export const scopedToMap = (storage: CachedStorage): S.Storage => {
+export const scopedToMap = (storage: CachedStorage): CachedStorage => {
   const filter = (key: ObjectID): boolean => !getObject(storage, key).belongsTo;
   return scoped(storage, filter);
 };

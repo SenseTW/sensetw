@@ -12,7 +12,7 @@ import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
 import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
-import * as S from '../../types/storage';
+import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
 import * as G from '../../graphics/point';
 import * as B from '../../types/sense/box';
@@ -21,8 +21,8 @@ import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
   selection:   State['selection'];
-  senseObject: S.Storage;
-  inScope:     S.Storage;
+  senseObject: CS.CachedStorage;
+  inScope:     CS.CachedStorage;
   input:       State['input'];
   stage:       State['stage'];
 }
@@ -34,8 +34,7 @@ export interface OwnProps extends ViewportState {}
 export type Props = StateFromProps & ActionProps & OwnProps;
 
 interface MapState {
-  inScope: S.Storage;
-  objectDragStart: {
+  prevDragPoint: {
     x: number,
     y: number,
   };
@@ -63,11 +62,6 @@ function getCenter(o: ObjectData): G.Point {
 }
 
 export class Map extends React.Component<Props, MapState> {
-
-  static getDerivedStateFromProps(props: Props, state: State) {
-    return { inScope: props.inScope };
-  }
-
   constructor(props: Props) {
     super(props);
 
@@ -82,8 +76,7 @@ export class Map extends React.Component<Props, MapState> {
     this.handleObjectUnsetDropTarget = this.handleObjectUnsetDropTarget.bind(this);
 
     this.state = {
-      inScope: this.props.inScope,
-      objectDragStart: { x: 0, y: 0 },
+      prevDragPoint: { x: 0, y: 0 },
       dropTarget: {},
     };
   }
@@ -126,39 +119,36 @@ export class Map extends React.Component<Props, MapState> {
   handleObjectDragStart(e: KonvaEvent.Mouse) {
     const x = e.evt.layerX;
     const y = e.evt.layerY;
-    this.setState({ objectDragStart: { x, y } });
+    this.setState({ prevDragPoint: { x, y } });
   }
 
   handleObjectDragMove(e: KonvaEvent.Mouse) {
-    const dx = e.evt.layerX - this.state.objectDragStart.x;
-    const dy = e.evt.layerY - this.state.objectDragStart.y;
+    const x = e.evt.layerX;
+    const y = e.evt.layerY;
+    const dx = x - this.state.prevDragPoint.x;
+    const dy = y - this.state.prevDragPoint.y;
     const objects = this.props.selection.map(id => {
-      const o = S.getObject(this.props.senseObject, id);
+      const o = CS.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
-    this.setState({
-      inScope: {
-        ...this.state.inScope,
-        objects: {
-          ...this.state.inScope.objects, ...objects
-        },
-      },
-    });
+    this.props.actions.cachedStorage.updateObjects(objects);
+    this.setState({ prevDragPoint: { x, y } });
   }
 
   handleObjectDragEnd(e: KonvaEvent.Mouse) {
-    const dx = e.evt.layerX - this.state.objectDragStart.x;
-    const dy = e.evt.layerY - this.state.objectDragStart.y;
+    const dx = e.evt.layerX - this.state.prevDragPoint.x;
+    const dy = e.evt.layerY - this.state.prevDragPoint.y;
     this.props.selection.forEach(id => {
-      const o = S.getObject(this.props.senseObject, id);
+      const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
-    this.setState({ objectDragStart: { x: 0, y: 0 } });
+    this.setState({ prevDragPoint: { x: 0, y: 0 } });
   }
 
   render() {
-    const objects = Object.values(this.state.inScope.objects).map(o => this.renderObject(o));
-    const edges =   Object.values(this.state.inScope.edges).map(e => this.renderEdge(e));
+    const storage = CS.toStorage(this.props.inScope);
+    const objects = Object.values(storage.objects).map(o => this.renderObject(o));
+    const edges =   Object.values(storage.edges).map(e => this.renderEdge(e));
 
     return (
       <Stage
@@ -199,7 +189,7 @@ export class Map extends React.Component<Props, MapState> {
     const handleObjectDeselect = (data: ObjectData) => {
       acts.selection.removeObjectFromSelection(data.id);
       if (this.props.selection.length === 1) {
-        acts.editor.focusObject(O.toFocus(S.getObject(this.props.senseObject, this.props.selection[0])));
+        acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, this.props.selection[0])));
       } else {
         acts.editor.focusObject(F.focusNothing());
       }
@@ -210,7 +200,7 @@ export class Map extends React.Component<Props, MapState> {
         return <Group key={o.id} />;
       }
       case ObjectType.CARD: {
-        if (!S.doesCardExist(this.props.inScope, o.data)) {
+        if (!CS.doesCardExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -219,7 +209,7 @@ export class Map extends React.Component<Props, MapState> {
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
-            card={S.getCard(this.props.senseObject, o.data)}
+            card={CS.getCard(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
             handleDeselect={handleObjectDeselect}
@@ -230,7 +220,7 @@ export class Map extends React.Component<Props, MapState> {
           />);
       }
       case ObjectType.BOX: {
-        if (!S.doesBoxExist(this.props.inScope, o.data)) {
+        if (!CS.doesBoxExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
         return (
@@ -239,8 +229,8 @@ export class Map extends React.Component<Props, MapState> {
             mapObject={o}
             transform={transform}
             inverseTransform={inverseTransform}
-            box={S.getBox(this.props.senseObject, o.data)}
-            cards={S.getCardsInBox(this.props.senseObject, o.data)}
+            box={CS.getBox(this.props.senseObject, o.data)}
+            cards={CS.getCardsInBox(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
             handleDeselect={handleObjectDeselect}
@@ -263,8 +253,8 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(e: EdgeData) {
     const edgeProps = {
-      from: getCenter(S.getObject(this.state.inScope, e.from)),
-      to: getCenter(S.getObject(this.state.inScope, e.to)),
+      from: getCenter(CS.getObject(this.props.inScope, e.from)),
+      to: getCenter(CS.getObject(this.props.inScope, e.to)),
       transform: makeTransform(this.props),
       inverseTransform: makeInverseTransform(this.props),
     };
