@@ -208,31 +208,6 @@ export const updateInBox =
     payload: { cardObject, box, target },
   });
 
-const FLUSH = 'FLUSH';
-export const flush = () => ({
-  type: FLUSH as typeof FLUSH,
-});
-
-const FLUSH_OBJECTS = 'FLUSH_OBJECTS';
-export const flushObjects = () => ({
-  type: FLUSH_OBJECTS as typeof FLUSH_OBJECTS,
-});
-
-const FLUSH_CARDS = 'FLUSH_CARDS';
-export const flushCards = () => ({
-  type: FLUSH_CARDS as typeof FLUSH_CARDS,
-});
-
-const FLUSH_BOXES = 'FLUSH_BOXES';
-export const flushBoxes = () => ({
-  type: FLUSH_BOXES as typeof FLUSH_BOXES,
-});
-
-const FLUSH_EDGES = 'FLUSH_EDGES';
-export const flushEdges = () => ({
-  type: FLUSH_EDGES as typeof FLUSH_EDGES,
-});
-
 export const actions = {
   updateObjects,
   overwriteObjects,
@@ -252,11 +227,6 @@ export const actions = {
   removeEdge,
   updateInBox,
   updateNotInBox,
-  flush,
-  flushObjects,
-  flushCards,
-  flushBoxes,
-  flushEdges,
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -282,61 +252,6 @@ export const reducer = (state: CachedStorage = initial, action: Action = emptyAc
       return {
         ...state,
         [target]: S.reducer(state[target], action),
-      };
-    }
-    case FLUSH: {
-      return {
-        [TargetType.PERMANENT]: toStorage(state),
-        [TargetType.TEMPORARY]: S.initial,
-      };
-    }
-    case FLUSH_OBJECTS: {
-      return {
-        [TargetType.PERMANENT]: {
-          ...state[TargetType.PERMANENT],
-          objects: {
-            ...state[TargetType.PERMANENT].objects,
-            ...state[TargetType.TEMPORARY].objects,
-          }
-        },
-        [TargetType.TEMPORARY]: S.initial,
-      };
-    }
-    case FLUSH_CARDS: {
-      return {
-        [TargetType.PERMANENT]: {
-          ...state[TargetType.PERMANENT],
-          cards: {
-            ...state[TargetType.PERMANENT].cards,
-            ...state[TargetType.TEMPORARY].cards,
-          }
-        },
-        [TargetType.TEMPORARY]: S.initial,
-      };
-
-    }
-    case FLUSH_BOXES: {
-      return {
-        [TargetType.PERMANENT]: {
-          ...state[TargetType.PERMANENT],
-          boxes: {
-            ...state[TargetType.PERMANENT].boxes,
-            ...state[TargetType.TEMPORARY].boxes,
-          }
-        },
-        [TargetType.TEMPORARY]: S.initial,
-      };
-    }
-    case FLUSH_EDGES: {
-      return {
-        [TargetType.PERMANENT]: {
-          ...state[TargetType.PERMANENT],
-          edges: {
-            ...state[TargetType.PERMANENT].edges,
-            ...state[TargetType.TEMPORARY].edges,
-          }
-        },
-        [TargetType.TEMPORARY]: S.initial,
       };
     }
     default: {
