@@ -9,3 +9,5 @@ const knex = Knex({
 export const context = ({ req }) => ({
   db: knex,
 });
+
+export type Context = typeof context;

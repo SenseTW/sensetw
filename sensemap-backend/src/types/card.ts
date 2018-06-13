@@ -1,13 +1,49 @@
 import { ID, Map, Card, CardType, cardFields, cardDataFields } from './sql';
-import { getMap, getCardsInMap } from './map';
+import { getMap, getCardsInMap, MapFilter } from './map';
 import { pick } from 'ramda';
+
+export type CardFilter = {
+  id?: ID;
+  cardType?: CardType;
+  description?: string;
+  saidBy?: string;
+  stakeholder?: string;
+  summary?: string;
+  tags?: string;
+  tags_contains?: string;
+  title?: string;
+  url?: string;
+  map?: MapFilter;
+
+};
+
+export type AllCardsArgs = {
+  filter?: CardFilter;
+  orderBy?: any;
+  skip?: number;
+  after: string;
+  before: string;
+  first: number;
+  last: number;
+};
 
 export async function getCard(db, id: ID): Promise<Card | null> {
   return db.select(cardFields).from('card').where('id', id).first();
 }
 
-export async function getAllCards(db): Promise<Card[]> {
-  return db.select(cardFields).from('card');
+export async function getAllCards(db, filter: CardFilter = {}): Promise<Card[]> {
+  let { map, tags, url } = filter;
+  let query = db.select(cardFields).from('card');
+  if (map) {
+    query = query.andWhere('mapId', map.id);
+  }
+  if (tags) {
+    query = query.andWhere('tags', tags);
+  }
+  if (url) {
+    query = query.andWhere('url', url);
+  }
+  return query;
 }
 
 export async function createCard(db, args): Promise<Card> {
@@ -29,9 +65,9 @@ export async function updateCard(db, id: ID, args): Promise<Card | null> {
 
 export const resolvers = {
   Query: {
-    allCards: async (_, args, { db }, info): Promise<Card[]> => {
+    allCards: async (_, args: AllCardsArgs, { db }, info): Promise<Card[]> => {
       if (args.filter) {
-        return getCardsInMap(db, args.filter.map.id);
+        return getAllCards(db, args.filter);
       } else {
         return getAllCards(db);
       }

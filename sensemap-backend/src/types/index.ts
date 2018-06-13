@@ -234,6 +234,8 @@ export const typeDefs = gql`
 
   input CardFilter {
     map: MapFilter
+    url: String
+    tags: String
   }
 
   input ObjectFilter {

@@ -1,5 +1,13 @@
 import { ID, Map, mapFields, SenseObject, Card, Box, Edge } from './sql';
 
+export type MapFilter = {
+  id?: ID;
+};
+
+type AllMapsArgs = {
+  filter?: MapFilter;
+};
+
 export async function getMap(db, id: ID): Promise<Map | null> {
   return db.select(mapFields).from('map').where('id', id).first();
 }
@@ -36,7 +44,7 @@ export async function getBoxesInMap(db, mapId: ID): Promise<Box[]> {
 
 export const resolvers = {
   Query: {
-    allMaps: async (_, args, { db }, info): Promise<Map[]> => {
+    allMaps: async (_, args: AllMapsArgs, { db }, info): Promise<Map[]> => {
       if (args.filter) {
         return [ await getMap(db, args.filter.id) ];
       } else {
