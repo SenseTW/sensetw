@@ -71,17 +71,17 @@ class MapPage extends React.Component<Props> {
 
     let data: BoxData | CardData | null = null;
     let isDirty: boolean = false;
-    let doesDataExist: boolean = false;
+    let isNew: boolean = false;
     switch (focus.objectType) {
       case ObjectType.BOX:
         data = CS.getBox(senseObject, focus.data);
         isDirty = CS.isBoxDirty(senseObject, focus.data);
-        doesDataExist = CS.doesBoxExist(senseObject, focus.data);
+        isNew = CS.isBoxNew(senseObject, focus.data);
         break;
       case ObjectType.CARD:
         data = CS.getCard(senseObject, focus.data);
         isDirty = CS.isCardDirty(senseObject, focus.data);
-        doesDataExist = CS.doesCardExist(senseObject, focus.data);
+        isNew = CS.isCardNew(senseObject, focus.data);
         break;
       default:
     }
@@ -97,9 +97,9 @@ class MapPage extends React.Component<Props> {
               <ObjectContent
                 objectType={focus.objectType}
                 data={data}
-                submitText={doesDataExist ? '更新' : '送出'}
-                submitDisabled={!isDirty}
-                cancelDisabled={!isDirty}
+                submitText={isNew ? '送出' : '更新'}
+                submitDisabled={!isDirty && !isNew}
+                cancelDisabled={!isDirty && !isNew}
                 onUpdate={action => {
                   if (data === null) {
                     return;
@@ -120,7 +120,7 @@ class MapPage extends React.Component<Props> {
                   }
                 }}
                 onSubmit={async (newData) => {
-                  if (doesDataExist) {
+                  if (!isNew) {
                     // should update the object
                     switch (focus.objectType) {
                       case ObjectType.CARD:
@@ -170,7 +170,7 @@ class MapPage extends React.Component<Props> {
                       default:
                     }
                   }
-                  if (!doesDataExist) {
+                  if (isNew) {
                     acts.editor.focusObject(F.focusNothing());
                     acts.editor.changeStatus(OE.StatusType.HIDE);
                   }
