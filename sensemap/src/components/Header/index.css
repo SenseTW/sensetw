@@ -1,0 +1,33 @@
+/* the main menu */
+.header .ui.inverted.menu {
+  background-color: #000;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.header .ui.inverted.menu .item {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* the dropdown menu */
+.header .right.menu .icon {
+  color: #757575;
+}
+
+/* the submenu */
+.header .ui.menu {
+  border-radius: 0;
+  margin-top: 0;
+  box-shadow: none;
+}
+
+.header .ui.menu .item:before {
+  width: 0;
+}
+
+.header .ui.menu .item {
+  color: #9b9da9;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}

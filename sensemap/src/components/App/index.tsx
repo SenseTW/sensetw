@@ -4,6 +4,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import DashboardPage from '../DashboardPage';
 import MapPage from '../MapPage';
 import ImportPage from '../ImportPage';
 import * as R from '../../types/routes';
@@ -22,6 +23,7 @@ class App extends React.Component {
       <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
           <Switch>
+            <Route path={R.dashboard} component={DashboardPage} />
             <Route path={R.importer} component={ImportPage} />
             <Route exact path={R.index} component={MapPage} />
             <Route path={`${R.index}:bid`} component={MapPage} />
