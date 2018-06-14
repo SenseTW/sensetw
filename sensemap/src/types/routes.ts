@@ -1,5 +1,7 @@
-export const index = `${process.env.PUBLIC_URL}/`;
+export const index = '/';
 
-export const map = `${process.env.PUBLIC_URL}/map`;
+export const map = '/map';
 
-export const importer = `${process.env.PUBLIC_URL}/import`;
+export const importer = '/import';
+
+export const dashboard = '/dashboard';
