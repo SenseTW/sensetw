@@ -19,11 +19,11 @@ import './index.css';
 class App extends React.Component {
   render() {
     return (
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
           <Switch>
             <Route path={R.importer} component={ImportPage} />
-            <Route exact path={`${R.index}`} component={MapPage} />
+            <Route exact path={R.index} component={MapPage} />
             <Route path={`${R.index}:bid`} component={MapPage} />
           </Switch>
         </div>
