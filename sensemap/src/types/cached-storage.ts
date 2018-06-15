@@ -106,10 +106,38 @@ export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
-export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolean): CachedStorage => ({
-  [TargetType.PERMANENT]: S.scoped(storage[TargetType.PERMANENT], filter),
-  [TargetType.TEMPORARY]: S.scoped(storage[TargetType.TEMPORARY], filter),
-});
+const submapByKeys = <T>(keys: string[], objmap: ObjectMap<T>): ObjectMap<T> =>
+  keys.reduce((acc, key) => { acc[key] = objmap[key]; return acc; }, {});
+
+/**
+ * It scopes the cached storage and create a new diff for the scoped storage.
+ *
+ * @param storage The given cached storage.
+ * @param filter The filter function.
+ */
+export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolean): CachedStorage => {
+  let result = {} as CachedStorage;
+
+  // compute the scoped storage
+  result[TargetType.PERMANENT] = S.scoped(storage[TargetType.PERMANENT], filter);
+
+  // compute the scoped cached storage
+  // the diff between the current storage and the next storage
+  const diff = storage[TargetType.TEMPORARY];
+  // get the next storage
+  const next = toStorage(storage);
+  // scoped next storage
+  const part = S.scoped(next, filter);
+  // create the diff of the scoped storage
+  result[TargetType.TEMPORARY] = {
+    objects: submapByKeys(Object.keys(diff.objects), part.objects),
+    cards:   submapByKeys(Object.keys(diff.cards), part.cards),
+    boxes:   submapByKeys(Object.keys(diff.boxes), part.boxes),
+    edges:   submapByKeys(Object.keys(diff.edges), part.edges),
+  };
+
+  return result;
+};
 
 // XXX: duplicated
 export const scopedToBox = (storage: CachedStorage, id: BoxID): CachedStorage => {
