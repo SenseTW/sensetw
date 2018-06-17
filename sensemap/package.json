@@ -35,6 +35,8 @@
     "docs": "typedoc --tsconfig tsconfig.json -out docs --ignoreCompilerErrors"
   },
   "devDependencies": {
+    "@types/enzyme": "^3.1.10",
+    "@types/enzyme-adapter-react-16": "^1.0.2",
     "@types/jest": "^22.2.2",
     "@types/node": "^9.6.1",
     "@types/ramda": "^0.25.29",
@@ -46,7 +48,10 @@
     "@types/redux-logger": "^3.0.5",
     "@types/redux-thunk": "^2.1.0",
     "@types/validator": "^9.4.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "gh-pages": "^1.1.0",
+    "redux-mock-store": "^1.5.3",
     "typedoc": "^0.11.1",
     "typescript": "^2.8.1"
   }
