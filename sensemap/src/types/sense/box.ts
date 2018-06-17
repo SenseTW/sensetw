@@ -118,6 +118,15 @@ export const updateTags =
   });
 
 /**
+ * Box action types.
+ */
+export const types = {
+  UPDATE_BOX_TITLE,
+  UPDATE_BOX_SUMMARY,
+  UPDATE_BOX_TAGS,
+};
+
+/**
  * The data constructors of box actions
  */
 export const actions = {
