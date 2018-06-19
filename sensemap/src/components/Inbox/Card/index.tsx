@@ -29,7 +29,7 @@ export default function Card(props: Props) {
     summary: props.card.summary.substr(0, summaryLimit),
   };
   const className = [
-    'card',
+    'inbox-card',
     (Object.keys(card.objects).length > 0 ? 'card--in-map' : 'card--not-in-map'),
     `card--${(card.cardType as string).toLowerCase()}`,
   ].join(' ');

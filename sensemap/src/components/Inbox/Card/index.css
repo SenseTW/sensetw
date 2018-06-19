@@ -1,5 +1,5 @@
 
-.card {
+.inbox-card {
   width: 300px;
   height: 84px;
   border-radius: 4px;
@@ -10,7 +10,7 @@
   padding: 2px;
 }
 
-.card.card--focused {
+.inbox-card.card--focused {
   margin-top: 2px;
   margin-bottom: 2px;
   margin-left: 0px;
@@ -28,27 +28,27 @@
   padding-bottom: 6px;
 }
 
-.card.card--not-in-map .card__body {
+.inbox-card.card--not-in-map .card__body {
   background-color: #ffffff;
 }
 
-.card.card--in-map .card__body {
+.inbox-card.card--in-map .card__body {
   background-color: rgb(176, 176, 176);
 }
 
-.card.card--not-in-map.card--question .card__body {
+.inbox-card.card--not-in-map.card--question .card__body {
   background-color: rgba(255, 236, 239);
 }
 
-.card.card--in-map.card--question .card__body {
+.inbox-card.card--in-map.card--question .card__body {
   background-color: rgb(147, 112, 127);
 }
 
-.card.card--not-in-map.card--answer .card__body {
+.inbox-card.card--not-in-map.card--answer .card__body {
   background-color: rgba(222, 255, 245);
 }
 
-.card.card--in-map.card--answer .card__body {
+.inbox-card.card--in-map.card--answer .card__body {
   background-color: rgb(71, 138, 138);
 }
 
