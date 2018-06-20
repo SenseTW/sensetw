@@ -1,13 +1,29 @@
-import { ID, Map, Box, boxFields, boxDataFields } from './sql';
+import { ID, Map, Box, boxFields, boxDataFields, SenseObject } from './sql';
 import { getMap, getBoxesInMap } from './map';
+import { objectsQuery } from './object';
 import { pick } from 'ramda';
 
+export function boxesQuery(db) {
+  const map = db.column('mapId').as('map')
+  const objects = db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"object"."boxId" = "box"."id"'));
+  const contains = db.raw('array(?) as contains', db.select('id').from('object').whereRaw('"object"."belongsToId" = "box"."id"'));
+  return db.select([ ...boxFields, map, objects, contains ]).from('box');
+}
+
 export async function getAllBoxes(db): Promise<Box[]> {
-  return db.select(boxFields).from('box');
+  return boxesQuery(db);
 }
 
 export async function getBox(db, id: ID): Promise<Box | null> {
-  return db.select(boxFields).from('box').where('id', id);
+  return boxesQuery(db).where('id', id).first();
+}
+
+export async function getObjectsForBox(db, id: ID): Promise<SenseObject[]> {
+  return objectsQuery(db).where('boxId', id);
+}
+
+export async function getObjectsInBox(db, id: ID): Promise<SenseObject[]> {
+  return objectsQuery(db).where('belongsTo', id);
 }
 
 export async function createBox(db, args): Promise<Box> {
@@ -52,14 +68,15 @@ export const resolvers = {
     },
   },
   Box: {
-    id:        (o, _, context, info): ID     => o.id,
-    createdAt: (o, _, context, info): Date   => o.createdAt,
-    updatedAt: (o, _, context, info): Date   => o.updatedAt,
-    title:     (o, _, context, info): ID     => o.title,
-    summary:   (o, _, context, info): string => o.summary,
-    tags:      (o, _, context, info): string => o.tags,
-    mapId:     (o, _, context, info): ID     => o.mapId,
-
-    map: async (o, _, { db }, info): Promise<Map | null> => getMap(db, o.mapId),
+    id:        async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.id        : o,
+    createdAt: async (o, _, { db }, info): Promise<Date>   => typeof(o) !== 'string' ? o.createdAt : (await getBox(db, o)).createdAt,
+    updatedAt: async (o, _, { db }, info): Promise<Date>   => typeof(o) !== 'string' ? o.updatedAt : (await getBox(db, o)).updatedAt,
+    title:     async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.title     : (await getBox(db, o)).title,
+    summary:   async (o, _, { db }, info): Promise<string> => typeof(o) !== 'string' ? o.summary   : (await getBox(db, o)).summary,
+    tags:      async (o, _, { db }, info): Promise<string> => typeof(o) !== 'string' ? o.tags      : (await getBox(db, o)).tags,
+    mapId:     async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.mapId     : (await getBox(db, o)).mapId,
+    map:       async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.map       : (await getBox(db, o)).mapId,
+    objects:   async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects  : getObjectsForBox(db, o),
+    contains:  async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.contains : getObjectsInBox(db, o),
   },
 };

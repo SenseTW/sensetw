@@ -4,12 +4,20 @@ import { getCard } from './card';
 import { getBox } from './box';
 import { pick } from 'ramda';
 
+export function objectsQuery(db) {
+  const map = db.column('mapId').as('map');
+  const box = db.column('boxId').as('box');
+  const card = db.column('cardId').as('card');
+  const belongsTo = db.column('belongsToId').as('belongsTo');
+  return db.select([ ...objectFields, map, card, box, belongsTo ]).from('object');
+}
+
 export async function getAllObjects(db): Promise<SenseObject[]> {
-  return db.select(objectFields).from('object');
+  return objectsQuery(db);
 }
 
 export async function getObject(db, id: ID): Promise<SenseObject> {
-  return db.select(objectFields).from('object').where('id', id);
+  return objectsQuery(db).where('id', id);
 }
 
 export async function createObject(db, args): Promise<SenseObject> {
@@ -54,7 +62,7 @@ export const resolvers = {
     },
   },
   Object: {
-    id:          (o, _, context, info): ID     => o.id,
+    id:          (o, _, context, info): ID     => o.id || o,
     createdAt:   (o, _, context, info): Date   => o.createdAt,
     updatedAt:   (o, _, context, info): Date   => o.updatedAt,
     x:           (o, _, context, info): number => o.x,
@@ -68,9 +76,9 @@ export const resolvers = {
     boxId:       (o, _, context, info): number => o.boxId,
     belongsToId: (o, _, context, info): number => o.belongsToId,
 
-    map:       async (o, _, { db }, info): Promise<Map>  => getMap(db, o.mapId),
-    card:      async (o, _, { db }, info): Promise<Card> => getCard(db, o.cardId),
-    box:       async (o, _, { db }, info): Promise<Box>  => getBox(db, o.boxId),
-    belongsTo: async (o, _, { db }, info): Promise<Box>  => getBox(db, o.belongsToId),
+    map:       async (o, _, { db }, info): Promise<ID>  => o.map,
+    card:      async (o, _, { db }, info): Promise<ID>  => o.card,
+    box:       async (o, _, { db }, info): Promise<ID>  => o.box,
+    belongsTo: async (o, _, { db }, info): Promise<ID>  => o.belongsTo,
   }
 };

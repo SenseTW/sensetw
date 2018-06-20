@@ -11,7 +11,12 @@ export type HasTimestamps = {
 
 const hasTimestampFields = [ 'id', 'createdAt', 'updatedAt' ];
 
-export type Map = HasID & HasTimestamps & {};
+export type Map = HasID & HasTimestamps & {
+  objects: HasID[],
+  cards: HasID[],
+  boxes: HasID[],
+  edges: HasID[],
+};
 
 export const mapFields = [ ...hasTimestampFields ];
 

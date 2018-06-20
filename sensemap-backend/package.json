@@ -8,14 +8,13 @@
   },
   "scripts": {
     "migrate": "node migrate.js",
+    "seed": "knex seed:run",
     "build": "rimraf dist && tsc",
-    "dev": "rimraf dist && tsc -w",
     "prestart": "npm run build",
     "start": "node dist",
-    "debug": "DEBUG=knex:query,sensemap:* yarn start",
-    "db:create": "docker run -it --rm --link sensemap-pg:postgres postgres psql -h postgres -U postgres -c 'CREATE DATABASE \"sensemap\" with owner \"postgres\";'",
-    "db:up": "docker run --name sensemap-pg -e POSTGRES_PASSWORD=mysecret -p 5432:5432 -d postgres",
-    "test": "jest"
+    "watch:start": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
+    "test": "jest",
+    "watch:test": "jest --watchAll"
   },
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",
@@ -27,12 +26,14 @@
     "@types/knex": "^0.14.14",
     "@types/node": "^8.10.18",
     "@types/ramda": "^0.25.32",
+    "concurrently": "^3.6.0",
     "dotenv": "^6.0.0",
     "jest": "^23.1.0",
     "node-pg-migrate": "^3.5.0",
+    "nodemon": "^1.17.5",
     "rimraf": "^2.5.4",
     "ts-jest": "^22.4.6",
-    "ts-node": "^6.1.0",
+    "ts-node": "^6.1.2",
     "typescript": "^2.9.1"
   },
   "dependencies": {

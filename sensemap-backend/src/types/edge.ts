@@ -3,12 +3,19 @@ import { getMap, getEdgesInMap } from './map';
 import { getObject } from './object';
 import { pick } from 'ramda';
 
+export function edgesQuery(db) {
+  const map = db.column('mapId').as('map');
+  const from = db.column('fromId').as('from');
+  const to = db.column('toId').as('to');
+  return db.select([ ...edgeFields, map, from, to ]).from('edge');
+}
+
 export async function getAllEdges(db): Promise<Edge[]> {
-  return db.select(edgeFields).from('edge');
+  return edgesQuery(db).from('edge');
 }
 
 export async function getEdge(db, id: ID): Promise<Edge | null> {
-  return db.select(edgeFields).from('edge').where('id', id);
+  return edgesQuery(db).where('id', id);
 }
 
 export async function createEdge(db, args): Promise<Edge> {
@@ -54,15 +61,14 @@ export const resolvers = {
     },
   },
   Edge: {
-    id:        (o, _, context, info): ID     => o.id,
-    createdAt: (o, _, context, info): Date   => o.createdAt,
-    updatedAt: (o, _, context, info): Date   => o.updatedAt,
-    mapId:     (o, _, context, info): ID     => o.mapId,
-    fromId:    (o, _, context, info): ID     => o.fromId,
-    toId:      (o, _, context, info): ID     => o.toId,
-
-    map:  async (o, _, { db }, info): Promise<Map> =>         getMap(db, o.mapId),
-    from: async (o, _, { db }, info): Promise<SenseObject> => getObject(db, o.fromId),
-    to:   async (o, _, { db }, info): Promise<SenseObject> => getObject(db, o.toId),
+    id:        async (o, _, { db }, info): Promise<ID>   => typeof(o) != 'string' ? o.id        : o,
+    createdAt: async (o, _, { db }, info): Promise<Date> => typeof(o) != 'string' ? o.createdAt : (await getEdge(db, o)).createdAt,
+    updatedAt: async (o, _, { db }, info): Promise<Date> => typeof(o) != 'string' ? o.updatedAt : (await getEdge(db, o)).updatedAt,
+    mapId:     async (o, _, { db }, info): Promise<ID>   => typeof(o) != 'string' ? o.mapId     : (await getEdge(db, o)).mapId,
+    fromId:    async (o, _, { db }, info): Promise<ID>   => typeof(o) != 'string' ? o.fromId    : (await getEdge(db, o)).fromId,
+    toId:      async (o, _, { db }, info): Promise<ID>   => typeof(o) != 'string' ? o.toId      : (await getEdge(db, o)).toId,
+    map:       async (o, _, { db }, info): Promise<Map>  => typeof(o) != 'string' ? o.map       : (await getEdge(db, o)).mapId,
+    from:      async (o, _, { db }, info): Promise<SenseObject> => typeof(o) != 'string' ? o.from : (await getEdge(db, o)).fromId,
+    to:        async (o, _, { db }, info): Promise<SenseObject> => typeof(o) != 'string' ? o.to   : (await getEdge(db, o)).toId,
   },
 };
