@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Header from '../Header';
 import MapCard from './MapCard';
+import FloatingActionButton from './FloatingActionButton';
 import { Container, Search, Card } from 'semantic-ui-react';
 import './index.css';
 
@@ -16,6 +17,7 @@ class DashboardPage extends React.PureComponent {
           <Card.Group itemsPerRow={3}>
             {xs.map((_, i) => <MapCard key={i} />)}
           </Card.Group>
+          <FloatingActionButton />
         </Container>
       </div>
     );
