@@ -60,6 +60,8 @@ export const typeDefs = gql`
       objectType: ObjectType!,
       x: Float!,
       y: Float!,
+      width: Float!,
+      height: Float!,
       zIndex: Float!,
       belongsToId: ID,
       boxId: ID,
@@ -101,6 +103,8 @@ export const typeDefs = gql`
       objectType: ObjectType,
       x: Float,
       y: Float,
+      width: Float!,
+      height: Float!,
       zIndex: Float,
       belongsToId: ID,
       boxId: ID,
@@ -162,6 +166,8 @@ export const typeDefs = gql`
     updatedAt: DateTime!
     x: Float!
     y: Float!
+    width: Float!,
+    height: Float!,
     zIndex: Float!
     mapId: ID,
     map: Map @relation(name: "MapObjects")
