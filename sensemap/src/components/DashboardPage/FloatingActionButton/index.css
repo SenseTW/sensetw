@@ -1,0 +1,26 @@
+.ui.button.floating-action-button:hover {
+  background-color: #3ad8fa;
+  color: white;
+  box-shadow: 0 0 6px 0 #d4d4d5, 0 0 6px 0 #3ad8fa;
+}
+
+.ui.button.floating-action-button:focus {
+  background-color: #3ad8fa;
+  color: white;
+  box-shadow: 0 0 6px 0 #d4d4d5, 0 0 6px 0 #3ad8fa;
+}
+
+.ui.button.floating-action-button:active {
+  background-color: #3ad8fa;
+  color: white;
+  box-shadow: 0 0 3px 0 #d4d4d5, 0 0 3px 0 #3ad8fa;
+}
+
+.ui.button.floating-action-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #3ad8fa;
+  color: white;
+  box-shadow: 0 0 6px 1px #d4d4d5, 0 0 6px 1px #3ad8fa;
+}

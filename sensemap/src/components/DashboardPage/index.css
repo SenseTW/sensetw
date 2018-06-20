@@ -1,4 +1,5 @@
 .dashboard-page .ui.search {
+  position: relative;
   margin-top: 1.375em;
 }
 
@@ -9,4 +10,9 @@
 
 .dashboard-page .ui.cards {
   margin-top: .5em;
+}
+
+.ui.button.floating-action-button {
+  left: 2em;
+  top: 7.5em;
 }
