@@ -1,0 +1,45 @@
+.ui.card.map-card > .content.map-card__header,
+.ui.card.map-card > .content.map-card__actions {
+  background-color: #50e3c2;
+}
+
+.ui.card.map-card > .content.map-card__header {
+  padding: 1em 1.5em;
+}
+
+.ui.card.map-card > .content.map-card__header > .header:not(.ui) {
+  color: white;
+  font-size: 0.857142rem;
+  font-weight: 500;
+}
+
+.ui.card.map-card > .content.map-card__header > .header:not(.ui) > .map-card__username {
+  font-weight: 700;
+}
+
+.ui.card.map-card > .content.map-card__content {
+  padding: 1.4em 1.5em;
+}
+
+.ui.card.map-card > .content.map-card__content > .header:not(.ui) {
+  font-size: 1.142857rem;
+}
+
+.ui.card.map-card > .content.map-card__content > .header+.description {
+  margin-top: 1.4em;
+  color: #979797;
+}
+
+.ui.card.map-card > .content.map-card__content > .description+.map-card__tags {
+  margin-top: 3.14em;
+}
+
+.ui.card.map-card > .content.map-card__actions {
+  padding: 0;
+}
+
+.ui.card.map-card > .content.map-card__actions > .ui.buttons > .ui.button {
+  font-weight: 500;
+  background-color: transparent;
+  color: white;
+}
