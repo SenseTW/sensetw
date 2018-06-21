@@ -1,0 +1,6 @@
+.inbox__divider {
+  display: inline-block;
+  border-right: 2px solid #303030;
+  width: 0;
+  height: 36px;
+}

@@ -1,5 +1,5 @@
 .inbox {
-  background-color: #37474f;
+  background-color: #000;
   padding-top: 0.1px; /* XXX fix the blank space on top */
   padding-bottom: 24px;
   height: 960px;
@@ -13,6 +13,22 @@
 
 .inbox__close-btn button {
   width: 96px;
+}
+
+.inbox__actions {
+  margin: 20px 10px;
+}
+
+.inbox__actions > * {
+  vertical-align: top;
+}
+
+.inbox__actions > .inbox__sync-btn.ui.basic.button {
+  margin: 1px 9px 1px 0;
+}
+
+.inbox__actions > .inbox__divider {
+  margin: 1px 9px 1px 0;
 }
 
 .inbox__add-card-btn {
