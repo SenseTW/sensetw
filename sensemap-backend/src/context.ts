@@ -2,7 +2,8 @@ import * as Knex from 'knex';
 import { development } from '../knexfile';
 
 const knex = Knex({
-  ...development,
+  client: 'pg',
+  connection: process.env.DATABASE_URL,
   debug: !!process.env.DEBUG,
 });
 

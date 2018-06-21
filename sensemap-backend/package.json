@@ -12,9 +12,9 @@
     "build": "rimraf dist && tsc",
     "prestart": "npm run build",
     "start": "node dist",
-    "watch:start": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
+    "start:watch": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
     "test": "jest",
-    "watch:test": "jest --watchAll"
+    "test:watch": "jest --watchAll"
   },
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",
