@@ -3,6 +3,9 @@ import { Button, Icon, Pagination, PaginationProps } from 'semantic-ui-react';
 import './index.css';
 import { CardData, State, ActionProps } from '../../types';
 import * as C from '../../types/sense/card';
+import SyncButton from './SyncButton';
+import Divider from './Divider';
+import Filter from './Filter';
 import CardList from './CardList';
 import { Pager } from '../Pager';
 
@@ -23,6 +26,11 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
         <Button icon labelPosition="right" onClick={acts.senseMap.closeInbox}>
           INBOX <Icon name="arrow left" />
         </Button>
+      </div>
+      <div className="inbox__actions">
+        <SyncButton />
+        <Divider />
+        <Filter />
       </div>
       <div className="inbox__add-card-btn">
         <Button icon="plus" size="tiny" color="grey" onClick={() => acts.senseObject.createCard(mapId, C.cardData())} />

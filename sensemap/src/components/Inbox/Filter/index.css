@@ -1,0 +1,20 @@
+.inbox__filter.ui.input > input:focus {
+  background-color: transparent;
+}
+
+.inbox__filter.ui.input > input {
+  border: 1px solid #909090;
+  background-color: transparent;
+  color: #909090;
+}
+
+.inbox__filter.ui.input > i.icon {
+  color: #909090;
+}
+
+.inbox__filter.ui.input > button.ui.button {
+  background-color: #00b0ac;
+  color: white;
+  border-top-right-radius: 0.285714rem !important;
+  border-bottom-right-radius: 0.285714rem !important;
+}
