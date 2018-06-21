@@ -11,7 +11,12 @@ export type HasTimestamps = {
 
 const hasTimestampFields = [ 'id', 'createdAt', 'updatedAt' ];
 
-export type Map = HasID & HasTimestamps & {};
+export type Map = HasID & HasTimestamps & {
+  objects: HasID[],
+  cards: HasID[],
+  boxes: HasID[],
+  edges: HasID[],
+};
 
 export const mapFields = [ ...hasTimestampFields ];
 
@@ -20,6 +25,8 @@ export type ObjectType = 'CARD' | 'BOX';
 export type SenseObject = HasID & HasTimestamps & {
   x: number,
   y: number,
+  width: number,
+  height: number,
   zIndex: number,
   mapId: ID,
   objectType: ObjectType,
@@ -28,7 +35,7 @@ export type SenseObject = HasID & HasTimestamps & {
   belongsToId: ID,
 }
 
-export const objectDataFields = [ 'x', 'y', 'zIndex', 'mapId', 'objectType', 'cardId', 'boxId', 'belongsToId' ];
+export const objectDataFields = [ 'x', 'y', 'width', 'height', 'zIndex', 'mapId', 'objectType', 'cardId', 'boxId', 'belongsToId' ];
 
 export const objectFields = [ ...hasTimestampFields, ...objectDataFields ];
 

@@ -1,11 +1,13 @@
 import * as Knex from 'knex';
+import { development } from '../knexfile';
 
 const knex = Knex({
-  client: 'pg',
+  ...development,
   debug: !!process.env.DEBUG,
-  connection: process.env.DATABASE_URL,
 });
 
 export const context = ({ req }) => ({
   db: knex,
 });
+
+export type Context = typeof context;
