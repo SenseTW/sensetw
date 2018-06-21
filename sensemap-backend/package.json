@@ -14,7 +14,9 @@
     "start": "node dist",
     "start:watch": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
     "test": "jest",
-    "test:watch": "jest --watchAll"
+    "test:watch": "jest --watchAll",
+    "dbms:verify": "node verify_db_connection.js",
+    "db:create": "node create_database.js"
   },
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",
