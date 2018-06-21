@@ -6,4 +6,4 @@ COPY . .
 
 RUN yarn
 
-ENTRYPOINT ["/workspace/entrypoint.sh"]
+ENTRYPOINT ["/workspace/scripts/entrypoint.sh"]

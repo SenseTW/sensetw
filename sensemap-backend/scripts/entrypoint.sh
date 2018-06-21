@@ -2,4 +2,5 @@
 
 cd /workspace
 
-yarn
+yarn run migrate up
+yarn start
