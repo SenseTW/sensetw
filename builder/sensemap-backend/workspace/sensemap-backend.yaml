@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Pod
+metadata:
+  name: api-release 
+spec:
+  containers:
+    - image: gcr.io/ggv-notetool/sensemap-backend:test-commit-sha
+      imagePullPolicy: Always
+      name: sensemap-backend
+      args: ["release"]
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "10m"
+      envFrom:
+        - configMapRef:
+            name: api-release-env
+    - image: b.gcr.io/cloudsql-docker/gce-proxy:1.11
+      name: cloudsql-proxy
+      resources:
+        requests:
+          memory: "64Mi"
+          cpu: "10m"
+      command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                "-instances=ggv-notetool:asia-east1:hypothsis=tcp:5432",
+                "-credential_file=/secrets/cloudsql/credentials.json"]
+      volumeMounts:
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
+        - name: ssl-certs
+          mountPath: /etc/ssl/certs
+        - name: cloudsql
+          mountPath: /cloudsql
+  volumes:
+    - name: cloudsql-instance-credentials
+      secret:
+        secretName: cloudsql-instance-credentials
+    - name: ssl-certs
+      hostPath:
+        path: /etc/ssl/certs
+    - name: cloudsql
+      emptyDir:
+    - name: api-release-env
+      configMap:
+        name: api-release-env
