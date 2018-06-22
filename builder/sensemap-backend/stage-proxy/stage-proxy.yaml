@@ -26,6 +26,15 @@ spec:
           ports:
             - containerPort: 6060
               name: stage-proxy-tcp
+        - image: andyshinn/dnsmasq:2.78
+          name: stage-proxy-dns
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+          ports:
+            - containerPort: 53
+              name: stage-proxy-dns
       volumes:
         - name: nginx-proxy-conf
           configMap:
