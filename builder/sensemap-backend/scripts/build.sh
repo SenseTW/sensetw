@@ -11,6 +11,7 @@ if [ "$1" != "release" ] && [ "$1" != "master" ]; then
 fi
 
 sed -i "s/\${DB_NAME}/$DB_NAME/g" env.yaml
+sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" env.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap-backend.yaml
 sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap-backend.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap-backend_service.yaml
