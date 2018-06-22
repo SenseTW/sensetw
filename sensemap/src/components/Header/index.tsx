@@ -8,7 +8,7 @@ interface Props {}
 class Header extends React.PureComponent<Props> {
   render() {
     return (
-      <div className="header">
+      <div className="sense-header">
         <Menu inverted>
           <Menu.Item>
             <img src={logo} />

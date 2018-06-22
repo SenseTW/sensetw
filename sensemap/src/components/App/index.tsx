@@ -5,6 +5,7 @@ import {
   Switch,
 } from 'react-router-dom';
 import DashboardPage from '../DashboardPage';
+import Header from '../Header';
 import MapPage from '../MapPage';
 import ImportPage from '../ImportPage';
 import * as R from '../../types/routes';
@@ -22,6 +23,7 @@ class App extends React.Component {
     return (
       <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
+          <Header />
           <Switch>
             <Route path={R.dashboard} component={DashboardPage} />
             <Route path={R.importer} component={ImportPage} />

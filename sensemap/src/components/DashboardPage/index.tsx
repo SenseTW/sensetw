@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Header from '../Header';
 import MapCard from './MapCard';
 import FloatingActionButton from './FloatingActionButton';
 import { Container, Search, Card } from 'semantic-ui-react';
@@ -11,7 +10,6 @@ class DashboardPage extends React.PureComponent {
 
     return (
       <div className="dashboard-page">
-        <Header />
         <Container>
           <Search disabled />
           <Card.Group itemsPerRow={3}>

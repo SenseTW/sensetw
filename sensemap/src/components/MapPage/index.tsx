@@ -42,7 +42,8 @@ type Props = StateFromProps & ActionProps;
 class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions: acts } = this.props;
-    acts.viewport.resizeViewport({ width, height });
+    // the header height is 105px
+    acts.viewport.resizeViewport({ width, height: height - 105 });
   }
 
   handleKeyUp = (e: KeyboardEvent) => {
@@ -87,110 +88,112 @@ class MapPage extends React.Component<Props> {
     }
 
     return (
-      <Sidebar.Pushable className="map-page" style={{ backgroundImage: `url(${background})` }}>
-        <Sidebar visible={senseMap.inbox === SM.InboxVisibility.VISIBLE} direction="left" width="wide">
-          <Inbox />
-        </Sidebar>
-        <Sidebar visible={status !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
-          data
-            ? (
-              <ObjectContent
-                objectType={focus.objectType}
-                data={data}
-                submitText={isNew ? '送出' : '更新'}
-                submitDisabled={!isDirty && !isNew}
-                cancelDisabled={!isDirty && !isNew}
-                onUpdate={action => {
-                  if (data === null) {
-                    return;
-                  }
+      <div className="map-page">
+        <Sidebar.Pushable style={{ backgroundImage: `url(${background})` }}>
+          <Sidebar visible={senseMap.inbox === SM.InboxVisibility.VISIBLE} direction="left" width="wide">
+            <Inbox />
+          </Sidebar>
+          <Sidebar visible={status !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
+            data
+              ? (
+                <ObjectContent
+                  objectType={focus.objectType}
+                  data={data}
+                  submitText={isNew ? '送出' : '更新'}
+                  submitDisabled={!isDirty && !isNew}
+                  cancelDisabled={!isDirty && !isNew}
+                  onUpdate={action => {
+                    if (data === null) {
+                      return;
+                    }
 
-                  switch (focus.objectType) {
-                    case ObjectType.CARD: {
-                      const card = C.reducer(data as CardData, action as CardAction);
-                      acts.senseObject.updateCard(card);
-                      break;
-                    }
-                    case ObjectType.BOX: {
-                      const box = B.reducer(data as BoxData, action as BoxAction);
-                      acts.senseObject.updateBox(box);
-                      break;
-                    }
-                    default:
-                  }
-                }}
-                onSubmit={async (newData) => {
-                  if (!isNew) {
-                    // should update the object
                     switch (focus.objectType) {
-                      case ObjectType.CARD:
-                        await acts.senseObject.saveCard(newData as CardData);
+                      case ObjectType.CARD: {
+                        const card = C.reducer(data as CardData, action as CardAction);
+                        acts.senseObject.updateCard(card);
                         break;
-                      case ObjectType.BOX:
-                        await acts.senseObject.saveBox(newData as BoxData);
+                      }
+                      case ObjectType.BOX: {
+                        const box = B.reducer(data as BoxData, action as BoxAction);
+                        acts.senseObject.updateBox(box);
                         break;
+                      }
                       default:
                     }
-                  } else {
-                    // should create an object
-                    switch (focus.objectType) {
-                      case ObjectType.CARD:
-                        const action =
-                          // tslint:disable-next-line:no-any
-                          await acts.senseObject.createCardObject(senseMap.map, newData as CardData) as any;
-                        const { payload: { objects } } = action as ReturnType<typeof CS.actions.updateObjects>;
-                        if (scope.type === MapScopeType.BOX) {
-                          const obj = Object.values(objects)[0];
-                          const boxId = scope.box;
-                          await acts.senseObject.addCardToBox(obj.id, boxId);
-                        }
-                        acts.cachedStorage.removeCard(data as CardData);
-                        acts.editor.changeStatus(OE.StatusType.HIDE);
-                        acts.editor.focusObject(F.focusNothing());
-                        break;
-                      case ObjectType.BOX:
-                        acts.senseObject.createBoxObject(senseMap.map, newData as BoxData);
-                        acts.cachedStorage.removeBox(data as BoxData);
-                        acts.editor.changeStatus(OE.StatusType.HIDE);
-                        acts.editor.focusObject(F.focusNothing());
-                        break;
-                      default:
+                  }}
+                  onSubmit={async (newData) => {
+                    if (!isNew) {
+                      // should update the object
+                      switch (focus.objectType) {
+                        case ObjectType.CARD:
+                          await acts.senseObject.saveCard(newData as CardData);
+                          break;
+                        case ObjectType.BOX:
+                          await acts.senseObject.saveBox(newData as BoxData);
+                          break;
+                        default:
+                      }
+                    } else {
+                      // should create an object
+                      switch (focus.objectType) {
+                        case ObjectType.CARD:
+                          const action =
+                            // tslint:disable-next-line:no-any
+                            await acts.senseObject.createCardObject(senseMap.map, newData as CardData) as any;
+                          const { payload: { objects } } = action as ReturnType<typeof CS.actions.updateObjects>;
+                          if (scope.type === MapScopeType.BOX) {
+                            const obj = Object.values(objects)[0];
+                            const boxId = scope.box;
+                            await acts.senseObject.addCardToBox(obj.id, boxId);
+                          }
+                          acts.cachedStorage.removeCard(data as CardData);
+                          acts.editor.changeStatus(OE.StatusType.HIDE);
+                          acts.editor.focusObject(F.focusNothing());
+                          break;
+                        case ObjectType.BOX:
+                          acts.senseObject.createBoxObject(senseMap.map, newData as BoxData);
+                          acts.cachedStorage.removeBox(data as BoxData);
+                          acts.editor.changeStatus(OE.StatusType.HIDE);
+                          acts.editor.focusObject(F.focusNothing());
+                          break;
+                        default:
+                      }
                     }
-                  }
-                }}
-                onCancel={() => {
-                  if (data) {
-                    switch (focus.objectType) {
-                      case ObjectType.CARD:
-                        acts.cachedStorage.removeCard(data as CardData);
-                        break;
-                      case ObjectType.BOX:
-                        acts.cachedStorage.removeBox(data as BoxData);
-                        break;
-                      default:
+                  }}
+                  onCancel={() => {
+                    if (data) {
+                      switch (focus.objectType) {
+                        case ObjectType.CARD:
+                          acts.cachedStorage.removeCard(data as CardData);
+                          break;
+                        case ObjectType.BOX:
+                          acts.cachedStorage.removeBox(data as BoxData);
+                          break;
+                        default:
+                      }
                     }
-                  }
-                  if (isNew) {
-                    acts.editor.focusObject(F.focusNothing());
-                    acts.editor.changeStatus(OE.StatusType.HIDE);
-                  }
-                }}
-              />
-            )
-            : <div className="inspector-empty">
-                <div>請選擇單一卡片或 Box</div>
-              </div>
-        }
-        </Sidebar>
-        <Sidebar.Pusher>
-          <ResizeDetector handleWidth handleHeight onResize={this.handleResize} />
-          <Viewport>
-            {(props) => (<Map id={senseMap.map} {...props} />)}
-          </Viewport>
-          <ObjectMenu />
-          <Breadcrumb />
-        </Sidebar.Pusher>
-      </Sidebar.Pushable>
+                    if (isNew) {
+                      acts.editor.focusObject(F.focusNothing());
+                      acts.editor.changeStatus(OE.StatusType.HIDE);
+                    }
+                  }}
+                />
+              )
+              : <div className="inspector-empty">
+                  <div>請選擇單一卡片或 Box</div>
+                </div>
+          }
+          </Sidebar>
+          <Sidebar.Pusher>
+            <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
+            <Viewport>
+              {(props) => (<Map id={senseMap.map} {...props} />)}
+            </Viewport>
+            <ObjectMenu />
+            <Breadcrumb />
+          </Sidebar.Pusher>
+        </Sidebar.Pushable>
+      </div>
     );
   }
 }
