@@ -4,9 +4,10 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
-import DashboardPage from '../DashboardPage';
 import Header from '../Header';
+import Breadcrumb from '../Breadcrumb';
 import MapPage from '../MapPage';
+import DashboardPage from '../DashboardPage';
 import ImportPage from '../ImportPage';
 import * as R from '../../types/routes';
 import './index.css';
@@ -24,6 +25,7 @@ class App extends React.Component {
       <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
           <Header />
+          <Breadcrumb />
           <Switch>
             <Route path={R.dashboard} component={DashboardPage} />
             <Route path={R.importer} component={ImportPage} />

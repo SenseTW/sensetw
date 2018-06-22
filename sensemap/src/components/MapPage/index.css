@@ -19,11 +19,3 @@
   left: 16px;
   margin: 0;
 }
-
-.map-page .ui.segment.breadcrumb {
-  position: absolute;
-  top: 16px;
-  right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
