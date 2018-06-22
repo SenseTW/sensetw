@@ -7,7 +7,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap-backend:$BRANCH_NAME']
 - name: gcr.io/cloud-builders/docker
-  args: ['run', '-v', '/workspace/sensemap-backend:/workspace', 'gcr.io/$PROJECT_ID/api-builder', "release", '$COMMIT_SHA']
+  args: ['run', '-v', '/workspace/sensemap-backend:/workspace', 'gcr.io/$PROJECT_ID/api-builder', "$BRANCH_NAME", '$COMMIT_SHA']
 - name: 'gcr.io/cloud-builders/kubectl'
   args:
   - 'apply'
