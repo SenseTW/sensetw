@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { History } from 'history';
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Switch, Route, Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Segment, Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../types';
@@ -14,77 +14,131 @@ interface StateFromProps {
   history: History;
   senseObject: CS.CachedStorage;
   scope: MapScope;
-  bid: string;
 }
 
 type RouterProps = RouteComponentProps<{ bid: string }>;
 
 type Props = StateFromProps & ActionProps & RouterProps;
 
-class Breadcrumb extends React.PureComponent<Props> {
+class MapSections extends React.PureComponent<Props> {
   componentWillMount() {
-    const { actions: { senseMap }, bid } = this.props;
+    const { actions: { senseMap } } = this.props;
 
     // sync the route to the scope
-    if (bid) {
-      senseMap.setScopeToBox(bid);
-    } else {
-      senseMap.setScopeToFullmap();
-    }
+    senseMap.setScopeToFullmap();
   }
 
   componentDidUpdate() {
-    const { history, scope, bid } = this.props;
+    const { history, scope } = this.props;
 
     // sync the scope to the route
-    if (scope.type === T.MapScopeType.FULL_MAP) {
-      if (bid) {
-        history.push(R.index);
-      }
-    } else {
-      if (scope.box !== bid) {
-        history.push(`${R.index}${scope.box}`);
-      }
+    if (scope.type !== T.MapScopeType.FULL_MAP) {
+      // XXX: can I get the router basename here?
+      history.push(`${process.env.PUBLIC_URL}${R.index}${scope.box}`);
     }
   }
 
   render() {
-    const { actions: { senseMap, selection }, senseObject, scope, bid } = this.props;
+    return (
+      <React.Fragment>
+        <SBreadcrumb.Section
+          link
+          as={Link}
+          to={R.dashboard}
+        >
+          Dashboard
+        </SBreadcrumb.Section>
+        <SBreadcrumb.Divider icon="right angle" />
+        <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
+      </React.Fragment>
+    );
+  }
+}
+
+class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
+  componentWillMount() {
+    const { actions: { senseMap }, bid } = this.props;
+
+    // sync the route to the scope
+    senseMap.setScopeToBox(bid);
+  }
+
+  componentDidUpdate() {
+    const { history, scope } = this.props;
+
+    // sync the scope to the route
+    if (scope.type === T.MapScopeType.FULL_MAP) {
+      history.push(`${process.env.PUBLIC_URL}${R.index}`);
+    }
+  }
+
+  render() {
+    const { actions: { senseMap, selection }, senseObject, bid } = this.props;
     const box = CS.getBox(senseObject, bid);
 
     return (
+      <React.Fragment>
+        <SBreadcrumb.Section
+          link
+          as={Link}
+          to={R.dashboard}
+        >
+          Dashboard
+        </SBreadcrumb.Section>
+        <SBreadcrumb.Divider icon="right angle" />
+        <SBreadcrumb.Section
+          link
+          as={Link}
+          to={R.index}
+          onClick={() => {
+            selection.clearSelection();
+            senseMap.setScopeToFullmap();
+          }}
+        >
+          Map
+        </SBreadcrumb.Section>
+        <SBreadcrumb.Divider icon="right angle" />
+        <SBreadcrumb.Section active>{
+          box === emptyBoxData
+            ? bid
+            : box.title
+        }</SBreadcrumb.Section>
+      </React.Fragment>
+    );
+  }
+}
+
+class Breadcrumb extends React.PureComponent<Props> {
+  render() {
+    return (
       <Segment compact className="breadcrumb">
         <SBreadcrumb>
-          {
-            scope.type === T.MapScopeType.BOX &&
-              (
-                <React.Fragment>
-                  <SBreadcrumb.Section active>{
-                    box === emptyBoxData
-                      ? bid
-                      : box.title
-                  }</SBreadcrumb.Section>
-                  <SBreadcrumb.Divider icon="left angle" />
-                </React.Fragment>
-              )
-          }
-          {
-            scope.type === T.MapScopeType.BOX
-              ? (
+        <Switch>
+          <Route path={R.dashboard}>
+            {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
+          </Route>
+          <Route path={R.importer}>
+            {() => (
+              <React.Fragment>
                 <SBreadcrumb.Section
                   link
                   as={Link}
-                  to={R.index}
-                  onClick={() => {
-                    selection.clearSelection();
-                    senseMap.setScopeToFullmap();
-                  }}
+                  to={R.dashboard}
                 >
-                  Map
+                  Dashboard
                 </SBreadcrumb.Section>
-              )
-              : <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
-          }
+                <SBreadcrumb.Divider icon="right angle" />
+                <SBreadcrumb.Section active>Import</SBreadcrumb.Section>
+              </React.Fragment>
+            )}
+          </Route>
+          <Route exact path={R.index}>
+            {() => <MapSections {...this.props} />}
+          </Route>
+          <Route path={`${R.index}:bid`}>
+            {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
+          </Route>
+        </Switch>
         </SBreadcrumb>
       </Segment>
     );
@@ -96,9 +150,8 @@ export default withRouter(connect<StateFromProps, ActionProps, RouterProps>(
     const { senseObject } = state;
     const { scope } = state.senseMap;
     const { history } = router;
-    const { bid } = router.match.params;
 
-    return { history, senseObject, scope, bid };
+    return { history, senseObject, scope };
   },
   mapDispatch({ actions })
 )(Breadcrumb));

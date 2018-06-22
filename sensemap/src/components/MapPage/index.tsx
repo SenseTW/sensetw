@@ -6,7 +6,6 @@ import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
-import Breadcrumb from '../Breadcrumb';
 import Inbox from '../../containers/Inbox';
 import {
   CardData,
@@ -190,7 +189,6 @@ class MapPage extends React.Component<Props> {
               {(props) => (<Map id={senseMap.map} {...props} />)}
             </Viewport>
             <ObjectMenu />
-            <Breadcrumb />
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>
