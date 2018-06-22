@@ -12,25 +12,26 @@ type AllMapsArgs = {
   filter?: MapFilter;
 };
 
+function mapsQuery(db) {
+  return db.select(mapFields(db)).from('map');
+}
+
 export async function getMap(db, id: ID): Promise<Map | null> {
-  const objects = db.raw('array(?) as objects', db.select('id').from('object').where('mapId', id));
-  const cards = db.raw('array(?) as cards', db.select('id').from('card').where('mapId', id));
-  const boxes = db.raw('array(?) as boxes', db.select('id').from('box').where('mapId', id));
-  const edges = db.raw('array(?) as edges', db.select('id').from('edge').where('mapId', id));
-  return db.select([...mapFields, objects, cards, boxes, edges]).from('map').where('id', id).first();
+  const m = await mapsQuery(db).where('id', id).first();
+  return m === undefined ? null : m;
 }
 
 export async function getAllMaps(db): Promise<Map[]> {
-  return db.select(mapFields).from('map');
+  return mapsQuery(db);
 }
 
 export async function createMap(db, args: Map): Promise<Map> {
-  const rows = await db('map').insert({}).returning(mapFields);
+  const rows = await db('map').insert({}).returning(mapFields(db));
   return rows[0];
 }
 
 export async function deleteMap(db, id: ID): Promise<Map> {
-  const rows = await db('map').where('id', id).delete().returning(mapFields);
+  const rows = await db('map').where('id', id).del().returning(mapFields(db));
   return rows[0];
 }
 
@@ -50,11 +51,22 @@ export async function getBoxesInMap(db, mapId: ID): Promise<Box[]> {
   return boxesQuery(db).where('mapId', mapId);
 }
 
+function getValue(db, o, key, query) {
+  if (typeof(o) === 'string') {
+    return query(db, o);
+  } else if (key in o) {
+    return o[key];
+  } else {
+    return query(db, o.id);
+  }
+}
+
 export const resolvers = {
   Query: {
     allMaps: async (_, args: AllMapsArgs, { db }, info): Promise<Map[]> => {
       if (args.filter) {
-        return [ await getMap(db, args.filter.id) ];
+        const m = await getMap(db, args.filter.id);
+        return !!m ? [ m ] : [];
       } else {
         return getAllMaps(db);
       }

@@ -4,10 +4,7 @@ import { objectsQuery } from './object';
 import { pick } from 'ramda';
 
 export function boxesQuery(db) {
-  const map = db.column('mapId').as('map')
-  const objects = db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"object"."boxId" = "box"."id"'));
-  const contains = db.raw('array(?) as contains', db.select('id').from('object').whereRaw('"object"."belongsToId" = "box"."id"'));
-  return db.select([ ...boxFields, map, objects, contains ]).from('box');
+  return db.select(boxFields(db)).from('box');
 }
 
 export async function getAllBoxes(db): Promise<Box[]> {
@@ -28,18 +25,18 @@ export async function getObjectsInBox(db, id: ID): Promise<SenseObject[]> {
 
 export async function createBox(db, args): Promise<Box> {
   const fields = pick(boxDataFields, args);
-  const rows = await db('box').insert(fields).returning(boxFields);
+  const rows = await db('box').insert(fields).returning(boxFields(db));
   return rows[0];
 }
 
 export async function deleteBox(db, id: ID): Promise<Box> {
-  const rows = await db('box').where('id', id).delete().returning(boxFields);
+  const rows = await db('box').where('id', id).delete().returning(boxFields(db));
   return rows[0];
 }
 
 export async function updateBox(db, id: ID, args): Promise<Box | null> {
   const fields = pick(boxDataFields, args);
-  const rows = await db('box').where('id', id).update(fields).returning(boxFields);
+  const rows = await db('box').where('id', id).update(fields).returning(boxFields(db));
   return rows[0];
 }
 

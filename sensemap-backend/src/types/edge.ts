@@ -4,10 +4,7 @@ import { getObject } from './object';
 import { pick } from 'ramda';
 
 export function edgesQuery(db) {
-  const map = db.column('mapId').as('map');
-  const from = db.column('fromId').as('from');
-  const to = db.column('toId').as('to');
-  return db.select([ ...edgeFields, map, from, to ]).from('edge');
+  return db.select(edgeFields(db)).from('edge');
 }
 
 export async function getAllEdges(db): Promise<Edge[]> {
@@ -20,18 +17,18 @@ export async function getEdge(db, id: ID): Promise<Edge | null> {
 
 export async function createEdge(db, args): Promise<Edge> {
   const fields = pick(edgeDataFields, args);
-  const rows = await db('edge').insert(fields).returning(edgeFields);
+  const rows = await db('edge').insert(fields).returning(edgeFields(db));
   return rows[0];
 }
 
 export async function updateEdge(db, id: ID, args): Promise<Edge | null> {
   const fields = pick(edgeDataFields, args);
-  const rows = await db('edge').where('id', id).update(fields).returning(edgeFields);
+  const rows = await db('edge').where('id', id).update(fields).returning(edgeFields(db));
   return rows[0];
 }
 
 export async function deleteEdge(db, id: ID): Promise<Edge | null> {
-  const rows = await db('edge').where('id', id).delete().returning(edgeFields);
+  const rows = await db('edge').where('id', id).delete().returning(edgeFields(db));
   return rows[0];
 }
 

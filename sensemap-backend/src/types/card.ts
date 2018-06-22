@@ -29,8 +29,7 @@ export type AllCardsArgs = {
 };
 
 export function cardsQuery(db) {
-  const objects = db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"cardId" = "card"."id"'));
-  return db.select([ ...cardFields, objects ]).from('card');
+  return db.select(cardFields(db)).from('card');
 }
 
 export async function getCard(db, id: ID): Promise<Card | null> {
@@ -58,18 +57,18 @@ export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
 
 export async function createCard(db, args): Promise<Card> {
   const fields = pick(cardDataFields, args);
-  const rows = await db('card').insert(fields).returning(cardFields);
+  const rows = await db('card').insert(fields).returning(cardFields(db));
   return rows[0];
 }
 
 export async function deleteCard(db, id: ID): Promise<Card | null> {
-  const rows = await db('card').where('id', id).delete().returning(cardFields);
+  const rows = await db('card').where('id', id).delete().returning(cardFields(db));
   return rows[0];
 }
 
 export async function updateCard(db, id: ID, args): Promise<Card | null> {
   const fields = pick(cardDataFields, args);
-  const rows = await db('card').where('id', id).update(fields).returning(cardFields);
+  const rows = await db('card').where('id', id).update(fields).returning(cardFields(db));
   return rows[0];
 }
 

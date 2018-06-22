@@ -5,11 +5,7 @@ import { getBox } from './box';
 import { pick } from 'ramda';
 
 export function objectsQuery(db) {
-  const map = db.column('mapId').as('map');
-  const box = db.column('boxId').as('box');
-  const card = db.column('cardId').as('card');
-  const belongsTo = db.column('belongsToId').as('belongsTo');
-  return db.select([ ...objectFields, map, card, box, belongsTo ]).from('object');
+  return db.select(objectFields(db)).from('object');
 }
 
 export async function getAllObjects(db): Promise<SenseObject[]> {
@@ -17,23 +13,24 @@ export async function getAllObjects(db): Promise<SenseObject[]> {
 }
 
 export async function getObject(db, id: ID): Promise<SenseObject> {
-  return objectsQuery(db).where('id', id);
+  const o = await objectsQuery(db).where('id', id).first();
+  return !!o ? o : null;
 }
 
 export async function createObject(db, args): Promise<SenseObject> {
   const fields = pick(objectDataFields, args);
-  const rows = await db('object').insert(fields).returning(objectFields);
+  const rows = await db('object').insert(fields).returning(objectFields(db));
   return rows[0];
 }
 
 export async function updateObject(db, id: ID, args): Promise<SenseObject | null> {
   const fields = pick(objectDataFields, args);
-  const rows = await db('object').where('id', id).update(fields).returning(objectFields);
+  const rows = await db('object').where('id', id).update(fields).returning(objectFields(db));
   return rows[0];
 }
 
 export async function deleteObject(db, id: ID): Promise<SenseObject | null> {
-  const rows = db('object').where('id', id).delete().returning(objectFields);
+  const rows = await db('object').where('id', id).del().returning(objectFields(db));
   return rows[0];
 }
 

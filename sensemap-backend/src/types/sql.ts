@@ -18,7 +18,13 @@ export type Map = HasID & HasTimestamps & {
   edges: HasID[],
 };
 
-export const mapFields = [ ...hasTimestampFields ];
+export const mapFields = (db) => [
+  ...hasTimestampFields,
+  db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"object"."mapId" = "map"."id"')),
+  db.raw('array(?) as cards', db.select('id').from('card').whereRaw('"card"."mapId" = "map"."id"')),
+  db.raw('array(?) as boxes', db.select('id').from('box').whereRaw('"box"."mapId" = "map"."id"')),
+  db.raw('array(?) as edges', db.select('id').from('edge').whereRaw('"edge"."mapId" = "map"."id"')),
+];
 
 export type ObjectType = 'CARD' | 'BOX';
 
@@ -37,7 +43,14 @@ export type SenseObject = HasID & HasTimestamps & {
 
 export const objectDataFields = [ 'x', 'y', 'width', 'height', 'zIndex', 'mapId', 'objectType', 'cardId', 'boxId', 'belongsToId' ];
 
-export const objectFields = [ ...hasTimestampFields, ...objectDataFields ];
+export const objectFields = (db) => [
+  ...hasTimestampFields,
+  ...objectDataFields,
+  db.column('mapId').as('map'),
+  db.column('boxId').as('box'),
+  db.column('cardId').as('card'),
+  db.column('belongsToId').as('belongsTo'),
+];
 
 export type CardType = 'NORMAL' | 'QUESTION' | 'ANSWER' | 'NOTE';
 
@@ -55,7 +68,12 @@ export type Card = HasID & HasTimestamps & {
 
 export const cardDataFields = [ 'cardType', 'description', 'saidBy', 'stakeholder', 'summary', 'tags', 'title', 'url', 'mapId' ];
 
-export const cardFields = [ ...hasTimestampFields, ...cardDataFields ];
+export const cardFields = (db) => [
+  ...hasTimestampFields,
+  ...cardDataFields,
+  db.column('mapId').as('map'),
+  db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"cardId" = "card"."id"')),
+];
 
 export type Box = HasID & HasTimestamps & {
   title: string,
@@ -66,7 +84,13 @@ export type Box = HasID & HasTimestamps & {
 
 export const boxDataFields = [ 'title', 'summary', 'tags', 'mapId' ];
 
-export const boxFields = [ ...hasTimestampFields, ...boxDataFields ];
+export const boxFields = (db) => [
+  ...hasTimestampFields,
+  ...boxDataFields,
+  db.column('mapId').as('map'),
+  db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"object"."boxId" = "box"."id"')),
+  db.raw('array(?) as contains', db.select('id').from('object').whereRaw('"object"."belongsToId" = "box"."id"')),
+];
 
 export type Edge = HasID & HasTimestamps & {
   mapId: ID,
@@ -76,4 +100,10 @@ export type Edge = HasID & HasTimestamps & {
 
 export const edgeDataFields = [ 'mapId', 'fromId', 'toId' ];
 
-export const edgeFields = [ ...hasTimestampFields, ...edgeDataFields ];
+export const edgeFields = (db) => [
+  ...hasTimestampFields,
+  ...edgeDataFields,
+  db.column('mapId').as('map'),
+  db.column('fromId').as('from'),
+  db.column('toId').as('to'),
+];
