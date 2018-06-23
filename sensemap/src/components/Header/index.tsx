@@ -1,11 +1,18 @@
 import * as React from 'react';
 import { Menu, Icon, Dropdown } from 'semantic-ui-react';
+import Breadcrumb from '../Breadcrumb';
 import './index.css';
 const logo = require('./logo.png');
 
 interface Props {}
 
-class Header extends React.PureComponent<Props> {
+/**
+ * The header contains a main menu with a submenu.
+ *
+ * It extends the normal React component instead of the pure component so the
+ * breadcrumb component will rerender properly after updates.
+ */
+class Header extends React.Component<Props> {
   render() {
     return (
       <div className="sense-header">
@@ -36,9 +43,9 @@ class Header extends React.PureComponent<Props> {
             </Menu.Item>
           </Menu.Menu>
         </Menu>
-        <Menu>
-          <Menu.Item>DASHBOARD</Menu.Item>
-        </Menu>
+        <div className="sense-header__submenu">
+          <Breadcrumb />
+        </div>
       </div>
     );
   }
