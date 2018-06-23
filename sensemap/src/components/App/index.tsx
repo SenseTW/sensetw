@@ -27,10 +27,10 @@ class App extends React.Component {
           <Header />
           <Breadcrumb />
           <Switch>
-            <Route path={R.dashboard} component={DashboardPage} />
-            <Route path={R.importer} component={ImportPage} />
-            <Route exact path={R.index} component={MapPage} />
-            <Route path={`${R.index}:bid`} component={MapPage} />
+            <Route exact path={R.dashboard} component={DashboardPage} />
+            <Route exact path={R.importer} component={ImportPage} />
+            <Route exact path={R.map} component={MapPage} />
+            <Route path={`${R.map}/:bid`} component={MapPage} />
           </Switch>
         </div>
       </Router>

@@ -1,7 +1,5 @@
-export const index = '/';
-
-export const map = '/map';
+export const dashboard = '/';
 
 export const importer = '/import';
 
-export const dashboard = '/dashboard';
+export const map = '/map';

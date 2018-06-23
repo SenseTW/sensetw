@@ -34,7 +34,7 @@ class MapSections extends React.PureComponent<Props> {
     // sync the scope to the route
     if (scope.type !== T.MapScopeType.FULL_MAP) {
       // XXX: can I get the router basename here?
-      history.push(`${process.env.PUBLIC_URL}${R.index}${scope.box}`);
+      history.push(`${process.env.PUBLIC_URL}${R.map}/${scope.box}`);
     }
   }
 
@@ -68,7 +68,7 @@ class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
 
     // sync the scope to the route
     if (scope.type === T.MapScopeType.FULL_MAP) {
-      history.push(`${process.env.PUBLIC_URL}${R.index}`);
+      history.push(`${process.env.PUBLIC_URL}${R.map}`);
     }
   }
 
@@ -89,7 +89,7 @@ class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
         <SBreadcrumb.Section
           link
           as={Link}
-          to={R.index}
+          to={R.map}
           onClick={() => {
             selection.clearSelection();
             senseMap.setScopeToFullmap();
@@ -114,10 +114,10 @@ class Breadcrumb extends React.PureComponent<Props> {
       <Segment compact className="breadcrumb">
         <SBreadcrumb>
         <Switch>
-          <Route path={R.dashboard}>
+          <Route exact path={R.dashboard}>
             {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
           </Route>
-          <Route path={R.importer}>
+          <Route exact path={R.importer}>
             {() => (
               <React.Fragment>
                 <SBreadcrumb.Section
@@ -132,10 +132,10 @@ class Breadcrumb extends React.PureComponent<Props> {
               </React.Fragment>
             )}
           </Route>
-          <Route exact path={R.index}>
+          <Route exact path={R.map}>
             {() => <MapSections {...this.props} />}
           </Route>
-          <Route path={`${R.index}:bid`}>
+          <Route path={`${R.map}/:bid`}>
             {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
           </Route>
         </Switch>
