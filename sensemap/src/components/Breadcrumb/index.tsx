@@ -113,32 +113,32 @@ class Breadcrumb extends React.PureComponent<Props> {
     return (
       <Segment compact className="breadcrumb">
         <SBreadcrumb>
-        <Switch>
-          <Route exact path={R.dashboard}>
-            {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
-          </Route>
-          <Route exact path={R.importer}>
-            {() => (
-              <React.Fragment>
-                <SBreadcrumb.Section
-                  link
-                  as={Link}
-                  to={R.dashboard}
-                >
-                  Dashboard
-                </SBreadcrumb.Section>
-                <SBreadcrumb.Divider icon="right angle" />
-                <SBreadcrumb.Section active>Import</SBreadcrumb.Section>
-              </React.Fragment>
-            )}
-          </Route>
-          <Route exact path={R.map}>
-            {() => <MapSections {...this.props} />}
-          </Route>
-          <Route path={`${R.map}/:bid`}>
-            {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
-          </Route>
-        </Switch>
+          <Switch>
+            <Route exact path={R.dashboard}>
+              {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
+            </Route>
+            <Route exact path={R.importer}>
+              {() => (
+                <React.Fragment>
+                  <SBreadcrumb.Section
+                    link
+                    as={Link}
+                    to={R.dashboard}
+                  >
+                    Dashboard
+                  </SBreadcrumb.Section>
+                  <SBreadcrumb.Divider icon="right angle" />
+                  <SBreadcrumb.Section active>Import</SBreadcrumb.Section>
+                </React.Fragment>
+              )}
+            </Route>
+            <Route exact path={R.map}>
+              {() => <MapSections {...this.props} />}
+            </Route>
+            <Route path={`${R.map}/:bid`}>
+              {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
+            </Route>
+          </Switch>
         </SBreadcrumb>
       </Segment>
     );
