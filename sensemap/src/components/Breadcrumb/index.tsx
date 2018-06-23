@@ -2,7 +2,7 @@ import * as React from 'react';
 import { History } from 'history';
 import { Switch, Route, Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { Segment, Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
+import { Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../types';
 import { actions, ActionProps, mapDispatch } from '../../types';
 import { emptyBoxData } from '../../types/sense/box';
@@ -10,15 +10,16 @@ import { MapScope } from '../../types/sense-map';
 import * as CS from '../../types/cached-storage';
 import * as R from '../../types/routes';
 
+// tslint:disable-next-line:no-any
+type MyRouteProps = RouteComponentProps<any>;
+
 interface StateFromProps {
-  history: History;
   senseObject: CS.CachedStorage;
   scope: MapScope;
+  history: History;
 }
 
-type RouterProps = RouteComponentProps<{ bid: string }>;
-
-type Props = StateFromProps & ActionProps & RouterProps;
+type Props = StateFromProps & ActionProps;
 
 class MapSections extends React.PureComponent<Props> {
   componentWillMount() {
@@ -111,47 +112,46 @@ class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
 class Breadcrumb extends React.PureComponent<Props> {
   render() {
     return (
-      <Segment compact className="breadcrumb">
-        <SBreadcrumb>
-          <Switch>
-            <Route exact path={R.dashboard}>
-              {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
-            </Route>
-            <Route exact path={R.importer}>
-              {() => (
-                <React.Fragment>
-                  <SBreadcrumb.Section
-                    link
-                    as={Link}
-                    to={R.dashboard}
-                  >
-                    Dashboard
-                  </SBreadcrumb.Section>
-                  <SBreadcrumb.Divider icon="right angle" />
-                  <SBreadcrumb.Section active>Import</SBreadcrumb.Section>
-                </React.Fragment>
-              )}
-            </Route>
-            <Route exact path={R.map}>
-              {() => <MapSections {...this.props} />}
-            </Route>
-            <Route path={`${R.map}/:bid`}>
-              {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
-            </Route>
-          </Switch>
-        </SBreadcrumb>
-      </Segment>
+      <SBreadcrumb>
+        <Switch>
+          <Route exact path={R.dashboard}>
+            {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
+          </Route>
+          <Route exact path={R.importer}>
+            {() => (
+              <React.Fragment>
+                <SBreadcrumb.Section
+                  link
+                  as={Link}
+                  to={R.dashboard}
+                >
+                  Dashboard
+                </SBreadcrumb.Section>
+                <SBreadcrumb.Divider icon="right angle" />
+                <SBreadcrumb.Section active>Import</SBreadcrumb.Section>
+              </React.Fragment>
+            )}
+          </Route>
+          <Route exact path={R.map}>
+            {() => <MapSections {...this.props} />}
+          </Route>
+          <Route path={`${R.map}/:bid`}>
+            {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
+          </Route>
+        </Switch>
+      </SBreadcrumb>
     );
   }
 }
 
-export default withRouter(connect<StateFromProps, ActionProps, RouterProps>(
-  (state: T.State, router) => {
+export default withRouter(connect<StateFromProps, ActionProps, MyRouteProps>(
+  (state: T.State, router: MyRouteProps) => {
     const { senseObject } = state;
     const { scope } = state.senseMap;
     const { history } = router;
 
-    return { history, senseObject, scope };
+    // pass router to trigger rerender when the url changed
+    return { senseObject, scope, history };
   },
   mapDispatch({ actions })
 )(Breadcrumb));

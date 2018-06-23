@@ -5,7 +5,6 @@ import {
   Switch,
 } from 'react-router-dom';
 import Header from '../Header';
-import Breadcrumb from '../Breadcrumb';
 import MapPage from '../MapPage';
 import DashboardPage from '../DashboardPage';
 import ImportPage from '../ImportPage';
@@ -25,7 +24,6 @@ class App extends React.Component {
       <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
           <Header />
-          <Breadcrumb />
           <Switch>
             <Route exact path={R.dashboard} component={DashboardPage} />
             <Route exact path={R.importer} component={ImportPage} />
