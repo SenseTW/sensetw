@@ -1,9 +1,11 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Image, Label, Button, Icon } from 'semantic-ui-react';
+import * as R from '../../../types/routes';
 import './index.css';
 
 const MapCard = (props: {}) => (
-  <Card className="map-card">
+  <Card className="map-card" as={Link} to={R.map}>
     <Card.Content className="map-card__header">
       <Card.Header>Owned by <span className="map-card__username">Ael</span></Card.Header>
     </Card.Content>
