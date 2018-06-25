@@ -115,7 +115,7 @@ export type State = {
 };
 
 export const initial: State = {
-  map: 'cjgdo1yhj0si501559s0hgw2a',
+  map: '1dbab857-942d-41d0-baa1-82fa70b0d773',
   scope: {
     type: MapScopeType.FULL_MAP,
   },
