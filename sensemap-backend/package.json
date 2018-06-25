@@ -15,6 +15,7 @@
     "start:watch": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
     "test": "jest",
     "test:watch": "jest --watchAll",
+    "test:coverage": "jest --coverage",
     "dbms:verify": "node verify_db_connection.js",
     "db:create": "node create_database.js"
   },
