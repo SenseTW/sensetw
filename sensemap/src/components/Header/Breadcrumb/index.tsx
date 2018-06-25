@@ -3,12 +3,12 @@ import { History } from 'history';
 import { Switch, Route, Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
-import * as T from '../../types';
-import { actions, ActionProps, mapDispatch } from '../../types';
-import { emptyBoxData } from '../../types/sense/box';
-import { MapScope } from '../../types/sense-map';
-import * as CS from '../../types/cached-storage';
-import * as R from '../../types/routes';
+import * as T from '../../../types';
+import { actions, ActionProps, mapDispatch } from '../../../types';
+import { emptyBoxData } from '../../../types/sense/box';
+import { MapScope } from '../../../types/sense-map';
+import * as CS from '../../../types/cached-storage';
+import * as R from '../../../types/routes';
 
 // tslint:disable-next-line:no-any
 type MyRouteProps = RouteComponentProps<any>;
