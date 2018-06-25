@@ -1,0 +1,31 @@
+.sense-header__submenu > .ui.menu {
+  margin-top: 12px;
+}
+
+.sense-header__submenu > .ui.right.menu {
+  margin-left: auto;
+}
+
+.sense-header__submenu > .ui.right.menu > .item {
+  margin-right: 16px;
+  font-size: 1.142857rem;
+  color: #9b9da9;
+}
+
+.sense-header__submenu > .ui.right.menu > .active.item {
+  color: #4a4a4a;
+}
+
+.sense-header__submenu > .ui.menu > .item.sense-header__submenu__annotation:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.sense-header__submenu > .ui.menu > .item.sense-header__submenu__annotation {
+  margin-right: 16px;
+  background-color: #000;
+  color: #fff;
+  border-radius: 0.285714rem;
+  height: 36px;
+  font-size: 1rem;
+}

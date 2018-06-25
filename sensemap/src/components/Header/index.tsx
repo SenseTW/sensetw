@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Menu, Icon, Dropdown } from 'semantic-ui-react';
-import Breadcrumb from '../Breadcrumb';
+import Breadcrumb from './Breadcrumb';
+import Submenu from './Submenu';
 import './index.css';
 const logo = require('./logo.png');
 
@@ -45,6 +46,7 @@ class Header extends React.Component<Props> {
         </Menu>
         <div className="sense-header__submenu">
           <Breadcrumb />
+          <Submenu />
         </div>
       </div>
     );
