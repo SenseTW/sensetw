@@ -8,7 +8,11 @@
   },
   "scripts": {
     "migrate": "node migrate.js",
-    "seed": "knex seed:run",
+    "migrate:create": "yarn run migrate create -j ts",
+    "migrate:up": "yarn run migrate up",
+    "migrate:down": "yarn run migrate down",
+    "migrate:dryrun": "yarn run migrate up --dry-run",
+    "seed": "node ./seed.js",
     "build": "rimraf dist && tsc",
     "prestart": "npm run build",
     "start": "node dist",
