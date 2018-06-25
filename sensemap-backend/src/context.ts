@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config()
+
 import * as Knex from 'knex';
 import { development } from '../knexfile';
 
