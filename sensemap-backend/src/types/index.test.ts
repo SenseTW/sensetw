@@ -1,5 +1,5 @@
 import { resolvers } from '.';
-import { maps } from '../../seeds/dev';
+import { maps } from '../../seeds/development';
 import { context } from '../context';
 
 const { db } = context({ req: null });
