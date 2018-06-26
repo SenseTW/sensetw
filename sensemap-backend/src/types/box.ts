@@ -12,7 +12,8 @@ export async function getAllBoxes(db): Promise<Box[]> {
 }
 
 export async function getBox(db, id: ID): Promise<Box | null> {
-  return boxesQuery(db).where('id', id).first();
+  const b = await boxesQuery(db).where('id', id).first();
+  return b === undefined ? null : b;
 }
 
 export async function getObjectsForBox(db, id: ID): Promise<SenseObject[]> {

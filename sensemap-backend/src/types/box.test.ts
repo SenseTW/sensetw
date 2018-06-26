@@ -13,6 +13,24 @@ test('getBox', async () => {
   expect(box.map).toEqual(boxes[0].map);
 });
 
+test('create/update/delete Box', async () => {
+  const box = await B.createBox(db, { mapId: maps[0].id });
+  const b1 = await B.getBox(db, box.id);
+  expect(b1).toEqual(box);
+
+  const b2 = await B.updateBox(db, box.id, { title: 'foobar' });
+  expect(b2.title).toBe('foobar');
+
+  const b3 = await B.getBox(db, box.id);
+  expect(b3.title).toBe('foobar');
+
+  const b4 = await B.deleteBox(db, box.id);
+  expect(b4).toEqual(b3);
+
+  const b5 = await B.getBox(db, box.id);
+  expect(b5).toBeNull();
+});
+
 test('addToContainCards', async () => {
   const box = await B.createBox(db, {
     mapId: maps[0].id,
