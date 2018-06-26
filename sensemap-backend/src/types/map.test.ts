@@ -1,6 +1,6 @@
 import * as M from './map';
 import * as O from './object';
-import { maps } from '../../seeds/dev';
+import { maps } from '../../seeds/development';
 import { context } from '../context';
 
 const nonexistent = '10330ced-04b4-46d3-91a6-1d294bb12da3';

@@ -1,6 +1,6 @@
 import * as O from './object'
 import { context } from '../context';
-import { maps } from '../../seeds/dev';
+import { maps } from '../../seeds/development';
 
 const { db } = context({ req: null });
 

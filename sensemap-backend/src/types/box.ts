@@ -40,6 +40,22 @@ export async function updateBox(db, id: ID, args): Promise<Box | null> {
   return rows[0];
 }
 
+export async function addObjectToBox(db, obj: ID, box: ID) {
+  await db('object').where('id', obj).update({ belongsToId: box });
+  return {
+    containsObject: obj,
+    belongsToBox: box,
+  };
+}
+
+export async function removeObjectFromBox(db, obj: ID, box: ID) {
+  await db('object').where('id', obj).update({ belongsToId: db.raw('NULL') });
+  return {
+    containsObject: obj,
+    belongsToBox: box,
+  };
+}
+
 export const resolvers = {
   Query: {
     allBoxes: async (_, args, { db }, info): Promise<Box[]> => {
@@ -62,6 +78,12 @@ export const resolvers = {
     },
     updateBox: async (_, args, { db }, info) => {
       return updateBox(db, args.id, args);
+    },
+    addToContainCards: async (_, { belongsToBoxId, containsObjectId }, { db }, info) => {
+      return addObjectToBox(db, containsObjectId, belongsToBoxId);
+    },
+    removeFromContainCards: async (_, { belongsToBoxId, containsObjectId }, { db }, info) => {
+      return removeObjectFromBox(db, containsObjectId, belongsToBoxId);
     },
   },
   Box: {
