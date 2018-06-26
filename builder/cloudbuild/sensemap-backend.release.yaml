@@ -6,10 +6,12 @@ steps:
          '-f', './sensemap-backend/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", "gcr.io/$PROJECT_ID/sensemap-backend"]
-
-- name: gcr.io/cloud-builders/docker
-  args: ['run', '-v', '/workspace/sensemap:/workspace', 'gcr.io/$PROJECT_ID/sense-builder', "release", '$COMMIT_SHA']
-- name: gcr.io/cloud-builders/gsutil
-  args: ['-h', 'Cache-Control:private', 'cp', '-r','-a', 'public-read', '/workspace/sensemap/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
-- name: gcr.io/cloud-builders/gsutil
-  args: ['-h', 'Cache-Control:private', 'cp', '-r', '-a', 'public-read', '/workspace/sensemap/gcs-build/*', 'gs://sensetw/']
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'set'
+  - 'image'
+  - 'deployment/sensemap-backend'
+  - 'sensemap-backend=gcr.io/$PROJECT_ID/sensemap-backend:$COMMIT_SHA'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
