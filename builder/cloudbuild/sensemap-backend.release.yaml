@@ -3,7 +3,7 @@ steps:
   args: ['build',
          '-t', 'gcr.io/$PROJECT_ID/sensemap-backend',
          '-t', 'gcr.io/$PROJECT_ID/sensemap-backend:$COMMIT_SHA',
-         '-f', './sensemap-backend/Dockerfile', '.']
+         '-f', './sensemap-backend/Dockerfile', './sensemap-backend/.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", "gcr.io/$PROJECT_ID/sensemap-backend"]
 - name: 'gcr.io/cloud-builders/kubectl'
