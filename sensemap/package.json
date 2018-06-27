@@ -6,6 +6,7 @@
   "dependencies": {
     "@types/history": "^4.6.2",
     "axios": "^0.18.0",
+    "classnames": "^2.2.6",
     "graphql-request": "^1.5.1",
     "konva": "^2.0.2",
     "moment": "^2.22.1",
@@ -36,6 +37,7 @@
     "docs": "typedoc --tsconfig tsconfig.json -out docs --ignoreCompilerErrors"
   },
   "devDependencies": {
+    "@types/classnames": "^2.2.4",
     "@types/enzyme": "^3.1.10",
     "@types/enzyme-adapter-react-16": "^1.0.2",
     "@types/jest": "^22.2.2",
