@@ -1,0 +1,283 @@
+.sense-svg-icon {
+  width: 1em;
+  height: 1em;
+  font-size: 1em;
+  margin: 0 .25rem 0 0;
+}
+
+.sense-svg-icon.disabled {
+  opacity: 0.45 !important;
+}
+
+.sense-svg-icon.loading {
+  animation: icon-loading 2s linear infinite;
+}
+
+.sense-svg-icon.mini {
+  width: 0.4em;
+  height: 0.4em;
+  font-size: 0.4em;
+}
+
+.sense-svg-icon.tiny {
+  width: 0.5em;
+  height: 0.5em;
+  font-size: 0.5em;
+}
+
+.sense-svg-icon.small {
+  width: 0.75em;
+  height: 0.75em;
+  font-size: 0.75em;
+}
+
+.sense-svg-icon.large {
+  width: 1.5em;
+  height: 1.5em;
+  font-size: 1.5em;
+}
+
+.sense-svg-icon.big {
+  width: 2em;
+  height: 2em;
+  font-size: 2em;
+}
+
+.sense-svg-icon.huge {
+  width: 4em;
+  height: 4em;
+  font-size: 4em;
+}
+
+.sense-svg-icon.massive {
+  width: 8em;
+  height: 8em;
+  font-size: 8em;
+}
+
+.sense-svg-icon.link {
+  cursor: pointer;
+  opacity: .8;
+  transition: opacity .1s ease;
+}
+
+.sense-svg-icon.link:hover {
+  opacity: 1 !important;
+}
+
+.sense-svg-icon.horizontally.flipped {
+  transform: scale(-1, 1);
+}
+
+.sense-svg-icon.vertically.flipped {
+  transform: scale(1, -1);
+}
+
+.sense-svg-icon.circular {
+  border-radius: 500em !important;
+  box-shadow: 0 0 0 0.1em rgba(0, 0, 0, .1) inset;
+  padding: .5em 0 !important;
+  width: 2em !important;
+  height: 2em !important;
+}
+
+.sense-svg-icon.bordered {
+  box-shadow: 0 0 0 0.1em rgba(0, 0, 0, .1) inset;
+  padding: .5em 0 !important;
+  width: 2em !important;
+  height: 2em !important;
+}
+
+.sense-svg-icon.inverted {
+  color: #fff !important;
+}
+
+.sense-svg-icon.inverted.circular,
+.sense-svg-icon.inverted.bordered {
+  background-color: #1b1c1d !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+.sense-svg-icon.red {
+  color: #db2828 !important;
+}
+
+
+.sense-svg-icon.red.inverted {
+  color: #ff695e !important;
+}
+
+.sense-svg-icon.red.inverted.circular,
+.sense-svg-icon.red.inverted.bordered {
+  background-color: #db2828 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.orange {
+  color: #f2711c !important;
+}
+
+.sense-svg-icon.orange.inverted {
+  color: #ff851b !important;
+}
+
+.sense-svg-icon.orange.inverted.circular,
+.sense-svg-icon.orange.inverted.bordered {
+  background-color: #f2711c !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.yellow {
+  color: #fbbd08 !important;
+}
+
+.sense-svg-icon.yellow.inverted {
+  color: #ffe21f !important;
+}
+
+.sense-svg-icon.yellow.inverted.circular,
+.sense-svg-icon.yellow.inverted.bordered {
+  background-color: #fbbd08 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.olive {
+  color: #b5cc18 !important;
+}
+
+.sense-svg-icon.olive.inverted {
+  color: #d9e778 !important;
+}
+
+.sense-svg-icon.olive.inverted.circular,
+.sense-svg-icon.olive.inverted.bordered {
+  background-color: #b5cc18 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.green {
+  color: #21ba45 !important;
+}
+
+.sense-svg-icon.green.inverted {
+  color: #2ecc40 !important;
+}
+
+.sense-svg-icon.green.inverted.circular,
+.sense-svg-icon.green.inverted.bordered {
+  background-color: #21ba45 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.teal {
+  color: #00b5ad !important;
+}
+
+.sense-svg-icon.teal.inverted {
+  color: #6dffff !important;
+}
+
+.sense-svg-icon.teal.inverted.circular,
+.sense-svg-icon.teal.inverted.bordered {
+  background-color: #00b5ad !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.blue {
+  color: #2185d0 !important;
+}
+
+.sense-svg-icon.blue.inverted {
+  color: #54c8ff !important;
+}
+
+.sense-svg-icon.blue.inverted.circular,
+.sense-svg-icon.blue.inverted.bordered {
+  background-color: #2185d0 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.violet {
+  color: #6435c9 !important;
+}
+
+.sense-svg-icon.violet.inverted {
+  color: #a291fb !important;
+}
+
+.sense-svg-icon.violet.inverted.circular,
+.sense-svg-icon.violet.inverted.bordered {
+  background-color: #6435c9 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.purple {
+  color: #a333c8 !important;
+}
+
+.sense-svg-icon.purple.inverted {
+  color: #dc73ff !important;
+}
+
+.sense-svg-icon.purple.inverted.circular,
+.sense-svg-icon.purple.inverted.bordered {
+  background-color: #a333c8 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.pink {
+  color: #e03997 !important;
+}
+
+.sense-svg-icon.pink.inverted {
+  color: #ff8edf !important;
+}
+
+.sense-svg-icon.pink.inverted.circular,
+.sense-svg-icon.pink.inverted.bordered {
+  background-color: #e03997 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.brown {
+  color: #a5673f !important;
+}
+
+.sense-svg-icon.brown.inverted {
+  color: #d67c1c !important;
+}
+
+.sense-svg-icon.brown.inverted.circular,
+.sense-svg-icon.brown.inverted.bordered {
+  background-color: #a5673f;
+  color: #fff !important;
+}
+
+.sense-svg-icon.grey {
+  color: #767676 !important;
+}
+
+.sense-svg-icon.grey.inverted {
+  color: #dcddde !important;
+}
+
+.sense-svg-icon.grey.inverted.circular,
+.sense-svg-icon.grey.inverted.bordered {
+  background-color: #767676 !important;
+  color: #fff !important;
+}
+
+.sense-svg-icon.black {
+  color: #1b1c1d !important;
+}
+
+.sense-svg-icon.black.inverted {
+  color: #545454 !important;
+}
+
+.sense-svg-icon.black.inverted.circular,
+.sense-svg-icon.black.inverted.bordered {
+  background-color: #1b1c1d !important;
+  color: #fff !important;
+}
