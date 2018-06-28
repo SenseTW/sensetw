@@ -7,7 +7,7 @@ class Card extends React.PureComponent<Props> {
     return (
       <SVGIcon {...this.props}>
         <title>icon / card</title>
-        <g id="icon-/-card" stroke="none" fill="currentColor" fill-rule="evenodd" transform="translate(2.0, 4.0)">
+        <g id="icon-/-card" stroke="none" fill="currentColor" fillRule="evenodd" transform="translate(2.0, 4.0)">
           <path d="M15,5.5 L5,5.5 C4.448,5.5 4,5.052 4,4.5 C4,3.948 4.448,3.5 5,3.5 L15,3.5 C15.552,3.5 16,3.948 16,4.5 C16,5.052 15.552,5.5 15,5.5" />
           <path d="M15.4995,8.5 L4.4995,8.5 C4.2235,8.5 3.9995,8.276 3.9995,8 C3.9995,7.724 4.2235,7.5 4.4995,7.5 L15.4995,7.5 C15.7755,7.5 15.9995,7.724 15.9995,8 C15.9995,8.276 15.7755,8.5 15.4995,8.5" />
           <path d="M15.4995,12.5 L4.4995,12.5 C4.2235,12.5 3.9995,12.276 3.9995,12 C3.9995,11.724 4.2235,11.5 4.4995,11.5 L15.4995,11.5 C15.7755,11.5 15.9995,11.724 15.9995,12 C15.9995,12.276 15.7755,12.5 15.4995,12.5" />
