@@ -5,6 +5,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
+import flash = require('connect-flash');
 import * as passport from 'passport';
 import { registerServer } from 'apollo-server-express';
 import { ApolloServer } from 'apollo-server';
@@ -19,7 +20,10 @@ const app = express();
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({ secret: process.env.SESSION_SECRET || 'xeepe3uuT1Gieh2ig0Aoyoongie1vooTeloo0Oongieb5mear4pix4aSh2loiCei' }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'xeepe3uuT1Gieh2ig0Aoyoongie1vooTeloo0Oongieb5mear4pix4aSh2loiCei',
+}));
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(Login(context));

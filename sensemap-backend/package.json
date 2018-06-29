@@ -22,6 +22,7 @@
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",
   "devDependencies": {
+    "@types/connect-flash": "^0.0.34",
     "@types/cookie-parser": "^1.4.1",
     "@types/cors": "^2.8.4",
     "@types/dotenv": "^4.0.3",
@@ -48,6 +49,7 @@
     "apollo-server": "^2.0.0-beta.4",
     "async-file": "^2.0.2",
     "body-parser": "^1.18.3",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
