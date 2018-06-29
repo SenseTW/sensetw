@@ -1,19 +1,20 @@
 import { Dispatch, GetState } from '.';
 import * as G from './graphql';
+import * as GM from './graphql/map';
 import * as GO from './graphql/object';
 import * as GC from './graphql/card';
 import * as GB from './graphql/box';
 import * as GE from './graphql/edge';
 import * as H from './sense/has-id';
 import * as C from './sense/card';
+import { MapID, MapData } from './sense/map';
+import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
 import { CardID, CardData } from './sense/card';
 import * as B from './sense/box';
 import { BoxID, BoxData } from './sense/box';
-import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
 import { Edge, EdgeID } from './sense/edge';
 import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
-import { MapID } from './sense-map';
 import * as SL from './selection';
 import * as SM from './sense-map';
 
@@ -81,6 +82,18 @@ const saveBox =
         // remove the box from the cache storage
         dispatch(CS.removeBoxes(boxMap));
       });
+  };
+
+const loadMaps =
+  (overwrite: Boolean = false) =>
+  (dispatch: Dispatch) => {
+    return GM.loadMaps()
+      .then(data => H.toIDMap<MapID, MapData>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteMaps(data, TargetType.PERMANENT)
+          : CS.updateMaps(data, TargetType.PERMANENT)
+      ));
   };
 
 const loadObjects =
@@ -317,6 +330,7 @@ export const actions = {
   updateBox,
   saveBox,
   removeBox,
+  loadMaps,
   loadObjects,
   loadCards,
   loadBoxes,

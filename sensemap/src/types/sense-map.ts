@@ -1,13 +1,8 @@
 import { Dispatch } from '.';
-import * as GM from './graphql/map';
 import { ActionUnion, emptyAction } from './action';
+import { MapID } from './sense/map';
 import { BoxID } from './sense/box';
 import * as SL from './selection';
-
-// tslint:disable-next-line:no-console
-GM.loadMaps().then(maps => console.log(maps));
-
-export type MapID = string;
 
 export enum MapScopeType {
   FULL_MAP = 'FULL_MAP',
