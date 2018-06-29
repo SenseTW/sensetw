@@ -1,5 +1,6 @@
 import { gql, IResolvers } from 'apollo-server';
 import { reduce, mergeDeepRight } from 'ramda';
+import * as U from './user';
 import * as M from './map';
 import * as C from './card';
 import * as B from './box';
