@@ -11,6 +11,15 @@ export type HasTimestamps = {
 
 const hasTimestampFields = [ 'id', 'createdAt', 'updatedAt' ];
 
+export type UserData = {
+  username: string,
+  email: string,
+};
+
+export type User = HasID & HasTimestamps & UserData;
+
+export const userFields = (db) => [ ...hasTimestampFields, 'username', 'email' ];
+
 export type Map = HasID & HasTimestamps & {
   objects: HasID[],
   cards: HasID[],
