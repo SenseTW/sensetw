@@ -15,6 +15,8 @@ const knex = Knex({
 
 export const context = ({ req }) => ({
   db: knex,
+  debug: !!process.env.DEBUG,
+  secret: process.env.SECRET || 'Wush8je7kee0faileir3sohy0tai4Chee7ua5ahrah0LaG1mui6iepieg0looque',
 });
 
 export type Context = typeof context;
