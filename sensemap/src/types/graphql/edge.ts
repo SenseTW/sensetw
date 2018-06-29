@@ -1,5 +1,5 @@
 import { HasID } from '../sense/has-id';
-import { MapID } from '../sense-map';
+import { MapID } from '../sense/map';
 import { ObjectID } from '../sense/object';
 import { EdgeID, Edge } from '../sense/edge';
 import { client } from './client';

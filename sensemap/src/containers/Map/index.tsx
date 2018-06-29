@@ -16,6 +16,7 @@ type Props = StateFromProps & ActionProps & OwnProps;
 
 class Map extends React.Component<Props> {
   componentDidMount() {
+    this.props.actions.senseObject.loadMaps();
     this.props.actions.senseObject.loadObjects(this.props.id);
     this.props.actions.senseObject.loadCards(this.props.id);
     this.props.actions.senseObject.loadBoxes(this.props.id);

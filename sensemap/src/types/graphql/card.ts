@@ -1,6 +1,6 @@
 import * as H from '../sense/has-id';
 import { ObjectID } from '../sense/object';
-import { MapID } from '../sense-map';
+import { MapID } from '../sense/map';
 import { CardID, CardData, stringToType as stringToCardType } from '../sense/card';
 import { client } from './client';
 import * as moment from 'moment';
