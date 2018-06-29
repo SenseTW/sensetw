@@ -12,8 +12,8 @@ import passport = require('./passport');
 import * as U from '../types/user';
 import { loggedIn, notLoggedIn } from './redirect';
 
-async function render(component) {
-  const html = ReactDOMServer.renderToStaticMarkup(component({}));
+async function render(component, props = {}) {
+  const html = ReactDOMServer.renderToStaticMarkup(component(props));
   const data = await fs.readFile(__dirname + '/../../public/index.html', 'utf8');
   const document = data.replace(/<body>[\s\S]*<\/body>/, `<body>${html}</body>`);
   return document;
@@ -46,12 +46,37 @@ export function router(context: Context) {
   );
 
   router.get('/signup', loggedIn(), async (req, res) => {
-    res.send(await render(SignUpPage));
+    const messages = {
+      error: req.flash('error'),
+      usernameError: req.flash('usernameError'),
+      passwordError: req.flash('passwordError'),
+      emailError: req.flash('emailError'),
+    };
+    res.send(await render(SignUpPage, { messages }));
   });
 
   router.post('/signup', loggedIn(), async (req, res) => {
+    if (!req.body.username || !req.body.password || !req.body.email) {
+      req.flash('error', 'Invalid form data.');
+      return res.redirect('/signup');
+    }
+
+    const { username, password } = req.body;
+    const email = req.body.email.toLowerCase();
+
+    const usernameMsg = U.checkUsername(username);
+    if (usernameMsg !== '') {
+      req.flash('usernameError', usernameMsg);
+      return res.redirect('/signup');
+    }
+
+    const passwordMsg = U.checkPassword(password);
+    if (passwordMsg !== '') {
+      req.flash('passwordError', passwordMsg);
+      return res.redirect('/signup');
+    }
+
     const { db } = context({ req });
-    const { username, password, email } = req.body;
     const u = await U.createUser(db, { username, email }, password);
     res.redirect('/login');
   });
