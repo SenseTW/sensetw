@@ -70,3 +70,10 @@ test('token', async () => {
   expect(data.version).toBe(1337);
   expect(data.expire).toBeTruthy();
 });
+
+test('checkUsername', () => {
+  expect(U.checkUsername('ab')).toBe('Username must be between 3 and 30 characters.');
+  expect(U.checkUsername('32aaaaaaaaaaaaaabbbbbbbbbbbbbbbb')).toBe('Username must be between 3 and 30 characters.');
+  expect(U.checkUsername('foo-bar')).toBe('Username must contain only letters, numbers, periods, and underscores.');
+  expect(U.checkUsername('the_42_awesome.monkeys')).toBe('');
+});

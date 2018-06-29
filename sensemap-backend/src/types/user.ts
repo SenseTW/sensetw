@@ -76,3 +76,24 @@ export function decrypt_token(siteSecret: string, token: string): TokenPayload {
   const [ version, id, _, expireTimestamp ] = decrypted.split(':');
   return { id, version: +version, expire: new Date(expireTimestamp) };
 }
+
+export function checkUsername(username: string): string {
+  if (username.length < 3 || username.length > 30) {
+    return 'Username must be between 3 and 30 characters.'
+  }
+
+  const i = username.search(/[^a-zA-Z0-9\._]/);
+  if (i >= 0) {
+    return 'Username must contain only letters, numbers, periods, and underscores.';
+  }
+
+  return '';
+}
+
+export function checkPassword(password: string): string {
+  if (password.length < 8 || password.length > 16) {
+    return 'Password must be between 8 and 16 characters.';
+  }
+
+  return '';
+}
