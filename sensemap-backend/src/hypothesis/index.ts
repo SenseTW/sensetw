@@ -1,20 +1,16 @@
 import * as express from 'express';
-import { router as rootRouter } from './root';
-import { router as linksRouter } from './links';
-import { router as profileRouter } from './profile';
-import { router as searchRouter } from './search';
+import { router as Root } from './root';
+import { router as Links } from './links';
+import { router as Profile } from './profile';
+import { router as Search } from './search';
 import { Context } from '../context';
 
-export type MiddlewareConfig = {
-  context: Context;
-};
-
-export function Middleware(config: MiddlewareConfig) {
+export function router(context: Context) {
   const router = express.Router();
   router.get('/ping', (req, res, next) => res.send('pong'));
-  router.use('/', rootRouter(config));
-  router.use('/links', linksRouter(config));
-  router.use('/profile', profileRouter(config));
-  router.use('/search', searchRouter(config));
+  router.use('/', Root(context));
+  router.use('/links', Links(context));
+  router.use('/profile', Profile(context));
+  router.use('/search', Search(context));
   return router;
 }

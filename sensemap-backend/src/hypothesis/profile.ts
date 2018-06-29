@@ -1,12 +1,12 @@
 import * as express from 'express';
 import * as M from '../types/map';
-import { MiddlewareConfig } from '.';
+import { Context } from '../context';
 
-export function router(config: MiddlewareConfig) {
+export function router(context: Context) {
   const router = express.Router();
 
   router.get('/', (req, res) => {
-    const { db } = config.context({ req });
+    const { db } = context({ req });
     M.getAllMaps(db).then((maps) => {
       const groups = maps.map(map => ({
         id: map.id,

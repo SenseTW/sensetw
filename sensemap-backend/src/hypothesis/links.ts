@@ -1,7 +1,7 @@
 import * as express from 'express';
-import { MiddlewareConfig } from '.';
+import { Context } from '../context';
 
-export function router(config: MiddlewareConfig) {
+export function router(context: Context) {
   const router = express.Router()
 
   router.get('/', (req, res) => {

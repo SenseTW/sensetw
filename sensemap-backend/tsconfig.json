@@ -3,15 +3,15 @@
     "outDir": "dist/",
     "lib": ["dom", "esnext"],
     "target": "es5",
+    "jsx": "react",
+    "rootDir": "src",
     "module": "commonjs",
     "types": [
       "node"
     ]
   },
-  "include": [
-    "./src/**/*"
-  ],
   "exclude": [
-    "./src/**/*.test.ts"
+    "src/**/*.test.ts",
+    "migrations"
   ]
 }

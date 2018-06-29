@@ -22,13 +22,18 @@
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.1",
     "@types/cors": "^2.8.4",
     "@types/dotenv": "^4.0.3",
     "@types/express": "^4.16.0",
     "@types/graphql": "^0.13.1",
     "@types/knex": "^0.14.14",
     "@types/node": "^8.10.18",
+    "@types/passport": "^0.4.5",
+    "@types/passport-local": "^1.0.33",
     "@types/ramda": "^0.25.32",
+    "@types/react": "^16.3.17",
+    "@types/react-dom": "^16.0.6",
     "concurrently": "^3.6.0",
     "dotenv": "^6.0.0",
     "jest": "^23.1.0",
@@ -41,13 +46,23 @@
   },
   "dependencies": {
     "apollo-server": "^2.0.0-beta.4",
+    "async-file": "^2.0.2",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
+    "express-promise-router": "^3.0.2",
+    "express-session": "^1.15.6",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
     "knex": "^0.14.6",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
     "pg": "^7.4.3",
-    "ramda": "^0.25.0"
+    "ramda": "^0.25.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "semantic-ui-react": "^0.81.1"
   },
   "jest": {
     "transform": {
