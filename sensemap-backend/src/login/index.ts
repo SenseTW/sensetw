@@ -27,16 +27,21 @@ export function router(context: Context) {
 
   router.get('/login-success', notLoggedIn(), async (req, res) => {
     // TODO follow-up OAuth redirects
-    console.log(req.user);
+    console.log(req.flash('success'));
     return res.send('Success!');
   });
 
   router.get('/login', loggedIn(), async (req, res) => {
+    console.log(req.flash('error'));
     res.send(await render(LoginPage));
   });
 
   router.post('/login',
-    passport.authenticate('local', { failureRedirect: '/login' }),
+    passport.authenticate('local', {
+      failureRedirect: '/login',
+      failureFlash: 'Invalid e-mail or password',
+      successFlash: 'Welcome!',
+    }),
     loggedIn()
   );
 
