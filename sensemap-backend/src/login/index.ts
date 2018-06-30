@@ -7,10 +7,11 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
+import oauth from './oauth';
 import { Context } from '../context';
 import passport = require('./passport');
 import * as U from '../types/user';
-import { loggedIn, notLoggedIn } from './redirect';
+import { passLoggedIn, requireLoggedIn } from './redirect';
 
 async function render(component, props = {}) {
   const html = ReactDOMServer.renderToStaticMarkup(component(props));
@@ -25,27 +26,25 @@ export function router(context: Context) {
   router.use(cookieParser());
   router.use(express.static('public'));
 
-  router.get('/login-success', notLoggedIn(), async (req, res) => {
-    // TODO follow-up OAuth redirects
-    console.log(req.flash('success'));
-    return res.send('Success!');
+  router.get('/login-success', requireLoggedIn(), async (req, res) => {
+    return res.redirect('/oauth/authorize');
   });
 
-  router.get('/login', loggedIn(), async (req, res) => {
+  router.get('/login', passLoggedIn(), async (req, res) => {
     console.log(req.flash('error'));
     res.send(await render(LoginPage));
   });
 
   router.post('/login',
+    passLoggedIn(),
     passport.authenticate('local', {
       failureRedirect: '/login',
       failureFlash: 'Invalid e-mail or password',
       successFlash: 'Welcome!',
     }),
-    loggedIn()
   );
 
-  router.get('/signup', loggedIn(), async (req, res) => {
+  router.get('/signup', passLoggedIn(), async (req, res) => {
     const messages = {
       error: req.flash('error'),
       usernameError: req.flash('usernameError'),
@@ -55,7 +54,7 @@ export function router(context: Context) {
     res.send(await render(SignUpPage, { messages }));
   });
 
-  router.post('/signup', loggedIn(), async (req, res) => {
+  router.post('/signup', passLoggedIn(), async (req, res) => {
     if (!req.body.username || !req.body.password || !req.body.email) {
       req.flash('error', 'Invalid form data.');
       return res.redirect('/signup');
@@ -85,6 +84,19 @@ export function router(context: Context) {
     req.logout();
     return res.redirect('/login');
   });
+
+  router.all('/oauth/authorize',
+    requireLoggedIn(),
+    oauth.authorize({
+      authenticateHandler: {
+        handle: async (req, res) => {
+          const { db } = context({ req });
+          return U.getUser(db, req.user.id);
+        },
+      },
+    }),
+  );
+  router.post('/oauth/token', oauth.token());
 
   return router;
 }

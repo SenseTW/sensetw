@@ -1,14 +1,18 @@
 
-export function loggedIn() {
+export function passLoggedIn() {
   return (req, res, next) => {
     if (!!req.user) {
-      return res.redirect('/login-success');
+      if (req.query.next) {
+        return res.redirect(req.query.next);
+      } else {
+        return res.redirect('/login-success');
+      }
     }
     return next();
   };
 }
 
-export function notLoggedIn() {
+export function requireLoggedIn() {
   return (req, res, next) => {
     if (!req.user) {
       return res.redirect('/login');
