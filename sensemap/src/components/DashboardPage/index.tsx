@@ -29,7 +29,7 @@ class DashboardPage extends React.PureComponent<Props> {
       <div className="dashboard-page">
         <Container>
           <Search disabled />
-          <Card.Group itemsPerRow={3}>
+          <Card.Group stackable itemsPerRow={3}>
             {Object.values(maps).map((m, i) => <MapCard key={i} data={m}/>)}
           </Card.Group>
           <FloatingActionButton />

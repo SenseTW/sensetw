@@ -4,7 +4,7 @@ import * as moment from 'moment';
 
 const graphQLMapFieldsFragment = `
   fragment mapFields on Map {
-    id, createdAt, updatedAt, name, description, tags, image
+    id, createdAt, updatedAt, type, name, description, tags, image
   }`;
 
 interface GraphQLMapFields {
