@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { Sidebar } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
@@ -8,7 +9,9 @@ import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
 import {
+  MapID,
   CardData,
+  BoxID,
   BoxData,
   ObjectType,
   MapScopeType,
@@ -29,7 +32,10 @@ import * as F from '../../types/sense/focus';
 import './index.css';
 const background = require('./background-map.png');
 
+type RouteProps = RouteComponentProps<{ mid: MapID, bid: BoxID }>;
+
 interface StateFromProps {
+  mid: MapID;
   senseMap: State['senseMap'];
   senseObject: SO.State;
   editor: OE.State;
@@ -66,7 +72,7 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions: acts, editor, scope, senseMap, senseObject } = this.props;
+    const { actions: acts, mid, editor, scope, senseMap, senseObject } = this.props;
     const { status, focus } = editor;
 
     let data: BoxData | CardData | null = null;
@@ -138,7 +144,7 @@ class MapPage extends React.Component<Props> {
                         case ObjectType.CARD:
                           const action =
                             // tslint:disable-next-line:no-any
-                            await acts.senseObject.createCardObject(senseMap.map, newData as CardData) as any;
+                            await acts.senseObject.createCardObject(mid, newData as CardData) as any;
                           const { payload: { objects } } = action as ReturnType<typeof CS.actions.updateObjects>;
                           if (scope.type === MapScopeType.BOX) {
                             const obj = Object.values(objects)[0];
@@ -150,7 +156,7 @@ class MapPage extends React.Component<Props> {
                           acts.editor.focusObject(F.focusNothing());
                           break;
                         case ObjectType.BOX:
-                          acts.senseObject.createBoxObject(senseMap.map, newData as BoxData);
+                          acts.senseObject.createBoxObject(mid, newData as BoxData);
                           acts.cachedStorage.removeBox(data as BoxData);
                           acts.editor.changeStatus(OE.StatusType.HIDE);
                           acts.editor.focusObject(F.focusNothing());
@@ -186,7 +192,7 @@ class MapPage extends React.Component<Props> {
           <Sidebar.Pusher>
             <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
             <Viewport>
-              {(props) => (<Map id={senseMap.map} {...props} />)}
+              {(props) => (<Map id={mid} {...props} />)}
             </Viewport>
             <ObjectMenu />
           </Sidebar.Pusher>
@@ -196,14 +202,15 @@ class MapPage extends React.Component<Props> {
   }
 }
 
-export default connect<StateFromProps, ActionProps>(
-  (state: State) => {
+export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
+  (state: State, router: RouteProps) => {
     const senseMap = state.senseMap;
     const senseObject = state.senseObject;
     const scope = state.senseMap.scope;
     const { editor } = state;
+    const { mid } = router.match.params;
 
-    return { senseMap, senseObject, scope, editor };
+    return { mid, senseMap, senseObject, scope, editor };
   },
   mapDispatch({ actions }),
-)(MapPage);
+)(MapPage));

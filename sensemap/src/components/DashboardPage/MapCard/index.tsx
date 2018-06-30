@@ -59,7 +59,7 @@ const MapCard = (props: Props) => (
     </Card.Content>
     <Card.Content extra className="map-card__actions">
       <Button.Group widths={2}>
-        <Button as={Link} to={R.map}>enter</Button>
+        <Button as={Link} to={R.toMapPath({ mid: props.data.id })}>enter</Button>
         <Button disabled>share</Button>
       </Button.Group>
       <Dropdown icon="ellipsis horizontal" pointing="bottom left" options={dropdownOptions} />

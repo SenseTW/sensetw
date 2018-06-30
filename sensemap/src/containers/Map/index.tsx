@@ -22,6 +22,15 @@ class Map extends React.Component<Props> {
     this.props.actions.senseObject.loadEdges(this.props.id);
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.id !== this.props.id) {
+      this.props.actions.senseObject.loadObjects(this.props.id);
+      this.props.actions.senseObject.loadCards(this.props.id);
+      this.props.actions.senseObject.loadBoxes(this.props.id);
+      this.props.actions.senseObject.loadEdges(this.props.id);
+    }
+  }
+
   render() {
     const inScope =
       (this.props.scope.type === MapScopeType.BOX

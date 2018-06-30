@@ -108,6 +108,7 @@ export const actions = {
 export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
+  // TODO: check map id usage
   map: MapID,
   scope: MapScope,
   inbox: InboxVisibility,
