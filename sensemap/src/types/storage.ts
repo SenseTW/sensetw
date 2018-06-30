@@ -78,6 +78,34 @@ export const getCardsInBox = (storage: Storage, id: BoxID): ObjectMap<CardData> 
     .reduce((a, c) => { a[c.id] = c; return a; }, {});
 
 /**
+ * Check if there is any map.
+ *
+ * @param storage The storage.
+ */
+export const hasNoMap = (storage: Storage): boolean => Object.keys(storage.maps).length === 0;
+
+/**
+ * Check if there is any object.
+ *
+ * @param storage The storage.
+ */
+export const hasNoObject = (storage: Storage): boolean => Object.keys(storage.objects).length === 0;
+
+/**
+ * Check if there is any card.
+ *
+ * @param storage The storage.
+ */
+export const hasNoCard = (storage: Storage): boolean => Object.keys(storage.cards).length === 0;
+
+/**
+ * Check if there is any box.
+ *
+ * @param storage The storage.
+ */
+export const hasNoBox = (storage: Storage): boolean => Object.keys(storage.boxes).length === 0;
+
+/**
  * Check if a map exists.
  *
  * @param storage The storage.

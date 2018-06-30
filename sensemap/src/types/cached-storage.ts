@@ -124,6 +124,17 @@ export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
+export const areMapsClean = (storage: CachedStorage): boolean => S.hasNoMap(storage[TargetType.TEMPORARY]);
+
+export const areObjectsClean = (storage: CachedStorage): boolean => S.hasNoObject(storage[TargetType.TEMPORARY]);
+
+export const areCardsClean = (storage: CachedStorage): boolean => S.hasNoCard(storage[TargetType.TEMPORARY]);
+
+export const areBoxesClean = (storage: CachedStorage): boolean => S.hasNoBox(storage[TargetType.TEMPORARY]);
+
+export const isClean = (storage: CachedStorage): boolean =>
+  areMapsClean(storage) && areObjectsClean(storage) && areCardsClean(storage) && areBoxesClean(storage);
+
 const submapByKeys = <T>(keys: string[], objmap: ObjectMap<T>): ObjectMap<T> =>
   keys.reduce((acc, key) => { acc[key] = objmap[key]; return acc; }, {});
 
