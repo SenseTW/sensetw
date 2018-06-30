@@ -1,19 +1,36 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
+import { State, ActionProps, actions, mapDispatch } from '../../types';
 import MapCard from './MapCard';
 import FloatingActionButton from './FloatingActionButton';
 import { Container, Search, Card } from 'semantic-ui-react';
+import * as CS from '../../types/cached-storage';
 import './index.css';
 
-class DashboardPage extends React.PureComponent {
+interface StateFromProps {
+  senseObject: CS.CachedStorage;
+}
+
+interface OwnProps {}
+
+type Props = OwnProps & StateFromProps & ActionProps;
+
+class DashboardPage extends React.PureComponent<Props> {
+  componentDidMount() {
+    const { actions: acts } = this.props;
+    acts.senseObject.loadMaps();
+  }
+
   render() {
-    const xs = [0, 1, 2, 3, 4, 5];
+    const { senseObject } = this.props;
+    const maps = CS.toStorage(senseObject).maps;
 
     return (
       <div className="dashboard-page">
         <Container>
           <Search disabled />
           <Card.Group itemsPerRow={3}>
-            {xs.map((_, i) => <MapCard key={i} />)}
+            {Object.values(maps).map((m, i) => <MapCard key={i} data={m}/>)}
           </Card.Group>
           <FloatingActionButton />
         </Container>
@@ -22,4 +39,10 @@ class DashboardPage extends React.PureComponent {
   }
 }
 
-export default DashboardPage;
+export default connect(
+  (state: State) => {
+    const { senseObject } = state;
+    return { senseObject };
+  },
+  mapDispatch({ actions })
+)(DashboardPage);
