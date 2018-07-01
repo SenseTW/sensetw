@@ -47,15 +47,15 @@ export const loadMaps =
 export const create =
   (map: MapData) => {
     const query = `
-      mutation CreateMap($id: ID!, $name: String, $description: String, $tags: String, $image: String) {
-        createMap(id: $id, name: $name, description: $description, tags: $tags, image: $image) {
+      mutation CreateMap($name: String, $description: String, $tags: String, $image: String) {
+        createMap(name: $name, description: $description, tags: $tags, image: $image) {
           ...mapFields
         }
       }
       ${graphQLMapFieldsFragment}
     `;
     return client.request(query, map)
-      .then(({ updateMap }) => toMapData(updateMap));
+      .then(({ createMap }) => toMapData(createMap));
   };
 
 export const update =

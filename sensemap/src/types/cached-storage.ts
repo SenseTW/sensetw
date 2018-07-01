@@ -132,8 +132,14 @@ export const areCardsClean = (storage: CachedStorage): boolean => S.hasNoCard(st
 
 export const areBoxesClean = (storage: CachedStorage): boolean => S.hasNoBox(storage[TargetType.TEMPORARY]);
 
+export const areEdgesClean = (storage: CachedStorage): boolean => S.hasNoEdge(storage[TargetType.TEMPORARY]);
+
 export const isClean = (storage: CachedStorage): boolean =>
-  areMapsClean(storage) && areObjectsClean(storage) && areCardsClean(storage) && areBoxesClean(storage);
+  areMapsClean(storage) &&
+  areObjectsClean(storage) &&
+  areCardsClean(storage) &&
+  areBoxesClean(storage) &&
+  areEdgesClean(storage);
 
 const submapByKeys = <T>(keys: string[], objmap: ObjectMap<T>): ObjectMap<T> =>
   keys.reduce((acc, key) => { acc[key] = objmap[key]; return acc; }, {});

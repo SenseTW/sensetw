@@ -106,6 +106,13 @@ export const hasNoCard = (storage: Storage): boolean => Object.keys(storage.card
 export const hasNoBox = (storage: Storage): boolean => Object.keys(storage.boxes).length === 0;
 
 /**
+ * Check if there is any edfe.
+ *
+ * @param storage The storage.
+ */
+export const hasNoEdge = (storage: Storage): boolean => Object.keys(storage.edges).length === 0;
+
+/**
  * Check if a map exists.
  *
  * @param storage The storage.
