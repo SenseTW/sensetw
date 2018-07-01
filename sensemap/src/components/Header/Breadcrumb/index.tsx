@@ -23,9 +23,10 @@ type Props = StateFromProps & ActionProps;
 
 class MapSections extends React.PureComponent<Props & { mid: T.MapID }> {
   componentWillMount() {
-    const { actions: { senseMap } } = this.props;
+    const { actions: { senseMap }, mid } = this.props;
 
     // sync the route to the scope
+    senseMap.setMap(mid);
     senseMap.setScopeToFullmap();
   }
 
@@ -58,9 +59,10 @@ class MapSections extends React.PureComponent<Props & { mid: T.MapID }> {
 
 class MapBoxSections extends React.PureComponent<Props & { mid: T.MapID, bid: T.BoxID }> {
   componentWillMount() {
-    const { actions: { senseMap }, bid } = this.props;
+    const { actions: { senseMap }, mid, bid } = this.props;
 
     // sync the route to the scope
+    senseMap.setMap(mid);
     senseMap.setScopeToBox(bid);
   }
 

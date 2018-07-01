@@ -41,10 +41,8 @@ class MapContent extends React.PureComponent<Props> {
 
     return (
       <Modal
-        closeOnDocumentClick
         size="tiny"
         open={!!mid}
-        onClose={() => acts.editor.focusMap()}
       >
         <Header>{isNew ? '新增 Map' : '編輯 Map'}</Header>
         <Modal.Content>
@@ -78,7 +76,6 @@ class MapContent extends React.PureComponent<Props> {
         <Modal.Actions>
           <Button.Group>
             <Button
-              disabled={disabled}
               onClick={() => {
                 if (map) {
                   acts.cachedStorage.removeMap(map);
@@ -94,7 +91,11 @@ class MapContent extends React.PureComponent<Props> {
               disabled={disabled}
               onClick={async () => {
                 if (map) {
-                  await acts.senseObject.saveMap(map);
+                  if (isNew) {
+                    await acts.senseObject.createMap(map);
+                  } else if (isDirty) {
+                    await acts.senseObject.saveMap(map);
+                  }
                 }
                 acts.editor.focusMap();
               }}

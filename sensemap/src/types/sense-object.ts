@@ -22,6 +22,18 @@ export type State = CachedStorage;
 
 export const initial: State = CS.initial;
 
+const createMap =
+  (map: MapData) =>
+  async (dispatch: Dispatch) => {
+    return GM.create(map)
+      .then((newMap) => dispatch(
+        CS.updateMaps(
+          H.toIDMap<MapID, MapData>([newMap]),
+          TargetType.PERMANENT,
+        )
+      ));
+  };
+
 const updateMap =
   (map: MapData) =>
   (dispatch: Dispatch) =>
@@ -112,6 +124,16 @@ const loadMaps =
           ? CS.overwriteMaps(data, TargetType.PERMANENT)
           : CS.updateMaps(data, TargetType.PERMANENT)
       ));
+  };
+
+// TODO: fire less actions
+const cleanUp =
+  () =>
+  (dispatch: Dispatch) => {
+    dispatch(CS.overwriteObjects({}, TargetType.PERMANENT));
+    dispatch(CS.overwriteCards({}, TargetType.PERMANENT));
+    dispatch(CS.overwriteBoxes({}, TargetType.PERMANENT));
+    dispatch(CS.overwriteEdges({}, TargetType.PERMANENT));
   };
 
 const loadObjects =
@@ -342,6 +364,7 @@ const removeEdge =
   };
 
 export const actions = {
+  createMap,
   updateMap,
   saveMap,
   updateCard,
@@ -351,6 +374,7 @@ export const actions = {
   saveBox,
   removeBox,
   loadMaps,
+  cleanUp,
   loadObjects,
   loadCards,
   loadBoxes,

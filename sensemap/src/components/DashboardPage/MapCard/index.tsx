@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Prompt, Link, matchPath } from 'react-router-dom';
-import { Card, Image, Label, Button, Icon, Dropdown, Modal, Header } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { Card, Image, Label, Button, Icon, Dropdown } from 'semantic-ui-react';
 import * as R from '../../../types/routes';
 import * as SM from '../../../types/sense/map';
 import * as U from '../../../types/utils';
@@ -8,14 +8,8 @@ import './index.css';
 
 interface Props {
   id?: string;
-  currentMap?: SM.MapID;
-  isMapClean?: boolean;
   data: SM.MapData;
   onEdit?(): void;
-}
-
-interface State {
-  modalOpen: boolean;
 }
 
 enum MapActionType {
@@ -44,14 +38,9 @@ const dropdownOptions: DropdownItemProps[] = [{
   value: MapActionType.LEAVE,
 }];
 
-class MapCard extends React.Component<Props, State> {
-  state: State = {
-    modalOpen: false,
-  };
-
+class MapCard extends React.Component<Props> {
   render() {
-    const { id, currentMap, isMapClean, data, onEdit = U.noop } = this.props;
-    const { modalOpen } = this.state;
+    const { id, data, onEdit = U.noop } = this.props;
 
     return (
       <Card id={id} className="map-card">
@@ -95,42 +84,6 @@ class MapCard extends React.Component<Props, State> {
             }}
           />
         </Card.Content>
-
-        <Prompt
-          when={!modalOpen && !isMapClean}
-          message={location => {
-            const match = matchPath<{ mid: SM.MapID }>(
-              location.pathname,
-              { path: R.map, exact: true }
-            );
-
-            if (match) {
-              const { params: { mid } } = match;
-              if (mid !== currentMap) {
-                // stop transition to the new map
-                this.setState({ modalOpen: true });
-                return false;
-              }
-            }
-
-            return true;
-          }}
-        />
-
-        <Modal
-          closeOnDocumentClick
-          size="tiny"
-          open={modalOpen}
-          onClose={() => this.setState({ modalOpen: false })}
-        >
-          <Header>切換 Map</Header>
-          <Modal.Content>
-            切換 Map 將拋棄所有未儲存的修改，您要繼續嗎？
-          </Modal.Content>
-          <Modal.Actions>
-            <Button primary as={Link} to={R.toMapPath({ mid: data.id })}>繼續</Button>
-          </Modal.Actions>
-        </Modal>
       </Card>
     );
   }

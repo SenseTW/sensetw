@@ -1,6 +1,7 @@
 import { HasID } from '../sense/has-id';
 import { TimeStamp } from '../utils';
 import { ActionUnion, emptyAction } from '../action';
+import * as moment from 'moment';
 
 export type MapID = string;
 
@@ -33,6 +34,17 @@ export const emptyMapData: MapData = {
   description: '',
   tags: '',
   image: '',
+};
+
+export const mapData = (partial: PartialMapData = {}): MapData => {
+  const now = +moment();
+
+  return {
+    ...emptyMapData,
+    ...partial,
+    createdAt: now,
+    updatedAt: now,
+  };
 };
 
 const UPDATE_MAP_TYPE = 'UPDATE_MAP_TYPE';

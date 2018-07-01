@@ -57,6 +57,13 @@ const setScopeToFullmap =
     type: SET_SCOPE_TO_FULL_MAP as typeof SET_SCOPE_TO_FULL_MAP,
   });
 
+const SET_MAP = 'SET_MAP';
+const setMap =
+  (map: MapID) => ({
+    type: SET_MAP as typeof SET_MAP,
+    payload: { map },
+  });
+
 const OPEN_INBOX = 'OPEN_INBOX';
 /**
  * A message to open the inbox.
@@ -95,6 +102,7 @@ const closeBox =
 const syncActions = {
   setScopeToBox,
   setScopeToFullmap,
+  setMap,
   openInbox,
   closeInbox,
 };
@@ -115,7 +123,7 @@ export type State = {
 };
 
 export const initial: State = {
-  map: '1dbab857-942d-41d0-baa1-82fa70b0d773',
+  map: '',
   scope: {
     type: MapScopeType.FULL_MAP,
   },
@@ -135,6 +143,9 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     }
     case SET_SCOPE_TO_FULL_MAP: {
       return { ...state, ...{ scope: { type: MapScopeType.FULL_MAP } } };
+    }
+    case SET_MAP: {
+      return { ...state, map: action.payload.map };
     }
     case OPEN_INBOX: {
       return { ...state, inbox: InboxVisibility.VISIBLE };

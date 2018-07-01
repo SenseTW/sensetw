@@ -16,6 +16,10 @@ type Props = StateFromProps & ActionProps & OwnProps;
 
 class Map extends React.Component<Props> {
   componentDidMount() {
+    // TODO:
+    //   should test if the current map has been loaded
+    //   or remove the warning prompt from the dashboard
+    this.props.actions.senseObject.cleanUp();
     this.props.actions.senseObject.loadObjects(this.props.id);
     this.props.actions.senseObject.loadCards(this.props.id);
     this.props.actions.senseObject.loadBoxes(this.props.id);
@@ -24,6 +28,7 @@ class Map extends React.Component<Props> {
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.id !== this.props.id) {
+      this.props.actions.senseObject.cleanUp();
       this.props.actions.senseObject.loadObjects(this.props.id);
       this.props.actions.senseObject.loadCards(this.props.id);
       this.props.actions.senseObject.loadBoxes(this.props.id);
