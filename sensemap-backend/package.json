@@ -49,6 +49,7 @@
   "dependencies": {
     "apollo-server": "^2.0.0-beta.4",
     "async-file": "^2.0.2",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",

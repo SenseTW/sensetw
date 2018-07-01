@@ -7,7 +7,7 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
-import oauth from './oauth';
+import oauth, { hypothesisClient } from './oauth';
 import { Context } from '../context';
 import passport = require('./passport');
 import * as U from '../types/user';
@@ -27,7 +27,7 @@ export function router(context: Context) {
   router.use(express.static('public'));
 
   router.get('/login-success', requireLoggedIn(), async (req, res) => {
-    return res.redirect('/oauth/authorize');
+    return res.redirect(`/oauth/authorize?client_id=${hypothesisClient.id}&state=login&response_type=code`);
   });
 
   router.get('/login', passLoggedIn(), async (req, res) => {
@@ -42,6 +42,9 @@ export function router(context: Context) {
       failureFlash: 'Invalid e-mail or password',
       successFlash: 'Welcome!',
     }),
+    async (req, res) => {
+      return res.redirect('/login-success');
+    }
   );
 
   router.get('/signup', passLoggedIn(), async (req, res) => {

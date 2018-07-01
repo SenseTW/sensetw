@@ -5,6 +5,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
+import * as cors from 'cors';
 import flash = require('connect-flash');
 import * as passport from 'passport';
 import { registerServer } from 'apollo-server-express';
@@ -17,6 +18,7 @@ import { router as Hypothesis } from './hypothesis';
 const PORT = 8000;
 
 const app = express();
+app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
