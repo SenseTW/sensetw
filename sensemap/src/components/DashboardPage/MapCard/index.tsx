@@ -11,6 +11,7 @@ interface Props {
   currentMap?: SM.MapID;
   isMapClean?: boolean;
   data: SM.MapData;
+  onEdit?(): void;
 }
 
 interface State {
@@ -23,7 +24,13 @@ enum MapActionType {
   LEAVE = 'LEAVE',
 }
 
-const dropdownOptions = [{
+interface DropdownItemProps {
+  key?: number;
+  text: string;
+  value: MapActionType;
+}
+
+const dropdownOptions: DropdownItemProps[] = [{
   key: 0,
   text: 'member',
   value: MapActionType.SHOW_MEMBER,
@@ -37,13 +44,13 @@ const dropdownOptions = [{
   value: MapActionType.LEAVE,
 }];
 
-class MapCard extends React.PureComponent<Props, State> {
+class MapCard extends React.Component<Props, State> {
   state: State = {
     modalOpen: false,
   };
 
   render() {
-    const { id, currentMap, isMapClean, data } = this.props;
+    const { id, currentMap, isMapClean, data, onEdit = U.noop } = this.props;
     const { modalOpen } = this.state;
 
     return (
@@ -67,7 +74,7 @@ class MapCard extends React.PureComponent<Props, State> {
           {
             data.tags &&
             <Card.Meta className="map-card__tags">
-              {U.toTags(data.tags).map((t, i) => <Label key={i}>tag</Label>)}
+              {U.toTags(data.tags).map((t, i) => <Label key={i}>{t}</Label>)}
             </Card.Meta>
           }
         </Card.Content>
@@ -76,7 +83,17 @@ class MapCard extends React.PureComponent<Props, State> {
             <Button as={Link} to={R.toMapPath({ mid: data.id })}>enter</Button>
             <Button disabled>share</Button>
           </Button.Group>
-          <Dropdown icon="ellipsis horizontal" pointing="bottom left" options={dropdownOptions} />
+          <Dropdown
+            icon="ellipsis horizontal"
+            pointing="bottom left"
+            options={dropdownOptions}
+            // tslint:disable-next-line:no-any
+            onChange={(event: any, item: DropdownItemProps) => {
+              if (item.value === MapActionType.EDIT) {
+                onEdit();
+              }
+            }}
+          />
         </Card.Content>
 
         <Prompt

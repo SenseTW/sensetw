@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { State, ActionProps, actions, mapDispatch, MapID } from '../../types';
 import MapCard from './MapCard';
 import FloatingActionButton from './FloatingActionButton';
+import MapContent from './MapContent';
 import { Container, Search, Card } from 'semantic-ui-react';
 import * as CS from '../../types/cached-storage';
 import './index.css';
@@ -16,24 +17,14 @@ interface OwnProps {}
 
 type Props = OwnProps & StateFromProps & ActionProps;
 
-interface OwnState {
-  modalOpen: boolean;
-  mid: MapID;
-}
-
-class DashboardPage extends React.PureComponent<Props, OwnState> {
-  state: OwnState = {
-    modalOpen: false,
-    mid: 'whatever',
-  };
-
+class DashboardPage extends React.Component<Props> {
   componentDidMount() {
     const { actions: acts } = this.props;
     acts.senseObject.loadMaps();
   }
 
   render() {
-    const { senseObject, map } = this.props;
+    const { actions: acts, senseObject, map } = this.props;
     const maps = CS.toStorage(senseObject).maps;
     const isClean = CS.isClean(senseObject);
 
@@ -44,10 +35,17 @@ class DashboardPage extends React.PureComponent<Props, OwnState> {
           <Card.Group stackable itemsPerRow={3}>
             {Object.values(maps).map(
               (m, i) =>
-                <MapCard key={i} currentMap={map} isMapClean={isClean} data={m}/>
+                <MapCard
+                  key={i}
+                  currentMap={map}
+                  isMapClean={isClean}
+                  data={m}
+                  onEdit={() => acts.editor.focusMap(m.id)}
+                />
             )}
           </Card.Group>
           <FloatingActionButton />
+          <MapContent />
         </Container>
       </div>
     );

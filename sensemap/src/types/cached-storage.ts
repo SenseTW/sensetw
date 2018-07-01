@@ -197,6 +197,9 @@ export const removeMaps = (maps: ObjectMap<MapData>, target: TargetType = Target
   payload: { maps, target },
 });
 
+export const removeMap = (map: MapData, target: TargetType = TargetType.TEMPORARY) =>
+  removeMaps(toIDMap<MapID, MapData>([map]));
+
 export const updateObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_OBJECTS as typeof S.UPDATE_OBJECTS,
   payload: { objects, target },
@@ -285,6 +288,7 @@ export const actions = {
   updateMaps,
   overwriteMaps,
   removeMaps,
+  removeMap,
   updateObjects,
   overwriteObjects,
   removeObjects,

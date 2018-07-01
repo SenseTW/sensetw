@@ -22,6 +22,24 @@ export type State = CachedStorage;
 
 export const initial: State = CS.initial;
 
+const updateMap =
+  (map: MapData) =>
+  (dispatch: Dispatch) =>
+    dispatch(CS.updateMaps(H.toIDMap<MapID, MapData>([map])));
+
+const saveMap =
+  (map: MapData) =>
+  (dispatch: Dispatch) => {
+    return GM.update(map)
+      .then((newMap) => {
+        const mapMap = H.toIDMap<MapID, MapData>([newMap]);
+        // update the map
+        dispatch(CS.updateMaps(mapMap, TargetType.PERMANENT));
+        // remove the map from the cached storage
+        dispatch(CS.removeMaps(mapMap));
+      });
+  };
+
 const createCard =
   (mapId: MapID, card: CardData) =>
   async (dispatch: Dispatch) => {
@@ -324,6 +342,8 @@ const removeEdge =
   };
 
 export const actions = {
+  updateMap,
+  saveMap,
   updateCard,
   saveCard,
   removeCard,
