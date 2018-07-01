@@ -108,7 +108,7 @@ export const actions = {
 export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
-  // TODO: check map id usage
+  // we need the current map id to check if we are transitioning to a new map
   map: MapID,
   scope: MapScope,
   inbox: InboxVisibility,
