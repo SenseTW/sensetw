@@ -16,3 +16,8 @@
   left: 2em;
   top: 7.5em;
 }
+
+/* Fix the modal position by reset it's container */
+.ui.modals.visible.transition {
+  display: flex !important;
+}
