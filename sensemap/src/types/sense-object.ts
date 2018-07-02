@@ -26,12 +26,15 @@ const createMap =
   (map: MapData) =>
   async (dispatch: Dispatch) => {
     return GM.create(map)
-      .then((newMap) => dispatch(
-        CS.updateMaps(
+      .then((newMap) => {
+        // add the new map
+        dispatch(CS.updateMaps(
           H.toIDMap<MapID, MapData>([newMap]),
           TargetType.PERMANENT,
-        )
-      ));
+        ));
+        // remove the temporary map from the cached storage;
+        dispatch(CS.removeMap(map));
+      });
   };
 
 const updateMap =
@@ -292,6 +295,13 @@ const removeCardsFromBox =
     return dispatch(SL.actions.clearSelection());
   };
 
+const removeMap =
+  (mapID: MapID) =>
+  (dispatch: Dispatch) => {
+    return GM.remove(mapID)
+      .then(() => loadMaps(true)(dispatch));
+  };
+
 const removeObject =
   (objectID: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
@@ -390,6 +400,7 @@ export const actions = {
   removeCardFromBox,
   removeCardsFromBox,
   unboxCards,
+  removeMap,
   removeObject,
   removeCardWithObject,
   removeBoxWithObject,

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Image, Label, Button, Icon, Dropdown } from 'semantic-ui-react';
+import { DropdownProps } from 'semantic-ui-react/src/modules/Dropdown';
+import { DropdownItemProps } from 'semantic-ui-react/src/modules/Dropdown/DropdownItem';
 import * as R from '../../../types/routes';
 import * as SM from '../../../types/sense/map';
 import * as U from '../../../types/utils';
@@ -9,23 +11,21 @@ import './index.css';
 interface Props {
   id?: string;
   data: SM.MapData;
-  onEdit?(): void;
+  onEdit?(map: SM.MapData): void;
+  onRemove?(map: SM.MapData): void;
 }
 
 enum MapActionType {
   SHOW_MEMBER = 'SHOW_MEMBER',
-  EDIT = 'EDIT',
-  LEAVE = 'LEAVE',
-}
-
-interface DropdownItemProps {
-  key?: number;
-  text: string;
-  value: MapActionType;
+  EDIT        = 'EDIT',
+  REMOVE      = 'REMOVE',
+  // TODO: member system
+  LEAVE       = 'LEAVE',
 }
 
 const dropdownOptions: DropdownItemProps[] = [{
   key: 0,
+  disabled: true,
   text: 'member',
   value: MapActionType.SHOW_MEMBER,
 }, {
@@ -34,13 +34,18 @@ const dropdownOptions: DropdownItemProps[] = [{
   value: MapActionType.EDIT,
 }, {
   key: 2,
-  text: 'leave map',
-  value: MapActionType.LEAVE,
+  text: 'delete',
+  value: MapActionType.REMOVE,
 }];
 
 class MapCard extends React.Component<Props> {
   render() {
-    const { id, data, onEdit = U.noop } = this.props;
+    const {
+      id,
+      data,
+      onEdit = U.noop,
+      onRemove = U.noop,
+    } = this.props;
 
     return (
       <Card id={id} className="map-card">
@@ -77,9 +82,15 @@ class MapCard extends React.Component<Props> {
             pointing="bottom left"
             options={dropdownOptions}
             // tslint:disable-next-line:no-any
-            onChange={(event: any, item: DropdownItemProps) => {
-              if (item.value === MapActionType.EDIT) {
-                onEdit();
+            onChange={(event: any, item: DropdownProps) => {
+              switch (item.value) {
+                case MapActionType.EDIT:
+                  onEdit(data);
+                  break;
+                case MapActionType.REMOVE:
+                  onRemove(data);
+                  break;
+                default:
               }
             }}
           />
