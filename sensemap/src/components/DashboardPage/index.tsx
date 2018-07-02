@@ -54,6 +54,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
                   key={m.id}
                   data={m}
                   onEdit={() => acts.editor.focusMap(m.id)}
+                  onRemove={() => acts.senseObject.removeMap(m.id)}
                 />
             )}
           </Card.Group>
