@@ -47,8 +47,8 @@ export const loadMaps =
 export const create =
   (map: MapData) => {
     const query = `
-      mutation CreateMap($name: String, $description: String, $tags: String, $image: String) {
-        createMap(name: $name, description: $description, tags: $tags, image: $image) {
+      mutation CreateMap($type: String, $name: String, $description: String, $tags: String, $image: String) {
+        createMap(type: $type, name: $name, description: $description, tags: $tags, image: $image) {
           ...mapFields
         }
       }
@@ -61,8 +61,8 @@ export const create =
 export const update =
   (map: MapData) => {
     const query = `
-      mutation UpdateMap($id: ID!, $name: String, $description: String, $tags: String, $image: String) {
-        updateMap(id: $id, name: $name, description: $description, tags: $tags, image: $image) {
+      mutation UpdateMap($id: ID!, $type: String, $name: String, $description: String, $tags: String, $image: String) {
+        updateMap(id: $id, type: $type, name: $name, description: $description, tags: $tags, image: $image) {
           ...mapFields
         }
       }

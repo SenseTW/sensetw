@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { State, actions, ActionProps, MapID, MapData, mapDispatch } from '../../../types';
-import { Modal, Header, Button, Form, TextArea, Input } from 'semantic-ui-react';
+import { Modal, Header, Button, Form, TextArea, Input, Radio } from 'semantic-ui-react';
 import * as SM from '../../../types/sense/map';
 import * as CS from '../../../types/cached-storage';
+import './index.css';
 
 interface StateFromProps {
   mid?: MapID;
@@ -69,6 +70,23 @@ class MapContent extends React.PureComponent<Props> {
                 placeholder="Tag, tag"
                 value={map && map.tags}
                 onChange={e => this.handleMapChange(SM.updateTags(e.currentTarget.value))}
+              />
+            </Form.Field>
+            <Form.Field className="map-content__type">
+              <label>Type</label>
+              <Radio
+                label="Public"
+                name="mapType"
+                value={SM.MapType.PUBLIC}
+                checked={map && map.type === SM.MapType.PUBLIC}
+                onChange={() => this.handleMapChange(SM.updateType(SM.MapType.PUBLIC))}
+              />
+              <Radio
+                label="Private"
+                name="mapType"
+                value={SM.MapType.PRIVATE}
+                checked={map && map.type === SM.MapType.PRIVATE}
+                onChange={() => this.handleMapChange(SM.updateType(SM.MapType.PRIVATE))}
               />
             </Form.Field>
           </Form>
