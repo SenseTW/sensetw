@@ -71,6 +71,13 @@ export const typeDefs = gql`
       incomingIds: [ID!],
       outgoingIds: [ID!]
     ): Object
+    updateMap(
+      id: ID!,
+      name: String,
+      description: String,
+      tags: String,
+      image: String,
+    ): Map
     updateBox(
       id: ID!,
       summary: String,
@@ -143,6 +150,10 @@ export const typeDefs = gql`
     id: ID! @isUnique
     createdAt: DateTime!
     updatedAt: DateTime!
+    name: String
+    description: String
+    tags: String
+    image: String
     objects: [Object!]! @relation(name: "MapObjects")
     edges: [Edge!]! @relation(name: "MapEdges")
     cards: [Card!]! @relation(name: "MapCards")
