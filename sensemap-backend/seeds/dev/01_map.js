@@ -9,6 +9,7 @@ exports.seed = function(knex, Promise) {
           description: 'This is a foobar map.',
           tags: 'foo,bar',
           image: 'example.gif',
+          type: 'sometype',
         },
         { id: '63a544b6-36cf-4344-b370-32d451a35b70' },
       ]);

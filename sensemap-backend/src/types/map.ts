@@ -106,6 +106,7 @@ export const resolvers = {
     description: async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.description : (await getMap(db, o)).description,
     tags:        async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.tags        : (await getMap(db, o)).tags,
     image:       async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.image       : (await getMap(db, o)).image,
+    type:        async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.type        : (await getMap(db, o)).type,
     objects:     async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects     : getObjectsInMap(db, o),
     edges:       async (o, _, { db }, info): Promise<Edge[]>        => typeof(o) !== 'string' ? o.edges       : getEdgesInMap(db, o),
     cards:       async (o, _, { db }, info): Promise<Card[]>        => typeof(o) !== 'string' ? o.cards       : getCardsInMap(db, o),
