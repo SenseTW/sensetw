@@ -52,6 +52,11 @@ export const typeDefs = gql`
       toId: ID,
     ): Edge
     createMap(
+      name: String,
+      description: String,
+      tags: String,
+      image: String,
+      type: String,
       boxesIds: [ID!],
       cardsIds: [ID!],
       edgesIds: [ID!],
