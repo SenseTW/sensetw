@@ -1,4 +1,5 @@
-import { ID, Map, mapFields, SenseObject, objectFields, Card, Box, Edge } from './sql';
+import { pick } from 'ramda';
+import { ID, Map, mapFields, mapDataFields, SenseObject, objectFields, Card, Box, Edge } from './sql';
 import { objectsQuery } from './object';
 import { boxesQuery } from './box';
 import { cardsQuery } from './card';
@@ -27,6 +28,12 @@ export async function getAllMaps(db): Promise<Map[]> {
 
 export async function createMap(db, args: Map): Promise<Map> {
   const rows = await db('map').insert({}).returning(mapFields(db));
+  return rows[0];
+}
+
+export async function updateMap(db, id: ID, args): Promise<Map> {
+  const fields = pick(mapDataFields, args);
+  const rows = await db('map').where('id', id).update(fields).returning(mapFields(db));
   return rows[0];
 }
 
@@ -82,18 +89,26 @@ export const resolvers = {
       return createMap(db, args);
     },
 
+    updateMap: async (_, args, { db }, info): Promise<Map> => {
+      return updateMap(db, args.id, args);
+    },
+
     deleteMap: async (_, args, { db }, info): Promise<Map> => {
       return deleteMap(db, args.id);
     },
   },
 
   Map: {
-    id:        async (o, _, { db }, info): Promise<ID>            => typeof(o) !== 'string' ? o.id        : o,
-    createdAt: async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.createdAt : (await getMap(db, o)).createdAt,
-    updatedAt: async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.updatedAt : (await getMap(db, o)).updatedAt,
-    objects:   async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects   : getObjectsInMap(db, o),
-    edges:     async (o, _, { db }, info): Promise<Edge[]>        => typeof(o) !== 'string' ? o.edges     : getEdgesInMap(db, o),
-    cards:     async (o, _, { db }, info): Promise<Card[]>        => typeof(o) !== 'string' ? o.cards     : getCardsInMap(db, o),
-    boxes:     async (o, _, { db }, info): Promise<Box[]>         => typeof(o) !== 'string' ? o.boxes     : getBoxesInMap(db, o),
+    id:          async (o, _, { db }, info): Promise<ID>            => typeof(o) !== 'string' ? o.id          : o,
+    createdAt:   async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.createdAt   : (await getMap(db, o)).createdAt,
+    updatedAt:   async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.updatedAt   : (await getMap(db, o)).updatedAt,
+    name:        async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.name        : (await getMap(db, o)).name,
+    description: async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.description : (await getMap(db, o)).description,
+    tags:        async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.tags        : (await getMap(db, o)).tags,
+    image:       async (o, _, { db }, info): Promise<string>        => typeof(o) !== 'string' ? o.image       : (await getMap(db, o)).image,
+    objects:     async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects     : getObjectsInMap(db, o),
+    edges:       async (o, _, { db }, info): Promise<Edge[]>        => typeof(o) !== 'string' ? o.edges       : getEdgesInMap(db, o),
+    cards:       async (o, _, { db }, info): Promise<Card[]>        => typeof(o) !== 'string' ? o.cards       : getCardsInMap(db, o),
+    boxes:       async (o, _, { db }, info): Promise<Box[]>         => typeof(o) !== 'string' ? o.boxes       : getBoxesInMap(db, o),
   },
 };
