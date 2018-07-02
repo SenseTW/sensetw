@@ -71,6 +71,13 @@ export const typeDefs = gql`
       incomingIds: [ID!],
       outgoingIds: [ID!]
     ): Object
+    updateMap(
+      id: ID!,
+      name: String,
+      description: String,
+      tags: String,
+      image: String,
+    ): Map
     updateBox(
       id: ID!,
       summary: String,
