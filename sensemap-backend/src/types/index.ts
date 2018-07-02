@@ -77,6 +77,7 @@ export const typeDefs = gql`
       description: String,
       tags: String,
       image: String,
+      type: String,
     ): Map
     updateBox(
       id: ID!,
@@ -154,6 +155,7 @@ export const typeDefs = gql`
     description: String
     tags: String
     image: String
+    type: String
     objects: [Object!]! @relation(name: "MapObjects")
     edges: [Edge!]! @relation(name: "MapEdges")
     cards: [Card!]! @relation(name: "MapCards")

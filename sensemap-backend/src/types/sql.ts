@@ -25,13 +25,14 @@ export type Map = HasID & HasTimestamps & {
   description: string,
   tags: string,
   image: string,
+  type: string,
   objects: HasID[],
   cards: HasID[],
   boxes: HasID[],
   edges: HasID[],
 };
 
-export const mapDataFields = [ 'name', 'description', 'tags', 'image' ];
+export const mapDataFields = [ 'name', 'description', 'tags', 'image', 'type' ];
 
 export const mapFields = (db) => [
   ...hasTimestampFields,
