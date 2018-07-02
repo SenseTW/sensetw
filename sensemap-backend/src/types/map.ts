@@ -27,7 +27,8 @@ export async function getAllMaps(db): Promise<Map[]> {
 }
 
 export async function createMap(db, args: Map): Promise<Map> {
-  const rows = await db('map').insert({}).returning(mapFields(db));
+  const fields = pick(mapDataFields, args);
+  const rows = await db('map').insert(fields).returning(mapFields(db));
   return rows[0];
 }
 
