@@ -3,13 +3,13 @@ import OAuthServer = require('express-oauth-server');
 import { context } from '../context';
 import * as U from '../types/user';
 
-const { db } = context({ req: null });
+const { db, public_url } = context({ req: null });
 
 export const hypothesisClient = {
   id: '00e468bc-c948-11e7-9ada-33c411fb1c8a',
   grants: ['authorization_code'],
   name: 'Hypothesis API',
-  redirectUris: ['http://localhost:3000/', 'https://h.sense.tw/oauth/authorize'],
+  redirectUris: [`${public_url}/oauth/web_message`],
 };
 
 const getClient = async (id: string, secret?: string): Promise<Client> => {
@@ -25,27 +25,35 @@ const getUser = async (id: string): Promise<User> => {
 };
 
 const getAccessToken = async (accessToken: string): Promise<Token> => {
-  const rows = await db.select('*').from('oauth_token').where('accessToken', accessToken);
+  const rows = await db.select(['accessToken', 'accessTokenExpiresAt', 'refreshToken', 'refreshTokenExpiresAt', 'clientId', 'userId']).from('oauth_token').where('accessToken', accessToken);
   if (rows.length === 0) {
     return null;
   }
   return {
     ...rows[0],
-    client: getClient(rows[0].clientId),
-    user: getUser(rows[0].userId),
+    client: await getClient(rows[0].clientId),
+    user: await getUser(rows[0].userId),
   };
 };
 
 const saveToken = async (token: Token, client: Client, user: User): Promise<Token> => {
-  const rows = db('oauth_token').insert({
+  const rows = await db('oauth_token').insert({
     accessToken: token.accessToken,
     accessTokenExpiresAt: token.accessTokenExpiresAt,
     refreshToken: token.refreshToken,
     refreshTokenExpiresAt: token.refreshTokenExpiresAt,
     clientId: client.id,
     userId: user.id,
-  }).returning('*');
-  return rows[0];
+  });
+  const t = {
+    accessToken: token.accessToken,
+    accessTokenExpiresAt: token.accessTokenExpiresAt,
+    refreshToken: token.refreshToken,
+    refreshTokenExpiresAt: token.refreshTokenExpiresAt,
+    client: await getClient(client.id),
+    user: await getUser(user.id),
+  };
+  return t;
 };
 
 const getAuthorizationCode = async (authorizationCode: string): Promise<AuthorizationCode> => {
@@ -53,11 +61,12 @@ const getAuthorizationCode = async (authorizationCode: string): Promise<Authoriz
   if (rows.length === 0) {
     return null;
   }
-  return {
+  const code = {
     ...rows[0],
-    client: getClient(rows[0].clientId),
-   user: getUser(rows[0].userId),
+    client: await getClient(rows[0].clientId),
+    user: await getUser(rows[0].userId),
   };
+  return code;
 };
 
 const saveAuthorizationCode = async (code: AuthorizationCode, client: Client, user: User): Promise<AuthorizationCode> => {
@@ -68,7 +77,7 @@ const saveAuthorizationCode = async (code: AuthorizationCode, client: Client, us
     client,
     user,
   };
-  const rows = db('oauth_authorization_code').insert({
+  const rows = await db('oauth_authorization_code').insert({
     authorizationCode: code.authorizationCode,
     expiresAt: code.expiresAt,
     redirectUri: code.redirectUri,
@@ -77,6 +86,11 @@ const saveAuthorizationCode = async (code: AuthorizationCode, client: Client, us
   });
   return values;
 };
+
+const revokeAuthorizationCode = async (code: AuthorizationCode): Promise<boolean> => {
+  const rows = await db('oauth_authorization_code').where('authorizationCode', code.authorizationCode).del();
+  return true;
+}
 
 const verifyScope = async (token: Token, scope: string): Promise<boolean> => {
   return true;
@@ -90,10 +104,11 @@ const model = {
 
   getAuthorizationCode,
   saveAuthorizationCode,
+  revokeAuthorizationCode,
 
   verifyScope,
 };
 
-const oauth = new OAuthServer({ model });
+const oauth = new OAuthServer({ model, requireClientAuthentication: { authorization_code: false } });
 
 export default oauth;

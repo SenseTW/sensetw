@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="google-site-verification" content="QaIKC4LVUZe22RLe6qeF-scVAwobkkBQWEwfsvq4D5c" />
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M9D9FX9');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>榕樹下</title>
+    <!-- the <base> tag is required by Angular JS when HTML 5 history is
+     enabled. We shouldn't really need this because a given instance of the app
+     only ever displays a single route.
+    -->
+    <base target="_top" href="/" />
+    <!--
+    {% for attrs in meta_attrs -%}
+      <meta {% for key, value in attrs.items() %}{{ key }}="{{ value }}" {% endfor %}/>
+    {% endfor -%}
+    {% if link_tags %}
+      {% for link in link_tags %}
+        <link rel="{{ link.rel }}" type="{{ link.type }}"
+              href="{{ link.href }}"/>
+      {% endfor %}
+    {% endif %}
+    -->
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M9D9FX9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <hypothesis-app></hypothesis-app>
+
+    <!-- The `js-hypothesis-settings` class should be removed once
+       https://github.com/hypothesis/client/pull/243 is released.
+    -->
+    <!-- App Configuration !-->
+    <script class="js-hypothesis-config js-hypothesis-settings" type="application/json">
+      <%- app_config %>
+    </script>
+
+    <!-- Client boot script !-->
+    <script src="<%= embed_url %>"></script>
+
+  </body>
+</html>

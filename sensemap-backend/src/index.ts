@@ -14,6 +14,7 @@ import { typeDefs, resolvers } from './types'
 import { context } from './context';
 import { router as Login } from './login';
 import { router as Hypothesis } from './hypothesis';
+import { router as HypothesisClient } from './client';
 
 const PORT = 8000;
 
@@ -28,8 +29,10 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+app.set('view engine', 'ejs');
 app.use(Login(context));
 app.use('/h/api', Hypothesis(context));
+app.use(HypothesisClient(context));
 
 const server = new ApolloServer({ typeDefs, resolvers, context });
 registerServer({ server, app });

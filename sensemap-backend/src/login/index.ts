@@ -31,7 +31,6 @@ export function router(context: Context) {
   });
 
   router.get('/login', passLoggedIn(), async (req, res) => {
-    console.log(req.flash('error'));
     res.send(await render(LoginPage));
   });
 
@@ -43,6 +42,9 @@ export function router(context: Context) {
       successFlash: 'Welcome!',
     }),
     async (req, res) => {
+      if (req.query.next) {
+        return res.redirect(req.query.next);
+      }
       return res.redirect('/login-success');
     }
   );
@@ -99,7 +101,20 @@ export function router(context: Context) {
       },
     }),
   );
-  router.post('/oauth/token', oauth.token());
+  router.post('/h/token', (req, res, next) => {
+    next();
+  }, oauth.token());
+  router.post('/oauth/revoke', async (req, res) => {
+    res.send('{}');
+  });
+
+  router.get('/oauth/web_message',
+    requireLoggedIn(),
+    async (req, res) => {
+      const { code, origin = process.env.PUBLIC_URL, state } = req.query;
+      res.render('authorize_web_message', { code, origin, state });
+    }
+  );
 
   return router;
 }

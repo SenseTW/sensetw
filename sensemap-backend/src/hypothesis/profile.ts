@@ -6,6 +6,8 @@ export function router(context: Context) {
   const router = express.Router();
 
   router.get('/', (req, res) => {
+    const userid = !!req.user ? `acct:${req.user.username}@ggv.tw` : null;
+    const authority = 'ggv.tw';
     const { db } = context({ req });
     M.getAllMaps(db).then((maps) => {
       const groups = maps.map(map => ({
@@ -17,8 +19,8 @@ export function router(context: Context) {
       const profile = {
         preferences: {},
         groups,
-        userid: null,
-        authority: 'ggv.tw',
+        userid,
+        authority,
         features: {
           filter_highlights: true,
           api_render_user_info: true,

@@ -1,4 +1,6 @@
 
+const public_url = process.env.PUBLIC_URL;
+
 export function passLoggedIn() {
   return (req, res, next) => {
     if (!!req.user) {
@@ -15,7 +17,7 @@ export function passLoggedIn() {
 export function requireLoggedIn() {
   return (req, res, next) => {
     if (!req.user) {
-      return res.redirect('/login');
+      return res.redirect(`/login?next=${encodeURIComponent(public_url + req.originalUrl)}`);
     }
     return next();
   };

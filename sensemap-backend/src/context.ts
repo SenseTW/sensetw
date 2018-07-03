@@ -16,6 +16,7 @@ const knex = Knex({
 export const context = ({ req }) => ({
   db: knex,
   debug: !!process.env.DEBUG,
+  public_url: process.env.PUBLIC_URL || 'https://api.sense.tw',
   secret: process.env.SECRET || 'Wush8je7kee0faileir3sohy0tai4Chee7ua5ahrah0LaG1mui6iepieg0looque',
 });
 
