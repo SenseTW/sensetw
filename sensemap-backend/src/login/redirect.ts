@@ -1,5 +1,4 @@
-
-const public_url = process.env.PUBLIC_URL;
+import { context } from '../context';
 
 export function passLoggedIn() {
   return (req, res, next) => {
@@ -16,8 +15,9 @@ export function passLoggedIn() {
 
 export function requireLoggedIn() {
   return (req, res, next) => {
+    const { env } = context({ req });
     if (!req.user) {
-      return res.redirect(`/login?next=${encodeURIComponent(public_url + req.originalUrl)}`);
+      return res.redirect(`/login?next=${encodeURIComponent(env.PUBLIC_URL + req.originalUrl)}`);
     }
     return next();
   };

@@ -1,24 +1,22 @@
 import * as express from 'express';
+import { Context } from '../context';
 
-const client_url = process.env.CLIENT_URL || 'https://h.sense.tw/embed.js';
-const public_url = process.env.PUBLIC_URL || 'https://api.sense.tw/';
-const client_oauth_id = process.env.CLIENT_OAUTH_ID;
-
-export function router(context) {
+export function router(context: Context) {
+  const { env } = context();
   const router = express.Router();
   router.get('/app.html', (req, res, next) => {
     res.render('app', {
       app_config: JSON.stringify({
-        'apiUrl': `${public_url}h/api`,
+        'apiUrl': `${env.PUBLIC_URL}/h/api`,
         //'authDomain': request.authority,
-        'oauthClientId': client_oauth_id,
+        'oauthClientId': env.CLIENT_OAUTH_ID,
         //'release': __version__,
-        'serviceUrl': public_url,
+        'serviceUrl': env.PUBLIC_URL,
         // The list of origins that the client will respond to cross-origin RPC
         // requests from.
         //'rpcAllowedOrigins': settings.get('h.client_rpc_allowed_origins'),
       }),
-      embed_url: client_url,
+      embed_url: env.CLIENT_JS_URL,
     });
   });
   return router;

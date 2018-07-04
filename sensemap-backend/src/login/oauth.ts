@@ -3,13 +3,13 @@ import OAuthServer = require('express-oauth-server');
 import { context } from '../context';
 import * as U from '../types/user';
 
-const { db, public_url } = context({ req: null });
+const { db, env } = context();
 
 export const hypothesisClient = {
   id: '00e468bc-c948-11e7-9ada-33c411fb1c8a',
   grants: ['authorization_code'],
   name: 'Hypothesis API',
-  redirectUris: [`${public_url}/oauth/web_message`],
+  redirectUris: [`${env.PUBLIC_URL}/oauth/web_message`],
 };
 
 const getClient = async (id: string, secret?: string): Promise<Client> => {

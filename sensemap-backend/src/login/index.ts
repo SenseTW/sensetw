@@ -111,7 +111,8 @@ export function router(context: Context) {
   router.get('/oauth/web_message',
     requireLoggedIn(),
     async (req, res) => {
-      const { code, origin = process.env.PUBLIC_URL, state } = req.query;
+      const { env } = context({ req });
+      const { code, origin = env.PUBLIC_URL, state } = req.query;
       res.render('authorize_web_message', { code, origin, state });
     }
   );

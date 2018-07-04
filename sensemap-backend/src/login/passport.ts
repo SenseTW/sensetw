@@ -4,7 +4,7 @@ import * as U from '../types/user';
 import { ID, User } from '../types/sql';
 import { context } from '../context';
 
-const { db } = context({ req: null });
+const { db } = context();
 
 const fakeUser = {
   id: '1337',
