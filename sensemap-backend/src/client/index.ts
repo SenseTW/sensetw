@@ -1,7 +1,7 @@
 import * as express from 'express';
 
 const client_url = process.env.CLIENT_URL || 'https://h.sense.tw/embed.js';
-const public_url = process.env.PUBLIC_URL || 'https://api.sense.tw';
+const public_url = process.env.PUBLIC_URL || 'https://api.sense.tw/';
 const client_oauth_id = process.env.CLIENT_OAUTH_ID;
 
 export function router(context) {
@@ -9,7 +9,7 @@ export function router(context) {
   router.get('/app.html', (req, res, next) => {
     res.render('app', {
       app_config: JSON.stringify({
-        'apiUrl': `${public_url}/h/api`,
+        'apiUrl': `${public_url}h/api`,
         //'authDomain': request.authority,
         'oauthClientId': client_oauth_id,
         //'release': __version__,
