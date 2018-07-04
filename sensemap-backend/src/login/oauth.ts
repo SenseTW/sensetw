@@ -88,7 +88,12 @@ const saveAuthorizationCode = async (code: AuthorizationCode, client: Client, us
 };
 
 const revokeAuthorizationCode = async (code: AuthorizationCode): Promise<boolean> => {
-  const rows = await db('oauth_authorization_code').where('authorizationCode', code.authorizationCode).del();
+  await db('oauth_authorization_code').where('authorizationCode', code.authorizationCode).del();
+  return true;
+}
+
+export const revokeUserToken = async (user: User): Promise<boolean> => {
+  await db('oauth_token').where('userId', user.id).del();
   return true;
 }
 

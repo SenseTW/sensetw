@@ -7,7 +7,7 @@ import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
-import oauth, { hypothesisClient } from './oauth';
+import oauth, { hypothesisClient, revokeUserToken } from './oauth';
 import { Context } from '../context';
 import passport = require('./passport');
 import * as U from '../types/user';
@@ -105,6 +105,8 @@ export function router(context: Context) {
     next();
   }, oauth.token());
   router.post('/oauth/revoke', async (req, res) => {
+    await revokeUserToken(req.user);
+    req.logout();
     res.send('{}');
   });
 
