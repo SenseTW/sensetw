@@ -104,7 +104,7 @@ class MapPage extends React.Component<Props> {
                 <ObjectContent
                   objectType={focus.objectType}
                   data={data}
-                  submitText={isNew ? '送出' : '更新'}
+                  submitText={isNew ? 'Submit' : 'Update'}
                   submitDisabled={!isDirty && !isNew}
                   cancelDisabled={!isDirty && !isNew}
                   onUpdate={action => {

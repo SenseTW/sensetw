@@ -84,7 +84,7 @@ class ObjectContent extends React.PureComponent<Props> {
               disabled={cancelDisabled}
               onClick={() => onCancel()}
             >
-              取消
+              Cancel
             </Button>
             <Button.Or />
             <Button
@@ -92,7 +92,7 @@ class ObjectContent extends React.PureComponent<Props> {
               disabled={submitDisabled}
               onClick={() => onSubmit(data)}
             >
-               {submitText || '送出'}
+               {submitText || 'Save'}
             </Button>
           </Button.Group>
         </div>

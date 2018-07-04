@@ -45,7 +45,7 @@ class MapContent extends React.PureComponent<Props> {
         size="tiny"
         open={!!mid}
       >
-        <Header>{isNew ? '新增 Map' : '編輯 Map'}</Header>
+        <Header>{isNew ? 'Add Map' : 'Edit Map'}</Header>
         <Modal.Content>
           <Form>
             <Form.Field className="map-content__name">
@@ -73,7 +73,7 @@ class MapContent extends React.PureComponent<Props> {
               />
             </Form.Field>
             <Form.Field className="map-content__type">
-              <label>Type</label>
+              <label>Access Type</label>
               <Radio
                 label="Public"
                 name="mapType"
@@ -101,7 +101,7 @@ class MapContent extends React.PureComponent<Props> {
                 acts.editor.focusMap();
               }}
             >
-              取消
+              Cancel
             </Button>
             <Button.Or />
             <Button
@@ -118,7 +118,7 @@ class MapContent extends React.PureComponent<Props> {
                 acts.editor.focusMap();
               }}
             >
-              {isNew ? '送出' : '儲存'}
+              {isNew ? 'Save' : 'Update'}
             </Button>
           </Button.Group>
         </Modal.Actions>
