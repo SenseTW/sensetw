@@ -104,11 +104,13 @@ export function router(context: Context) {
   router.post('/h/token', (req, res, next) => {
     next();
   }, oauth.token());
-  router.post('/oauth/revoke', async (req, res) => {
-    await revokeUserToken(req.user);
-    req.logout();
-    res.send('{}');
-  });
+  router.all('/oauth/revoke',
+    requireLoggedIn(),
+    async (req, res) => {
+      await revokeUserToken(req.user);
+      req.logout();
+      res.send('{}');
+    });
 
   router.get('/oauth/web_message',
     requireLoggedIn(),
