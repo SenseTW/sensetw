@@ -110,7 +110,7 @@ export const cardData = (partial: PartialCardData = {}): CardData => {
   const now = +moment();
 
   return {
-    ...emptyCardData,
+    ...{...emptyCardData, summary: 'New Card' },
     ...partial,
     createdAt: now,
     updatedAt: now,

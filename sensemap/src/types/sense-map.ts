@@ -73,6 +73,16 @@ const openInbox =
     type: OPEN_INBOX as typeof OPEN_INBOX,
   });
 
+const ACTIVATE_INBOX_PAGE = 'ACTIVATE_INBOX_PAGE';
+/**
+ * A message to change the inbox activated page.
+ */
+const activateInboxPage = 
+  (page: number) => ({
+    type: ACTIVATE_INBOX_PAGE as typeof ACTIVATE_INBOX_PAGE,
+    payload: { page }
+  });
+
 const CLOSE_INBOX = 'CLOSE_INBOX';
 /**
  * A message to close the inbox.
@@ -104,6 +114,7 @@ const syncActions = {
   setScopeToFullmap,
   setMap,
   openInbox,
+  activateInboxPage,
   closeInbox,
 };
 
@@ -120,6 +131,7 @@ export type State = {
   map: MapID,
   scope: MapScope,
   inbox: InboxVisibility,
+  activateInboxPage: number
 };
 
 export const initial: State = {
@@ -128,6 +140,7 @@ export const initial: State = {
     type: MapScopeType.FULL_MAP,
   },
   inbox: InboxVisibility.HIDDEN,
+  activateInboxPage: 1
 };
 
 /**
@@ -149,6 +162,9 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     }
     case OPEN_INBOX: {
       return { ...state, inbox: InboxVisibility.VISIBLE };
+    }
+    case ACTIVATE_INBOX_PAGE: {
+      return { ...state, activateInboxPage: action.payload.page };
     }
     case CLOSE_INBOX: {
       return { ...state, inbox: InboxVisibility.HIDDEN };

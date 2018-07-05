@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Icon, Pagination, PaginationProps } from 'semantic-ui-react';
 import './index.css';
 import { CardData, State, ActionProps } from '../../types';
-import * as C from '../../types/sense/card';
+import AddCardButton from './AddCardButton';
 import SyncButton from './SyncButton';
 import Divider from './Divider';
 import Filter from './Filter';
@@ -32,11 +32,10 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
         <Divider />
         <Filter />
       </div>
-      <div className="inbox__add-card-btn">
-        <Button icon="plus" size="tiny" color="grey" onClick={() => acts.senseObject.createCard(mapId, C.cardData())} />
-      </div>
-      <Pager data={cards} pageSize={9}>
+      <AddCardButton mapId={mapId} visible={senseMap.activateInboxPage === 1} actions={acts} />
+      <Pager data={cards} pageSize={9} currentPage={senseMap.activateInboxPage} >
         {({ data, totalPages, currentPage, handlePageChange }) => {
+          console.log(currentPage, senseMap.activateInboxPage);
           return (
             <React.Fragment>
               <CardList cards={data} />
@@ -50,6 +49,7 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
                   if (typeof newProps.activePage === 'number'
                       && Number.isInteger(newProps.activePage)) {
                     handlePageChange(newProps.activePage);
+                    acts.senseMap.activateInboxPage(newProps.activePage);
                   }
                 }}
               />

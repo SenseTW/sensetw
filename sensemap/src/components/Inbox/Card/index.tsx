@@ -43,7 +43,7 @@ export default function Card(props: Props) {
         <Reveal.Content visible style={{ pointerEvents: 'none' }}>
           <div className="card__body">
             <div className="card__summary">
-              {card.summary}
+              {card.summary} <br />
             </div>
             {renderCardTags({ tags: card.tags })}
           </div>
