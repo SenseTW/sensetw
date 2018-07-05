@@ -102,6 +102,9 @@ export function router(context: Context) {
     }),
   );
   router.post('/h/token', (req, res, next) => {
+    const { env } = context({ req });
+    // XXX to support web_message response_type
+    req.query.redirect_uri = `${env.PUBLIC_URL}/oauth/web_message`;
     next();
   }, oauth.token());
   router.all('/oauth/revoke',

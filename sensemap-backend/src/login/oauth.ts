@@ -6,7 +6,7 @@ import * as U from '../types/user';
 const { db, env } = context();
 
 export const hypothesisClient = {
-  id: '00e468bc-c948-11e7-9ada-33c411fb1c8a',
+  id: env.CLIENT_OAUTH_ID,
   grants: ['authorization_code'],
   name: 'Hypothesis API',
   redirectUris: [`${env.PUBLIC_URL}/oauth/web_message`],
