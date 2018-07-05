@@ -1,5 +1,11 @@
 .App {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+}
+
+.App > .sense-header {
+  z-index: 1000;
 }
 
 .ui.right.sidebar {

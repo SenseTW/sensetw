@@ -119,6 +119,9 @@ class Breadcrumb extends React.PureComponent<Props> {
           <Route exact path={R.mapList}>
             {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
           </Route>
+          <Route exact path={R.settings}>
+            {() => <SBreadcrumb.Section active>Settings</SBreadcrumb.Section>}
+          </Route>
           <Route exact path={R.importer}>
             {() => (
               <React.Fragment>

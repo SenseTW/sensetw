@@ -29,7 +29,13 @@ class Header extends React.Component<Props> {
             target="_blank"
             rel="noopener noreferrer"
           >
-            ABOUT
+            About
+          </Menu.Item>
+          <Menu.Item
+            as={Link}
+            to={R.mapList}
+          >
+            Dashboard
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item>
@@ -47,7 +53,12 @@ class Header extends React.Component<Props> {
                 }
               >
                 <Dropdown.Menu>
-                  <Dropdown.Item>Profile</Dropdown.Item>
+                  <Dropdown.Item
+                    as={Link}
+                    to={R.settings}
+                  >
+                    Settings
+                  </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             </Menu.Item>

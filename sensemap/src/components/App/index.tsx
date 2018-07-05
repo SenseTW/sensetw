@@ -9,6 +9,7 @@ import Header from '../Header';
 import MapPage from '../MapPage';
 import DashboardPage from '../DashboardPage';
 import ImportPage from '../ImportPage';
+import SettingsPage from '../SettingsPage';
 import * as R from '../../types/routes';
 import './index.css';
 
@@ -27,6 +28,7 @@ class App extends React.Component {
           <Header />
           <Switch>
             <Route exact path={R.index} render={() => <Redirect to={R.mapList} />} />
+            <Route exact path={R.settings} component={SettingsPage} />
             <Route exact path={R.importer} component={ImportPage} />
             <Route exact path={R.mapList} component={DashboardPage} />
             <Route exact path={R.map} component={MapPage} />
