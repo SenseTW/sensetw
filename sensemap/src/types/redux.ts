@@ -8,6 +8,7 @@ import * as OE from './object-editor';
 import * as V  from './viewport';
 import * as SG from './stage';
 import * as I  from './input';
+import * as S from './settings';
 import * as IP from './importer';
 
 export { mapDispatch } from './map-dispatch';
@@ -20,6 +21,7 @@ export type State = {
   input:        I.State,
   viewport:     V.State,
   stage:       SG.State,
+  settings:    S.State,
   importer:    IP.State,
 };
 
@@ -39,6 +41,7 @@ export const initial = {
   input:        I.initial,
   viewport:     V.initial,
   stage:       SG.initial,
+  settings:     S.initial,
   importer:    IP.initial,
 };
 
@@ -52,6 +55,7 @@ export type Action
   |  I.Action
   |  V.Action
   | SG.Action
+  |  S.Action
   | IP.Action
   ;
 
@@ -65,6 +69,7 @@ export const actions = {
   input:          I.actions,
   viewport:       V.actions,
   stage:         SG.actions,
+  settings:       S.actions,
   importer:      IP.actions,
 };
 
@@ -78,5 +83,6 @@ export const reducer = combineReducers({
   input:        I.reducer,
   viewport:     V.reducer,
   stage:       SG.reducer,
+  settings:     S.reducer,
   importer:    IP.reducer,
 });

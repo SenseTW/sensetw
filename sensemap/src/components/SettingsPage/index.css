@@ -58,6 +58,13 @@
   color: #acacac;
 }
 
+.settings-page > .ui.container > .ui.form .field > .settings-page__error {
+  display: block;
+  font-size: 1.142857rem;
+  margin-top: 6px;
+  color: #ad292d;
+}
+
 .settings-page > .ui.container > .ui.form > .settings-page__submit {
   margin-top: 98px;
 }
