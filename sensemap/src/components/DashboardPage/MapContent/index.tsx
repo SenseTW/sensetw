@@ -38,7 +38,7 @@ class MapContent extends React.PureComponent<Props> {
     }
 
     const { actions: acts, map, isNew, isDirty } = this.props;
-    const disabled = !isNew && !isDirty;
+    const disabled = !(isNew && map && map.name) && !isDirty;
 
     return (
       <Modal
@@ -49,7 +49,7 @@ class MapContent extends React.PureComponent<Props> {
         <Modal.Content>
           <Form>
             <Form.Field className="map-content__name">
-              <label>Map Name</label>
+              <label>Map Name (required)</label>
               <Input
                 placeholder="my wonderful map"
                 value={map && map.name}
