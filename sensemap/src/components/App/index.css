@@ -7,8 +7,3 @@
 .App > .sense-header {
   z-index: 1000;
 }
-
-.ui.right.sidebar {
-  top: 0px !important;
-  height: 100% !important;
-}
