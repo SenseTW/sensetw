@@ -8,6 +8,7 @@ import Map from '../../containers/Map';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
+import InboxToggler from '../InboxToggler';
 import {
   MapID,
   CardData,
@@ -74,6 +75,7 @@ class MapPage extends React.Component<Props> {
   render() {
     const { actions: acts, mid, editor, scope, senseMap, senseObject } = this.props;
     const { status, focus } = editor;
+    const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
 
     let data: BoxData | CardData | null = null;
     let isDirty: boolean = false;
@@ -95,10 +97,20 @@ class MapPage extends React.Component<Props> {
     return (
       <div className="map-page">
         <Sidebar.Pushable style={{ backgroundImage: `url(${background})` }}>
-          <Sidebar visible={senseMap.inbox === SM.InboxVisibility.VISIBLE} direction="left" width="wide">
+          <Sidebar
+            visible={isInboxVisible}
+            animation="overlay"
+            direction="left"
+            width="wide"
+          >
             <Inbox />
           </Sidebar>
-          <Sidebar visible={status !== OE.StatusType.HIDE} animation="overlay" width="wide" direction="right">{
+          <Sidebar
+            visible={status !== OE.StatusType.HIDE}
+            animation="overlay"
+            width="wide"
+            direction="right"
+          >{
             data
               ? (
                 <ObjectContent
@@ -194,7 +206,17 @@ class MapPage extends React.Component<Props> {
             <Viewport>
               {(props) => (<Map id={mid} {...props} />)}
             </Viewport>
-            <ObjectMenu />
+            <ObjectMenu style={{ left: isInboxVisible ? 378 : 28 }} />
+            <InboxToggler
+              className="inbox__btn"
+              style={{ left: isInboxVisible ? 350 : 0 }}
+              open={isInboxVisible}
+              onToggle={open =>
+                open
+                  ? acts.senseMap.openInbox()
+                  : acts.senseMap.closeInbox()
+              }
+            />
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>
