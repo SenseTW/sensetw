@@ -10,7 +10,10 @@ import * as SM from '../../types/sense/map';
 import * as CS from '../../types/cached-storage';
 import * as R from '../../types/routes';
 import * as U from '../../types/utils';
+import { sort } from 'ramda';
 import './index.css';
+
+const sortByUpdateTimeDesc = sort((a: SM.MapData, b: SM.MapData) => b.updatedAt - a.updatedAt);
 
 interface StateFromProps {
   senseObject: CS.CachedStorage;
@@ -41,6 +44,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
     const { actions: acts, senseObject, map } = this.props;
     const { modalOpen, mid } = this.state;
     const maps = CS.toStorage(senseObject).maps;
+    const mapList = sortByUpdateTimeDesc(Object.values(maps));
     const isClean = CS.isClean(senseObject);
 
     return (
@@ -48,7 +52,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
         <Container>
           <Search disabled />
           <Card.Group stackable itemsPerRow={3}>
-            {Object.values(maps).sort((a, b) => b.createdAt - a.createdAt).map(
+            {mapList.map(
               (m) =>
                 <MapCard
                   key={m.id}

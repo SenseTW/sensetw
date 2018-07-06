@@ -6,6 +6,7 @@ import { DropdownItemProps } from 'semantic-ui-react/src/modules/Dropdown/Dropdo
 import * as R from '../../../types/routes';
 import * as SM from '../../../types/sense/map';
 import * as U from '../../../types/utils';
+import * as moment from 'moment';
 import './index.css';
 
 interface Props {
@@ -46,11 +47,15 @@ class MapCard extends React.Component<Props> {
       onEdit = U.noop,
       onRemove = U.noop,
     } = this.props;
+    const formattedTime = moment(data.updatedAt).format(U.TIME_FORMAT);
+    const timeHint = data.createdAt === data.updatedAt
+      ? `created at ${formattedTime}`
+      : `updated at ${formattedTime}`;
 
     return (
       <Card id={id} className="map-card">
         <Card.Content className="map-card__header">
-          <Card.Header>
+          <Card.Header title={timeHint}>
             <Icon float="left" name={data.type === SM.MapType.PUBLIC ? 'globe' : 'lock'} />
             Owned by <span className="map-card__username">Ael</span>
           </Card.Header>
@@ -59,7 +64,7 @@ class MapCard extends React.Component<Props> {
         <Card.Content extra className="map-card__content">
           {
             data.name &&
-            <Card.Header>{data.name}</Card.Header>
+            <Card.Header title={timeHint}>{data.name}</Card.Header>
           }
           {
             data.description &&
