@@ -2,9 +2,9 @@ import * as C from './card';
 import { context } from '../context';
 import { maps } from '../../seeds/dev';
 
-const { db } = context({ req: null });
-
-beforeAll(async () => db.seed.run());
+const { db } = context();
+beforeEach(() => db.seed.run());
+afterAll(() => db.destroy());
 
 test('Card result fields', async () => {
   const id = maps[0].cards[0].id;

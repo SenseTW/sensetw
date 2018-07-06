@@ -3,11 +3,11 @@ import * as O from './object';
 import { maps } from '../../seeds/dev';
 import { context } from '../context';
 
-const nonexistent = '10330ced-04b4-46d3-91a6-1d294bb12da3';
+const nonExistentID = '10330ced-04b4-46d3-91a6-1d294bb12da3';
 
-const { db } = context({ req: null });
-
-beforeAll(async () => db.seed.run());
+const { db } = context();
+beforeEach(() => db.seed.run());
+afterAll(() => db.destroy());
 
 describe('GraphQL', () => {
   test('Map result fields', async () => {
@@ -55,7 +55,7 @@ describe('GraphQL', () => {
   });
 
   test('allMaps null result', async () => {
-    const ms = await M.resolvers.Query.allMaps(null, { filter: { id: nonexistent } }, { db }, null);
+    const ms = await M.resolvers.Query.allMaps(null, { filter: { id: nonExistentID } }, { db }, null);
     expect(ms.length).toBe(0);
   });
 });

@@ -1,20 +1,11 @@
-import * as dotenv from 'dotenv';
-dotenv.config()
-
 import * as U from './user';
 import { context } from '../context';
 
-// XXX hack
-const nonExistentUUID = '0be4e68e-c0f8-41a3-bffd-f3d430cd9822';
+const { db } = context();
+beforeEach(() => db.seed.run());
+afterAll(() => db.destroy());
 
-async function clearUserTable {
-  const { db } = context({ req: null });
-  await db('user').delete();
-}
-
-afterEach(async () => {
-  await clearUserTable();
-});
+const nonExistentID = '0be4e68e-c0f8-41a3-bffd-f3d430cd9822';
 
 test('createUser', async () => {
   const { db } = context({ req: null });
@@ -30,7 +21,7 @@ test('createUser', async () => {
 
 test('getUser not found', async () => {
   const { db } = context({ req: null });
-  const u0 = await U.getUser(db, nonExistentUUID);
+  const u0 = await U.getUser(db, nonExistentID);
   expect(u0).toBeNull();
 });
 
@@ -59,14 +50,14 @@ test('authenticate', async () => {
 });
 
 test('token', async () => {
-  const token0 = U.generate_token('mysitesecret', { id: nonExistentUUID, version: 1337 });
+  const token0 = U.generate_token('mysitesecret', { id: nonExistentID, version: 1337 });
   expect(token0.length > 64).toBeTruthy();
 
-  //const token1 = U.generate_token(nonExistentUUID, 'mysitesecret');
+  //const token1 = U.generate_token(nonExistentID, 'mysitesecret');
   //expect(token1).not.toBe(token0);
 
   const data = U.decrypt_token('mysitesecret', token0);
-  expect(data.id).toBe(nonExistentUUID);
+  expect(data.id).toBe(nonExistentID);
   expect(data.version).toBe(1337);
   expect(data.expire).toBeTruthy();
 });

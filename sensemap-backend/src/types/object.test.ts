@@ -2,9 +2,9 @@ import * as O from './object'
 import { context } from '../context';
 import { maps } from '../../seeds/dev';
 
-const { db } = context({ req: null });
-
-beforeAll(async () => db.seed.run());
+const { db } = context();
+beforeEach(() => db.seed.run());
+afterAll(() => db.destroy());
 
 describe('GraphQL', () => {
   test('Object result fields', async () => {

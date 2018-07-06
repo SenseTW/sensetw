@@ -14,9 +14,9 @@
     "start": "node dist",
     "start:watch": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
     "debug": "concurrently 'tsc -w' 'nodemon --inspect-brk --require ts-node/register dist'",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
-    "test:coverage": "jest --coverage",
+    "test": "jest --runInBand",
+    "test:watch": "yarn test --watch",
+    "test:coverage": "yarn test --coverage",
     "dbms:verify": "node verify_db_connection.js",
     "db:create": "node create_database.js"
   },
