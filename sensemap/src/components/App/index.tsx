@@ -5,6 +5,7 @@ import {
   Redirect,
   Switch,
 } from 'react-router-dom';
+import Analytics from '../Analytics';
 import Header from '../Header';
 import MapPage from '../MapPage';
 import DashboardPage from '../DashboardPage';
@@ -25,6 +26,7 @@ class App extends React.Component {
     return (
       <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
+          <Route render={(props) => <Analytics {...props} trackingId="UA-112380022-4" />} />
           <Header />
           <Switch>
             <Route exact path={R.index} render={() => <Redirect to={R.mapList} />} />
