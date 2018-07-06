@@ -35,7 +35,6 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
       <AddCardButton mapId={mapId} visible={senseMap.activateInboxPage === 1} actions={acts} />
       <Pager data={cards} pageSize={9} currentPage={senseMap.activateInboxPage} >
         {({ data, totalPages, currentPage, handlePageChange }) => {
-          console.log(currentPage, senseMap.activateInboxPage);
           return (
             <React.Fragment>
               <CardList cards={data} />
