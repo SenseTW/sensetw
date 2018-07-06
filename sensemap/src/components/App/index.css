@@ -9,6 +9,6 @@
 }
 
 .ui.right.sidebar {
-  top: 80px !important;
-  height: 85% !important;
+  top: 0px !important;
+  height: 100% !important;
 }
