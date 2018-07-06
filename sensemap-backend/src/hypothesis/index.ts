@@ -13,6 +13,6 @@ export function router(context: Context) {
   router.use('/links', Links(context));
   router.use('/profile', Profile(context));
   router.use('/search', Search(context));
-  router.use('/annotations/:id', Annotations(context));
+  router.use('/annotations', Annotations(context));
   return router;
 }
