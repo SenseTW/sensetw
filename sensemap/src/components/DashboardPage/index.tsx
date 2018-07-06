@@ -48,7 +48,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
         <Container>
           <Search disabled />
           <Card.Group stackable itemsPerRow={3}>
-            {Object.values(maps).map(
+            {Object.values(maps).sort((a, b) => b.createdAt - a.createdAt).map(
               (m) =>
                 <MapCard
                   key={m.id}
