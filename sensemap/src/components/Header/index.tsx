@@ -25,7 +25,7 @@ class Header extends React.Component<Props> {
           </Menu.Item>
           <Menu.Item
             as="a"
-            href="https://beta.hackfoldr.org/sense-tw"
+            href="https://about.sense.tw/"
             target="_blank"
             rel="noopener noreferrer"
           >
