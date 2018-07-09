@@ -12,7 +12,7 @@ export function router(context: Context) {
     M.getAllMaps(db).then((maps) => {
       const groups = maps.map(map => ({
         id: map.id,
-        name: '',
+        name: map.name,
         public: true,
       }));
 
