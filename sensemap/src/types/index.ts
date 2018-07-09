@@ -1,11 +1,12 @@
 // base types
+export { MapID, MapType, MapData } from './sense/map';
 export { ObjectID, ObjectType, ObjectData } from './sense/object';
 export { BoxID, BoxData } from './sense/box';
 export { CardID, CardType, CardData } from './sense/card';
 export { EdgeID, Edge } from './sense/edge';
 
 // application types
-export { MapID, MapScopeType } from './sense-map';
+export { MapScopeType } from './sense-map';
 
 // redux types
 export {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, TextArea, Input } from 'semantic-ui-react';
+import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import * as B from '../../types/sense/box';
 
 interface Props {
@@ -19,6 +19,9 @@ class BoxContent extends React.PureComponent<Props> {
 
     return (
       <Form className="box-content">
+        <Header as="h3" color="grey">
+          BOX INSPECTOR
+        </Header>
         <Form.Field className="box-content__title">
           <label>Title</label>
           <Input

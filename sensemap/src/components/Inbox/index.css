@@ -5,16 +5,6 @@
   height: 960px;
 }
 
-.inbox__close-btn {
-  width: 96px;
-  height: 36px;
-  margin-top: 16px;
-}
-
-.inbox__close-btn button {
-  width: 96px;
-}
-
 .inbox__actions {
   margin: 20px 10px;
 }

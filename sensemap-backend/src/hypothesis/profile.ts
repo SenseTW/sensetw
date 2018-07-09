@@ -1,12 +1,14 @@
 import * as express from 'express';
 import * as M from '../types/map';
-import { MiddlewareConfig } from '.';
+import { Context } from '../context';
 
-export function router(config: MiddlewareConfig) {
+export function router(context: Context) {
   const router = express.Router();
 
   router.get('/', (req, res) => {
-    const { db } = config.context({ req });
+    const userid = !!req.user ? `acct:${req.user.username}@ggv.tw` : null;
+    const authority = 'ggv.tw';
+    const { db } = context({ req });
     M.getAllMaps(db).then((maps) => {
       const groups = maps.map(map => ({
         id: map.id,
@@ -17,8 +19,8 @@ export function router(config: MiddlewareConfig) {
       const profile = {
         preferences: {},
         groups,
-        userid: null,
-        authority: 'ggv.tw',
+        userid,
+        authority,
         features: {
           filter_highlights: true,
           api_render_user_info: true,

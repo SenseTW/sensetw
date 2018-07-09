@@ -2,12 +2,15 @@ import * as React from 'react';
 import {
   BrowserRouter as Router,
   Route,
+  Redirect,
   Switch,
 } from 'react-router-dom';
+import Analytics from '../Analytics';
 import Header from '../Header';
 import MapPage from '../MapPage';
 import DashboardPage from '../DashboardPage';
 import ImportPage from '../ImportPage';
+import SettingsPage from '../SettingsPage';
 import * as R from '../../types/routes';
 import './index.css';
 
@@ -23,12 +26,15 @@ class App extends React.Component {
     return (
       <Router basename={process.env.PUBLIC_URL}>
         <div className="App">
+          <Route render={(props) => <Analytics {...props} trackingId="UA-112380022-4" />} />
           <Header />
           <Switch>
-            <Route exact path={R.dashboard} component={DashboardPage} />
+            <Route exact path={R.index} render={() => <Redirect to={R.mapList} />} />
+            <Route exact path={R.settings} component={SettingsPage} />
             <Route exact path={R.importer} component={ImportPage} />
+            <Route exact path={R.mapList} component={DashboardPage} />
             <Route exact path={R.map} component={MapPage} />
-            <Route path={`${R.map}/:bid`} component={MapPage} />
+            <Route path={R.submap} component={MapPage} />
           </Switch>
         </div>
       </Router>

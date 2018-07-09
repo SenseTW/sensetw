@@ -1,6 +1,7 @@
 import { ActionUnion, emptyAction } from './action';
 import * as S from './storage';
 import { ObjectMap, toIDMap } from './sense/has-id';
+import { MapID, MapData, emptyMapData } from './sense/map';
 import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
@@ -28,6 +29,10 @@ export const initial = {
 
 export const toStorage = (storage: CachedStorage): S.Storage => {
   return {
+    maps: {
+      ...storage[TargetType.PERMANENT].maps,
+      ...storage[TargetType.TEMPORARY].maps,
+    },
     objects: {
       ...storage[TargetType.PERMANENT].objects,
       ...storage[TargetType.TEMPORARY].objects,
@@ -46,6 +51,10 @@ export const toStorage = (storage: CachedStorage): S.Storage => {
     },
   };
 };
+
+export const getMap =
+  (storage: CachedStorage, id: MapID): MapData =>
+  storage[TargetType.TEMPORARY].maps[id] || storage[TargetType.PERMANENT].maps[id] || emptyMapData;
 
 export const getObject =
   (storage: CachedStorage, id: ObjectID): ObjectData =>
@@ -70,6 +79,9 @@ export const getCardsInBox = (storage: CachedStorage, id: BoxID): ObjectMap<Card
     .map(cid => getCard(storage, cid))
     .reduce((a, c) => { a[c.id] = c; return a; }, {});
 
+export const doesMapExist = (storage: CachedStorage, id: MapID): boolean =>
+  S.doesMapExist(storage[TargetType.TEMPORARY], id) || S.doesMapExist(storage[TargetType.PERMANENT], id);
+
 export const doesObjectExist = (storage: CachedStorage, id: ObjectID): boolean =>
   S.doesObjectExist(storage[TargetType.TEMPORARY], id) || S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
@@ -81,6 +93,9 @@ export const doesBoxExist = (storage: CachedStorage, id: BoxID): boolean =>
 
 export const doesEdgeExist = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) || S.doesEdgeExist(storage[TargetType.PERMANENT], id);
+
+export const isMapNew = (storage: CachedStorage, id: MapID): boolean =>
+  S.doesMapExist(storage[TargetType.TEMPORARY], id) && !S.doesMapExist(storage[TargetType.PERMANENT], id);
 
 export const isObjectNew = (storage: CachedStorage, id: ObjectID): boolean =>
   S.doesObjectExist(storage[TargetType.TEMPORARY], id) && !S.doesObjectExist(storage[TargetType.PERMANENT], id);
@@ -94,6 +109,9 @@ export const isBoxNew = (storage: CachedStorage, id: BoxID): boolean =>
 export const isEdgeNew = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && !S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
+export const isMapDirty = (storage: CachedStorage, id: MapID): boolean =>
+  S.doesMapExist(storage[TargetType.TEMPORARY], id) && S.doesMapExist(storage[TargetType.PERMANENT], id);
+
 export const isObjectDirty = (storage: CachedStorage, id: ObjectID): boolean =>
   S.doesObjectExist(storage[TargetType.TEMPORARY], id) && S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
@@ -105,6 +123,23 @@ export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
 
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
+
+export const areMapsClean = (storage: CachedStorage): boolean => S.hasNoMap(storage[TargetType.TEMPORARY]);
+
+export const areObjectsClean = (storage: CachedStorage): boolean => S.hasNoObject(storage[TargetType.TEMPORARY]);
+
+export const areCardsClean = (storage: CachedStorage): boolean => S.hasNoCard(storage[TargetType.TEMPORARY]);
+
+export const areBoxesClean = (storage: CachedStorage): boolean => S.hasNoBox(storage[TargetType.TEMPORARY]);
+
+export const areEdgesClean = (storage: CachedStorage): boolean => S.hasNoEdge(storage[TargetType.TEMPORARY]);
+
+export const isClean = (storage: CachedStorage): boolean =>
+  areMapsClean(storage) &&
+  areObjectsClean(storage) &&
+  areCardsClean(storage) &&
+  areBoxesClean(storage) &&
+  areEdgesClean(storage);
 
 const submapByKeys = <T>(keys: string[], objmap: ObjectMap<T>): ObjectMap<T> =>
   keys.reduce((acc, key) => { acc[key] = objmap[key]; return acc; }, {});
@@ -130,6 +165,7 @@ export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolea
   const part = S.scoped(next, filter);
   // create the diff of the scoped storage
   result[TargetType.TEMPORARY] = {
+    maps:    submapByKeys(Object.keys(diff.maps), part.maps),
     objects: submapByKeys(Object.keys(diff.objects), part.objects),
     cards:   submapByKeys(Object.keys(diff.cards), part.cards),
     boxes:   submapByKeys(Object.keys(diff.boxes), part.boxes),
@@ -151,6 +187,24 @@ export const scopedToMap = (storage: CachedStorage): CachedStorage => {
   const filter = (key: ObjectID): boolean => !getObject(storage, key).belongsTo;
   return scoped(storage, filter);
 };
+
+export const updateMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_MAPS as typeof S.UPDATE_MAPS,
+  payload: { maps, target },
+});
+
+export const overwriteMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_MAPS as typeof S.OVERWRITE_MAPS,
+  payload: { maps, target },
+});
+
+export const removeMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_MAPS as typeof S.REMOVE_MAPS,
+  payload: { maps, target },
+});
+
+export const removeMap = (map: MapData, target: TargetType = TargetType.TEMPORARY) =>
+  removeMaps(toIDMap<MapID, MapData>([map]));
 
 export const updateObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_OBJECTS as typeof S.UPDATE_OBJECTS,
@@ -237,6 +291,10 @@ export const updateInBox =
   });
 
 export const actions = {
+  updateMaps,
+  overwriteMaps,
+  removeMaps,
+  removeMap,
   updateObjects,
   overwriteObjects,
   removeObjects,
@@ -261,6 +319,9 @@ export type Action = ActionUnion<typeof actions>;
 
 export const reducer = (state: CachedStorage = initial, action: Action = emptyAction): CachedStorage => {
   switch (action.type) {
+    case S.UPDATE_MAPS:
+    case S.OVERWRITE_MAPS:
+    case S.REMOVE_MAPS:
     case S.UPDATE_OBJECTS:
     case S.OVERWRITE_OBJECTS:
     case S.REMOVE_OBJECTS:

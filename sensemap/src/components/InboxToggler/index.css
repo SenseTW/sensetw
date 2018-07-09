@@ -1,0 +1,14 @@
+.inbox-toggler {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  background-color: #d8d8d8;
+}
+
+.inbox-toggler > i.icon {
+  flex: 1;
+  margin: 0;
+  color: #4a4a4a;
+}

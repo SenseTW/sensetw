@@ -1,8 +1,13 @@
-.add-card-btn {
-  height: 36px;
-  opacity: 0.48;
-  border-radius: 4px;
-  background-color: rgba(216, 216, 216, 0.59);
-  border: solid 2px #ffffff;
-  text-align: center;
+.inbox__add-card-btn {
+  margin-top: 14px;
+  margin-right: 8px;
+  margin-left: 8px;
+}
+
+.inbox__add-card-btn button {
+  width: 100%;
+}
+
+.inbox__add-card-btn.hidden {
+  display: none;
 }

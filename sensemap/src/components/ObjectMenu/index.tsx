@@ -4,7 +4,6 @@ import { Menu } from 'semantic-ui-react';
 import * as T from '../../types';
 import { actions, ActionProps, mapDispatch } from '../../types';
 import * as SL from '../../types/selection';
-import * as SM from '../../types/sense-map';
 import * as CS from '../../types/cached-storage';
 import * as OE from '../../types/object-editor';
 import { cardData } from '../../types/sense/card';
@@ -23,7 +22,12 @@ interface StateFromProps {
   editor:      T.State['editor'];
 }
 
-type Props = StateFromProps & ActionProps;
+interface OwnProps {
+  // tslint:disable-next-line:no-any
+  style: any;
+}
+
+type Props = StateFromProps & ActionProps & OwnProps;
 
 const selectedCardsAndBoxes:
   (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
@@ -165,11 +169,11 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions: acts, senseObject, selection, senseMap, input, editor } = this.props;
+    const { style, actions: acts, senseObject, selection, input, editor } = this.props;
     const isMultiSelectable = I.isMultiSelectable(input);
 
     return (
-      <Menu vertical>
+      <Menu vertical style={style}>
         <Menu.Item>{
           selection.length === 0
             ? '功能選單'
@@ -179,15 +183,6 @@ class ObjectMenu extends React.PureComponent<Props> {
                 : '按 Shift/Ctrl 選取多張卡片'
               : `選取了 ${selection.length} 張卡片`
         }</Menu.Item>
-        {
-          senseMap.inbox === SM.InboxVisibility.HIDDEN &&
-          <Menu.Item
-            name="open-inbox"
-            onClick={acts.senseMap.openInbox}
-          >
-            Inbox
-          </Menu.Item>
-        }
         {
           this.canCreateBox() &&
           <Menu.Item

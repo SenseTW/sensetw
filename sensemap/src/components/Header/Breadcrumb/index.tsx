@@ -21,21 +21,22 @@ interface StateFromProps {
 
 type Props = StateFromProps & ActionProps;
 
-class MapSections extends React.PureComponent<Props> {
+class MapSections extends React.PureComponent<Props & { mid: T.MapID }> {
   componentWillMount() {
-    const { actions: { senseMap } } = this.props;
+    const { actions: { senseMap }, mid } = this.props;
 
     // sync the route to the scope
+    senseMap.setMap(mid);
     senseMap.setScopeToFullmap();
   }
 
   componentDidUpdate() {
-    const { history, scope } = this.props;
+    const { history, scope, mid } = this.props;
 
     // sync the scope to the route
     if (scope.type !== T.MapScopeType.FULL_MAP) {
       // XXX: can I get the router basename here?
-      history.push(`${process.env.PUBLIC_URL}${R.map}/${scope.box}`);
+      history.push(`${process.env.PUBLIC_URL}${R.toSubmapPath({ mid, bid: scope.box })}`);
     }
   }
 
@@ -45,7 +46,7 @@ class MapSections extends React.PureComponent<Props> {
         <SBreadcrumb.Section
           link
           as={Link}
-          to={R.dashboard}
+          to={R.mapList}
         >
           Dashboard
         </SBreadcrumb.Section>
@@ -56,25 +57,26 @@ class MapSections extends React.PureComponent<Props> {
   }
 }
 
-class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
+class MapBoxSections extends React.PureComponent<Props & { mid: T.MapID, bid: T.BoxID }> {
   componentWillMount() {
-    const { actions: { senseMap }, bid } = this.props;
+    const { actions: { senseMap }, mid, bid } = this.props;
 
     // sync the route to the scope
+    senseMap.setMap(mid);
     senseMap.setScopeToBox(bid);
   }
 
   componentDidUpdate() {
-    const { history, scope } = this.props;
+    const { history, scope, mid } = this.props;
 
     // sync the scope to the route
     if (scope.type === T.MapScopeType.FULL_MAP) {
-      history.push(`${process.env.PUBLIC_URL}${R.map}`);
+      history.push(`${process.env.PUBLIC_URL}${R.toMapPath({ mid })}`);
     }
   }
 
   render() {
-    const { actions: { senseMap, selection }, senseObject, bid } = this.props;
+    const { actions: { senseMap, selection }, senseObject, mid, bid } = this.props;
     const box = CS.getBox(senseObject, bid);
 
     return (
@@ -82,7 +84,7 @@ class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
         <SBreadcrumb.Section
           link
           as={Link}
-          to={R.dashboard}
+          to={R.mapList}
         >
           Dashboard
         </SBreadcrumb.Section>
@@ -90,7 +92,7 @@ class MapBoxSections extends React.PureComponent<Props & { bid: string }> {
         <SBreadcrumb.Section
           link
           as={Link}
-          to={R.map}
+          to={R.toMapPath({ mid })}
           onClick={() => {
             selection.clearSelection();
             senseMap.setScopeToFullmap();
@@ -114,8 +116,11 @@ class Breadcrumb extends React.PureComponent<Props> {
     return (
       <SBreadcrumb>
         <Switch>
-          <Route exact path={R.dashboard}>
+          <Route exact path={R.mapList}>
             {() => <SBreadcrumb.Section active>Dashboard</SBreadcrumb.Section>}
+          </Route>
+          <Route exact path={R.settings}>
+            {() => <SBreadcrumb.Section active>Settings</SBreadcrumb.Section>}
           </Route>
           <Route exact path={R.importer}>
             {() => (
@@ -123,7 +128,7 @@ class Breadcrumb extends React.PureComponent<Props> {
                 <SBreadcrumb.Section
                   link
                   as={Link}
-                  to={R.dashboard}
+                  to={R.mapList}
                 >
                   Dashboard
                 </SBreadcrumb.Section>
@@ -133,10 +138,10 @@ class Breadcrumb extends React.PureComponent<Props> {
             )}
           </Route>
           <Route exact path={R.map}>
-            {() => <MapSections {...this.props} />}
+            {({ match: { params: { mid }} }) => <MapSections {...this.props} mid={mid} />}
           </Route>
-          <Route path={`${R.map}/:bid`}>
-            {({ match: { params: { bid }} }) => <MapBoxSections {...this.props} bid={bid} />}
+          <Route path={R.submap}>
+            {({ match: { params: { mid, bid }} }) => <MapBoxSections {...this.props} mid={mid} bid={bid} />}
           </Route>
         </Switch>
       </SBreadcrumb>

@@ -35,11 +35,35 @@
 }
 
 .ui.card.map-card > .content.map-card__actions {
+  position: relative;
   padding: 0;
+}
+
+.ui.card.map-card > .content.map-card__actions > .ui.buttons {
+  padding-right: 4rem;
 }
 
 .ui.card.map-card > .content.map-card__actions > .ui.buttons > .ui.button {
   font-weight: 500;
   background-color: transparent;
   color: white;
+  text-transform: uppercase;
+}
+
+.ui.card.map-card > .content.map-card__actions > .ui.dropdown {
+  position: absolute;
+  width: 4rem;
+  line-height: 1em;
+  top: 0;
+  right: 0;
+  padding: 0.785714em;
+  color: white;
+}
+
+.ui.card.map-card > .content.map-card__actions > .ui.dropdown > .text {
+  display: none;
+}
+
+.ui.card.map-card > .content.map-card__actions > .ui.dropdown > .menu > .item {
+  text-transform: uppercase;
 }

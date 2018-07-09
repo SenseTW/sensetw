@@ -14,7 +14,13 @@ class Submenu extends React.PureComponent<Props> {
 
     return (
       <Menu tabular className={`${className} right`}>
-        <Menu.Item className={`${className}__annotation`}>Annotation</Menu.Item>
+        <Menu.Item
+          className={`${className}__annotation`}
+          as="a"
+          href="https://via.sense.tw/"
+        >
+          Annotation
+        </Menu.Item>
         <Switch>
           <Route path={R.map}>
             {() => <Menu.Item active>Map</Menu.Item>}

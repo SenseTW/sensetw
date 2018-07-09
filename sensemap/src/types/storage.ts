@@ -1,5 +1,6 @@
 import { ActionUnion, emptyAction } from './action';
 import { ObjectMap } from './sense/has-id';
+import { MapID, MapData, emptyMapData } from './sense/map';
 import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
@@ -9,6 +10,7 @@ import { EdgeID, Edge, emptyEdge } from './sense/edge';
  * The storage of sense objects.
  */
 export type Storage = {
+  maps:    ObjectMap<MapData>,
   objects: ObjectMap<ObjectData>,
   cards:   ObjectMap<CardData>,
   boxes:   ObjectMap<BoxData>,
@@ -16,11 +18,20 @@ export type Storage = {
 };
 
 export const initial: Storage = {
+  maps:    {},
   objects: {},
   cards:   {},
   boxes:   {},
   edges:   {},
 };
+
+/**
+ * It gets a map by it's id.
+ *
+ * @param storage The storage.
+ * @param id The map id.
+ */
+export const getMap = (storage: Storage, id: MapID): MapData => storage.maps[id] || emptyMapData;
 
 /**
  * It gets an object by it's id.
@@ -67,6 +78,49 @@ export const getCardsInBox = (storage: Storage, id: BoxID): ObjectMap<CardData> 
     .reduce((a, c) => { a[c.id] = c; return a; }, {});
 
 /**
+ * Check if there is any map.
+ *
+ * @param storage The storage.
+ */
+export const hasNoMap = (storage: Storage): boolean => Object.keys(storage.maps).length === 0;
+
+/**
+ * Check if there is any object.
+ *
+ * @param storage The storage.
+ */
+export const hasNoObject = (storage: Storage): boolean => Object.keys(storage.objects).length === 0;
+
+/**
+ * Check if there is any card.
+ *
+ * @param storage The storage.
+ */
+export const hasNoCard = (storage: Storage): boolean => Object.keys(storage.cards).length === 0;
+
+/**
+ * Check if there is any box.
+ *
+ * @param storage The storage.
+ */
+export const hasNoBox = (storage: Storage): boolean => Object.keys(storage.boxes).length === 0;
+
+/**
+ * Check if there is any edfe.
+ *
+ * @param storage The storage.
+ */
+export const hasNoEdge = (storage: Storage): boolean => Object.keys(storage.edges).length === 0;
+
+/**
+ * Check if a map exists.
+ *
+ * @param storage The storage.
+ * @param id The map id.
+ */
+export const doesMapExist = (storage: Storage, id: MapID): boolean => !!storage.maps[id];
+
+/**
  * Check if an object exists.
  *
  * @param storage The storage.
@@ -99,36 +153,6 @@ export const doesBoxExist = (storage: Storage, id: BoxID): boolean => !!storage.
 export const doesEdgeExist = (storage: Storage, id: EdgeID): boolean => !!storage.edges[id];
 
 /**
- * It gets a card from a storage or fallback to another storage.
- *
- * @param storage The target storage.
- * @param defaultStorage The fallback storage.
- * @param id The card id.
- */
-export const getCardOrDefault = (storage: Storage, defaultStorage: Storage, id: CardID): CardData =>
-  storage.cards[id] || defaultStorage.cards[id] || emptyCardData;
-
-/**
- * It gets a box from a storage or fallback to another storage.
- *
- * @param storage The target storage.
- * @param defaultStorage The fallback storage.
- * @param id The box id.
- */
-export const getBoxOrDefault = (storage: Storage, defaultStorage: Storage, id: BoxID): BoxData =>
-  storage.boxes[id] || defaultStorage.boxes[id] || emptyBoxData;
-
-/**
- * It gets an edge from a storage or fallback to another storage.
- *
- * @param storage The target storage.
- * @param defaultStorage The fallback storage.
- * @param id The edge id.
- */
-export const getEdgeOrDefault = (storage: Storage, defaultStorage: Storage, id: EdgeID): Edge =>
-  storage.edges[id] || defaultStorage.edges[id] || emptyEdge;
-
-/**
  * It filters the storage objects and create a new storage with those objects
  * and their edges.
  *
@@ -154,8 +178,8 @@ export const scoped = (storage: Storage, filter: (key: ObjectID) => boolean): St
         return acc;
       },
       {});
-  const { cards, boxes } = storage;
-  return { objects, cards, boxes, edges };
+  const { maps, cards, boxes } = storage;
+  return { maps, objects, cards, boxes, edges };
 };
 
 /**
@@ -179,6 +203,36 @@ export const scopedToMap = (storage: Storage): Storage => {
   const filter = (key: ObjectID): boolean => !getObject(storage, key).belongsTo;
   return scoped(storage, filter);
 };
+
+/**
+ * Partially update `maps` state.
+ */
+export const UPDATE_MAPS = 'UPDATE_MAPS';
+export const updateMaps =
+  (maps: ObjectMap<MapData>) => ({
+    type: UPDATE_MAPS as typeof UPDATE_MAPS,
+    payload: { maps },
+  });
+
+/**
+ * Overwrite `maps`.
+ */
+export const OVERWRITE_MAPS = 'OVERWRITE_MAPS';
+export const overwriteMaps =
+  (maps: ObjectMap<MapData>) => ({
+    type: OVERWRITE_MAPS as typeof OVERWRITE_MAPS,
+    payload: { maps },
+  });
+
+/**
+ * Remove listed `maps`.
+ */
+export const REMOVE_MAPS = 'REMOVE_MAPS';
+export const removeMaps =
+  (maps: ObjectMap<MapData>) => ({
+    type: REMOVE_MAPS as typeof REMOVE_MAPS,
+    payload: { maps },
+  });
 
 /**
  * Partially update `objects` state.
@@ -321,6 +375,9 @@ export const updateInBox =
   });
 
 export const actions = {
+  updateMaps,
+  overwriteMaps,
+  removeMaps,
   updateObjects,
   overwriteObjects,
   removeObjects,
@@ -341,6 +398,27 @@ export type Action = ActionUnion<typeof actions>;
 
 export const reducer = (state: Storage = initial, action: Action = emptyAction): Storage => {
   switch (action.type) {
+    case UPDATE_MAPS: {
+      return {
+        ...state,
+        maps: { ...state.maps, ...action.payload.maps },
+      };
+    }
+    case OVERWRITE_MAPS: {
+      return {
+        ...state,
+        maps: action.payload.maps,
+      };
+    }
+    case REMOVE_MAPS: {
+      const maps = { ...state.maps };
+      Object.keys(action.payload.maps).forEach(key => delete maps[key]);
+
+      return {
+        ...state,
+        maps,
+      };
+    }
     case UPDATE_OBJECTS: {
       return {
         ...state,

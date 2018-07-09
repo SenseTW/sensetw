@@ -1,25 +1,59 @@
 import { Dispatch, GetState } from '.';
 import * as G from './graphql';
+import * as GM from './graphql/map';
 import * as GO from './graphql/object';
 import * as GC from './graphql/card';
 import * as GB from './graphql/box';
 import * as GE from './graphql/edge';
 import * as H from './sense/has-id';
 import * as C from './sense/card';
+import { MapID, MapData } from './sense/map';
+import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
 import { CardID, CardData } from './sense/card';
 import * as B from './sense/box';
 import { BoxID, BoxData } from './sense/box';
-import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
 import { Edge, EdgeID } from './sense/edge';
 import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
-import { MapID } from './sense-map';
 import * as SL from './selection';
 import * as SM from './sense-map';
 
 export type State = CachedStorage;
 
 export const initial: State = CS.initial;
+
+const createMap =
+  (map: MapData) =>
+  async (dispatch: Dispatch) => {
+    return GM.create(map)
+      .then((newMap) => {
+        // add the new map
+        dispatch(CS.updateMaps(
+          H.toIDMap<MapID, MapData>([newMap]),
+          TargetType.PERMANENT,
+        ));
+        // remove the temporary map from the cached storage;
+        dispatch(CS.removeMap(map));
+      });
+  };
+
+const updateMap =
+  (map: MapData) =>
+  (dispatch: Dispatch) =>
+    dispatch(CS.updateMaps(H.toIDMap<MapID, MapData>([map])));
+
+const saveMap =
+  (map: MapData) =>
+  (dispatch: Dispatch) => {
+    return GM.update(map)
+      .then((newMap) => {
+        const mapMap = H.toIDMap<MapID, MapData>([newMap]);
+        // update the map
+        dispatch(CS.updateMaps(mapMap, TargetType.PERMANENT));
+        // remove the map from the cached storage
+        dispatch(CS.removeMaps(mapMap));
+      });
+  };
 
 const createCard =
   (mapId: MapID, card: CardData) =>
@@ -81,6 +115,28 @@ const saveBox =
         // remove the box from the cache storage
         dispatch(CS.removeBoxes(boxMap));
       });
+  };
+
+const loadMaps =
+  (overwrite: Boolean = false) =>
+  (dispatch: Dispatch) => {
+    return GM.loadMaps()
+      .then(data => H.toIDMap<MapID, MapData>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteMaps(data, TargetType.PERMANENT)
+          : CS.updateMaps(data, TargetType.PERMANENT)
+      ));
+  };
+
+// TODO: fire less actions
+const cleanUp =
+  () =>
+  (dispatch: Dispatch) => {
+    dispatch(CS.overwriteObjects({}, TargetType.PERMANENT));
+    dispatch(CS.overwriteCards({}, TargetType.PERMANENT));
+    dispatch(CS.overwriteBoxes({}, TargetType.PERMANENT));
+    dispatch(CS.overwriteEdges({}, TargetType.PERMANENT));
   };
 
 const loadObjects =
@@ -239,6 +295,13 @@ const removeCardsFromBox =
     return dispatch(SL.actions.clearSelection());
   };
 
+const removeMap =
+  (mapID: MapID) =>
+  (dispatch: Dispatch) => {
+    return GM.remove(mapID)
+      .then(() => loadMaps(true)(dispatch));
+  };
+
 const removeObject =
   (objectID: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
@@ -311,12 +374,17 @@ const removeEdge =
   };
 
 export const actions = {
+  createMap,
+  updateMap,
+  saveMap,
   updateCard,
   saveCard,
   removeCard,
   updateBox,
   saveBox,
   removeBox,
+  loadMaps,
+  cleanUp,
   loadObjects,
   loadCards,
   loadBoxes,
@@ -332,6 +400,7 @@ export const actions = {
   removeCardFromBox,
   removeCardsFromBox,
   unboxCards,
+  removeMap,
   removeObject,
   removeCardWithObject,
   removeBoxWithObject,

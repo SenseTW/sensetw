@@ -1,5 +1,6 @@
 import { gql, IResolvers } from 'apollo-server';
 import { reduce, mergeDeepRight } from 'ramda';
+import * as U from './user';
 import * as M from './map';
 import * as C from './card';
 import * as B from './box';
@@ -51,6 +52,11 @@ export const typeDefs = gql`
       toId: ID,
     ): Edge
     createMap(
+      name: String,
+      description: String,
+      tags: String,
+      image: String,
+      type: String,
       boxesIds: [ID!],
       cardsIds: [ID!],
       edgesIds: [ID!],
@@ -70,6 +76,14 @@ export const typeDefs = gql`
       incomingIds: [ID!],
       outgoingIds: [ID!]
     ): Object
+    updateMap(
+      id: ID!,
+      name: String,
+      description: String,
+      tags: String,
+      image: String,
+      type: String,
+    ): Map
     updateBox(
       id: ID!,
       summary: String,
@@ -142,6 +156,11 @@ export const typeDefs = gql`
     id: ID! @isUnique
     createdAt: DateTime!
     updatedAt: DateTime!
+    name: String
+    description: String
+    tags: String
+    image: String
+    type: String
     objects: [Object!]! @relation(name: "MapObjects")
     edges: [Edge!]! @relation(name: "MapEdges")
     cards: [Card!]! @relation(name: "MapCards")

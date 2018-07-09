@@ -1,7 +1,6 @@
 import * as express from 'express';
 import { pick } from 'ramda';
 import * as C from '../types/card';
-import { MiddlewareConfig } from '.';
 
 function compileCardFilter(query) {
   const { uri, url, group, tag } = query;
@@ -18,12 +17,12 @@ function translateAnnotation(card) {
   };
 }
 
-export function router(config: MiddlewareConfig) {
+export function router(context) {
   const router = express.Router();
 
   router.get('/', (req, res, next) => {
     const cardFilter = compileCardFilter(req.query);
-    const { db } = config.context({ req });
+    const { db } = context({ req });
     C.getAllCards(db, cardFilter).then((cards) => {
       const rows = cards.map(translateAnnotation);
       const total = rows.length;

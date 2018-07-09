@@ -1,10 +1,10 @@
 import * as H from '../sense/has-id';
 import * as OT from '../sense/object-type';
+import { MapID } from '../sense/map';
 import { ObjectType } from '../sense/object-type';
 import { ObjectID, ObjectData } from '../sense/object';
 import { CardID } from '../sense/card';
 import { BoxID } from '../sense/box';
-import { MapID } from '../sense-map';
 import { client } from './client';
 import * as moment from 'moment';
 

@@ -15,27 +15,38 @@ describe('GraphQL', () => {
     expect(map.id).toBe(maps[0].id);
     expect(map.createdAt).toBeTruthy();
     expect(map.updatedAt).toBeTruthy();
+    expect(map.name).toBeTruthy();
+    expect(map.description).toBeTruthy();
+    expect(map.tags).toBeTruthy();
+    expect(map.image).toBeTruthy();
+    expect(map.type).toBeTruthy();
     expect(map.objects).toContain(maps[0].objects[0].id);
     expect(map.cards).toContain(maps[0].cards[0].id);
     expect(map.boxes).toContain(maps[0].boxes[0].id);
     expect(map.edges).toContain(maps[0].edges[0].id);
   });
 
-  test('create/get/delete Map', async () => {
+  test('create/update/delete Map', async () => {
     const m0 = await M.resolvers.Mutation.createMap(null, {}, { db }, null);
     expect(m0.id).toBeTruthy();
     expect(m0.createdAt).toBeTruthy();
     expect(m0.updatedAt).toBeTruthy();
+    expect(m0.name).toBeNull();
 
-    const m1 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);
-    expect(m1.id).toBe(m0.id);
-    expect(m1.createdAt).toEqual(m0.createdAt);
-    expect(m1.updateAt).toEqual(m0.updateAt);
+    const m1 = await M.resolvers.Mutation.updateMap(null, { id: m0.id, name: 'baz', type: 'someothertype' } { db }, null);
 
-    const m2 = await M.resolvers.Mutation.deleteMap(null, { id: m0.id }, { db }, null);
+    const m2 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);
     expect(m2.id).toBe(m0.id);
-    const r2 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);
-    expect(r2).toBeNull();
+    expect(m2.createdAt).toEqual(m0.createdAt);
+    expect(m2.updateAt).toEqual(m0.updateAt);
+    expect(m2.name).toEqual('baz');
+    expect(m2.type).toEqual('someothertype');
+
+
+    const m3 = await M.resolvers.Mutation.deleteMap(null, { id: m0.id }, { db }, null);
+    expect(m3.id).toBe(m0.id);
+    const r3 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);
+    expect(r3).toBeNull();
   });
 
   test('allMaps', async () => {

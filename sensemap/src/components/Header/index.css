@@ -8,6 +8,7 @@
 .sense-header .ui.inverted.menu .item {
   padding-top: 8px;
   padding-bottom: 8px;
+  text-transform: uppercase;
 }
 
 /* the dropdown menu */
@@ -20,6 +21,7 @@
   display: flex;
   height: 52px;
   border-bottom: solid 1px #e6e6e6;
+  background-color: #fff;
 }
 
 .sense-header > .sense-header__submenu > .ui.breadcrumb {

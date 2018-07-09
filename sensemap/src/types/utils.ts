@@ -1,5 +1,7 @@
 export type TimeStamp = number;
 
+export const TIME_FORMAT = 'YYYY-M-DD HH:mm';
+
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
  */

@@ -12,6 +12,7 @@ interface RenderProp<DataType> {
 export interface Props<DataType> {
   data: DataType[];
   pageSize: number;
+  currentPage: number;
   children: RenderProp<DataType>;
 }
 
@@ -23,7 +24,7 @@ export class Pager<DataType> extends React.Component<Props<DataType>, State<Data
   constructor(props: Props<DataType>) {
     super(props);
     this.state = {
-      currentPage: 2,
+      currentPage: props.currentPage || 1,
     };
     this.handlePageChange = this.handlePageChange.bind(this);
   }

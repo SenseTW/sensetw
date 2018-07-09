@@ -1,0 +1,70 @@
+.settings-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  background-color: #fffcbf;
+}
+
+.settings-page::before {
+  content: '';
+  display: flex;
+  align-self: flex-start;
+  flex: 1;
+}
+
+.settings-page::after {
+  content: '';
+  display: flex;
+  align-self: flex-end;
+  flex: 1;
+}
+
+.settings-page > .ui.container {
+  flex: 1;
+  width: 432px;
+  padding: 36px 64px;
+  background-color: #fff;
+}
+
+.settings-page > .ui.container > .ui.form > .ui.header {
+  font-size: 1.714285rem;
+  padding-bottom: 3px;
+  margin-bottom: 22px;
+}
+
+.settings-page > .ui.container > .ui.form > .ui.header::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin-top: 3px;
+  background-color: rgba(230, 230, 230, 0.75);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.settings-page > .ui.container > .ui.form .field {
+  margin-bottom: 24px;
+}
+
+.settings-page > .ui.container > .ui.form .field > label {
+  font-size: 1.142857rem;
+  margin-bottom: 12px;
+}
+
+.settings-page > .ui.container > .ui.form .field > .settings-page__hint {
+  display: block;
+  font-size: 1.142857rem;
+  margin-top: 6px;
+  color: #acacac;
+}
+
+.settings-page > .ui.container > .ui.form .field > .settings-page__error {
+  display: block;
+  font-size: 1.142857rem;
+  margin-top: 6px;
+  color: #ad292d;
+}
+
+.settings-page > .ui.container > .ui.form > .settings-page__submit {
+  margin-top: 98px;
+}

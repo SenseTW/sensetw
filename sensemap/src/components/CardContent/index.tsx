@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, TextArea, Input } from 'semantic-ui-react';
+import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import * as C from '../../types/sense/card';
 import { isURL } from 'validator';
@@ -22,8 +22,11 @@ class CardContent extends React.PureComponent<Props> {
 
     return (
       <Form className="card-content">
+        <Header as="h3" color="grey">
+        CARD INSPECTOR
+        </Header>
         <Form.Field className="card-content__summary">
-          <label>Summary / Description</label>
+          <label>Summary</label>
           <TextArea
             placeholder="說重點"
             value={summary}
@@ -47,15 +50,8 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateTitle(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field className="card-content__description">
-          <label>Quote</label>
-          <TextArea
-            placeholder="資料原文摘錄與補充資訊"
-            value={description}
-            onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
-          />
-        </Form.Field>
         <Form.Field className="card-content__url">
+          <label>Source Link</label>
           <Input
             placeholder="https://o.sense.tw/abcd"
             value={url}
@@ -79,8 +75,23 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateUrl(e.currentTarget.value))}
           />
         </Form.Field>
+        <Form.Field className="card-content__description">
+          <label>Description</label>
+          <TextArea
+            placeholder="資料原文摘錄與補充資訊"
+            value={description}
+            onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
+          />
+        </Form.Field>
+        <Form.Field className="card-content__card-type">
+          <label>Card Type</label>
+          <CardTypeSelector
+            cardType={cardType}
+            onChange={type => onChange && onChange(C.updateCardType(type))}
+          />
+        </Form.Field>
         <Form.Field className="card-content__said-by" inline>
-          <label>發言人</label>
+          <label>Said By</label>
           <Input
             placeholder="誰提出的意見？ e.g. XX 大學校長 XXX"
             value={saidBy}
@@ -89,19 +100,12 @@ class CardContent extends React.PureComponent<Props> {
           />
         </Form.Field>
         <Form.Field className="card-content__stakeholder" inline>
-          <label>利害關係人</label>
+          <label>Stakeholders</label>
           <Input
             placeholder="誰會被影響？（用逗號隔開）e.g. 經濟部, 半導體廠商, 大學"
             value={stakeholder}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(C.updateStakeholder(e.currentTarget.value))}
-          />
-        </Form.Field>
-        <Form.Field className="card-content__card-type">
-          <label>Card Type</label>
-          <CardTypeSelector
-            cardType={cardType}
-            onChange={type => onChange && onChange(C.updateCardType(type))}
           />
         </Form.Field>
         {children}

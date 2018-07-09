@@ -1,9 +1,8 @@
 import { Dispatch } from '.';
 import { ActionUnion, emptyAction } from './action';
+import { MapID } from './sense/map';
 import { BoxID } from './sense/box';
 import * as SL from './selection';
-
-export type MapID = string;
 
 export enum MapScopeType {
   FULL_MAP = 'FULL_MAP',
@@ -58,6 +57,13 @@ const setScopeToFullmap =
     type: SET_SCOPE_TO_FULL_MAP as typeof SET_SCOPE_TO_FULL_MAP,
   });
 
+const SET_MAP = 'SET_MAP';
+const setMap =
+  (map: MapID) => ({
+    type: SET_MAP as typeof SET_MAP,
+    payload: { map },
+  });
+
 const OPEN_INBOX = 'OPEN_INBOX';
 /**
  * A message to open the inbox.
@@ -65,6 +71,16 @@ const OPEN_INBOX = 'OPEN_INBOX';
 const openInbox =
   () => ({
     type: OPEN_INBOX as typeof OPEN_INBOX,
+  });
+
+const ACTIVATE_INBOX_PAGE = 'ACTIVATE_INBOX_PAGE';
+/**
+ * A message to change the inbox activated page.
+ */
+const activateInboxPage = 
+  (page: number) => ({
+    type: ACTIVATE_INBOX_PAGE as typeof ACTIVATE_INBOX_PAGE,
+    payload: { page }
   });
 
 const CLOSE_INBOX = 'CLOSE_INBOX';
@@ -96,7 +112,9 @@ const closeBox =
 const syncActions = {
   setScopeToBox,
   setScopeToFullmap,
+  setMap,
   openInbox,
+  activateInboxPage,
   closeInbox,
 };
 
@@ -109,17 +127,20 @@ export const actions = {
 export type Action = ActionUnion<typeof syncActions>;
 
 export type State = {
+  // we need the current map id to check if we are transitioning to a new map
   map: MapID,
   scope: MapScope,
   inbox: InboxVisibility,
+  activateInboxPage: number
 };
 
 export const initial: State = {
-  map: '1dbab857-942d-41d0-baa1-82fa70b0d773',
+  map: '',
   scope: {
     type: MapScopeType.FULL_MAP,
   },
   inbox: InboxVisibility.HIDDEN,
+  activateInboxPage: 1
 };
 
 /**
@@ -136,8 +157,14 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     case SET_SCOPE_TO_FULL_MAP: {
       return { ...state, ...{ scope: { type: MapScopeType.FULL_MAP } } };
     }
+    case SET_MAP: {
+      return { ...state, map: action.payload.map };
+    }
     case OPEN_INBOX: {
       return { ...state, inbox: InboxVisibility.VISIBLE };
+    }
+    case ACTIVATE_INBOX_PAGE: {
+      return { ...state, activateInboxPage: action.payload.page };
     }
     case CLOSE_INBOX: {
       return { ...state, inbox: InboxVisibility.HIDDEN };

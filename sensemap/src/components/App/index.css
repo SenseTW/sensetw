@@ -1,8 +1,9 @@
 .App {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
-.ui.right.sidebar {
-  top: 80px !important;
-  height: 85% !important;
+.App > .sense-header {
+  z-index: 1000;
 }

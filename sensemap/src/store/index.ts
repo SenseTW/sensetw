@@ -5,8 +5,12 @@ import thunkMiddleware from 'redux-thunk';
 
 export const store = createStore(
   reducer,
-  applyMiddleware(
-    thunkMiddleware,
-    logger
-  )
+  process.env.NODE_ENV !== 'production'
+    ? applyMiddleware(
+      thunkMiddleware,
+      logger
+    )
+    : applyMiddleware(
+      thunkMiddleware
+    )
 );
