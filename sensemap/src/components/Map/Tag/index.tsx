@@ -29,7 +29,7 @@ class Tag extends React.Component<Props, State> {
 
   textNode: TextNode | null = null;
 
-  componentDidMount() {
+  updateDimension() {
     if (!this.textNode) {
       return;
     }
@@ -40,6 +40,19 @@ class Tag extends React.Component<Props, State> {
 
     const { onResize = noop } = this.props;
     onResize(w + 2 * tagPadding, h + 2 * tagPadding);
+  }
+
+  componentDidMount() {
+    this.updateDimension();
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    const { x: prevX = 0, y: prevY = 0, text: prevText } = prevProps;
+    const { x = 0, y = 0, text } = this.props;
+
+    if (x !== prevX || y !== prevY || text !== prevText) {
+      this.updateDimension();
+    }
   }
 
   render() {
