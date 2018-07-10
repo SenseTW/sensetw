@@ -5,6 +5,7 @@
 
 .ui.card.map-card > .content.map-card__header {
   padding: 1em 1.5em;
+  flex-grow: 0;
 }
 
 .ui.card.map-card > .content.map-card__header > .header:not(.ui) {
@@ -19,6 +20,7 @@
 
 .ui.card.map-card > .content.map-card__content {
   padding: 1.4em 1.5em;
+  flex-grow: 1;
 }
 
 .ui.card.map-card > .content.map-card__content > .header:not(.ui) {
