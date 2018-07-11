@@ -42,7 +42,7 @@ export async function updateAnnotation(db: Knex, id: ID, args: any): Promise<Ann
   const data = await getAnnotation(db, id);
 
   const a = toAnnotationField(args);
-  if (!isEmpty(a)) {
+  if (a && !isEmpty(a)) {
     await db('annotation').update(a).where('id', id).returning(annotationFields(db));
   }
 
