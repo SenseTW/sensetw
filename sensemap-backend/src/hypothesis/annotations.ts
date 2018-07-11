@@ -18,8 +18,8 @@ function fromAnnotation(env, annotation: T.Annotation): any {
       // XXX
       incontext: `https://O.sense.tw/${annotation.id}`,
     },
-    tags: annotation.card.tags.split(','),
-    text: annotation.card.title,
+    tags: annotation.card.tags.split(/,\s*/).filter(t => !!t),
+    text: annotation.card.summary,
     uri: annotation.card.url,
     flagged: false,
     user_info: {
@@ -30,10 +30,7 @@ function fromAnnotation(env, annotation: T.Annotation): any {
   };
 }
 
-function getSummary(o: any): string {
-  if (o.text) {
-    return o.text;
-  }
+function getQuote(o: any): string {
   const quotes = o.target.map(t => t.selector.find(s => s.type === 'TextQuoteSelector')).filter(s => !!s);
   if (quotes.length > 0) {
     return quotes[0].exact;
@@ -42,8 +39,6 @@ function getSummary(o: any): string {
 }
 
 function toAnnotation(env, o: any) {
-  // use TexQuoteSelector
-  const summary = getSummary(o);
   return {
     mapId: o.group === '__world__' ? process.env.PUBLIC_MAP_ID : o.group,
     target: o.target,
@@ -51,7 +46,8 @@ function toAnnotation(env, o: any) {
     card: {
       url: o.uri,
       tags: o.tags ? o.tags.join(',') : '',
-      summary,
+      summary: o.text || getQuote(o),
+      title: getQuote(o),
     },
   };
 }
@@ -59,24 +55,33 @@ function toAnnotation(env, o: any) {
 export function router(context: Context) {
   const router = express.Router()
 
-  router.get('/:id', async (req, res) => {
+  router.get('/:id', async (req, res, next) => {
     const { db, env } = context({ req });
     const a = await A.getAnnotation(db, req.params.id);
-    res.send(fromAnnotation(env, a));
+    if (!a) {
+      return next();
+    }
+    return res.send(fromAnnotation(env, a));
   });
 
-  router.post('/', async (req, res) => {
+  router.post('/', async (req, res, next) => {
     const { db, env } = context({ req });
     const args = toAnnotation(env, req.body);
     const a = await A.createAnnotation(db, args);
-    res.send(fromAnnotation(env, a));
+    if (!a) {
+      return next();
+    }
+    return res.send(fromAnnotation(env, a));
   });
 
-  router.patch('/:id', async (req, res) => {
+  router.patch('/:id', async (req, res, next) => {
     const { db, env } = context({ req });
     const args = toAnnotation(env, req.body);
     const a = await A.updateAnnotation(db, req.params.id, args);
-    res.send(fromAnnotation(env, a));
+    if (!a) {
+      return next();
+    }
+    return res.send(fromAnnotation(env, a));
   });
 
   router.delete('/:id', async (req, res) => {
@@ -86,7 +91,7 @@ export function router(context: Context) {
       id: req.params.id,
       deleted: false,
     }
-    res.send(a);
+    return res.send(a);
   });
 
   return router;

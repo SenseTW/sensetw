@@ -16,12 +16,21 @@ type SearchQuery = {
   any?: string,
 };
 
+function getURL(url: any): string | undefined {
+  if (typeof url === 'string') {
+    return url;
+  } else if (Array.isArray(url)) {
+    return url[0];
+  }
+  return;
+}
+
 function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
   const { limit, offset, sort, order, uri, url, user, group, tag } = query;
 
   let filter: C.CardFilter = {};
   if (uri || url) {
-    filter.url = uri || url;
+    filter.url = getURL(uri) || getURL(url);
   }
   if (tag) {
     filter.tags = tag;
@@ -46,10 +55,10 @@ function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
 export function router(context) {
   const router = express.Router();
 
-  router.get('/', (req, res, next) => {
+  router.get('/', async (req, res, next) => {
     const args = compileAllCardsArgs(req.query);
     const { db, env } = context({ req });
-    C.getAllCards(db, args, C.cardsWithTargetQuery).then((cards) => {
+    return C.getAllCards(db, args, C.cardsWithTargetQuery).then((cards) => {
       const rows = cards.map(translateAnnotation(env));
       const total = rows.length;
       res.send({ rows, total });

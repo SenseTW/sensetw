@@ -94,6 +94,7 @@ export const cardFields = (db) => [
 
 export const cardWithTargetFields = (db) => [
   ...cardFields(db),
+  db.raw('? as "annotationID"', db.select('id').from('annotation').whereRaw('"cardId" = "card"."id"')),
   db.raw('? as target', db.select('target').from('annotation').whereRaw('"cardId" = "card"."id"')),
 ];
 
