@@ -1,4 +1,4 @@
-import { ID, Map, Card, CardType, cardFields, cardDataFields, SenseObject } from './sql';
+import { ID, Map, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
 import { getMap, getCardsInMap, MapFilter } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
@@ -20,35 +20,54 @@ export type CardFilter = {
 
 export type AllCardsArgs = {
   filter?: CardFilter;
-  orderBy?: any;
+  orderBy?: string | [string, string];
   skip?: number;
-  after: string;
-  before: string;
-  first: number;
-  last: number;
+  limit?: number;
+  //after?: string;
+  //before?: string;
+  //first?: number;
+  //last?: number;
 };
 
 export function cardsQuery(db) {
   return db.select(cardFields(db)).from('card');
 }
 
+export function cardsWithTargetQuery(db) {
+  return db.select(cardWithTargetFields(db)).from('card');
+}
+
 export async function getCard(db, id: ID): Promise<Card | null> {
   return cardsQuery(db).where('id', id).first();
 }
 
-export async function getAllCards(db, filter: CardFilter = {}): Promise<Card[]> {
-  let { map, tags, url } = filter;
-  let query = cardsQuery(db);
-  if (map) {
-    query = query.andWhere('mapId', map.id);
+export async function getAllCards(db, args: AllCardsArgs = {}, query = cardsQuery): Promise<Card[]> {
+  let q = query(db);
+  if (args.filter) {
+    const { map, tags, url } = args.filter;
+    if (map) {
+      q = q.andWhere('mapId', map.id);
+    }
+    if (tags) {
+      q = q.andWhereRaw('"tags" @@ ?', tags);
+    }
+    if (url) {
+      q = q.andWhere('url', url);
+    }
   }
-  if (tags) {
-    query = query.andWhere('tags', tags);
+
+  if (args.limit) {
+    q = q.limit(args.limit);
   }
-  if (url) {
-    query = query.andWhere('url', url);
+  if (args.skip) {
+    q = q.offset(args.skip);
   }
-  return query;
+  if (typeof args.orderBy === 'string') {
+    q = q.orderBy(args.orderBy, 'desc')
+  } else if (args.orderBy) {
+    q = q.orderBy(args.orderBy[0], args.orderBy[1])
+  }
+  return q;
 }
 
 export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
@@ -76,7 +95,7 @@ export const resolvers = {
   Query: {
     allCards: async (_, args: AllCardsArgs, { db }, info): Promise<Card[]> => {
       if (args.filter) {
-        return getAllCards(db, args.filter);
+        return getAllCards(db, args);
       } else {
         return getAllCards(db);
       }
