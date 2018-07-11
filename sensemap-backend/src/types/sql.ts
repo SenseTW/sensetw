@@ -124,3 +124,14 @@ export const edgeFields = (db) => [
   db.column('fromId').as('from'),
   db.column('toId').as('to'),
 ];
+
+export type Annotation = HasID & HasTimestamps & {
+  target: any[],
+};
+
+export const annotationDataFields = [ 'target', 'mapId' ];
+
+export const annotationFields = (db) => [
+  ...hasTimestampFields,
+  ...annotationDataFields,
+];
