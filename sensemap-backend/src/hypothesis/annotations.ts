@@ -42,20 +42,13 @@ function getSourceTitle(o: any): string {
   return o.document.title || '';
 }
 
-function getURL(env, o: any): string {
-  if (o.uri || o.url) {
-    return `${env.VIA_URL}/${o.uri || o.url}`;
-  }
-  return '';
-}
-
 function toAnnotation(env, o: any) {
   return {
     mapId: o.group === '__world__' ? process.env.PUBLIC_MAP_ID : o.group,
     target: o.target,
     document: o.document,
     card: {
-      url: getURL(env, o),
+      url: o.uri || o.url || '',
       tags: o.tags ? o.tags.join(',') : '',
       summary: o.text || getQuote(o),
       title: getSourceTitle(o),
