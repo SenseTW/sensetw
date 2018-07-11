@@ -38,16 +38,27 @@ function getQuote(o: any): string {
   return '';
 }
 
+function getSourceTitle(o: any): string {
+  return o.document.title || '';
+}
+
+function getURL(o: any): string {
+  if (o.uri || o.url) {
+    return `${process.env.VIA_URL}/${o.uri || o.url}`;
+  }
+  return '';
+}
+
 function toAnnotation(env, o: any) {
   return {
     mapId: o.group === '__world__' ? process.env.PUBLIC_MAP_ID : o.group,
     target: o.target,
     document: o.document,
     card: {
-      url: o.uri,
+      url: getURL(o),
       tags: o.tags ? o.tags.join(',') : '',
       summary: o.text || getQuote(o),
-      title: getQuote(o),
+      title: getSourceTitle(o),
     },
   };
 }

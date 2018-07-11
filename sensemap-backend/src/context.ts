@@ -18,6 +18,7 @@ const env = {
   SENSEMAP_API_ROOT: noSlash(process.env.SENSEMAP_API_ROOT || 'https://api.sense.tw/graphql'),
   HYPOTHESIS_API_ROOT: noSlash(process.env.HYPOTHESIS_API_ROOT || 'https://api.sense.tw/h/api'),
   PUBLIC_MAP_ID: process.env.PUBLIC_MAP_ID || '1dbab857-942d-41d0-baa1-82fa70b0d773',
+  VIA_URL: process.env.VIA_URL || 'https://via.sense.tw',
 };
 
 const db = Knex({
