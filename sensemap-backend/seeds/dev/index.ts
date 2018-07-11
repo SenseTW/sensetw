@@ -34,3 +34,9 @@ exports.boxes = [
     map: '63a544b6-36cf-4344-b370-32d451a35b70',
   },
 ];
+
+exports.annotations = [
+  {
+    id: '65524a44-7346-46c3-b04a-6a00836d8feb',
+  },
+];

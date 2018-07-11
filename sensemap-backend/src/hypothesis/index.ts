@@ -3,6 +3,7 @@ import { router as Root } from './root';
 import { router as Links } from './links';
 import { router as Profile } from './profile';
 import { router as Search } from './search';
+import { router as Annotation } from './annotation';
 import { Context } from '../context';
 
 export function router(context: Context) {
@@ -12,5 +13,6 @@ export function router(context: Context) {
   router.use('/links', Links(context));
   router.use('/profile', Profile(context));
   router.use('/search', Search(context));
+  router.use('/annotations/:id', Annotation(context));
   return router;
 }

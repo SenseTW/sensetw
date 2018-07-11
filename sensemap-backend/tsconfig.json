@@ -12,6 +12,7 @@
   },
   "exclude": [
     "src/**/*.test.ts",
-    "migrations"
+    "migrations",
+    "seeds"
   ]
 }

@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
+    "knex": "knex",
     "migrate": "node migrate.js",
-    "seed": "knex seed:run",
     "build": "rimraf dist && tsc",
     "prestart": "npm run build",
     "start": "node dist",

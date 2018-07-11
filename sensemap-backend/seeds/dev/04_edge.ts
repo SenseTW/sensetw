@@ -1,5 +1,6 @@
+import * as Knex from "knex";
 
-exports.seed = function(knex, Promise) {
+exports.seed = function (knex: Knex): Promise<any> {
   return knex('edge').insert([
     {
       id: '041c1000-5af7-458a-97f5-e7a748021882',
