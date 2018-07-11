@@ -42,9 +42,9 @@ function getSourceTitle(o: any): string {
   return o.document.title || '';
 }
 
-function getURL(o: any): string {
+function getURL(env, o: any): string {
   if (o.uri || o.url) {
-    return `${process.env.VIA_URL}/${o.uri || o.url}`;
+    return `${env.VIA_URL}/${o.uri || o.url}`;
   }
   return '';
 }
@@ -55,7 +55,7 @@ function toAnnotation(env, o: any) {
     target: o.target,
     document: o.document,
     card: {
-      url: getURL(o),
+      url: getURL(env, o),
       tags: o.tags ? o.tags.join(',') : '',
       summary: o.text || getQuote(o),
       title: getSourceTitle(o),
