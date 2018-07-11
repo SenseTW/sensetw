@@ -69,6 +69,7 @@ class Header extends React.Component<Props> {
         <TagList
           x={Header.style.contents.tags.left}
           y={Header.style.contents.tags.top}
+          width={Header.style.contents.title.width}
           tags={toTags(box.tags)}
         />
       </Group>

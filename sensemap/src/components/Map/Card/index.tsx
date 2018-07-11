@@ -197,6 +197,7 @@ class Card extends React.Component<Props, State> {
         <TagList
           x={tagLeft}
           y={height - tagBottom - tagHeight}
+          width={width - 2 * tagLeft}
           tags={toTags(tags)}
           onResize={(w, h) => this.setState({ tagHeight: h })}
         />
