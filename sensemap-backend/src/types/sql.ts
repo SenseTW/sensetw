@@ -92,6 +92,11 @@ export const cardFields = (db) => [
   db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"cardId" = "card"."id"')),
 ];
 
+export const cardWithTargetFields = (db) => [
+  ...cardFields(db),
+  db.raw('? as target', db.select('target').from('annotation').whereRaw('"cardId" = "card"."id"')),
+];
+
 export type Box = HasID & HasTimestamps & {
   title: string,
   summary: string,
