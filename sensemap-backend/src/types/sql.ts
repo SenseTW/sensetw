@@ -132,9 +132,13 @@ export const edgeFields = (db) => [
 
 export type Annotation = HasID & HasTimestamps & {
   target: any[],
+  document: any,
+  mapId: ID,
+  cardId: ID,
+  card?: Card,
 };
 
-export const annotationDataFields = [ 'target', 'mapId' ];
+export const annotationDataFields = [ 'target', 'document', 'mapId', 'cardId' ];
 
 export const annotationFields = (db) => [
   ...hasTimestampFields,

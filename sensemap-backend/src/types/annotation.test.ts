@@ -1,4 +1,5 @@
 import * as A from './annotation';
+import * as C from './card';
 import { maps, annotations } from '../../seeds/dev';
 import { context } from '../context';
 
@@ -11,9 +12,10 @@ test('getAnnotation', async () => {
   expect(a0.id).toBeTruthy();
   expect(a0.mapId).toBeTruthy();
   expect(a0.target[0].source).toBeTruthy();
+  expect(a0.card.id).toBeTruthy();
 });
 
-test('create/update/delete', async () => {
+test('create/update/delete annotation', async () => {
   const a0 = await A.createAnnotation(db, {
     mapId: maps[0].id,
     target: [
@@ -53,4 +55,45 @@ test('create/update/delete', async () => {
   const a2 = await A.deleteAnnotation(db, a0.id);
   const a3 = await A.getAnnotation(db, a0.id);
   expect(a3).toBeNull();
+});
+
+test('create/update/delete annotation /w card', async () => {
+  const a0 = await A.createAnnotation(db, {
+    mapId: maps[0].id,
+    target: [],
+    card: {
+      title: 'foo',
+      cardType: 'NORMAL',
+      url: 'http://example.com',
+      mapId: maps[0].id,
+    }
+  });
+  expect(a0.id).toBeTruthy();
+  expect(a0.card.id).toBeTruthy();
+
+  const a2 = await A.updateAnnotation(db, a0.id, {
+    target: [
+      {
+        "source": "https://foobar.com/",
+        "selector": [
+          {
+            "endContainer": "/main[1]/div[2]/div[1]/div[1]/div[3]/p[1]",
+            "startContainer": "/main[1]/div[2]/div[1]/div[1]/div[3]/p[1]",
+            "type": "RangeSelector",
+            "startOffset": 0,
+            "endOffset": 74,
+          },
+        ]
+      },
+    ],
+    card: {
+      title: 'Example',
+      description: 'Hello',
+    },
+  });
+  expect(a2.card.title).toBe('Example');
+
+  const a3 = await A.deleteAnnotation(db, a0.id);
+  const c = await C.getCard(db, a2.card.id);
+  expect(c).toBeNull();
 });

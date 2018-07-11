@@ -38,7 +38,8 @@ export function cardsWithTargetQuery(db) {
 }
 
 export async function getCard(db, id: ID): Promise<Card | null> {
-  return cardsQuery(db).where('id', id).first();
+  const c = await cardsQuery(db).where('id', id).first();
+  return !!c ? c : null;
 }
 
 export async function getAllCards(db, args: AllCardsArgs = {}, query = cardsQuery): Promise<Card[]> {

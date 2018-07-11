@@ -3,11 +3,14 @@ import { Context } from '../context';
 import * as T from '../types/sql';
 import * as A from '../types/annotation';
 
+type AnnotationQuery = {
+};
+
 function fromAnnotation(env, annotation: T.Annotation): any {
   return {
     id: annotation.id,
     created: annotation.createdAt,
-    group: "",
+    group: annotation.mapId,
     updated: annotation.updatedAt,
     target: annotation.target,
     links: {
@@ -15,22 +18,29 @@ function fromAnnotation(env, annotation: T.Annotation): any {
       // XXX
       incontext: `https://O.sense.tw/${annotation.id}`,
     },
-    tags: [],
-    text: "",
-    uri: "",
+    tags: annotation.card.tags.split(','),
+    text: annotation.card.title,
+    uri: annotation.card.url,
     flagged: false,
     user_info: {
       display_name: null,
     },
-    user: "",
-    document: {
-      title: []
-    },
+    user: '',
+    document: annotation.document,
   };
 }
 
-function toAnnotation(o: any): T.Annotation {
-  return o;
+function toAnnotation(env, o: any) {
+  return {
+    mapId: o.group === '__world__' ? process.env.PUBLIC_MAP_ID : o.group,
+    target: o.target,
+    document: o.document,
+    card: {
+      url: o.uri,
+      title: o.text,
+      tags: o.tags ? o.tags.join(',') : '',
+    },
+  };
 }
 
 export function router(context: Context) {
@@ -40,6 +50,30 @@ export function router(context: Context) {
     const { db, env } = context({ req });
     const a = await A.getAnnotation(db, req.params.id);
     res.send(fromAnnotation(env, a));
+  });
+
+  router.post('/', async (req, res) => {
+    const { db, env } = context({ req });
+    const args = toAnnotation(env, req.body);
+    const a = await A.createAnnotation(db, args);
+    res.send(fromAnnotation(env, a));
+  });
+
+  router.patch('/:id', async (req, res) => {
+    const { db, env } = context({ req });
+    const args = toAnnotation(env, req.body);
+    const a = await A.updateAnnotation(db, req.params.id, args);
+    res.send(fromAnnotation(env, a));
+  });
+
+  router.delete('/:id', async (req, res) => {
+    const { db, env } = context({ req });
+    //const a = await A.deleteAnnotation(db, req.params.id);
+    const a = {
+      id: req.params.id,
+      deleted: false,
+    }
+    res.send(a);
   });
 
   return router;

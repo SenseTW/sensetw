@@ -10,6 +10,7 @@
     "knex": "knex",
     "migrate": "node migrate.js",
     "build": "rimraf dist && tsc",
+    "build:watch": "rimraf dist && tsc -w",
     "prestart": "yarn build",
     "start": "node dist",
     "start:watch": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",

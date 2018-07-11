@@ -1,6 +1,7 @@
 import * as express from 'express';
 import { pick } from 'ramda';
 import * as C from '../types/card';
+import { translateAnnotation } from './card';
 
 type SearchQuery = {
   limit?: number,
@@ -40,31 +41,6 @@ function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
     args.orderBy = order ? ['updatedAt', order] : 'updatedAt';
   }
   return args;
-}
-
-const translateAnnotation = env => card => {
-  return {
-    id: card.id,
-    group: card.mapId,
-    target: card.target,
-    links: {
-      json: `${env.HYPOTHESIS_API_ROOT}/annotations/${card.id}`,
-      incontext: `${env.HYPOTHESIS_API_ROOT}/annotations/${card.id}`,
-    },
-    tags: card.tags,
-    text: card.summary,
-    created: card.createdAt,
-    uri: card.url,
-    flagged: false,
-    user_info: {
-      display_name: null,
-    },
-    user: '',
-    hidden: false,
-    permissions: {
-      read: [ 'group:__world__' ],
-    },
-  };
 }
 
 export function router(context) {
