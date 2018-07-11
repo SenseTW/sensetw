@@ -30,15 +30,28 @@ function fromAnnotation(env, annotation: T.Annotation): any {
   };
 }
 
+function getSummary(o: any): string {
+  if (o.text) {
+    return o.text;
+  }
+  const quotes = o.target.map(t => t.selector.find(s => s.type === 'TextQuoteSelector')).filter(s => !!s);
+  if (quotes.length > 0) {
+    return quotes[0].exact;
+  }
+  return '';
+}
+
 function toAnnotation(env, o: any) {
+  // use TexQuoteSelector
+  const summary = getSummary(o);
   return {
     mapId: o.group === '__world__' ? process.env.PUBLIC_MAP_ID : o.group,
     target: o.target,
     document: o.document,
     card: {
       url: o.uri,
-      title: o.text,
       tags: o.tags ? o.tags.join(',') : '',
+      summary,
     },
   };
 }
