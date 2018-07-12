@@ -23,7 +23,7 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
   return (
     <div className="inbox">
       <div className="inbox__actions">
-        <SyncButton />
+        <SyncButton mapId={mapId} actions={acts} />
         <Divider />
         <Filter />
       </div>
