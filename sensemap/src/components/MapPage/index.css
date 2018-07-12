@@ -13,13 +13,17 @@
   height: 100%;
 }
 
-.map-page .ui.menu {
+.map-page .map-page__menu {
   position: absolute;
   top: 16px;
-  /* left: inbox__btn width(12px) + left padding(16px) */
-  left: 28px;
-  margin: 0;
-  transition: left .5s ease;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.map-page .map-page__menu > .object-menu-2 {
 }
 
 .map-page .inbox__btn {

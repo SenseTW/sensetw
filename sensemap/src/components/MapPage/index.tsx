@@ -5,7 +5,7 @@ import { Sidebar } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
-import ObjectMenu from '../ObjectMenu';
+import ObjectMenu2 from '../ObjectMenu2';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
 import InboxToggler from '../InboxToggler';
@@ -206,7 +206,9 @@ class MapPage extends React.Component<Props> {
             <Viewport>
               {(props) => (<Map id={mid} {...props} />)}
             </Viewport>
-            <ObjectMenu style={{ left: isInboxVisible ? 378 : 28 }} />
+            <div className="map-page__menu">
+              <ObjectMenu2 />
+            </div>
             <InboxToggler
               className="inbox__btn"
               style={{ left: isInboxVisible ? 350 : 0 }}
