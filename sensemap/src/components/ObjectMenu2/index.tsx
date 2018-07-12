@@ -8,6 +8,12 @@ import Unbox from '../SVGIcon/Unbox';
 import Inspector from '../SVGIcon/Inspector';
 import Edge from '../SVGIcon/Edge';
 import RemoveEdge from '../SVGIcon/RemoveEdge';
+import Copy from '../SVGIcon/Copy';
+import Delete from '../SVGIcon/Delete';
+import BatchTag from '../SVGIcon/BatchTag';
+import BoxCard from '../SVGIcon/BoxCard';
+import OpenBox from '../SVGIcon/OpenBox';
+import Eject from '../SVGIcon/Eject';
 import * as T from '../../types';
 import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
@@ -15,7 +21,9 @@ import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
 import * as CS from '../../types/cached-storage';
 import * as F from '../../types/sense/focus';
+// TODO: use UUID v4
 import * as U from '../../types/utils';
+import { cardData } from '../../types/sense/card';
 import { boxData } from '../../types/sense/box';
 import './index.css';
 
@@ -30,7 +38,34 @@ interface OwnProps {}
 
 type Props = StateFromProps & OwnProps & ActionProps;
 
+const selectedCardsAndBoxes:
+  (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
+  props => props.selection.reduce(
+    (acc, id) => {
+      switch (CS.getObject(props.senseObject, id).objectType) {
+        case T.ObjectType.CARD: {
+          return { ...acc, cards: [ ...acc.cards, id ] };
+        }
+        case T.ObjectType.BOX: {
+          return { ...acc, boxes: [ ...acc.boxes, id ] };
+        }
+        default: {
+          return acc;
+        }
+      }
+    },
+    { cards: [], boxes: [] }
+  );
+
 class ObjectMenu2 extends React.PureComponent<Props> {
+  handleCreateCard(): void {
+    const { actions: acts } = this.props;
+    const data = cardData({ id: U.objectId() });
+    acts.senseObject.updateCard(data);
+    acts.editor.focusObject(F.focusCard(data.id));
+    acts.editor.changeStatus(OE.StatusType.SHOW);
+  }
+
   canCreateBox(): boolean {
     return this.props.senseMap.scope.type === T.MapScopeType.FULL_MAP;
   }
@@ -102,6 +137,87 @@ class ObjectMenu2 extends React.PureComponent<Props> {
     r.forEach(edge => this.props.actions.senseObject.removeEdge(map, edge));
   }
 
+  canCopy(): boolean {
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    return cards.length + boxes.length === 1;
+  }
+
+  canDeleteCard(): boolean {
+    const { cards } = selectedCardsAndBoxes(this.props);
+    return cards.length === 1;
+  }
+
+  async handleDeleteCard() {
+    const { actions: acts, senseObject, selection } = this.props;
+    const { id, data } = CS.getObject(senseObject, selection[0]);
+    const card = CS.getCard(senseObject, data);
+    // remove the card container object
+    await acts.senseObject.removeObject(id);
+    // clear any local modifications
+    acts.cachedStorage.removeCard(card);
+    acts.editor.focusObject(F.focusNothing());
+  }
+
+  canBatchTag(): boolean {
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    return cards.length + boxes.length > 1;
+  }
+
+  canAddCard(): boolean {
+    if (this.props.senseMap.scope.type !== T.MapScopeType.FULL_MAP) {
+      return false;
+    }
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    return cards.length >= 1 && boxes.length === 1;
+  }
+
+  handleAddCard(): void {
+    if (!this.canAddCard()) {
+      return;
+    }
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    const object = CS.getObject(this.props.senseObject, boxes[0]);
+    this.props.actions.senseObject.addCardsToBox(cards, object.data);
+    return;
+  }
+
+  canOpenBox(): boolean {
+    const { boxes } = selectedCardsAndBoxes(this.props);
+    return boxes.length === 1;
+  }
+
+  handleOpenBox(): void {
+    const { actions: acts, selection, senseObject } = this.props;
+    const objectId = selection[0];
+    const obj = CS.getObject(senseObject, objectId);
+    acts.selection.clearSelection();
+    acts.senseMap.openBox(obj.data);
+  }
+
+  canRemoveCard(): Boolean {
+    return this.props.senseMap.scope.type === T.MapScopeType.BOX
+      && this.props.selection.length >= 1;
+  }
+
+  handleRemoveCard(): void {
+    if (!this.canRemoveCard()) {
+      return;
+    }
+    switch (this.props.senseMap.scope.type) {
+      case T.MapScopeType.BOX: {
+        const cards = this.props.selection;
+        const box   = this.props.senseMap.scope.box;
+        if (!box) {
+          throw Error('This cannot happen: map scope has type BOX with null box ID.');
+        }
+        this.props.actions.senseObject.removeCardsFromBox(cards, box);
+        break;
+      }
+      case T.MapScopeType.FULL_MAP:
+      default:
+    }
+  }
+
   render() {
     const { actions: acts, editor } = this.props;
     const canCreateBox = this.canCreateBox();
@@ -109,19 +225,27 @@ class ObjectMenu2 extends React.PureComponent<Props> {
     const isInspectorOpen = editor.status === OE.StatusType.SHOW;
     const canCreateEdge = this.canCreateEdge();
     const canRemoveEdge = this.canRemoveEdge();
+    const canCopy = this.canCopy();
+    const canDeleteCard = this.canDeleteCard();
+    const canBatchTag = this.canBatchTag();
+    const canAddCard = this.canAddCard();
+    const canOpenBox = this.canOpenBox();
+    const canRemoveCard = this.canRemoveCard();
+    const showSecondMenu =
+      canCopy || canDeleteCard || canBatchTag || canAddCard || canOpenBox || canRemoveCard;
+    // setup the popup props and force the position to be a string literal
+    const popupProps = { inverted: true, position: 'bottom center' as 'bottom center' };
 
     return (
       <div className="object-menu-2">
-        <Menu inverted icon>
+        <Menu compact inverted icon>
           <Popup
-            inverted
-            position="bottom center"
-            trigger={<Menu.Item onClick={U.noop}><Card /></Menu.Item>}
+            {...popupProps}
+            trigger={<Menu.Item onClick={() => this.handleCreateCard()}><Card /></Menu.Item>}
             content="New Card"
           />
           <Popup
-            inverted
-            position="bottom center"
+            {...popupProps}
             trigger={
               <Menu.Item
                 disabled={!canUnbox && !canCreateBox}
@@ -143,8 +267,7 @@ class ObjectMenu2 extends React.PureComponent<Props> {
             }
           />
           <Popup
-            inverted
-            position="bottom center"
+            {...popupProps}
             trigger={
               <Menu.Item
                 active={isInspectorOpen}
@@ -162,8 +285,7 @@ class ObjectMenu2 extends React.PureComponent<Props> {
             content="Edit"
           />
           <Popup
-            inverted
-            position="bottom center"
+            {...popupProps}
             trigger={
               <Menu.Item
                 disabled={!canRemoveEdge && !canCreateEdge}
@@ -185,6 +307,60 @@ class ObjectMenu2 extends React.PureComponent<Props> {
             }
           />
         </Menu>
+        {
+          showSecondMenu &&
+          <Menu compact inverted icon>
+            {
+              // the copy action is not implemented
+              canCopy &&
+              <Popup
+                {...popupProps}
+                trigger={<Menu.Item disabled onClick={U.noop}><Copy /></Menu.Item>}
+                content="Copy"
+              />
+            }
+            {
+              canDeleteCard &&
+              <Popup
+                {...popupProps}
+                trigger={<Menu.Item onClick={() => this.handleDeleteCard()}><Delete /></Menu.Item>}
+                content="Delete"
+              />
+            }
+            {
+              canBatchTag &&
+              <Popup
+                {...popupProps}
+                trigger={<Menu.Item disabled onClick={U.noop}><BatchTag /></Menu.Item>}
+                content="Batch Tag"
+              />
+            }
+            {
+              canAddCard &&
+              <Popup
+                {...popupProps}
+                trigger={<Menu.Item onClick={() => this.handleAddCard()}><BoxCard /></Menu.Item>}
+                content="Box Cards"
+              />
+            }
+            {
+              canOpenBox &&
+              <Popup
+                {...popupProps}
+                trigger={<Menu.Item onClick={() => this.handleOpenBox()}><OpenBox /></Menu.Item>}
+                content="Open Box"
+              />
+            }
+            {
+              canRemoveCard &&
+              <Popup
+                {...popupProps}
+                trigger={<Menu.Item onClick={() => this.handleRemoveCard()}><Eject /></Menu.Item>}
+                content="Eject"
+              />
+            }
+          </Menu>
+        }
       </div>
     );
   }
