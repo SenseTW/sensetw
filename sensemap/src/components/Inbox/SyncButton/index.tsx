@@ -9,12 +9,15 @@ interface StateFromProps {
 
 type Props = StateFromProps & ActionProps;
 
+type ClickEvent = React.SyntheticEvent<HTMLElement>;
+
 const SyncButton = ({ mapId, actions: act }: Props) => (
   <Button
     basic
     icon="refresh"
     className="inbox__sync-btn"
-    onClick={(e: any) => { console.log(e); act.senseObject.loadCards(mapId); }}
+    // tslint:disable-next-line:no-console
+    onClick={(e: ClickEvent) => { console.log(e); act.senseObject.loadCards(mapId); }}
   />
 );
 
