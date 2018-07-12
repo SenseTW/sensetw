@@ -1,0 +1,28 @@
+.sense-object-menu > .ui.inverted.menu {
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.sense-object-menu > .ui.inverted.menu:first-child {
+  margin-right: 2px;
+}
+
+.sense-object-menu > .ui.inverted.menu .item {
+  padding: 0.428571em;
+}
+
+.sense-object-menu > .ui.inverted.menu .item.disabled {
+  color: rgba(225,225,225,.3) !important;
+}
+
+.sense-object-menu > .ui.inverted.menu .item:before {
+  width: 0;
+}
+
+.sense-object-menu > .ui.inverted.menu .item > .sense-svg-icon {
+  width: 1.714285em;
+  height: 1.714285em;
+}
+
+.ui.inverted.popup {
+  padding: 0.428571em 0.714285em;
+}
