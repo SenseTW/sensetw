@@ -51,6 +51,7 @@ function toAnnotation(env, o: any) {
       url: o.uri || o.url || '',
       tags: o.tags ? o.tags.join(',') : '',
       summary: o.text || getQuote(o),
+      description: getQuote(o),
       title: getSourceTitle(o),
     },
   };
