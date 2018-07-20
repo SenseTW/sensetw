@@ -14,9 +14,8 @@ import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
+import * as D from '../../graphics/drawing';
 import * as G from '../../graphics/point';
-import * as B from '../../types/sense/box';
-import * as C from '../../types/sense/card';
 import { Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
@@ -39,29 +38,47 @@ interface MapState {
     y: number,
   };
   dropTarget: ObjectMap<ObjectData>;
+  transform: G.Transform;
+  inverseTransform: G.Transform;
 }
 
 const makeTransform: V.StateToTransform =
-  ({ top, left }) => ({ x, y }) => ({ x: x - left, y: y - top });
+  ({ top, left, level }) => ({ x, y, width, height }) => ({
+    x: (x - left) * level,
+    y: (y - top) * level,
+    width: width * level,
+    height: height * level,
+  });
 
 const makeInverseTransform: V.StateToTransform =
-  ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
+  ({ top, left, level }) => ({ x, y, width, height }) => ({
+    x: x / level + left,
+    y: y / level + top,
+    width: width / level,
+    height: height / level,
+  });
 
-function getCenter(o: ObjectData): G.Point {
+function getCenter(o: ObjectData): D.BoundingBox {
   switch (o.objectType) {
-    case ObjectType.CARD: {
-      return { x: o.x + C.DEFAULT_WIDTH / 2, y: o.y + C.DEFAULT_HEIGHT / 2 };
-    }
+    case ObjectType.CARD:
     case ObjectType.BOX: {
-      return { x: o.x + B.DEFAULT_WIDTH / 2, y: o.y + B.DEFAULT_HEIGHT / 2 };
+      const { x, y, width, height } = o;
+      return { x: x + width / 2, y: y + height / 2, width, height };
     }
     default: {
-      return { x: o.x, y: o.y };
+      return { x: o.x, y: o.y, width: 0, height: 0 };
     }
   }
 }
 
 export class Map extends React.Component<Props, MapState> {
+  static getDerivedStateFromProps(props: Props) {
+    return {
+      transform: makeTransform(props),
+      inverseTransform: makeInverseTransform(props),
+    };
+  }
+
   constructor(props: Props) {
     super(props);
 
@@ -78,6 +95,8 @@ export class Map extends React.Component<Props, MapState> {
     this.state = {
       prevDragPoint: { x: 0, y: 0 },
       dropTarget: {},
+      transform: makeTransform(this.props),
+      inverseTransform: makeInverseTransform(this.props),
     };
   }
 
@@ -117,27 +136,29 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   handleObjectDragStart(e: KonvaEvent.Mouse) {
-    const x = e.evt.layerX;
-    const y = e.evt.layerY;
-    this.setState({ prevDragPoint: { x, y } });
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY, width: 0, height: 0 });
+    this.setState({ prevDragPoint });
   }
 
   handleObjectDragMove(e: KonvaEvent.Mouse) {
-    const x = e.evt.layerX;
-    const y = e.evt.layerY;
-    const dx = x - this.state.prevDragPoint.x;
-    const dy = y - this.state.prevDragPoint.y;
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY, width: 0, height: 0 });
+    const dx = prevDragPoint.x - this.state.prevDragPoint.x;
+    const dy = prevDragPoint.y - this.state.prevDragPoint.y;
     const objects = this.props.selection.objects.map(id => {
       const o = CS.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
     this.props.actions.cachedStorage.updateObjects(objects);
-    this.setState({ prevDragPoint: { x, y } });
+    this.setState({ prevDragPoint });
   }
 
   handleObjectDragEnd(e: KonvaEvent.Mouse) {
-    const dx = e.evt.layerX - this.state.prevDragPoint.x;
-    const dy = e.evt.layerY - this.state.prevDragPoint.y;
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY, width: 0, height: 0 });
+    const dx = prevDragPoint.x - this.state.prevDragPoint.x;
+    const dy = prevDragPoint.y - this.state.prevDragPoint.y;
     this.props.selection.objects.forEach(id => {
       const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
@@ -172,8 +193,6 @@ export class Map extends React.Component<Props, MapState> {
 
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
     const isSelected = SL.contains(this.props.selection, o.id);
-    const transform = makeTransform(this.props);
-    const inverseTransform = makeInverseTransform(this.props);
 
     const handleObjectSelect = (data: ObjectData) => {
       if (isMultiSelectable) {
@@ -209,8 +228,8 @@ export class Map extends React.Component<Props, MapState> {
             key={o.id}
             isDirty={CS.isCardDirty(this.props.inScope, o.data)}
             mapObject={o}
-            transform={transform}
-            inverseTransform={inverseTransform}
+            transform={this.state.transform}
+            inverseTransform={this.state.inverseTransform}
             card={CS.getCard(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
@@ -230,8 +249,8 @@ export class Map extends React.Component<Props, MapState> {
             key={o.id}
             isDirty={CS.isBoxDirty(this.props.inScope, o.data)}
             mapObject={o}
-            transform={transform}
-            inverseTransform={inverseTransform}
+            transform={this.state.transform}
+            inverseTransform={this.state.inverseTransform}
             box={CS.getBox(this.props.senseObject, o.data)}
             cards={CS.getCardsInBox(this.props.senseObject, o.data)}
             selected={isSelected}

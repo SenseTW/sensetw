@@ -16,8 +16,8 @@ export interface OwnProps {
 export type Props = StateFromProps & DispatchFromProps & OwnProps;
 
 export function Viewport(props: Props) {
-  const { children, top, left, width, height } = props;
-  return children({ top, left, width, height });
+  const { children, top, left, width, height, level } = props;
+  return children({ top, left, width, height, level });
 }
 
 export default Viewport;

@@ -1,15 +1,6 @@
 import { ActionUnion } from './action';
+import { Position, Dimension } from '../graphics/drawing';
 import * as G from '../graphics/point';
-
-type Position = {
-  x: number;
-  y: number;
-};
-
-export type Dimension = {
-  width: number;
-  height: number;
-};
 
 type ZoomLevel = number;
 
@@ -18,6 +9,7 @@ export type State = {
   height: number;
   top:    number;
   left:   number;
+  level:  ZoomLevel;
 };
 
 export type StateToTransform = (s: State) => G.Transform;
@@ -27,6 +19,7 @@ export const initial: State = {
   height: 800,
   top:    0,
   left:   0,
+  level:  1.0,
 };
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
@@ -82,7 +75,10 @@ export const reducer = (state: State = initial, action: Action): State => {
       };
     }
     case ZOOM_VIEWPORT: {
-      return state;
+      return {
+        ...state,
+        level: action.payload.level,
+      };
     }
     case RESIZE_VIEWPORT: {
       const { width, height } = action.payload.dimension;

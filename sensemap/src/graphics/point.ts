@@ -1,8 +1,6 @@
+import { Position as Point, BoundingBox } from './drawing';
 
-export interface Point {
-  x: number;
-  y: number;
-}
+export { Point };
 
 export function toTuple(p: Point): [number, number] {
   return [p.x, p.y];
@@ -21,5 +19,5 @@ export function subtract(a: Point, b: Point): Point {
 }
 
 export interface Transform {
-  (p: Point): Point;
+  (p: BoundingBox): BoundingBox;
 }
