@@ -1,4 +1,5 @@
 import { ActionUnion } from './action';
+import { BoundingBox, emptyBoundingBox } from '../graphics/drawing';
 import { ObjectID } from './sense/object';
 
 const ADD_OBJECT_TO_SELECTION = 'ADD_OBJECT_TO_SELECTION';
@@ -19,6 +20,12 @@ const toggleObjectSelection = (id: ObjectID) => ({
   payload: id,
 });
 
+const SET_BOUNDING_BOX = 'SET_BOUNDING_BOX';
+const setBoundingBox = (boundingBox: BoundingBox) => ({
+  type: SET_BOUNDING_BOX as typeof SET_BOUNDING_BOX,
+  payload: { boundingBox },
+});
+
 const CLEAR_SELECTION = 'CLEAR_SELECTION';
 const clearSelection = () => ({
   type: CLEAR_SELECTION as typeof CLEAR_SELECTION,
@@ -28,47 +35,72 @@ export const actions = {
   addObjectToSelection,
   removeObjectFromSelection,
   toggleObjectSelection,
+  setBoundingBox,
   clearSelection,
 };
 
 export type Action = ActionUnion<typeof actions>;
 
-export type State = ObjectID[];
-export const initial: State = [];
+export type State = {
+  objects: ObjectID[],
+  boundingBox: BoundingBox,
+};
+export const initial: State = {
+  objects: [],
+  boundingBox: emptyBoundingBox,
+};
 
 export const contains = (selection: State, id: ObjectID): Boolean =>
-  selection.indexOf(id) >= 0;
+  selection.objects.indexOf(id) >= 0;
+
+export const get = (selection: State, index: number): ObjectID =>
+  selection.objects[index];
+
+export const count = (selection: State): number =>
+  selection.objects.length;
 
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
     case ADD_OBJECT_TO_SELECTION: {
       const id = action.payload;
-      if (state.indexOf(id) >= 0) {
+      if (state.objects.indexOf(id) >= 0) {
         return state;
       } else {
-        return [...state, id];
+        return { ...state, objects: [...state.objects, id] };
       }
     }
     case REMOVE_OBJECT_FROM_SELECTION: {
       const id = action.payload;
-      const i = state.indexOf(id);
+      const i = state.objects.indexOf(id);
       if (i >= 0) {
-        return [...state.slice(0, i), ...state.slice(i + 1)];
+        return {
+          ...state,
+          objects: [...state.objects.slice(0, i), ...state.objects.slice(i + 1)],
+        };
       } else {
         return state;
       }
     }
     case TOGGLE_OBJECT_SELECTION: {
       const id = action.payload;
-      const i = state.indexOf(id);
+      const i = state.objects.indexOf(id);
       if (i >= 0) {
-        return [...state.slice(0, i), ...state.slice(i + 1)];
+        return {
+          ...state,
+          objects: [...state.objects.slice(0, i), ...state.objects.slice(i + 1)],
+        };
       } else {
-        return [...state, id];
+        return {
+          ...state,
+          objects: [...state.objects, id],
+        };
       }
     }
     case CLEAR_SELECTION: {
-      return [];
+      return {
+        ...state,
+        objects: [],
+      };
     }
     default: {
       return state;
