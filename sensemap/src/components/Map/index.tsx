@@ -127,7 +127,7 @@ export class Map extends React.Component<Props, MapState> {
     const y = e.evt.layerY;
     const dx = x - this.state.prevDragPoint.x;
     const dy = y - this.state.prevDragPoint.y;
-    const objects = this.props.selection.map(id => {
+    const objects = this.props.selection.objects.map(id => {
       const o = CS.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
@@ -138,7 +138,7 @@ export class Map extends React.Component<Props, MapState> {
   handleObjectDragEnd(e: KonvaEvent.Mouse) {
     const dx = e.evt.layerX - this.state.prevDragPoint.x;
     const dy = e.evt.layerY - this.state.prevDragPoint.y;
-    this.props.selection.forEach(id => {
+    this.props.selection.objects.forEach(id => {
       const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
@@ -187,9 +187,10 @@ export class Map extends React.Component<Props, MapState> {
     };
 
     const handleObjectDeselect = (data: ObjectData) => {
+      const selection = this.props.selection;
       acts.selection.removeObjectFromSelection(data.id);
-      if (this.props.selection.length === 1) {
-        acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, this.props.selection[0])));
+      if (SL.count(selection) === 1) {
+        acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
       } else {
         acts.editor.focusObject(F.focusNothing());
       }
