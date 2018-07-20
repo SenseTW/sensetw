@@ -7,13 +7,16 @@ interface Props {
   box: { title: string, tags: string };
   x: number;
   y: number;
+  width: number;
+  height: number;
 }
 
-class Header extends React.Component<Props> {
+interface State {
+  tagHeight: number;
+}
 
+class Header extends React.Component<Props, State> {
   static style = {
-    width: 320,
-    height: 130,
     background: {
       color: '#ffffff',
     },
@@ -38,20 +41,25 @@ class Header extends React.Component<Props> {
       },
       tags: {
         left: 21,
-        top: 87,
+        bottom: 8,
       }
     },
   };
 
+  state = {
+    tagHeight: 0,
+  };
+
   render() {
-    const { box } = this.props;
+    const { box, width, height } = this.props;
+    const { tagHeight } = this.state;
     const sanitizedTitle = box.title.substr(0, Header.style.contents.title.textLimit);
     return (
       <Group>
         <Rect
           fill={Header.style.background.color}
-          width={Header.style.width}
-          height={Header.style.height}
+          width={width}
+          height={height}
           stroke={Header.style.border.color}
           strokeWidth={Header.style.border.width}
           cornerRadius={Header.style.cornerRadius}
@@ -68,9 +76,10 @@ class Header extends React.Component<Props> {
         />
         <TagList
           x={Header.style.contents.tags.left}
-          y={Header.style.contents.tags.top}
-          width={Header.style.contents.title.width}
+          y={height - Header.style.contents.tags.bottom - tagHeight}
+          width={width - 2 * Header.style.contents.tags.left}
           tags={toTags(box.tags)}
+          onResize={(w, h) => this.setState({ tagHeight: h })}
         />
       </Group>
     );

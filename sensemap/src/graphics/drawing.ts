@@ -1,14 +1,14 @@
-export interface HasPosition {
+export interface Position {
   x: number;
   y: number;
 }
 
-export interface HasDimension {
+export interface Dimension {
   width: number;
   height: number;
 }
 
-export type BoundingBox = HasPosition & HasDimension;
+export type BoundingBox = Position & Dimension;
 
 export const emptyBoundingBox = {
   x: 0,

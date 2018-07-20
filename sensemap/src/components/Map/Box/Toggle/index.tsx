@@ -4,6 +4,8 @@ import { Group, Rect, Line } from 'react-konva';
 interface Props {
   x: number;
   y: number;
+  width: number;
+  height: number;
   show: boolean;
   action: () => void;
 }
@@ -25,7 +27,6 @@ const TriangleDown = (x: number, y: number) => (
 class Toggle extends React.Component<Props> {
 
   static style = {
-    width: 320,
     height: 20,
     background: {
       color: '#f5f5f5',
@@ -38,22 +39,22 @@ class Toggle extends React.Component<Props> {
   };
 
   render() {
-    const { x, y } = this.props;
+    const { x, y, width, height } = this.props;
     return (
       <Group x={x} y={y} onClick={this.props.action}>
         <Rect
           x={0}
           y={0}
-          width={Toggle.style.width}
-          height={Toggle.style.height}
+          width={width}
+          height={height}
           fill={Toggle.style.background.color}
           stroke={Toggle.style.border.color}
           strokeWidth={Toggle.style.border.width}
           cornerRadius={Toggle.style.cornerRadius}
         />
         {this.props.show
-          ? TriangleUp(Toggle.style.width / 2 - 5, 8.5)
-          : TriangleDown(Toggle.style.width / 2 - 5, 6.5)}
+          ? TriangleUp(width / 2 - 5, 8.5)
+          : TriangleDown(width / 2 - 5, 6.5)}
       </Group>
     );
   }

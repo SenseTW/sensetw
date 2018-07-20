@@ -1,6 +1,6 @@
 import { ActionUnion, emptyAction } from '../action';
 import { HasID } from './has-id';
-import { HasPosition, HasDimension } from '../../graphics/drawing';
+import { Position, Dimension } from '../../graphics/drawing';
 import { ObjectType } from './object-type';
 import { TimeStamp } from '../utils';
 import { CardID } from './card';
@@ -17,7 +17,7 @@ export type ObjectID = string;
  *
  * @extends {HasID<ObjectID>}
  */
-export interface ObjectData extends HasID<ObjectID>, HasPosition, HasDimension {
+export interface ObjectData extends HasID<ObjectID>, Position, Dimension {
   createdAt:  TimeStamp;
   updatedAt:  TimeStamp;
   zIndex:     number;
