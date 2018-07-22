@@ -43,7 +43,12 @@ interface MapState {
 }
 
 const makeTransform: V.StateToTransform =
-  ({ top, left, level }) => ({ x, y, width, height }) => ({
+  ({ top, left, level }) => ({
+    x = D.emptyBoundingBox.x,
+    y = D.emptyBoundingBox.y,
+    width = D.emptyBoundingBox.width,
+    height = D.emptyBoundingBox.height,
+  } = {}) => ({
     x: (x - left) * level,
     y: (y - top) * level,
     width: width * level,
@@ -51,7 +56,12 @@ const makeTransform: V.StateToTransform =
   });
 
 const makeInverseTransform: V.StateToTransform =
-  ({ top, left, level }) => ({ x, y, width, height }) => ({
+  ({ top, left, level }) => ({
+    x = D.emptyBoundingBox.x,
+    y = D.emptyBoundingBox.y,
+    width = D.emptyBoundingBox.width,
+    height = D.emptyBoundingBox.height,
+  } = {}) => ({
     x: x / level + left,
     y: y / level + top,
     width: width / level,
@@ -137,13 +147,13 @@ export class Map extends React.Component<Props, MapState> {
 
   handleObjectDragStart(e: KonvaEvent.Mouse) {
     const prevDragPoint =
-      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY, width: 0, height: 0 });
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     this.setState({ prevDragPoint });
   }
 
   handleObjectDragMove(e: KonvaEvent.Mouse) {
     const prevDragPoint =
-      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY, width: 0, height: 0 });
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
     const dy = prevDragPoint.y - this.state.prevDragPoint.y;
     const objects = this.props.selection.objects.map(id => {
@@ -156,7 +166,7 @@ export class Map extends React.Component<Props, MapState> {
 
   handleObjectDragEnd(e: KonvaEvent.Mouse) {
     const prevDragPoint =
-      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY, width: 0, height: 0 });
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
     const dy = prevDragPoint.y - this.state.prevDragPoint.y;
     this.props.selection.objects.forEach(id => {
