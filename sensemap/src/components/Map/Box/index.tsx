@@ -89,10 +89,8 @@ class Box extends React.Component<Props, State> {
     });
     const { box, isDirty = false } = this.props;
     const cards = Object.values(this.props.cards);
-    const { height: cardHeight } =
-      this.props.transform({ x: 0, y: 0, width: 0, height: Card.style.height });
-    const { height: toggleHeight } =
-      this.props.transform({ x: 0, y: 0, width: 0, height: Toggle.style.height });
+    const { height: cardHeight } = this.props.transform({ height: Card.style.height });
+    const { height: toggleHeight } = this.props.transform({ height: Toggle.style.height });
     const selectedWidth = width - selectedOffsetX * 2;
     const selectedHeight = height - selectedOffsetY * 2;
 

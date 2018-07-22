@@ -19,5 +19,5 @@ export function subtract(a: Point, b: Point): Point {
 }
 
 export interface Transform {
-  (p: BoundingBox): BoundingBox;
+  (p: Partial<BoundingBox>): BoundingBox;
 }
