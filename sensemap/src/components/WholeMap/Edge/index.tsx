@@ -1,12 +1,30 @@
 import * as React from 'react';
+import { Line } from 'react-konva';
 import { TransformerForProps } from '../';
-import { Edge as EdgeData } from '../../../types';
+import { Point, toTuple } from '../../../graphics/point';
+import { transformObject } from '../../../types/viewport';
 
-type Props = EdgeData & TransformerForProps;
+interface OwnProps {
+  from: Point;
+  to: Point;
+}
+
+type Props = OwnProps & TransformerForProps;
 
 class Edge extends React.PureComponent<Props> {
+  static style = {
+    color: 'black',
+  };
+
   render() {
-    return (null);
+    const { transform } = this.props;
+    const from = toTuple(transform(this.props.from));
+    const to = toTuple(transform(this.props.to));
+    const style = transformObject(transform, Edge.style) as typeof Edge.style;
+
+    return (
+      <Line points={[...from, ...to]} stroke={style.color} />
+    );
   }
 }
 

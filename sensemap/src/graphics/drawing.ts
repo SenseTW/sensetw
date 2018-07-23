@@ -8,6 +8,7 @@ export interface Dimension {
   height: number;
 }
 
+// TODO: give it another alias
 export type BoundingBox = Position & Dimension;
 
 export const emptyBoundingBox = {

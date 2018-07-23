@@ -48,6 +48,23 @@ export const makeInverseTransform: StateToTransform =
     height: height / level,
   });
 
+export const transformObject = (trans: G.Transform, style: Object): Object => {
+  if (typeof style === 'string') {
+    return style;
+  } else if (typeof style === 'number') {
+    const { width } = trans({ width: style });
+    return width;
+  } else if (Array.isArray(style)) {
+    return style.map(x => transformObject(trans, x));
+  } else if ( typeof style === 'object') {
+    let ret = {};
+    Object.keys(style)
+      .forEach((key) => ret[key] = transformObject(trans, style[key]));
+    return ret;
+  }
+  return style;
+};
+
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 const panViewport =
   (pos: Position) => ({

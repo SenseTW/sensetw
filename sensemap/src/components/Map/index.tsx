@@ -14,7 +14,6 @@ import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
-import * as D from '../../graphics/drawing';
 import * as G from '../../graphics/point';
 import { Event as KonvaEvent } from '../../types/konva';
 
@@ -40,19 +39,6 @@ interface MapState {
   dropTarget: ObjectMap<ObjectData>;
   transform: G.Transform;
   inverseTransform: G.Transform;
-}
-
-function getCenter(o: ObjectData): D.BoundingBox {
-  switch (o.objectType) {
-    case ObjectType.CARD:
-    case ObjectType.BOX: {
-      const { x, y, width, height } = o;
-      return { x: x + width / 2, y: y + height / 2, width, height };
-    }
-    default: {
-      return { x: o.x, y: o.y, width: 0, height: 0 };
-    }
-  }
 }
 
 export class Map extends React.Component<Props, MapState> {
@@ -256,8 +242,8 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(e: EdgeData) {
     const edgeProps = {
-      from: getCenter(CS.getObject(this.props.inScope, e.from)),
-      to: getCenter(CS.getObject(this.props.inScope, e.to)),
+      from: O.getCenter(CS.getObject(this.props.inScope, e.from)),
+      to: O.getCenter(CS.getObject(this.props.inScope, e.to)),
       transform: this.state.transform,
       inverseTransform: this.state.inverseTransform,
     };
