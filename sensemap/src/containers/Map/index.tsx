@@ -10,6 +10,7 @@ interface StateFromProps extends CO.StateFromProps {
 
 interface OwnProps extends CO.OwnProps {
   id: MapID;
+  component?: React.ComponentClass<CO.Props>; // defaults to CO.Map
 }
 
 type Props = StateFromProps & ActionProps & OwnProps;
@@ -39,13 +40,14 @@ class Map extends React.Component<Props> {
   }
 
   render() {
+    const { component: Comp = CO.Map } = this.props;
     const inScope =
       (this.props.scope.type === MapScopeType.BOX
       && !!this.props.scope.box
       && CS.doesBoxExist(this.props.senseObject, this.props.scope.box))
         ? CS.scopedToBox(this.props.senseObject, this.props.scope.box)
         : CS.scopedToMap(this.props.senseObject);
-    return <CO.Map {...this.props} inScope={inScope} />;
+    return <Comp {...this.props} inScope={inScope} />;
   }
 }
 

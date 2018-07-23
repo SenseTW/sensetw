@@ -1,5 +1,5 @@
 import { ActionUnion } from './action';
-import { Position, Dimension } from '../graphics/drawing';
+import { Position, Dimension, emptyBoundingBox } from '../graphics/drawing';
 import * as G from '../graphics/point';
 
 type ZoomLevel = number;
@@ -21,6 +21,32 @@ export const initial: State = {
   left:   0,
   level:  1.0,
 };
+
+export const makeTransform: StateToTransform =
+  ({ top, left, level }) => ({
+    x = emptyBoundingBox.x,
+    y = emptyBoundingBox.y,
+    width = emptyBoundingBox.width,
+    height = emptyBoundingBox.height,
+  } = {}) => ({
+    x: (x - left) * level,
+    y: (y - top) * level,
+    width: width * level,
+    height: height * level,
+  });
+
+export const makeInverseTransform: StateToTransform =
+  ({ top, left, level }) => ({
+    x = emptyBoundingBox.x,
+    y = emptyBoundingBox.y,
+    width = emptyBoundingBox.width,
+    height = emptyBoundingBox.height,
+  } = {}) => ({
+    x: x / level + left,
+    y: y / level + top,
+    width: width / level,
+    height: height / level,
+  });
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 const panViewport =
