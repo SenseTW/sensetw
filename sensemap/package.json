@@ -4,7 +4,6 @@
   "private": true,
   "license": "MIT",
   "dependencies": {
-    "@types/history": "^4.6.2",
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "graphql-request": "^1.5.1",
@@ -21,6 +20,7 @@
     "react-scripts-ts": "2.14.0",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
+    "redux-react-session": "^2.4.0",
     "redux-thunk": "^2.3.0",
     "semantic-ui-css": "^2.3.1",
     "semantic-ui-react": "^0.79.1",
