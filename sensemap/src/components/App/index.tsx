@@ -11,6 +11,7 @@ import MapPage from '../MapPage';
 import DashboardPage from '../DashboardPage';
 import ImportPage from '../ImportPage';
 import SettingsPage from '../SettingsPage';
+import TermsOfServicePage from '../TermsOfServicePage';
 import * as R from '../../types/routes';
 import './index.css';
 
@@ -35,6 +36,7 @@ class App extends React.Component {
             <Route exact path={R.mapList} component={DashboardPage} />
             <Route exact path={R.map} component={MapPage} />
             <Route path={R.submap} component={MapPage} />
+            <Route path={R.termsOfService} component={TermsOfServicePage} />
           </Switch>
         </div>
       </Router>
