@@ -17,3 +17,9 @@ export const toSubmapPath = pathToRegexp.compile(submap);
 export const settings = '/settings';
 
 export const termsOfService = '/terms-of-service';
+
+export const signup = '/signup';
+
+export const login = '/login';
+
+export const logout = '/logout';
