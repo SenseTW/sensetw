@@ -1,0 +1,14 @@
+.signup-page {
+    height: 100%;
+    background: #b3fcfb;
+}
+
+.signup-page__error {
+    font-size: 12px;
+    color: red;
+}
+
+.signup-page__info {
+    font-size: 8px;
+    color: gray;
+}
