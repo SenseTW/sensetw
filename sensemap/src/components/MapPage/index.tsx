@@ -5,6 +5,7 @@ import { Sidebar } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
+import WholeMap from '../../components/WholeMap';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
@@ -204,7 +205,11 @@ class MapPage extends React.Component<Props> {
           <Sidebar.Pusher>
             <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
             <Viewport>
-              {(props) => (<Map id={mid} {...props} />)}
+              {(props) => (
+                false
+                  ? <Map id={mid} {...props} />
+                  : <Map id={mid} {...props} component={WholeMap} />
+              )}
             </Viewport>
             <div className="map-page__menu">
               <ObjectMenu />

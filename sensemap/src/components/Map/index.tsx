@@ -42,32 +42,6 @@ interface MapState {
   inverseTransform: G.Transform;
 }
 
-const makeTransform: V.StateToTransform =
-  ({ top, left, level }) => ({
-    x = D.emptyBoundingBox.x,
-    y = D.emptyBoundingBox.y,
-    width = D.emptyBoundingBox.width,
-    height = D.emptyBoundingBox.height,
-  } = {}) => ({
-    x: (x - left) * level,
-    y: (y - top) * level,
-    width: width * level,
-    height: height * level,
-  });
-
-const makeInverseTransform: V.StateToTransform =
-  ({ top, left, level }) => ({
-    x = D.emptyBoundingBox.x,
-    y = D.emptyBoundingBox.y,
-    width = D.emptyBoundingBox.width,
-    height = D.emptyBoundingBox.height,
-  } = {}) => ({
-    x: x / level + left,
-    y: y / level + top,
-    width: width / level,
-    height: height / level,
-  });
-
 function getCenter(o: ObjectData): D.BoundingBox {
   switch (o.objectType) {
     case ObjectType.CARD:
@@ -84,8 +58,8 @@ function getCenter(o: ObjectData): D.BoundingBox {
 export class Map extends React.Component<Props, MapState> {
   static getDerivedStateFromProps(props: Props) {
     return {
-      transform: makeTransform(props),
-      inverseTransform: makeInverseTransform(props),
+      transform: V.makeTransform(props),
+      inverseTransform: V.makeInverseTransform(props),
     };
   }
 
@@ -105,8 +79,8 @@ export class Map extends React.Component<Props, MapState> {
     this.state = {
       prevDragPoint: { x: 0, y: 0 },
       dropTarget: {},
-      transform: makeTransform(this.props),
-      inverseTransform: makeInverseTransform(this.props),
+      transform: V.makeTransform(this.props),
+      inverseTransform: V.makeInverseTransform(this.props),
     };
   }
 
@@ -284,8 +258,8 @@ export class Map extends React.Component<Props, MapState> {
     const edgeProps = {
       from: getCenter(CS.getObject(this.props.inScope, e.from)),
       to: getCenter(CS.getObject(this.props.inScope, e.to)),
-      transform: makeTransform(this.props),
-      inverseTransform: makeInverseTransform(this.props),
+      transform: this.state.transform,
+      inverseTransform: this.state.inverseTransform,
     };
     return <Edge key={e.id} {...edgeProps} />;
   }
