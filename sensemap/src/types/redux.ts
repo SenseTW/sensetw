@@ -1,5 +1,6 @@
 import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } from 'redux';
 import { emptyAction } from './action';
+import * as SS from './session';
 import * as A  from './account';
 import * as SM from './sense-map';
 import * as CS from './cached-storage';
@@ -15,6 +16,7 @@ import * as IP from './importer';
 export { mapDispatch } from './map-dispatch';
 
 export type State = {
+  session:     SS.State,
   account:     A.State,
   senseMap:    SM.State,
   senseObject: SO.State,
@@ -36,6 +38,7 @@ export type GetState = () => State;
 export type Reducer = ReduxReducer<State>;
 
 export const initial = {
+  session:        SS.inital,
   account:        A.initial,
   senseMap:       SM.initial,
   senseObject:    SO.initial,
@@ -81,6 +84,7 @@ export const actions = {
 export type ActionProps = { actions: typeof actions };
 
 export const reducer = combineReducers({
+  session:       SS.reducer,
   account:       A.reducer,
   senseMap:      SM.reducer,
   senseObject:   SO.reducer,
