@@ -1,11 +1,10 @@
 import * as React from 'react';
 import { Line } from 'react-konva';
-import * as D from '../../../graphics/drawing';
 import * as G from '../../../graphics/point';
 
 export interface Props {
-  from:             D.BoundingBox;
-  to:               D.BoundingBox;
+  from:             G.Point;
+  to:               G.Point;
   transform:        G.Transform;
   inverseTransform: G.Transform;
 }
