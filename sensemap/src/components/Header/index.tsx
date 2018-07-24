@@ -67,11 +67,17 @@ class Header extends React.Component<Props> {
                     Settings
                   </Dropdown.Item>
                   <Dropdown.Item
+                    as={Link}
+                    to={R.login}
+                  >
+                    Login
+                  </Dropdown.Item>
+                  <Dropdown.Item
                     onClick={(e) => {
                       actions.account.logoutRequest(this.props.history);
                     }}
                   >
-                  Logout
+                    Logout
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>

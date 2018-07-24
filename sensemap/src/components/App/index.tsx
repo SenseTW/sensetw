@@ -13,7 +13,6 @@ import SignUpPage from '../SignupPage';
 import SettingsPage from '../SettingsPage';
 import TermsOfServicePage from '../TermsOfServicePage';
 import LoginPage from '../LoginPage';
-import PrivateRoute from '../../containers/PrivateRoute';
 import * as R from '../../types/routes';
 import './index.css';
 
@@ -40,14 +39,12 @@ export class App extends React.Component<Props> {
       { this.props.checked &&
           <div className="App">
             <Route render={(props) => <Analytics {...props} trackingId="UA-112380022-4" />} />
-            {
-              this.props.authenticated && <Header />
-            }
+            <Header />
             <Switch>
-              <PrivateRoute exact path={R.index} component={DashboardPage} authenticated={this.props.authenticated} />
-              <PrivateRoute exact path={R.importer} component={ImportPage} authenticated={this.props.authenticated} />
-              <PrivateRoute exact path={R.settings} component={SettingsPage} authenticated={this.props.authenticated} />
-              <PrivateRoute exact path={R.mapList} component={DashboardPage} authenticated={this.props.authenticated} />
+              <Route exact path={R.index} component={DashboardPage} />
+              <Route exact path={R.importer} component={ImportPage} />
+              <Route exact path={R.settings} component={SettingsPage} />
+              <Route exact path={R.mapList} component={DashboardPage} />
               <Route exact path={R.map} component={MapPage} />
               <Route path={R.submap} component={MapPage} />
               <Route path={R.signup} component={SignUpPage} />
