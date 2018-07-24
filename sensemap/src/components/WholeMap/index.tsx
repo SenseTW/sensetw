@@ -38,7 +38,7 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
 
     switch (object.objectType) {
       case ObjectType.BOX: {
-        const { x, y, width, height } = object;
+        const { x, y } = object;
         // TODO: check for the existance
         const box = CS.getBox(senseObject, object.data);
         return (
@@ -48,13 +48,13 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
             key={box.id}
             x={x}
             y={y}
-            width={width}
-            height={height}
+            width={Box.style.width}
+            height={Box.style.height}
           />
         );
       }
       case ObjectType.CARD: {
-        const { x, y, width, height } = object;
+        const { x, y } = object;
         // TODO: check for the existance
         const card = CS.getCard(senseObject, object.data);
         return (
@@ -64,8 +64,8 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
             key={card.id}
             x={x}
             y={y}
-            width={width}
-            height={height}
+            width={Card.style.width}
+            height={Card.style.height}
           />
         );
       }
@@ -76,10 +76,27 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
 
   renderEdge(edge: EdgeData) {
     const transformers = this.state;
-    const edgeProps = {
-      from: O.getCenter(CS.getObject(this.props.inScope, edge.from)),
-      to: O.getCenter(CS.getObject(this.props.inScope, edge.to)),
-    };
+    let o = CS.getObject(this.props.inScope, edge.from);
+    const from = O.getCenter({
+      ...o,
+      width: o.objectType === ObjectType.BOX
+        ? Box.style.width
+        : Card.style.width,
+      height: o.objectType === ObjectType.BOX
+        ? Box.style.height
+        : Card.style.height,
+    });
+    o = CS.getObject(this.props.inScope, edge.to);
+    const to = O.getCenter({
+      ...o,
+      width: o.objectType === ObjectType.BOX
+        ? Box.style.width
+        : Card.style.width,
+      height: o.objectType === ObjectType.BOX
+        ? Box.style.height
+        : Card.style.height,
+    });
+    const edgeProps = { from, to };
 
     return (
       <Edge

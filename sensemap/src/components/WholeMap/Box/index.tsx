@@ -11,6 +11,8 @@ class Box extends React.PureComponent<Props> {
   static style = {
     backgroundColor: '#4d4d4d',
     borderRadius: 18,
+    width: 216,
+    height: 96,
     padding: {
       top: 12,
       right: 9,
