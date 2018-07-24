@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { State, actions, ActionProps, mapDispatch } from '../../types';
-import { Menu, Popup } from 'semantic-ui-react';
+import { Menu, Popup, Icon } from 'semantic-ui-react';
 import Card from '../SVGIcon/Card';
 import Box from '../SVGIcon/Box';
 import Unbox from '../SVGIcon/Unbox';
@@ -19,6 +19,7 @@ import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
+import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
 import * as F from '../../types/sense/focus';
 // TODO: use UUID v4
@@ -32,6 +33,7 @@ interface StateFromProps {
   senseObject: SO.State;
   senseMap: SM.State;
   editor: OE.State;
+  viewport: V.State;
 }
 
 interface OwnProps {}
@@ -222,6 +224,13 @@ class ObjectMenu extends React.PureComponent<Props> {
     }
   }
 
+  handleZoom(step: number): void {
+    const { actions: acts, viewport } = this.props;
+    const { level } = viewport;
+    const center = V.getCenter(viewport);
+    acts.viewport.zoomViewport(level * step, center);
+  }
+
   render() {
     const { actions: acts, editor } = this.props;
     const canCreateBox = this.canCreateBox();
@@ -365,6 +374,16 @@ class ObjectMenu extends React.PureComponent<Props> {
             }
           </Menu>
         }
+        {
+          <Menu compact inverted icon>
+            <Menu.Item onClick={() => this.handleZoom(0.9)}>
+              <Icon name="minus" />
+            </Menu.Item>
+            <Menu.Item onClick={() => this.handleZoom(1.1)}>
+              <Icon name="plus" />
+            </Menu.Item>
+          </Menu>
+        }
       </div>
     );
   }
@@ -376,6 +395,7 @@ export default connect<StateFromProps, ActionProps>(
     senseObject: state.senseObject,
     senseMap: state.senseMap,
     editor: state.editor,
+    viewport: state.viewport,
   }),
   mapDispatch({ actions }),
 )(ObjectMenu);

@@ -7,6 +7,8 @@ import Edge from './Edge';
 import { ObjectType, ObjectData, Edge as EdgeData } from '../../types';
 import * as G from '../../graphics/point';
 import * as O from '../../types/sense/object';
+import * as B from '../../types/sense/box';
+import * as C from '../../types/sense/card';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
 
@@ -41,6 +43,11 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
         const { x, y } = object;
         // TODO: check for the existance
         const box = CS.getBox(senseObject, object.data);
+
+        if (B.isEmpty(box)) {
+          return null;
+        }
+
         return (
           <Box
             {...transformers}
@@ -57,6 +64,11 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
         const { x, y } = object;
         // TODO: check for the existance
         const card = CS.getCard(senseObject, object.data);
+
+        if (C.isEmpty(card)) {
+          return null;
+        }
+
         return (
           <Card
             {...transformers}

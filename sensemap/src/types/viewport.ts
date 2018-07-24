@@ -65,6 +65,11 @@ export const transformObject = (trans: G.Transform, style: Object): Object => {
   return style;
 };
 
+export const getCenter = (state: State): G.Point => ({
+  x: state.left + state.width / 2,
+  y: state.top + state.height / 2,
+});
+
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 const panViewport =
   (pos: Position) => ({
@@ -74,9 +79,9 @@ const panViewport =
 
 const ZOOM_VIEWPORT = 'ZOOM_VIEWPORT';
 const zoomViewport =
-  (level: ZoomLevel) => ({
+  (level: ZoomLevel, origin: G.Point = { x: 0, y: 0 }) => ({
     type: ZOOM_VIEWPORT as typeof ZOOM_VIEWPORT,
-    payload: { level }
+    payload: { level, origin }
   });
 
 const RESIZE_VIEWPORT = 'RESIZE_VIEWPORT';
@@ -118,9 +123,20 @@ export const reducer = (state: State = initial, action: Action): State => {
       };
     }
     case ZOOM_VIEWPORT: {
+      const { level, origin } = action.payload;
+      const oldPoint = {
+        x: (state.left - origin.x) / state.level,
+        y: (state.top - origin.y) / state.level,
+      };
+      const newPoint = {
+        x: (state.left - origin.x) / level,
+        y: (state.top - origin.y) / level,
+      };
       return {
         ...state,
-        level: action.payload.level,
+        left: state.left + (newPoint.x - oldPoint.x),
+        top: state.top + (newPoint.y - oldPoint.y),
+        level,
       };
     }
     case RESIZE_VIEWPORT: {
