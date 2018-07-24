@@ -2,6 +2,7 @@ import { HasID } from './has-id';
 import { ObjectID } from './object';
 import { ActionUnion, emptyAction } from '../action';
 import { TimeStamp } from '../utils';
+import { equals } from 'ramda';
 import * as moment from 'moment';
 
 export type CardID = string;
@@ -116,6 +117,8 @@ export const cardData = (partial: PartialCardData = {}): CardData => {
     updatedAt: now,
   };
 };
+
+export const isEmpty = (card: CardData): boolean => equals(emptyCardData, card);
 
 const UPDATE_CARD_TYPE = 'UPDATE_CARD_TYPE';
 /**

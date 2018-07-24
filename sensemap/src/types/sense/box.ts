@@ -2,6 +2,7 @@ import { HasID } from './has-id';
 import { ObjectID } from './object';
 import { TimeStamp } from '../utils';
 import { ActionUnion, emptyAction } from '../action';
+import { equals } from 'ramda';
 import * as moment from 'moment';
 
 export type BoxID = string;
@@ -80,6 +81,8 @@ export const boxData = (partial: PartialBoxData = {}): BoxData => {
     updatedAt: now,
   };
 };
+
+export const isEmpty = (box: BoxData): boolean => equals(emptyBoxData, box);
 
 const UPDATE_BOX_TITLE = 'UPDATE_BOX_TITLE';
 /**
