@@ -11,6 +11,8 @@ class Card extends React.PureComponent<Props> {
   static style = {
     backgroundColor: '#d8d8d8',
     borderRadius: 9,
+    width: 126,
+    height: 84,
     padding: {
       top: 12,
       right: 9,
