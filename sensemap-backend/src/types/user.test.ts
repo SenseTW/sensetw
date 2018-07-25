@@ -1,5 +1,6 @@
 import * as U from './user';
 import { context } from '../context';
+import { users } from '../../seeds/dev';
 
 const { db } = context();
 beforeEach(() => db.seed.run());
@@ -67,4 +68,13 @@ test('checkUsername', () => {
   expect(U.checkUsername('32aaaaaaaaaaaaaabbbbbbbbbbbbbbbb')).toBe('Username must be between 3 and 30 characters.');
   expect(U.checkUsername('foo-bar')).toBe('Username must contain only letters, numbers, periods, and underscores.');
   expect(U.checkUsername('the_42_awesome.monkeys')).toBe('');
+});
+
+describe('GraphQL', () => {
+  test('User fields', async () => {
+    const u = await U.resolvers.Query.User(null, { id: users[0].id }, { db });
+    expect(u.id).toBe(users[0].id);
+    expect(u.email).toBe('hello@somewhere');
+    expect(u.maps).toBeTruthy();
+  });
 });
