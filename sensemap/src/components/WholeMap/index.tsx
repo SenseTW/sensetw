@@ -11,13 +11,20 @@ import * as B from '../../types/sense/box';
 import * as C from '../../types/sense/card';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
+import { NodeType, Event as KonvaEvent } from '../../types/konva';
 
 export interface TransformerForProps {
   transform: G.Transform;
   inverseTransform: G.Transform;
 }
 
-class WholeMap extends React.Component<Props, TransformerForProps> {
+interface MapState {
+  prevPoint: G.Point;
+}
+
+type State = MapState & TransformerForProps;
+
+class WholeMap extends React.Component<Props, State> {
   static getDerivedStateFromProps(props: Props) {
     return {
       transform: V.makeTransform(props),
@@ -29,9 +36,29 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
     super(props);
 
     this.state = {
+      prevPoint: { x: 0, y: 0 },
       transform: V.makeTransform(props),
       inverseTransform: V.makeInverseTransform(props),
     };
+  }
+
+  handleMouseMove = (e: KonvaEvent.Mouse) => {
+    if (this.props.stage.mouseDown) {
+      this.props.actions.stage.stageMouseMove({
+        dx: e.evt.movementX,
+        dy: e.evt.movementY,
+      });
+    }
+  }
+
+  handleMouseDown = (e: KonvaEvent.Mouse) => {
+    if (e.target && e.target.nodeType === NodeType.STAGE) {
+      this.props.actions.stage.stageMouseDown();
+    }
+  }
+
+  handleMouseUp = (e: KonvaEvent.Mouse) => {
+    this.props.actions.stage.stageMouseUp();
   }
 
   renderObject(object: ObjectData) {
@@ -129,6 +156,9 @@ class WholeMap extends React.Component<Props, TransformerForProps> {
       <Stage
         width={width}
         height={height}
+        onMouseDown={this.handleMouseDown}
+        onMouseUp={this.handleMouseUp}
+        onMouseMove={this.handleMouseMove}
       >
         <Layer>
           {edges}

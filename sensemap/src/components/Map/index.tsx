@@ -15,7 +15,7 @@ import * as F from '../../types/sense/focus';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
 import * as G from '../../graphics/point';
-import { Event as KonvaEvent } from '../../types/konva';
+import { NodeType, Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
   selection:   State['selection'];
@@ -32,10 +32,7 @@ export interface OwnProps extends ViewportState {}
 export type Props = StateFromProps & ActionProps & OwnProps;
 
 interface MapState {
-  prevDragPoint: {
-    x: number,
-    y: number,
-  };
+  prevDragPoint: G.Point;
   dropTarget: ObjectMap<ObjectData>;
   transform: G.Transform;
   inverseTransform: G.Transform;
@@ -79,9 +76,8 @@ export class Map extends React.Component<Props, MapState> {
     return;
   }
 
-  // tslint:disable-next-line:no-any
-  handleMouseDown(e: any) {
-    if (e.target && e.target.nodeType === 'Stage') {
+  handleMouseDown(e: KonvaEvent.Mouse) {
+    if (e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.stage.stageMouseDown();
     }
   }
@@ -90,9 +86,8 @@ export class Map extends React.Component<Props, MapState> {
     this.props.actions.stage.stageMouseUp();
   }
 
-  // tslint:disable-next-line:no-any
-  handleClick(e: any) {
-    if (e.target && e.target.nodeType === 'Stage') {
+  handleClick(e: KonvaEvent.Mouse) {
+    if (e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.selection.clearSelection();
     }
   }
