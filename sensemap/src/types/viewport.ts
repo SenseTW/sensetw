@@ -71,6 +71,11 @@ export const getCenter = (state: State): G.Point => ({
 });
 
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
+/**
+ * A message to move the viewport with an offset in screen space.
+ *
+ * @param pos The offset
+ */
 const panViewport =
   (pos: Position) => ({
     type: PAN_VIEWPORT as typeof PAN_VIEWPORT,
@@ -78,6 +83,12 @@ const panViewport =
   });
 
 const ZOOM_VIEWPORT = 'ZOOM_VIEWPORT';
+/**
+ * A message to zoom the viewport with a scale(level) and an optional center(origin).
+ *
+ * @param level The scale.
+ * @param origin The center.
+ */
 const zoomViewport =
   (level: ZoomLevel, origin: G.Point = { x: 0, y: 0 }) => ({
     type: ZOOM_VIEWPORT as typeof ZOOM_VIEWPORT,
@@ -118,16 +129,18 @@ export const reducer = (state: State = initial, action: Action): State => {
     case PAN_VIEWPORT: {
       return {
         ...state,
-        left: state.left - action.payload.x,
-        top:  state.top  - action.payload.y,
+        left: state.left - action.payload.x / state.level,
+        top:  state.top  - action.payload.y / state.level,
       };
     }
     case ZOOM_VIEWPORT: {
       const { level, origin } = action.payload;
+      // the old viewport offset in the global space
       const oldPoint = {
         x: (state.left - origin.x) / state.level,
         y: (state.top - origin.y) / state.level,
       };
+      // the new viewport offset in the global space
       const newPoint = {
         x: (state.left - origin.x) / level,
         y: (state.top - origin.y) / level,
