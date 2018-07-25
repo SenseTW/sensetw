@@ -7,11 +7,12 @@ import Breadcrumb from './Breadcrumb';
 import Submenu from './Submenu';
 import * as R from '../../types/routes';
 import './index.css';
-import { actions, ActionProps, mapDispatch } from '../../types';
+import { State, actions, ActionProps, mapDispatch } from '../../types';
 import AccountMenuItem from './AccountMenuItem';
 const logo = require('./logo.png');
 
 type StateFromProps = {
+  authenticated: boolean;
 };
 
 // tslint:disable:no-any
@@ -39,12 +40,14 @@ class Header extends React.Component<Props> {
           >
             About
           </Menu.Item>
-          <Menu.Item
-            as={Link}
-            to={R.mapList}
-          >
+          { this.props.authenticated && 
+            <Menu.Item
+              as={Link}
+              to={R.mapList}
+            >
             Dashboard
-          </Menu.Item>
+            </Menu.Item>
+          }
           <Menu.Menu position="right">
             <Menu.Item>
               <Icon name="question circle outline" size="large" />
@@ -52,16 +55,20 @@ class Header extends React.Component<Props> {
             <AccountMenuItem />
           </Menu.Menu>
         </Menu>
-        <div className="sense-header__submenu">
-          <Breadcrumb />
-          <Submenu />
-        </div>
+        { 
+          (this.props.location.pathname.indexOf('login') < 0 && 
+           this.props.location.pathname.indexOf('signup') < 0 ) &&
+          <div className="sense-header__submenu">
+            <Breadcrumb />
+            <Submenu />
+          </div>
+        }
       </div>
     );
   }
 }
 
 export default connect<StateFromProps, ActionProps>(
-  (state: Props) => state,
+  (state: State) => state.session,
   mapDispatch({actions})
 )(withRouter(Header));
