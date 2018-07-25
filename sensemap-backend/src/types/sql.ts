@@ -18,7 +18,12 @@ export type UserData = {
 
 export type User = HasID & HasTimestamps & UserData;
 
-export const userFields = (db) => [ ...hasTimestampFields, 'username', 'email' ];
+export const userFields = (db) => [
+  ...hasTimestampFields,
+  'username',
+  'email',
+  db.raw('array(?) as maps', db.select('id').from('map').whereRaw('"map"."ownerId" = "user"."id"')),
+];
 
 export type Map = HasID & HasTimestamps & {
   name: string,
@@ -26,17 +31,19 @@ export type Map = HasID & HasTimestamps & {
   tags: string,
   image: string,
   type: string,
+  owner: ID,
   objects: HasID[],
   cards: HasID[],
   boxes: HasID[],
   edges: HasID[],
 };
 
-export const mapDataFields = [ 'name', 'description', 'tags', 'image', 'type' ];
+export const mapDataFields = [ 'name', 'description', 'tags', 'image', 'type', 'ownerId' ];
 
 export const mapFields = (db) => [
   ...hasTimestampFields,
   ...mapDataFields,
+  db.raw('"ownerId" as owner'),
   db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"object"."mapId" = "map"."id"')),
   db.raw('array(?) as cards', db.select('id').from('card').whereRaw('"card"."mapId" = "map"."id"')),
   db.raw('array(?) as boxes', db.select('id').from('box').whereRaw('"box"."mapId" = "map"."id"')),

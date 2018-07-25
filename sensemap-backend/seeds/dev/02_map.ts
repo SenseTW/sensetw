@@ -10,6 +10,7 @@ exports.seed = function (knex: Knex): Promise<any> {
         tags: 'foo,bar',
         image: 'example.gif',
         type: 'sometype',
+        ownerId: 'dd776858-52f4-48b4-b40c-2b9330409513',
       },
       { id: '63a544b6-36cf-4344-b370-32d451a35b70' },
     ]));

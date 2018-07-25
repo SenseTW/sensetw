@@ -18,6 +18,7 @@ export const typeDefs = gql`
     allEdges(filter: EdgeFilter): [Edge!]!
     allMaps(filter: MapFilter): [Map!]!
     allObjects(filter: ObjectFilter): [Object!]!
+    User(id: ID): User
     Box(id: ID): Box
     Card(id: ID): Card
     Edge(id: ID): Edge
@@ -57,6 +58,7 @@ export const typeDefs = gql`
       tags: String,
       image: String,
       type: String,
+      ownerId: ID,
       boxesIds: [ID!],
       cardsIds: [ID!],
       edgesIds: [ID!],
@@ -83,6 +85,7 @@ export const typeDefs = gql`
       tags: String,
       image: String,
       type: String,
+      ownerId: ID,
     ): Map
     updateBox(
       id: ID!,
@@ -152,10 +155,20 @@ export const typeDefs = gql`
     ): RemoveFromContainCardsPayload
   }
 
+  type User @model {
+    id: ID! @isUnique
+    createdAt: DateTime!
+    updatedAt: DateTime!
+    username: String!
+    email: String
+    maps: [Map!]! @relation(name: "MapOwners")
+  }
+
   type Map @model {
     id: ID! @isUnique
     createdAt: DateTime!
     updatedAt: DateTime!
+    owner: User @relation(name: "MapOwners")
     name: String
     description: String
     tags: String
@@ -289,5 +302,6 @@ export const resolvers =
       B.resolvers,
       O.resolvers,
       E.resolvers,
+      U.resolvers,
     ]
   ) as IResolvers<any, any>;

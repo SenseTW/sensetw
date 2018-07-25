@@ -13,7 +13,7 @@ type AllMapsArgs = {
   filter?: MapFilter;
 };
 
-function mapsQuery(db) {
+export function mapsQuery(db) {
   return db.select(mapFields(db)).from('map');
 }
 

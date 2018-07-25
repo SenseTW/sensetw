@@ -1,6 +1,6 @@
 import * as M from './map';
 import * as O from './object';
-import { maps } from '../../seeds/dev';
+import { maps, users } from '../../seeds/dev';
 import { context } from '../context';
 
 const nonExistentID = '10330ced-04b4-46d3-91a6-1d294bb12da3';
@@ -24,14 +24,18 @@ describe('GraphQL', () => {
     expect(map.cards).toContain(maps[0].cards[0].id);
     expect(map.boxes).toContain(maps[0].boxes[0].id);
     expect(map.edges).toContain(maps[0].edges[0].id);
+    expect(map.owner).toBeTruthy();
   });
 
   test('create/update/delete Map', async () => {
-    const m0 = await M.resolvers.Mutation.createMap(null, {}, { db }, null);
+    const m0 = await M.resolvers.Mutation.createMap(null, {
+      ownerId: users[0].id,
+    }, { db }, null);
     expect(m0.id).toBeTruthy();
     expect(m0.createdAt).toBeTruthy();
     expect(m0.updatedAt).toBeTruthy();
     expect(m0.name).toBeNull();
+    expect(m0.owner).toBe(users[0].id);
 
     const m1 = await M.resolvers.Mutation.updateMap(null, { id: m0.id, name: 'baz', type: 'someothertype' } { db }, null);
 
