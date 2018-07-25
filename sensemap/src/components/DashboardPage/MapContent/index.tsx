@@ -81,6 +81,7 @@ class MapContent extends React.PureComponent<Props> {
                 checked={map && map.type === SM.MapType.PUBLIC}
                 onChange={() => this.handleMapChange(SM.updateType(SM.MapType.PUBLIC))}
               />
+              {/*
               <Radio
                 label="Private"
                 name="mapType"
@@ -88,6 +89,7 @@ class MapContent extends React.PureComponent<Props> {
                 checked={map && map.type === SM.MapType.PRIVATE}
                 onChange={() => this.handleMapChange(SM.updateType(SM.MapType.PRIVATE))}
               />
+              */}
             </Form.Field>
           </Form>
         </Modal.Content>
