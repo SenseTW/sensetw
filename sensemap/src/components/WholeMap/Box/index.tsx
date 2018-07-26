@@ -9,7 +9,7 @@ import { Event as KonvaEvent } from '../../../types/konva';
 
 interface OwnProps {
   mapObject: ObjectData;
-  selected?: boolean;
+  selected?: Boolean;
   onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDeselect?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
@@ -52,8 +52,9 @@ class Box extends React.PureComponent<Props, OwnState> {
 
   render() {
     const {
+      transform,
+      mapObject,
       selected = false,
-      transform, mapObject,
       onSelect = noop,
       onDeselect = noop,
       onDragStart = noop,
