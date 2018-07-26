@@ -32,6 +32,7 @@ import * as C from '../../types/sense/card';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
 import './index.css';
+import { Key } from 'ts-keycode-enum';
 const background = require('./background-map.png');
 
 type RouteProps = RouteComponentProps<{ mid: MapID, bid: BoxID }>;
@@ -42,6 +43,7 @@ interface StateFromProps {
   senseObject: SO.State;
   editor: OE.State;
   scope: typeof SM.initial.scope;
+  showAnotherMode: Boolean;
 }
 
 type Props = StateFromProps & ActionProps;
@@ -74,7 +76,7 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions: acts, mid, editor, scope, senseMap, senseObject } = this.props;
+    const { actions: acts, mid, editor, scope, senseMap, senseObject, showAnotherMode } = this.props;
     const { status, focus } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
 
@@ -94,6 +96,8 @@ class MapPage extends React.Component<Props> {
         break;
       default:
     }
+    const isWholePicture = senseMap.mode === SM.MapModeType.WHOLE;
+    const shouldShowWholePicture = showAnotherMode ? !isWholePicture : isWholePicture;
 
     return (
       <div className="map-page">
@@ -206,9 +210,9 @@ class MapPage extends React.Component<Props> {
             <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
             <Viewport>
               {(props) => (
-                false
-                  ? <Map id={mid} {...props} />
-                  : <Map id={mid} {...props} component={WholeMap} />
+                shouldShowWholePicture
+                  ? <Map id={mid} {...props} component={WholeMap} />
+                  : <Map id={mid} {...props} />
               )}
             </Viewport>
             <div className="map-page__menu">
@@ -238,8 +242,9 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
     const scope = state.senseMap.scope;
     const { editor } = state;
     const { mid } = router.match.params;
+    const showAnotherMode = state.input.keyStatus[Key.Alt];
 
-    return { mid, senseMap, senseObject, scope, editor };
+    return { mid, senseMap, senseObject, scope, editor, showAnotherMode };
   },
   mapDispatch({ actions }),
 )(MapPage));

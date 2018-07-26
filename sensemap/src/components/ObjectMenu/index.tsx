@@ -231,6 +231,19 @@ class ObjectMenu extends React.PureComponent<Props> {
     acts.viewport.zoomViewport(level * step, center);
   }
 
+  isWholePicture(): boolean {
+    const { senseMap } = this.props;
+    return senseMap.mode === SM.MapModeType.WHOLE;
+  }
+
+  handleModeChange(): void {
+    const { actions: acts, senseMap } = this.props;
+    const newMode = senseMap.mode === SM.MapModeType.PART
+      ? SM.MapModeType.WHOLE
+      : SM.MapModeType.PART;
+    acts.senseMap.setMode(newMode);
+  }
+
   render() {
     const { actions: acts, editor } = this.props;
     const canCreateBox = this.canCreateBox();
@@ -381,6 +394,12 @@ class ObjectMenu extends React.PureComponent<Props> {
             </Menu.Item>
             <Menu.Item onClick={() => this.handleZoom(1.1)}>
               <Icon name="plus" />
+            </Menu.Item>
+            <Menu.Item
+              active={this.isWholePicture()}
+              onClick={() => this.handleModeChange()}
+            >
+              <Icon name="eye" />
             </Menu.Item>
           </Menu>
         }
