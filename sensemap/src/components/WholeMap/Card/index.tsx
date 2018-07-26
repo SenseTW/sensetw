@@ -4,10 +4,17 @@ import { TransformerForProps } from '../';
 import { ObjectData, CardData, CardType } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
+import { noop } from '../../../types/utils';
+import { Event as KonvaEvent } from '../../../types/konva';
 
 interface OwnProps {
   mapObject: ObjectData;
-  selected?: boolean;
+  selected?: Boolean;
+  onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onDeselect?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
 }
 
 type Props = OwnProps & BoundingBox & CardData & TransformerForProps;
@@ -41,7 +48,17 @@ class Card extends React.PureComponent<Props> {
   };
 
   render() {
-    const { transform, selected, cardType } = this.props;
+    const {
+      transform,
+      mapObject,
+      selected = false,
+      cardType,
+      onSelect = noop,
+      onDeselect = noop,
+      onDragStart = noop,
+      onDragMove = noop,
+      onDragEnd = noop,
+    } = this.props;
     // TODO: should I use the object dimension or the style dimension?
     const { x, y, width, height } = transform({
       x: this.props.x,
@@ -73,6 +90,13 @@ class Card extends React.PureComponent<Props> {
           height={height}
           cornerRadius={style.borderRadius}
           fill={style.backgroundColor[cardType]}
+          onMouseDown={
+            (e: KonvaEvent.Mouse) =>
+              selected ? onDeselect(e, mapObject) : onSelect(e, mapObject)
+          }
+          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
+          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
+          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
         />
       </Group>
     );

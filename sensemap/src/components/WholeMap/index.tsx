@@ -9,8 +9,11 @@ import * as G from '../../graphics/point';
 import * as O from '../../types/sense/object';
 import * as B from '../../types/sense/box';
 import * as C from '../../types/sense/card';
+import * as F from '../../types/sense/focus';
+import * as I from '../../types/input';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
+import * as SL from '../../types/selection';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
 
 export interface TransformerForProps {
@@ -54,11 +57,39 @@ class WholeMap extends React.Component<Props, State> {
   handleMouseDown = (e: KonvaEvent.Mouse) => {
     if (e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.stage.stageMouseDown();
+      // TODO: should prevent desection when map has been dragged
+      this.props.actions.selection.clearSelection();
     }
   }
 
   handleMouseUp = (e: KonvaEvent.Mouse) => {
     this.props.actions.stage.stageMouseUp();
+  }
+
+  handleSelect = (e: KonvaEvent.Mouse, object: ObjectData) => {
+    const { actions: acts, input } = this.props;
+    const isMultiSelectable = I.isMultiSelectable(input);
+
+    if (isMultiSelectable) {
+      acts.editor.focusObject(F.focusNothing());
+      acts.selection.addObjectToSelection(object.id);
+    } else {
+      acts.selection.clearSelection();
+      acts.editor.focusObject(O.toFocus(object));
+      acts.selection.addObjectToSelection(object.id);
+    }
+  }
+
+  handleDeselect(e: KonvaEvent.Mouse, object: ObjectData) {
+    const { actions: acts, inScope, selection } = this.props;
+
+    acts.selection.removeObjectFromSelection(object.id);
+    if (SL.count(selection) === 1) {
+      const target = SL.get(selection, 0);
+      acts.editor.focusObject(O.toFocus(CS.getObject(inScope, target)));
+    } else {
+      acts.editor.focusObject(F.focusNothing());
+    }
   }
 
   // XXX: duplicated
@@ -96,8 +127,9 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   renderObject(object: ObjectData) {
-    const { senseObject } = this.props;
+    const { senseObject, selection } = this.props;
     const transformers = this.state;
+    const isSelected = SL.contains(selection, object.id);
 
     switch (object.objectType) {
       case ObjectType.BOX: {
@@ -115,10 +147,13 @@ class WholeMap extends React.Component<Props, State> {
             {...box}
             key={box.id}
             mapObject={object}
+            selected={isSelected}
             x={x}
             y={y}
             width={Box.style.width}
             height={Box.style.height}
+            onSelect={this.handleSelect}
+            onDeselect={this.handleDeselect}
           />
         );
       }
@@ -137,10 +172,13 @@ class WholeMap extends React.Component<Props, State> {
             {...card}
             key={card.id}
             mapObject={object}
+            selected={isSelected}
             x={x}
             y={y}
             width={Card.style.width}
             height={Card.style.height}
+            onSelect={this.handleSelect}
+            onDeselect={this.handleDeselect}
           />
         );
       }
