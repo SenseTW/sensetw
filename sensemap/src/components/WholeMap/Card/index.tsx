@@ -1,11 +1,16 @@
 import * as React from 'react';
-import { Rect } from 'react-konva';
+import { Group, Rect } from 'react-konva';
 import { TransformerForProps } from '../';
-import { CardData, CardType } from '../../../types';
+import { ObjectData, CardData, CardType } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
 
-type Props = BoundingBox & CardData & TransformerForProps;
+interface OwnProps {
+  mapObject: ObjectData;
+  selected?: boolean;
+}
+
+type Props = OwnProps & BoundingBox & CardData & TransformerForProps;
 
 class Card extends React.PureComponent<Props> {
   static style = {
@@ -23,11 +28,20 @@ class Card extends React.PureComponent<Props> {
       right: 9,
       bottom: 12,
       left: 9,
+    },
+    selected: {
+      borderRadius: 27,
+      color: '#3ad8fa',
+      offset: {
+        x: -18,
+        y: -18,
+      },
+      strokeWidth: 9,
     }
   };
 
   render() {
-    const { transform, cardType } = this.props;
+    const { transform, selected, cardType } = this.props;
     // TODO: should I use the object dimension or the style dimension?
     const { x, y, width, height } = transform({
       x: this.props.x,
@@ -37,15 +51,30 @@ class Card extends React.PureComponent<Props> {
     });
     const style = transformObject(transform, Card.style) as typeof Card.style;
 
-    return (
+    const selectedWidth = width - style.selected.offset.x * 2;
+    const selectedHeight = height - style.selected.offset.y * 2;
+    const selectedRect = selected && (
       <Rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        cornerRadius={style.borderRadius}
-        fill={style.backgroundColor[cardType]}
+        x={style.selected.offset.x}
+        y={style.selected.offset.y}
+        width={selectedWidth}
+        height={selectedHeight}
+        cornerRadius={style.selected.borderRadius}
+        stroke={style.selected.color}
+        strokeWidth={style.selected.strokeWidth}
       />
+    );
+
+    return (
+      <Group x={x} y={y}>
+        {selectedRect}
+        <Rect
+          width={width}
+          height={height}
+          cornerRadius={style.borderRadius}
+          fill={style.backgroundColor[cardType]}
+        />
+      </Group>
     );
   }
 }

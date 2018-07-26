@@ -19,7 +19,7 @@ export interface TransformerForProps {
 }
 
 interface MapState {
-  prevPoint: G.Point;
+  prevDragPoint: G.Point;
 }
 
 type State = MapState & TransformerForProps;
@@ -36,7 +36,7 @@ class WholeMap extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      prevPoint: { x: 0, y: 0 },
+      prevDragPoint: { x: 0, y: 0 },
       transform: V.makeTransform(props),
       inverseTransform: V.makeInverseTransform(props),
     };
@@ -61,6 +61,40 @@ class WholeMap extends React.Component<Props, State> {
     this.props.actions.stage.stageMouseUp();
   }
 
+  // XXX: duplicated
+  handleObjectDragStart(e: KonvaEvent.Mouse) {
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+    this.setState({ prevDragPoint });
+  }
+
+  // XXX: duplicated
+  handleObjectDragMove(e: KonvaEvent.Mouse) {
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+    const dx = prevDragPoint.x - this.state.prevDragPoint.x;
+    const dy = prevDragPoint.y - this.state.prevDragPoint.y;
+    const objects = this.props.selection.objects.map(id => {
+      const o = CS.getObject(this.props.senseObject, id);
+      return { ...o, x: o.x + dx, y: o.y + dy };
+    }).reduce((a, o) => { a[o.id] = o; return a; }, {});
+    this.props.actions.cachedStorage.updateObjects(objects);
+    this.setState({ prevDragPoint });
+  }
+
+  // XXX: duplicated
+  handleObjectDragEnd(e: KonvaEvent.Mouse) {
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+    const dx = prevDragPoint.x - this.state.prevDragPoint.x;
+    const dy = prevDragPoint.y - this.state.prevDragPoint.y;
+    this.props.selection.objects.forEach(id => {
+      const o = CS.getObject(this.props.senseObject, id);
+      this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
+    });
+    this.setState({ prevDragPoint: { x: 0, y: 0 } });
+  }
+
   renderObject(object: ObjectData) {
     const { senseObject } = this.props;
     const transformers = this.state;
@@ -80,6 +114,7 @@ class WholeMap extends React.Component<Props, State> {
             {...transformers}
             {...box}
             key={box.id}
+            mapObject={object}
             x={x}
             y={y}
             width={Box.style.width}
@@ -101,6 +136,7 @@ class WholeMap extends React.Component<Props, State> {
             {...transformers}
             {...card}
             key={card.id}
+            mapObject={object}
             x={x}
             y={y}
             width={Card.style.width}
