@@ -10,6 +10,7 @@ export type State = {
   top:    number;
   left:   number;
   level:  ZoomLevel;
+  prevViewport?: State;
 };
 
 export type StateToTransform = (s: State) => G.Transform;
@@ -20,7 +21,13 @@ export const initial: State = {
   top:    0,
   left:   0,
   level:  1.0,
+  prevViewport: undefined,
 };
+
+export const viewport = (v: Partial<State>): State => ({
+  ...initial,
+  ...v
+});
 
 export const makeTransform: StateToTransform =
   ({ top, left, level }) => ({
@@ -70,6 +77,18 @@ export const getCenter = (state: State): G.Point => ({
   y: state.top + state.height / 2,
 });
 
+const SET_VIEWPORT = 'SET_VIEWPORT';
+/**
+ * A message to set the viewport with a new viewport.
+ *
+ * @param state The new viewport
+ */
+const setViewport =
+  (state: Partial<State>) => ({
+    type: SET_VIEWPORT as typeof SET_VIEWPORT,
+    payload: { state },
+  });
+
 const PAN_VIEWPORT = 'PAN_VIEWPORT';
 /**
  * A message to move the viewport with an offset in screen space.
@@ -109,23 +128,44 @@ const resizeViewport =
   });
 
 const RESET_VIEWPORT = 'RESET_VIEWPORT';
-const resetViewPort = 
+const resetViewPort =
   () => ({
     type: RESET_VIEWPORT as typeof RESET_VIEWPORT,
-    payload: {}
+    payload: {},
+  });
+
+const SAVE_VIEWPORT = 'SAVE_REPORT';
+const save =
+  () => ({
+    type: SAVE_VIEWPORT as typeof SAVE_VIEWPORT,
+  });
+
+const LOAD_VIEWPORT = 'LOAD_VIEWPORT';
+const load =
+  () => ({
+    type: LOAD_VIEWPORT as typeof LOAD_VIEWPORT,
   });
 
 export const actions = {
+  setViewport,
   panViewport,
   zoomViewport,
   resizeViewport,
-  resetViewPort
+  resetViewPort,
+  save,
+  load,
 };
 
 export type Action = ActionUnion<typeof actions>;
 
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
+    case SET_VIEWPORT: {
+      return {
+        ...state,
+        ...action.payload.state,
+      };
+    }
     case PAN_VIEWPORT: {
       return {
         ...state,
@@ -158,6 +198,17 @@ export const reducer = (state: State = initial, action: Action): State => {
     }
     case RESET_VIEWPORT: {
       return initial;
+    }
+    case SAVE_VIEWPORT: {
+      return viewport({ prevViewport: state });
+    }
+    case LOAD_VIEWPORT: {
+      if (state.prevViewport === undefined) {
+        // tslint:disable-next-line:no-console
+        console.error(new Error('no more viewports'));
+        return state;
+      }
+      return state.prevViewport;
     }
     default: return state;
   }
