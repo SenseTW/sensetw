@@ -1,6 +1,6 @@
 import { ActionUnion, emptyAction } from '../action';
 import { HasID } from './has-id';
-import { Position, Dimension, BoundingBox } from '../../graphics/drawing';
+import { Position, Dimension, getCenter as getBoxCenter } from '../../graphics/drawing';
 import { ObjectType } from './object-type';
 import { TimeStamp } from '../utils';
 import { CardID } from './card';
@@ -91,15 +91,14 @@ export const toFocus = (object: ObjectData): F.Focus => {
   }
 };
 
-export function getCenter(o: ObjectData): BoundingBox {
+export function getCenter(o: ObjectData): Position {
   switch (o.objectType) {
     case ObjectType.CARD:
     case ObjectType.BOX: {
-      const { x, y, width, height } = o;
-      return { x: x + width / 2, y: y + height / 2, width, height };
+      return getBoxCenter(o);
     }
     default: {
-      return { x: o.x, y: o.y, width: 0, height: 0 };
+      return getBoxCenter({ x: o.x, y: o.y, width: 0, height: 0 });
     }
   }
 }

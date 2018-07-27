@@ -1,8 +1,11 @@
-import { Dispatch } from '.';
+import { Dispatch, GetState } from '.';
 import { ActionUnion, emptyAction } from './action';
+import * as D from '../graphics/drawing';
 import { MapID } from './sense/map';
 import { BoxID } from './sense/box';
+import * as CS from './cached-storage';
 import * as SL from './selection';
+import * as V from './viewport';
 
 export enum MapScopeType {
   FULL_MAP = 'FULL_MAP',
@@ -118,6 +121,75 @@ const setMode =
     payload: { mode },
   });
 
+const toWholeMode =
+  () =>
+  (dispatch: Dispatch, getState: GetState) => {
+    dispatch(setMode(MapModeType.WHOLE));
+    const state = getState();
+    // get scoped objects
+    const { senseMap, senseObject, viewport } = state;
+    let inScope;
+    switch (senseMap.scope.type) {
+      case MapScopeType.BOX:
+        inScope = CS.scopedToBox(senseObject, senseMap.scope.box);
+        break;
+      case MapScopeType.FULL_MAP:
+      default:
+        inScope = CS.scopedToMap(senseObject);
+        break;
+    }
+    const objects = Object.values(CS.toStorage(inScope).objects);
+    // caculate the bounding box
+    const box = D.flatten(objects);
+    const center = D.getCenter(box);
+    const { width, height } = viewport;
+    // save the old viewport
+    dispatch(V.actions.save());
+    // get the zoom scale and set the new viewport
+    if (width / box.width < height / box.height) {
+      // fit width
+      const level = width / box.width;
+      const globalHeight = height / level;
+      dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
+    } else {
+      // fit height
+      const level = height / box.height;
+      const globalWidth = width / level;
+      dispatch(V.actions.setViewport({ left: center.y - globalWidth / 2, top: box.y, level }));
+    }
+  };
+
+const toNormalMode =
+  () =>
+  (dispatch: Dispatch, getState: GetState) => {
+    dispatch(setMode(MapModeType.PART));
+    // recover the old viewport
+    const state = getState();
+    const { selection, senseObject, viewport } = state;
+    dispatch(V.actions.load());
+    if (SL.count(selection) !== 0) {
+      // get the selected objects
+      const objects = selection.objects.map(id => CS.getObject(senseObject, id));
+      // caculate the bounding box
+      const box = D.flatten(objects);
+      const center = D.getCenter(box);
+      // get the zoom scale
+      const { width, height } = viewport;
+      // set the new viewport
+      if (width / box.width < height / box.height) {
+        // fit width
+        const level = width / box.width;
+        const globalHeight = height / level;
+        dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
+      } else {
+        // fit height
+        const level = height / box.height;
+        const globalWidth = width / level;
+        dispatch(V.actions.setViewport({ left: center.y - globalWidth / 2, top: box.y, level }));
+      }
+    }
+  };
+
 /**
  * The data constructors of map actions.
  */
@@ -135,6 +207,8 @@ export const actions = {
   ...syncActions,
   openBox,
   closeBox,
+  toWholeMode,
+  toNormalMode,
 };
 
 export type Action = ActionUnion<typeof syncActions>;

@@ -238,10 +238,11 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   handleModeChange(): void {
     const { actions: acts, senseMap } = this.props;
-    const newMode = senseMap.mode === SM.MapModeType.PART
-      ? SM.MapModeType.WHOLE
-      : SM.MapModeType.PART;
-    acts.senseMap.setMode(newMode);
+    if (senseMap.mode === SM.MapModeType.PART) {
+      acts.senseMap.toWholeMode();
+    } else {
+      acts.senseMap.toNormalMode();
+    }
   }
 
   render() {

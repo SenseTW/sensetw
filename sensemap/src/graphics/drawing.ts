@@ -37,6 +37,11 @@ export const emptyBoundingRect = {
   left: Infinity,
 };
 
+export const getCenter = (box: BoundingBox): Position => ({
+  x: box.x + box.width / 2,
+  y: box.y + box.height / 2,
+});
+
 export const rectFromBox = (box: BoundingBox): BoundingRect => (
   box.width * box.height === 0
     ? emptyBoundingRect
@@ -62,7 +67,7 @@ export const boxFromRect = (rect: BoundingRect): BoundingBox => (
     }
 );
 
-export const flatten = (objects: [BoundingBox]): BoundingBox =>
+export const flatten = (objects: BoundingBox[]): BoundingBox =>
   boxFromRect(objects.reduce(
     (result, box) => {
       const rect = rectFromBox(box);
