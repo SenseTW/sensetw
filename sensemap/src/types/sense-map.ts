@@ -85,7 +85,7 @@ const ACTIVATE_INBOX_PAGE = 'ACTIVATE_INBOX_PAGE';
 /**
  * A message to change the inbox activated page.
  */
-const activateInboxPage = 
+const activateInboxPage =
   (page: number) => ({
     type: ACTIVATE_INBOX_PAGE as typeof ACTIVATE_INBOX_PAGE,
     payload: { page }
@@ -138,24 +138,26 @@ const toWholeMode =
         inScope = CS.scopedToMap(senseObject);
         break;
     }
+    // XXX: should use render width and height
     const objects = Object.values(CS.toStorage(inScope).objects);
     // caculate the bounding box
-    const box = D.flatten(objects);
+    let box = D.flatten(objects);
+    const boxRatio = box.width / box.height;
     const center = D.getCenter(box);
-    const { width, height } = viewport;
+    const screenRatio = viewport.width / viewport.height;
     // save the old viewport
     dispatch(V.actions.save());
     // get the zoom scale and set the new viewport
-    if (width / box.width < height / box.height) {
-      // fit width
-      const level = width / box.width;
-      const globalHeight = height / level;
-      dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
-    } else {
+    if (boxRatio < screenRatio) {
       // fit height
-      const level = height / box.height;
-      const globalWidth = width / level;
-      dispatch(V.actions.setViewport({ left: center.y - globalWidth / 2, top: box.y, level }));
+      const level = viewport.height / box.height;
+      const globalWidth = viewport.width / level;
+      dispatch(V.actions.setViewport({ left: center.x - globalWidth / 2, top: box.y, level }));
+    } else {
+      // fit width
+      const level = viewport.width / box.width;
+      const globalHeight = viewport.height / level;
+      dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
     }
   };
 
@@ -172,20 +174,21 @@ const toNormalMode =
       const objects = selection.objects.map(id => CS.getObject(senseObject, id));
       // caculate the bounding box
       const box = D.flatten(objects);
+      const boxRatio = box.width / box.height;
       const center = D.getCenter(box);
       // get the zoom scale
-      const { width, height } = viewport;
+      const screenRatio = viewport.width / viewport.height;
       // set the new viewport
-      if (width / box.width < height / box.height) {
-        // fit width
-        const level = width / box.width;
-        const globalHeight = height / level;
-        dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
-      } else {
+      if (boxRatio < screenRatio) {
         // fit height
-        const level = height / box.height;
-        const globalWidth = width / level;
-        dispatch(V.actions.setViewport({ left: center.y - globalWidth / 2, top: box.y, level }));
+        const level = viewport.height / box.height;
+        const globalWidth = viewport.width / level;
+        dispatch(V.actions.setViewport({ left: center.x - globalWidth / 2, top: box.y, level }));
+      } else {
+        // fit width
+        const level = viewport.width / box.width;
+        const globalHeight = viewport.height / level;
+        dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
       }
     }
   };

@@ -200,7 +200,7 @@ export const reducer = (state: State = initial, action: Action): State => {
       return initial;
     }
     case SAVE_VIEWPORT: {
-      return viewport({ prevViewport: state });
+      return viewport({ ...state, prevViewport: state });
     }
     case LOAD_VIEWPORT: {
       if (state.prevViewport === undefined) {
