@@ -1,4 +1,5 @@
 import { HasID } from '../sense/has-id';
+import { UserData, anonymousUserData } from './user';
 import { TimeStamp } from '../utils';
 import { ActionUnion, emptyAction } from '../action';
 import * as moment from 'moment';
@@ -11,14 +12,13 @@ export enum MapType {
 }
 
 export interface MapData extends HasID<MapID> {
-  id: MapID;
   createdAt: TimeStamp;
   updatedAt: TimeStamp;
   type: MapType;
   name: string;
   description: string;
   tags: string;
-  // owner: User;
+  owner: UserData;
   // members: User[];
   image: string;
 }
@@ -34,6 +34,7 @@ export const emptyMapData: MapData = {
   description: '',
   tags: '',
   image: '',
+  owner: anonymousUserData,
 };
 
 export const mapData = (partial: PartialMapData = {}): MapData => {
