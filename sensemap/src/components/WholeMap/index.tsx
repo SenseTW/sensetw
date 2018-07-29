@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Stage, Layer } from 'react-konva';
 import { Props } from '../Map';
 import Box from './Box';
+import CardList from './CardList';
 import Card from './Card';
 import Edge from './Edge';
 import { ObjectType, ObjectData, Edge as EdgeData } from '../../types';
@@ -23,6 +24,7 @@ export interface TransformerForProps {
 
 interface MapState {
   prevDragPoint: G.Point;
+  hoverObject?: ObjectData;
 }
 
 type State = MapState & TransformerForProps;
@@ -40,6 +42,7 @@ class WholeMap extends React.Component<Props, State> {
 
     this.state = {
       prevDragPoint: { x: 0, y: 0 },
+      hoverObject: undefined,
       transform: V.makeTransform(props),
       inverseTransform: V.makeInverseTransform(props),
     };
@@ -93,7 +96,7 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   // XXX: duplicated
-  handleObjectDragStart(e: KonvaEvent.Mouse) {
+  handleObjectDragStart = (e: KonvaEvent.Mouse) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     this.setState({ prevDragPoint });
@@ -126,6 +129,14 @@ class WholeMap extends React.Component<Props, State> {
     this.setState({ prevDragPoint: { x: 0, y: 0 } });
   }
 
+  handleMouseOver = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
+    this.setState({ hoverObject });
+  }
+
+  handleMouseOut = () => {
+    this.setState({ hoverObject: undefined });
+  }
+
   renderObject(object: ObjectData) {
     const { senseObject, selection } = this.props;
     const transformers = this.state;
@@ -134,7 +145,6 @@ class WholeMap extends React.Component<Props, State> {
     switch (object.objectType) {
       case ObjectType.BOX: {
         const { x, y } = object;
-        // TODO: check for the existance
         const box = CS.getBox(senseObject, object.data);
 
         if (B.isEmpty(box)) {
@@ -154,12 +164,13 @@ class WholeMap extends React.Component<Props, State> {
             height={Box.style.height}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
+            onMouseOver={this.handleMouseOver}
+            onMouseOut={this.handleMouseOut}
           />
         );
       }
       case ObjectType.CARD: {
         const { x, y } = object;
-        // TODO: check for the existance
         const card = CS.getCard(senseObject, object.data);
 
         if (C.isEmpty(card)) {
@@ -226,6 +237,25 @@ class WholeMap extends React.Component<Props, State> {
     const objects = Object.values(storage.objects).map(o => this.renderObject(o));
     const edges = Object.values(storage.edges).map(e => this.renderEdge(e));
 
+    const { transform, inverseTransform, hoverObject } = this.state;
+    const cards = hoverObject !== undefined
+      ? Object
+          .values(CS.getCardsInBox(this.props.senseObject, hoverObject.data))
+          .filter(c => c.id !== '0')
+      : [];
+    const cardList =
+      cards.length !== 0 &&
+      hoverObject !== undefined && (
+        <CardList
+          transform={transform}
+          inverseTransform={inverseTransform}
+          mapObject={hoverObject}
+          x={hoverObject.x + Box.style.width}
+          y={hoverObject.y}
+          cards={cards}
+        />
+      );
+
     return (
       <Stage
         width={width}
@@ -237,6 +267,7 @@ class WholeMap extends React.Component<Props, State> {
         <Layer>
           {edges}
           {objects}
+          {cardList}
         </Layer>
       </Stage>
     );

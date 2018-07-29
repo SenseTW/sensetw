@@ -10,6 +10,8 @@ import { Event as KonvaEvent } from '../../../types/konva';
 interface OwnProps {
   mapObject: ObjectData;
   selected?: Boolean;
+  onMouseOver?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onMouseOut?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDeselect?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
@@ -19,7 +21,6 @@ interface OwnProps {
 
 interface OwnState {
   newlySelected: boolean;
-  hover: boolean;
 }
 
 type Props = OwnProps & BoundingBox & BoxData & TransformerForProps;
@@ -70,13 +71,14 @@ class Box extends React.PureComponent<Props, OwnState> {
       mapObject,
       selected = false,
       title,
+      onMouseOver = noop,
+      onMouseOut = noop,
       onSelect = noop,
       onDeselect = noop,
       onDragStart = noop,
       onDragMove = noop,
       onDragEnd = noop
     } = this.props;
-    const { hover } = this.state;
     const { x, y, width, height } = transform({
       x: this.props.x,
       y: this.props.y,
@@ -96,16 +98,6 @@ class Box extends React.PureComponent<Props, OwnState> {
         cornerRadius={style.selected.borderRadius}
         stroke={style.selected.color}
         strokeWidth={style.selected.strokeWidth}
-      />
-    );
-
-    const hoverRect = hover && (
-      <Rect
-        x={width + style.hover.margin.left}
-        width={style.hover.width}
-        height={style.hover.height}
-        cornerRadius={style.hover.borderRadius}
-        fill={style.hover.backgroundColor}
       />
     );
 
@@ -133,8 +125,8 @@ class Box extends React.PureComponent<Props, OwnState> {
         <Rect
           width={width}
           height={height}
-          onMouseOver={() => this.setState({ hover: true })}
-          onMouseOut={() => this.setState({ hover: false })}
+          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
+          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
           onMouseDown={
             (e: KonvaEvent.Mouse) =>
               selected ? onDeselect(e, mapObject) : onSelect(e, mapObject)
@@ -143,7 +135,6 @@ class Box extends React.PureComponent<Props, OwnState> {
           onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
           onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
         />
-        {hoverRect}
       </Group>
     );
   }

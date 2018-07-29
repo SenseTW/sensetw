@@ -8,7 +8,7 @@ interface OwnProps {
 
 type Props = OwnProps & TextConfig;
 
-class ReactiveText extends React.PureComponent<Props> {
+class Text extends React.PureComponent<Props> {
   textNode: Node | null = null;
   width: number = 0;
   height: number = 0;
@@ -45,4 +45,4 @@ class ReactiveText extends React.PureComponent<Props> {
   }
 }
 
-export default ReactiveText;
+export default Text;
