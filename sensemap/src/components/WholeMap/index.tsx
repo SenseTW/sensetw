@@ -155,7 +155,7 @@ class WholeMap extends React.Component<Props, State> {
           <Box
             {...transformers}
             {...box}
-            key={box.id}
+            key={object.id}
             mapObject={object}
             selected={isSelected}
             x={x}
@@ -181,7 +181,7 @@ class WholeMap extends React.Component<Props, State> {
           <Card
             {...transformers}
             {...card}
-            key={card.id}
+            key={object.id}
             mapObject={object}
             selected={isSelected}
             x={x}
