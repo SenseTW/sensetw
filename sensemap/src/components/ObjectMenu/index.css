@@ -1,9 +1,10 @@
 .sense-object-menu > .ui.inverted.menu {
   box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.5);
+  margin-right: 2px;
 }
 
-.sense-object-menu > .ui.inverted.menu:first-child {
-  margin-right: 2px;
+.sense-object-menu > .ui.inverted.menu:last-child {
+  margin-right: 0;
 }
 
 .sense-object-menu > .ui.inverted.menu .item {

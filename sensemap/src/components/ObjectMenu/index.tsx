@@ -390,12 +390,6 @@ class ObjectMenu extends React.PureComponent<Props> {
         }
         {
           <Menu compact inverted icon>
-            <Menu.Item onClick={() => this.handleZoom(0.9)}>
-              <Icon name="minus" />
-            </Menu.Item>
-            <Menu.Item onClick={() => this.handleZoom(1.1)}>
-              <Icon name="plus" />
-            </Menu.Item>
             <Menu.Item
               active={this.isWholePicture()}
               onClick={() => this.handleModeChange()}
