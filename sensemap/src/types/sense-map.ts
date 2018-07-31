@@ -174,22 +174,13 @@ const toNormalMode =
       const objects = selection.objects.map(id => CS.getObject(senseObject, id));
       // caculate the bounding box
       const box = D.flatten(objects);
-      const boxRatio = box.width / box.height;
       const center = D.getCenter(box);
-      // get the zoom scale
-      const screenRatio = viewport.width / viewport.height;
       // set the new viewport
-      if (boxRatio < screenRatio) {
-        // fit height
-        const level = viewport.height / box.height;
-        const globalWidth = viewport.width / level;
-        dispatch(V.actions.setViewport({ left: center.x - globalWidth / 2, top: box.y, level }));
-      } else {
-        // fit width
-        const level = viewport.width / box.width;
-        const globalHeight = viewport.height / level;
-        dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
-      }
+      dispatch(V.actions.setViewport({
+        left: center.x - viewport.width / 2,
+        top: center.y - viewport.height / 2,
+        level: 1.0
+      }));
     }
   };
 
