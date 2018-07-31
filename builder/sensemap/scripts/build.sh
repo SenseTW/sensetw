@@ -1,7 +1,7 @@
 #!/bin/bash
 
 URL=sense.tw
-
+API_URL=api.sense.tw
 cd /workspace
 
 if [ ! -f /workspace/gcs-build/build-date ]; then
@@ -16,16 +16,18 @@ if [ "$1" = "release" ]; then
 else
     branch="$2"
     commit="$3"
-    URL=${branch}.stage.sense.tw
+    URL=${branch}.staging.sense.tw
+    API_URL=${branch}.staging.api.sense.tw
 
     if [ "$2" = "master" ]; then
-        URL=stage.sense.tw
+        URL=staging.sense.tw
+        API_URL=staging.api.sense.tw
     fi
 fi
 
 echo "${URL}" >> ./gcs-build/build-url
+export SENSEMAP_API_ROOT=${API_URL}
 
 yarn
-#PUBLIC_URL=https://${URL}/ yarn run build
 PUBLIC_URL="" yarn run build
 cp -r ./build/* ./gcs-build/
