@@ -12,6 +12,8 @@ interface OwnProps {
   selected?: Boolean;
   onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDeselect?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onMouseOver?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onMouseOut?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
@@ -55,6 +57,8 @@ class Card extends React.PureComponent<Props> {
       cardType,
       onSelect = noop,
       onDeselect = noop,
+      onMouseOver = noop,
+      onMouseOut = noop,
       onDragStart = noop,
       onDragMove = noop,
       onDragEnd = noop,
@@ -94,6 +98,8 @@ class Card extends React.PureComponent<Props> {
             (e: KonvaEvent.Mouse) =>
               selected ? onDeselect(e, mapObject) : onSelect(e, mapObject)
           }
+          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
+          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
           onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
           onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
           onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
