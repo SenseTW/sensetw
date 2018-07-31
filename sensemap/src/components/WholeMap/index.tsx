@@ -5,7 +5,7 @@ import Box from './Box';
 import CardList from './CardList';
 import Card from './Card';
 import Edge from './Edge';
-import { ObjectType, ObjectData, Edge as EdgeData } from '../../types';
+import { ObjectType, ObjectData, CardData, Edge as EdgeData } from '../../types';
 import * as G from '../../graphics/point';
 import * as O from '../../types/sense/object';
 import * as B from '../../types/sense/box';
@@ -190,6 +190,8 @@ class WholeMap extends React.Component<Props, State> {
             height={Card.style.height}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
+            onMouseOver={this.handleMouseOver}
+            onMouseOut={this.handleMouseOut}
           />
         );
       }
@@ -238,11 +240,29 @@ class WholeMap extends React.Component<Props, State> {
     const edges = Object.values(storage.edges).map(e => this.renderEdge(e));
 
     const { transform, inverseTransform, hoverObject } = this.state;
-    const cards = hoverObject !== undefined
-      ? Object
-          .values(CS.getCardsInBox(this.props.senseObject, hoverObject.data))
-          .filter(c => c.id !== '0')
-      : [];
+
+    let offsetX = 0;
+    let cards: CardData[] = [];
+    if (hoverObject) {
+      switch (hoverObject.objectType) {
+        case ObjectType.BOX:
+          offsetX = Box.style.width;
+          // cards of the box
+          cards = Object
+            .values(CS.getCardsInBox(this.props.senseObject, hoverObject.data))
+            .filter(c => c.id !== '0');
+          break;
+        case ObjectType.CARD:
+          offsetX = Card.style.width;
+          // the card itself
+          cards = [CS.getCard(this.props.senseObject, hoverObject.data)];
+          break;
+        default:
+      }
+    }
+    // filter out the empty card
+    cards = cards.filter(c => c.id !== '0');
+
     const cardList =
       cards.length !== 0 &&
       hoverObject !== undefined && (
@@ -250,7 +270,7 @@ class WholeMap extends React.Component<Props, State> {
           transform={transform}
           inverseTransform={inverseTransform}
           mapObject={hoverObject}
-          x={hoverObject.x + Box.style.width}
+          x={hoverObject.x + offsetX}
           y={hoverObject.y}
           cards={cards}
         />
