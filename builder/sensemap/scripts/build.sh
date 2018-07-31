@@ -26,7 +26,7 @@ else
 fi
 
 echo "${URL}" >> ./gcs-build/build-url
-export SENSEMAP_API_ROOT=${API_URL}
+export REACT_APP_SENSEMAP_API_ROOT=https://${API_URL}/graphql
 
 yarn
 PUBLIC_URL="" yarn run build
