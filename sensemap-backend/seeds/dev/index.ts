@@ -3,6 +3,12 @@ exports.seed = function (knex, Promise) {
   return Promise.resolve();
 };
 
+exports.users = [
+  {
+    id: 'dd776858-52f4-48b4-b40c-2b9330409513',
+  },
+];
+
 exports.maps = [
   {
     id: 'b2f73daf-e767-4d8d-9506-52589d4fd039',
@@ -32,5 +38,11 @@ exports.boxes = [
   {
     id: '45f2ce6e-603a-4c97-90a5-1965709ef0c1',
     map: '63a544b6-36cf-4344-b370-32d451a35b70',
+  },
+];
+
+exports.annotations = [
+  {
+    id: '65524a44-7346-46c3-b04a-6a00836d8feb',
   },
 ];

@@ -217,7 +217,7 @@ export class Map extends React.Component<Props, MapState> {
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}
-            openCard={(id) => acts.editor.changeStatus(OE.StatusType.SHOW)}
+            openCard={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
           />);
       }
       case ObjectType.BOX: {
@@ -241,10 +241,7 @@ export class Map extends React.Component<Props, MapState> {
             handleDragEnd={this.handleObjectDragEnd}
             handleSetDropTarget={this.handleObjectSetDropTarget}
             handleUnsetDropTarget={this.handleObjectUnsetDropTarget}
-            openBox={(id) => {
-              acts.selection.clearSelection();
-              acts.senseMap.openBox(id);
-            }}
+            openBox={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
           />);
       }
       default: {

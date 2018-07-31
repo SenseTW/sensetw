@@ -15,6 +15,30 @@ export class Hypothesis {
     };
   }
 
+  signup(username: string, email: string, password: string) {
+    return axios
+      .post(`${this.apiUrl}/api/signup`, { username, password})
+      .then(response => {
+        return new Promise(resolve => {
+          return resolve(response.data);
+        });
+      });
+  }
+
+  login(username: string, password: string) {
+    return axios
+      .post(`${this.apiUrl}/api/login`, { username, password})
+      .then(response => {
+        return new Promise(resolve => {
+          return resolve(response.data);
+        });
+      });
+  }
+
+  logout() {
+    return axios.get(`${this.apiUrl}/logout`);
+  }
+
   search(option: SearchOption): Promise<SearchResult<Annotation>> {
     return axios.get(`${this.apiUrl}/search`, { ...this.defaultConfig, params: option }).then(r => r.data);
   }

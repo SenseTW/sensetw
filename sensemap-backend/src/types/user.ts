@@ -1,13 +1,22 @@
-import { ID, User, UserData, userFields } from './sql';
+import { ID, User, UserData, userFields, Map } from './sql';
 import * as Knex from 'knex';
 import { pick } from 'ramda';
 import * as crypto from 'crypto';
+import { mapsQuery } from './map';
 
 const token_algorithm = 'aes-256-ctr';
 
+export function usersQuery(db: Knex) {
+  return db.select(userFields(db)).from('user');
+}
+
 export async function getUser(db: Knex, id: ID): Promise<User | null> {
-  const u: User | undefined = await  db.select(userFields(db)).from('user').where('id', id).first();
+  const u: User | undefined = await usersQuery(db).where('id', id).first();
   return u === undefined ? null : u;
+}
+
+export async function getUserMaps(db: Knex, id: ID): Promise<Map> {
+  return mapsQuery(db).where('ownerId', id);
 }
 
 export async function authenticate(db: Knex, username: string, password: string): Promise<User | null> {
@@ -96,4 +105,20 @@ export function checkPassword(password: string): string {
   }
 
   return '';
+}
+
+export const resolvers = {
+  Query: {
+    User: async (_, args, { db }, info): Promise<User | null> => {
+      return getUser(db, args.id);
+    },
+  },
+  User: {
+    id:          async (o, _, { db }, info): Promise<ID>            => typeof(o) !== 'string' ? o.id          : o,
+    createdAt:   async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.createdAt   : (await getUser(db, o)).createdAt,
+    updatedAt:   async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.updatedAt   : (await getUser(db, o)).updatedAt,
+    username:    async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.username    : (await getUser(db, o)).username,
+    email:       async (o, _, { db }, info): Promise<Date>          => typeof(o) !== 'string' ? o.email       : (await getUser(db, o)).email,
+    maps:        async (o, _, { db }, info): Promise<Map[]>         => typeof(o) !== 'string' ? o.maps        : getUserMaps(db, o),
+  },
 }

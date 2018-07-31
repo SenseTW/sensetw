@@ -7,16 +7,17 @@
     "test": "tests"
   },
   "scripts": {
+    "knex": "knex",
     "migrate": "node migrate.js",
-    "seed": "knex seed:run",
     "build": "rimraf dist && tsc",
-    "prestart": "npm run build",
+    "build:watch": "rimraf dist && tsc -w",
+    "prestart": "yarn build",
     "start": "node dist",
     "start:watch": "concurrently 'tsc -w' 'nodemon --require ts-node/register dist'",
     "debug": "concurrently 'tsc -w' 'nodemon --inspect-brk --require ts-node/register dist'",
-    "test": "jest",
-    "test:watch": "jest --watchAll",
-    "test:coverage": "jest --coverage",
+    "test": "jest --runInBand",
+    "test:watch": "yarn test --watch",
+    "test:coverage": "yarn test --coverage",
     "dbms:verify": "node verify_db_connection.js",
     "db:create": "node create_database.js"
   },
@@ -37,6 +38,7 @@
     "@types/ramda": "^0.25.32",
     "@types/react": "^16.3.17",
     "@types/react-dom": "^16.0.6",
+    "@types/supertest": "^2.0.4",
     "concurrently": "^3.6.0",
     "dotenv": "^6.0.0",
     "jest": "^23.1.0",
@@ -69,7 +71,8 @@
     "ramda": "^0.25.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "semantic-ui-react": "^0.81.1"
+    "semantic-ui-react": "^0.81.1",
+    "supertest": "^3.1.0"
   },
   "jest": {
     "transform": {

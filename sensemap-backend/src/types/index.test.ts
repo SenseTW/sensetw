@@ -2,9 +2,9 @@ import { resolvers } from '.';
 import { maps } from '../../seeds/dev';
 import { context } from '../context';
 
-const { db } = context({ req: null });
-
-beforeAll(async () => db.seed.run());
+const { db } = context();
+beforeEach(() => db.seed.run());
+afterAll(() => db.destroy());
 
 test('ping', () => {
   expect(resolvers.Query.ping()).toBe('pong');

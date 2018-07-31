@@ -56,10 +56,18 @@ const resizeViewport =
     payload: { dimension }
   });
 
+const RESET_VIEWPORT = 'RESET_VIEWPORT';
+const resetViewPort = 
+  () => ({
+    type: RESET_VIEWPORT as typeof RESET_VIEWPORT,
+    payload: {}
+  });
+
 export const actions = {
   panViewport,
   zoomViewport,
   resizeViewport,
+  resetViewPort
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -79,6 +87,9 @@ export const reducer = (state: State = initial, action: Action): State => {
     case RESIZE_VIEWPORT: {
       const { width, height } = action.payload.dimension;
       return { ...state, width, height };
+    }
+    case RESET_VIEWPORT: {
+      return initial;
     }
     default: return state;
   }

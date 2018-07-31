@@ -206,7 +206,9 @@ class MapPage extends React.Component<Props> {
             <Viewport>
               {(props) => (<Map id={mid} {...props} />)}
             </Viewport>
-            <ObjectMenu style={{ left: isInboxVisible ? 378 : 28 }} />
+            <div className="map-page__menu">
+              <ObjectMenu />
+            </div>
             <InboxToggler
               className="inbox__btn"
               style={{ left: isInboxVisible ? 350 : 0 }}

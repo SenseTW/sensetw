@@ -1,5 +1,6 @@
+import * as Knex from "knex";
 
-exports.seed = function(knex, Promise) {
+exports.seed = function (knex: Knex): Promise<any> {
   return knex('object').insert([
     {
       id: '8f479cad-50a1-4604-92cd-df60b0291b9e',

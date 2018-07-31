@@ -57,7 +57,7 @@ class MapCard extends React.Component<Props> {
         <Card.Content className="map-card__header">
           <Card.Header title={timeHint}>
             <Icon float="left" name={data.type === SM.MapType.PUBLIC ? 'globe' : 'lock'} />
-            Owned by <span className="map-card__username">Ael</span>
+            Owned by <span className="map-card__username">{data.owner.username}</span>
           </Card.Header>
         </Card.Content>
         <Image src={data.image || 'https://picsum.photos/360/200'} />

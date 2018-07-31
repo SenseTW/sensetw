@@ -3,9 +3,9 @@ import * as O from './object';
 import { maps, boxes } from '../../seeds/dev';
 import { context } from '../context';
 
-const { db } = context({ req: null });
-
-beforeAll(async () => db.seed.run());
+const { db } = context();
+beforeEach(() => db.seed.run());
+afterAll(() => db.destroy());
 
 test('getBox', async () => {
   const box = await B.getBox(db, boxes[0].id);

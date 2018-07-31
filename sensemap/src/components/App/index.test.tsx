@@ -6,7 +6,7 @@ import App from './index';
 configure({ adapter: new Adapter() });
 
 function setup() {
-  const enzymeWrapper = shallow(<App />);
+  const enzymeWrapper = shallow(<App checked={false} authenticated={false} user={{}} />);
   return { enzymeWrapper };
 }
 

@@ -1,10 +1,13 @@
 import { MapID, MapType, MapData } from '../sense/map';
+import { anonymousUserData } from '../sense/user';
+import { graphQLUserFieldsFragment, GraphQLUserFields, toUserData } from './user';
 import { client } from './client';
 import * as moment from 'moment';
 
 const graphQLMapFieldsFragment = `
   fragment mapFields on Map {
     id, createdAt, updatedAt, type, name, description, tags, image
+    owner { ...userFields }
   }`;
 
 interface GraphQLMapFields {
@@ -16,6 +19,7 @@ interface GraphQLMapFields {
   description: string;
   tags:        string;
   image:       string;
+  owner:       GraphQLUserFields;
 }
 
 const toMapData: (m: GraphQLMapFields) => MapData =
@@ -28,6 +32,7 @@ const toMapData: (m: GraphQLMapFields) => MapData =
     description: m.description || '',
     tags:        m.tags || '',
     image:       m.image || '',
+    owner:       !!m.owner ? toUserData(m.owner) : anonymousUserData,
   });
 
 export const loadMaps =
@@ -39,6 +44,7 @@ export const loadMaps =
         }
       }
       ${graphQLMapFieldsFragment}
+      ${graphQLUserFieldsFragment}
     `;
     return client.request(query)
       .then(({ allMaps }) => allMaps.map(toMapData));
@@ -53,6 +59,7 @@ export const create =
         }
       }
       ${graphQLMapFieldsFragment}
+      ${graphQLUserFieldsFragment}
     `;
     return client.request(query, map)
       .then(({ createMap }) => toMapData(createMap));
@@ -67,6 +74,7 @@ export const update =
         }
       }
       ${graphQLMapFieldsFragment}
+      ${graphQLUserFieldsFragment}
     `;
     return client.request(query, map)
       .then(({ updateMap }) => toMapData(updateMap));
@@ -79,6 +87,7 @@ export const remove =
         deleteMap(id: $mapID) { ...mapFields }
       }
       ${graphQLMapFieldsFragment}
+      ${graphQLUserFieldsFragment}
     `;
     const variables = { mapID };
     return client.request(query, variables)

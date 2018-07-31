@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv';
 dotenv.config()
 
 import * as Knex from 'knex';
-import { development } from '../knexfile';
 
 function noSlash(a: string): string {
   return a.replace(/\/+$/, '');
@@ -18,6 +17,8 @@ const env = {
   PUBLIC_URL: noSlash(process.env.PUBLIC_URL || 'https://api.sense.tw'),
   SENSEMAP_API_ROOT: noSlash(process.env.SENSEMAP_API_ROOT || 'https://api.sense.tw/graphql'),
   HYPOTHESIS_API_ROOT: noSlash(process.env.HYPOTHESIS_API_ROOT || 'https://api.sense.tw/h/api'),
+  PUBLIC_MAP_ID: process.env.PUBLIC_MAP_ID || '1dbab857-942d-41d0-baa1-82fa70b0d773',
+  VIA_URL: process.env.VIA_URL || 'https://via.sense.tw',
 };
 
 const db = Knex({
