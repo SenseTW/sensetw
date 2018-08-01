@@ -19,12 +19,29 @@ export async function getUserMaps(db: Knex, id: ID): Promise<Map> {
   return mapsQuery(db).where('ownerId', id);
 }
 
-export async function authenticate(db: Knex, username: string, password: string): Promise<User | null> {
-  const u: User | undefined = await db.select(userFields(db)).from('user')
-    .where('salthash', db.raw(`crypt(?, ??)`, [ password, 'salthash' ]))
-    .andWhere('username', username)
-    .returning(userFields(db))
-    .first();
+type UsernameIdentityClaim = {
+  type: 'username',
+  username: string,
+  password: string,
+};
+
+type EmailIdentityClaim = {
+  type: 'email',
+  email: string,
+  password: string,
+};
+
+type IdentityClaim = UsernameIdentityClaim | EmailIdentityClaim;
+
+export async function authenticate(db: Knex, claim: IdentityClaim): Promise<User | null> {
+  let q = db.select(userFields(db)).from('user')
+    .where('salthash', db.raw(`crypt(?, ??)`, [ claim.password, 'salthash' ]))
+  if (claim.type === 'username') {
+    q = q.andWhere('username', claim.username);
+  } else if (claim.type === 'email') {
+    q = q.andWhere('email', claim.email);
+  }
+  const u: User | undefined = await q.first();
   return u === undefined ? null : u;
 }
 

@@ -43,11 +43,26 @@ test('authenticate', async () => {
   const { db } = context({ req: null });
   const u0 = await U.createUser(db, { username: 'foo', email: 'foo@example.com' }, 'mysecret');
 
-  const u1 = await U.authenticate(db, u0.username, 'mysecret');
+  const u1 = await U.authenticate(db, {
+    type: 'username',
+    username: u0.username,
+    password: 'mysecret'
+  });
   expect(u1.id).toBe(u0.id);
 
-  const u2 = await U.authenticate(db, u0.username, 'wrongsecret');
+  const u2 = await U.authenticate(db, {
+    type: 'username',
+    username: u0.username,
+    password: 'wrongsecret',
+  });
   expect(u2).toBeNull();
+
+  const u3 = await U.authenticate(db, {
+    type: 'email',
+    email: 'foo@example.com',
+    password: 'mysecret',
+  });
+  expect(u3.id).toBe(u0.id);
 });
 
 test('token', async () => {
