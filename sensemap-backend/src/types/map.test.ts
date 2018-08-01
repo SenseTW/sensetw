@@ -37,7 +37,7 @@ describe('GraphQL', () => {
     expect(m0.name).toBeNull();
     expect(m0.owner).toBe(users[0].id);
 
-    const m1 = await M.resolvers.Mutation.updateMap(null, { id: m0.id, name: 'baz', type: 'someothertype' } { db }, null);
+    const m1 = await M.resolvers.Mutation.updateMap(null, { id: m0.id, name: 'baz', type: 'someothertype' }, { db }, null);
 
     const m2 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);
     expect(m2.id).toBe(m0.id);
