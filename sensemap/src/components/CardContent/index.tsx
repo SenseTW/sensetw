@@ -63,11 +63,12 @@ class CardContent extends React.PureComponent<Props> {
                * @see https://mathiasbynens.github.io/rel-noopener/
                */
               onClick: () => {
+                const viaUrl = `https://via.sense.tw/${url}`;
                 // tslint:disable-next-line:no-any
-                const w: any | null = window.open(url);
+                const w: any | null = window.open(viaUrl);
                 if (w) {
                   w.opener = null;
-                  w.location = url;
+                  w.location = viaUrl;
                 }
               },
             }}
