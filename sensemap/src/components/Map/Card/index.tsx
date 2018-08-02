@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Group, Rect, Circle, Text } from 'react-konva';
 import TagList from '../TagList';
 import * as T from '../../../types';
-import * as C from '../../../types/sense/card';
 import { noop, toTags } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 import * as G from '../../../graphics/point';
@@ -27,8 +26,6 @@ interface State {
   newlySelected: boolean;
 }
 
-const width = C.DEFAULT_WIDTH;
-const height = C.DEFAULT_HEIGHT;
 const cornerRadius = 4;
 
 const dirtyRadius = 5;
@@ -38,7 +35,6 @@ const dirtyColor = '#3ad8fa';
 const summaryPadding = 0;
 const summaryOffsetX = 10 - summaryPadding;
 const summaryOffsetY = 8 - summaryPadding;
-const summaryWidth = width - summaryOffsetX * 2;
 const summaryFontFamily = 'sans-serif';
 const summaryFontSize = 16;
 const summaryAbsoluteLineHegiht = 22;
@@ -50,7 +46,6 @@ const summaryLimit = 39;
 const titlePadding = 0;
 const titleOffsetX = 10 - titlePadding;
 const titleOffsetY = 12 + summaryHeight - summaryPadding - titlePadding;
-const titleWidth = width - titleOffsetX * 2;
 const titleFontFamily = 'sans-serif';
 const titleFontSize = 13;
 const titleAbsoluteLineHeight = 16;
@@ -73,8 +68,6 @@ const shadowOffsetY = 3;
 
 const selectedOffsetX = -6;
 const selectedOffsetY = -6;
-const selectedWidth = width - selectedOffsetX * 2;
-const selectedHeight = height - selectedOffsetY * 2;
 const selectedCornerRadius = 8;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 3;
@@ -91,14 +84,20 @@ class Card extends React.Component<Props, State> {
   render() {
     const { isDirty = false } = this.props;
     const { data } = this.props.mapObject;
-    const { x, y } = this.props.transform({
+    const { x, y, width, height } = this.props.transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
+      width: this.props.mapObject.width,
+      height: this.props.mapObject.height,
     });
     const {title, summary, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedTitle   = title.substr(0, titleLimit);
     const tagHeight = this.state.tagHeight;
+    const selectedWidth = width - selectedOffsetX * 2;
+    const selectedHeight = height - selectedOffsetY * 2;
+    const summaryWidth = width - summaryOffsetX * 2;
+    const titleWidth = width - titleOffsetX * 2;
 
     const handleSelect    = this.props.handleSelect    || noop;
     const handleDeselect  = this.props.handleDeselect  || noop;

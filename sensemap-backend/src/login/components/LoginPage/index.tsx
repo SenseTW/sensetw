@@ -8,7 +8,7 @@ function LoginPage(props) {
         <Segment>
           <Header>Welcome Back</Header>
           <Form size="large" method="post">
-            <Form.Input name="username" fluid={true} icon="mail" iconPosition="left" placeholder="Hello@sense.tw" type="text" />
+            <Form.Input name="email" fluid={true} icon="mail" iconPosition="left" placeholder="Hello@sense.tw" type="text" />
             <Form.Input name="password" fluid={true} icon="lock" iconPosition="left" placeholder="Password" type="password" />
             <div>
               <a href="mailto:hello@sense.tw">Forget Password?</a>

@@ -5,7 +5,6 @@ import Card from './Card';
 import Toggle from './Toggle';
 import * as T from '../../../types';
 import { ObjectMap } from '../../../types/sense/has-id';
-import * as B from '../../../types/sense/box';
 import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 import * as G from '../../../graphics/point';
@@ -41,27 +40,27 @@ interface State {
   listDisplay: ListDisplay;
 }
 
-const width = B.DEFAULT_WIDTH;
-const height = B.DEFAULT_HEIGHT;
-
 const dirtyRadius = 5;
 const dirtyPadding = 10;
 const dirtyColor = '#3ad8fa';
 
 const selectedOffsetX = -8;
 const selectedOffsetY = -8;
-const selectedWidth = width - selectedOffsetY * 2;
-const selectedHeight = height - selectedOffsetX * 2;
 const selectedCornerRadius = 10;
 const selectedColor = '#3ad8fa';
 const selectedStrokeWidth = 2;
 
-function boxCards(props: Props, cards: T.CardData[]) {
-  const cardHeight = Card.style.height;
-  const top = Header.style.height;
+function boxCards(
+  { cardHeight, width, height }: { cardHeight: number, width: number, height: number },
+  cards: T.CardData[]
+) {
+  const top = height;
   return (
     <Group x={0} y={top}>
-      {cards.map((card, i) => <Card card={card} x={0} y={i * cardHeight} key={card.id} />)}
+      {cards.map(
+        (card, i) =>
+          <Card card={card} x={0} y={i * cardHeight} width={width} height={cardHeight} key={card.id} />
+      )}
     </Group>
   );
 }
@@ -82,12 +81,18 @@ class Box extends React.Component<Props, State> {
   }
 
   render() {
-    const { x, y } = this.props.transform({
+    const { x, y, width, height } = this.props.transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
+      width: this.props.mapObject.width,
+      height: this.props.mapObject.height,
     });
     const { box, isDirty = false } = this.props;
     const cards = Object.values(this.props.cards);
+    const { height: cardHeight } = this.props.transform({ height: Card.style.height });
+    const { height: toggleHeight } = this.props.transform({ height: Toggle.style.height });
+    const selectedWidth = width - selectedOffsetX * 2;
+    const selectedHeight = height - selectedOffsetY * 2;
 
     const handleSelect    = this.props.handleSelect    || noop;
     const handleDeselect  = this.props.handleDeselect  || noop;
@@ -143,7 +148,7 @@ class Box extends React.Component<Props, State> {
         onMouseLeave={handleUnsetDropTarget}
       >
         {this.props.selected ? selected : null}
-        <Header box={box} x={0} y={0} />
+        <Header box={box} x={0} y={0} width={width} height={height} />
         {
           isDirty &&
           <Circle
@@ -154,16 +159,18 @@ class Box extends React.Component<Props, State> {
           />
         }
         {this.state.listDisplay === ListDisplay.COLLAPSED
-          ? null : boxCards(this.props, cards)}
+          ? null : boxCards({ cardHeight, width, height }, cards)}
         <Toggle
           x={0}
           y={
-            Header.style.height
+            height
             + (this.state.listDisplay === ListDisplay.COLLAPSED
                ? 0
-               : Card.style.height * cards.length
+               : cardHeight * cards.length
               )
           }
+          width={width}
+          height={toggleHeight}
           show={this.state.listDisplay === ListDisplay.EXPANDED}
           action={this.handleToggleListDisplay}
         />

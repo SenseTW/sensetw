@@ -1,8 +1,11 @@
-import { Dispatch } from '.';
+import { Dispatch, GetState } from '.';
 import { ActionUnion, emptyAction } from './action';
+import * as D from '../graphics/drawing';
 import { MapID } from './sense/map';
 import { BoxID } from './sense/box';
+import * as CS from './cached-storage';
 import * as SL from './selection';
+import * as V from './viewport';
 
 export enum MapScopeType {
   FULL_MAP = 'FULL_MAP',
@@ -34,6 +37,11 @@ export type MapScope
 export enum InboxVisibility {
   VISIBLE = 'VISIBLE',
   HIDDEN  = 'HIDDEN',
+}
+
+export enum MapModeType {
+  PART = 'PART',
+  WHOLE = 'WHOLE',
 }
 
 const SET_SCOPE_TO_BOX = 'SET_SCOPE_TO_BOX';
@@ -77,7 +85,7 @@ const ACTIVATE_INBOX_PAGE = 'ACTIVATE_INBOX_PAGE';
 /**
  * A message to change the inbox activated page.
  */
-const activateInboxPage = 
+const activateInboxPage =
   (page: number) => ({
     type: ACTIVATE_INBOX_PAGE as typeof ACTIVATE_INBOX_PAGE,
     payload: { page }
@@ -106,6 +114,76 @@ const closeBox =
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
+const SET_MAP_MODE = 'SET_MAP_MODE';
+const setMode =
+  (mode: MapModeType) => ({
+    type: SET_MAP_MODE as typeof SET_MAP_MODE,
+    payload: { mode },
+  });
+
+const toWholeMode =
+  () =>
+  (dispatch: Dispatch, getState: GetState) => {
+    dispatch(setMode(MapModeType.WHOLE));
+    const state = getState();
+    // get scoped objects
+    const { senseMap, senseObject, viewport } = state;
+    let inScope;
+    switch (senseMap.scope.type) {
+      case MapScopeType.BOX:
+        inScope = CS.scopedToBox(senseObject, senseMap.scope.box);
+        break;
+      case MapScopeType.FULL_MAP:
+      default:
+        inScope = CS.scopedToMap(senseObject);
+        break;
+    }
+    // XXX: should use render width and height
+    const objects = Object.values(CS.toStorage(inScope).objects);
+    // caculate the bounding box
+    let box = D.flatten(objects);
+    const boxRatio = box.width / box.height;
+    const center = D.getCenter(box);
+    const screenRatio = viewport.width / viewport.height;
+    // save the old viewport
+    dispatch(V.actions.save());
+    // get the zoom scale and set the new viewport
+    if (boxRatio < screenRatio) {
+      // fit height
+      const level = viewport.height / box.height;
+      const globalWidth = viewport.width / level;
+      dispatch(V.actions.setViewport({ left: center.x - globalWidth / 2, top: box.y, level }));
+    } else {
+      // fit width
+      const level = viewport.width / box.width;
+      const globalHeight = viewport.height / level;
+      dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
+    }
+  };
+
+const toNormalMode =
+  () =>
+  (dispatch: Dispatch, getState: GetState) => {
+    dispatch(setMode(MapModeType.PART));
+    // recover the old viewport
+    const state = getState();
+    const { selection, senseObject, viewport } = state;
+    dispatch(V.actions.load());
+    if (SL.count(selection) !== 0) {
+      // get the selected objects
+      const objects = selection.objects.map(id => CS.getObject(senseObject, id));
+      // caculate the bounding box
+      const box = D.flatten(objects);
+      const center = D.getCenter(box);
+      // set the new viewport
+      dispatch(V.actions.setViewport({
+        left: center.x - viewport.width / 2,
+        top: center.y - viewport.height / 2,
+        level: 1.0
+      }));
+    }
+  };
+
 /**
  * The data constructors of map actions.
  */
@@ -116,12 +194,15 @@ const syncActions = {
   openInbox,
   activateInboxPage,
   closeInbox,
+  setMode,
 };
 
 export const actions = {
   ...syncActions,
   openBox,
   closeBox,
+  toWholeMode,
+  toNormalMode,
 };
 
 export type Action = ActionUnion<typeof syncActions>;
@@ -130,6 +211,7 @@ export type State = {
   // we need the current map id to check if we are transitioning to a new map
   map: MapID,
   scope: MapScope,
+  mode: MapModeType,
   inbox: InboxVisibility,
   activateInboxPage: number
 };
@@ -139,6 +221,7 @@ export const initial: State = {
   scope: {
     type: MapScopeType.FULL_MAP,
   },
+  mode: MapModeType.PART,
   inbox: InboxVisibility.HIDDEN,
   activateInboxPage: 1
 };
@@ -168,6 +251,10 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     }
     case CLOSE_INBOX: {
       return { ...state, inbox: InboxVisibility.HIDDEN };
+    }
+    case SET_MAP_MODE: {
+      const { mode } = action.payload;
+      return { ...state, mode };
     }
     default:
       return state;

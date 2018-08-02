@@ -15,9 +15,7 @@ import * as F from '../../types/sense/focus';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
 import * as G from '../../graphics/point';
-import * as B from '../../types/sense/box';
-import * as C from '../../types/sense/card';
-import { Event as KonvaEvent } from '../../types/konva';
+import { NodeType, Event as KonvaEvent } from '../../types/konva';
 
 export interface StateFromProps {
   selection:   State['selection'];
@@ -34,34 +32,20 @@ export interface OwnProps extends ViewportState {}
 export type Props = StateFromProps & ActionProps & OwnProps;
 
 interface MapState {
-  prevDragPoint: {
-    x: number,
-    y: number,
-  };
+  prevDragPoint: G.Point;
   dropTarget: ObjectMap<ObjectData>;
-}
-
-const makeTransform: V.StateToTransform =
-  ({ top, left }) => ({ x, y }) => ({ x: x - left, y: y - top });
-
-const makeInverseTransform: V.StateToTransform =
-  ({ top, left }) => ({ x, y }) => ({ x: x + left, y: y + top });
-
-function getCenter(o: ObjectData): G.Point {
-  switch (o.objectType) {
-    case ObjectType.CARD: {
-      return { x: o.x + C.DEFAULT_WIDTH / 2, y: o.y + C.DEFAULT_HEIGHT / 2 };
-    }
-    case ObjectType.BOX: {
-      return { x: o.x + B.DEFAULT_WIDTH / 2, y: o.y + B.DEFAULT_HEIGHT / 2 };
-    }
-    default: {
-      return { x: o.x, y: o.y };
-    }
-  }
+  transform: G.Transform;
+  inverseTransform: G.Transform;
 }
 
 export class Map extends React.Component<Props, MapState> {
+  static getDerivedStateFromProps(props: Props) {
+    return {
+      transform: V.makeTransform(props),
+      inverseTransform: V.makeInverseTransform(props),
+    };
+  }
+
   constructor(props: Props) {
     super(props);
 
@@ -78,6 +62,8 @@ export class Map extends React.Component<Props, MapState> {
     this.state = {
       prevDragPoint: { x: 0, y: 0 },
       dropTarget: {},
+      transform: V.makeTransform(this.props),
+      inverseTransform: V.makeInverseTransform(this.props),
     };
   }
 
@@ -90,9 +76,8 @@ export class Map extends React.Component<Props, MapState> {
     return;
   }
 
-  // tslint:disable-next-line:no-any
-  handleMouseDown(e: any) {
-    if (e.target && e.target.nodeType === 'Stage') {
+  handleMouseDown(e: KonvaEvent.Mouse) {
+    if (e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.stage.stageMouseDown();
     }
   }
@@ -101,9 +86,8 @@ export class Map extends React.Component<Props, MapState> {
     this.props.actions.stage.stageMouseUp();
   }
 
-  // tslint:disable-next-line:no-any
-  handleClick(e: any) {
-    if (e.target && e.target.nodeType === 'Stage') {
+  handleClick(e: KonvaEvent.Mouse) {
+    if (e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.selection.clearSelection();
     }
   }
@@ -117,28 +101,30 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   handleObjectDragStart(e: KonvaEvent.Mouse) {
-    const x = e.evt.layerX;
-    const y = e.evt.layerY;
-    this.setState({ prevDragPoint: { x, y } });
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+    this.setState({ prevDragPoint });
   }
 
   handleObjectDragMove(e: KonvaEvent.Mouse) {
-    const x = e.evt.layerX;
-    const y = e.evt.layerY;
-    const dx = x - this.state.prevDragPoint.x;
-    const dy = y - this.state.prevDragPoint.y;
-    const objects = this.props.selection.map(id => {
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+    const dx = prevDragPoint.x - this.state.prevDragPoint.x;
+    const dy = prevDragPoint.y - this.state.prevDragPoint.y;
+    const objects = this.props.selection.objects.map(id => {
       const o = CS.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
     this.props.actions.cachedStorage.updateObjects(objects);
-    this.setState({ prevDragPoint: { x, y } });
+    this.setState({ prevDragPoint });
   }
 
   handleObjectDragEnd(e: KonvaEvent.Mouse) {
-    const dx = e.evt.layerX - this.state.prevDragPoint.x;
-    const dy = e.evt.layerY - this.state.prevDragPoint.y;
-    this.props.selection.forEach(id => {
+    const prevDragPoint =
+      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+    const dx = prevDragPoint.x - this.state.prevDragPoint.x;
+    const dy = prevDragPoint.y - this.state.prevDragPoint.y;
+    this.props.selection.objects.forEach(id => {
       const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
@@ -172,8 +158,6 @@ export class Map extends React.Component<Props, MapState> {
 
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
     const isSelected = SL.contains(this.props.selection, o.id);
-    const transform = makeTransform(this.props);
-    const inverseTransform = makeInverseTransform(this.props);
 
     const handleObjectSelect = (data: ObjectData) => {
       if (isMultiSelectable) {
@@ -187,9 +171,10 @@ export class Map extends React.Component<Props, MapState> {
     };
 
     const handleObjectDeselect = (data: ObjectData) => {
+      const selection = this.props.selection;
       acts.selection.removeObjectFromSelection(data.id);
-      if (this.props.selection.length === 1) {
-        acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, this.props.selection[0])));
+      if (SL.count(selection) === 1) {
+        acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
       } else {
         acts.editor.focusObject(F.focusNothing());
       }
@@ -208,8 +193,8 @@ export class Map extends React.Component<Props, MapState> {
             key={o.id}
             isDirty={CS.isCardDirty(this.props.inScope, o.data)}
             mapObject={o}
-            transform={transform}
-            inverseTransform={inverseTransform}
+            transform={this.state.transform}
+            inverseTransform={this.state.inverseTransform}
             card={CS.getCard(this.props.senseObject, o.data)}
             selected={isSelected}
             handleSelect={handleObjectSelect}
@@ -229,8 +214,8 @@ export class Map extends React.Component<Props, MapState> {
             key={o.id}
             isDirty={CS.isBoxDirty(this.props.inScope, o.data)}
             mapObject={o}
-            transform={transform}
-            inverseTransform={inverseTransform}
+            transform={this.state.transform}
+            inverseTransform={this.state.inverseTransform}
             box={CS.getBox(this.props.senseObject, o.data)}
             cards={CS.getCardsInBox(this.props.senseObject, o.data)}
             selected={isSelected}
@@ -252,10 +237,10 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(e: EdgeData) {
     const edgeProps = {
-      from: getCenter(CS.getObject(this.props.inScope, e.from)),
-      to: getCenter(CS.getObject(this.props.inScope, e.to)),
-      transform: makeTransform(this.props),
-      inverseTransform: makeInverseTransform(this.props),
+      from: O.getCenter(CS.getObject(this.props.inScope, e.from)),
+      to: O.getCenter(CS.getObject(this.props.inScope, e.to)),
+      transform: this.state.transform,
+      inverseTransform: this.state.inverseTransform,
     };
     return <Edge key={e.id} {...edgeProps} />;
   }

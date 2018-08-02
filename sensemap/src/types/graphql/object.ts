@@ -3,8 +3,16 @@ import * as OT from '../sense/object-type';
 import { MapID } from '../sense/map';
 import { ObjectType } from '../sense/object-type';
 import { ObjectID, ObjectData } from '../sense/object';
-import { CardID } from '../sense/card';
-import { BoxID } from '../sense/box';
+import {
+  CardID,
+  DEFAULT_WIDTH as DEFAULT_CARD_WIDTH,
+  DEFAULT_HEIGHT as DEFAULT_CARD_HEIGHT
+} from '../sense/card';
+import {
+  BoxID,
+  DEFAULT_WIDTH as DEFAULT_BOX_WIDTH,
+  DEFAULT_HEIGHT as DEFAULT_BOX_HEIGHT,
+} from '../sense/box';
 import { client } from './client';
 import * as moment from 'moment';
 
@@ -50,6 +58,24 @@ const toObjectDataFieldData: (o: GraphQLObjectFields, isDeleted: boolean) => str
     }
   };
 
+// TODO: should update server-side width
+const getDefaultWidth = (type: ObjectType) => {
+  switch (type) {
+    case ObjectType.CARD: return DEFAULT_CARD_WIDTH;
+    case ObjectType.BOX:  return DEFAULT_BOX_WIDTH;
+    default:              return 0;
+  }
+};
+
+// TODO: should update server-side height
+const getDefaultHeight = (type: ObjectType) => {
+  switch (type) {
+    case ObjectType.CARD: return DEFAULT_CARD_HEIGHT;
+    case ObjectType.BOX:  return DEFAULT_BOX_HEIGHT;
+    default:              return 0;
+  }
+};
+
 const toObjectData: (o: GraphQLObjectFields, isDeleted?: boolean) => ObjectData =
   (o, isDeleted = false) => ({
     id:         o.id,
@@ -57,8 +83,8 @@ const toObjectData: (o: GraphQLObjectFields, isDeleted?: boolean) => ObjectData 
     updatedAt:  +moment(o.updatedAt),
     x:          o.x,
     y:          o.y,
-    width:      o.width,
-    height:     o.height,
+    width:      o.width || getDefaultWidth(OT.fromString(o.objectType)),
+    height:     o.height || getDefaultHeight(OT.fromString(o.objectType)),
     zIndex:     o.zIndex,
     objectType: OT.fromString(o.objectType),
     data:       toObjectDataFieldData(o, isDeleted),

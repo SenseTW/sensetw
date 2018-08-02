@@ -1,5 +1,6 @@
 import { ActionUnion, emptyAction } from '../action';
 import { HasID } from './has-id';
+import { Position, Dimension, getCenter as getBoxCenter } from '../../graphics/drawing';
 import { ObjectType } from './object-type';
 import { TimeStamp } from '../utils';
 import { CardID } from './card';
@@ -16,13 +17,9 @@ export type ObjectID = string;
  *
  * @extends {HasID<ObjectID>}
  */
-export interface ObjectData extends HasID<ObjectID> {
+export interface ObjectData extends HasID<ObjectID>, Position, Dimension {
   createdAt:  TimeStamp;
   updatedAt:  TimeStamp;
-  x:          number;
-  y:          number;
-  width:      number;
-  height:     number;
   zIndex:     number;
   objectType: ObjectType;
   belongsTo?: BoxID;
@@ -93,6 +90,18 @@ export const toFocus = (object: ObjectData): F.Focus => {
     default:              return F.focusNothing();
   }
 };
+
+export function getCenter(o: ObjectData): Position {
+  switch (o.objectType) {
+    case ObjectType.CARD:
+    case ObjectType.BOX: {
+      return getBoxCenter(o);
+    }
+    default: {
+      return getBoxCenter({ x: o.x, y: o.y, width: 0, height: 0 });
+    }
+  }
+}
 
 const UPDATE_POSITION = 'UPDATE_POSITION';
 /**

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { State, actions, ActionProps, mapDispatch } from '../../types';
-import { Menu, Popup } from 'semantic-ui-react';
+import { Menu, Popup, Icon } from 'semantic-ui-react';
 import Card from '../SVGIcon/Card';
 import Box from '../SVGIcon/Box';
 import Unbox from '../SVGIcon/Unbox';
@@ -19,6 +19,7 @@ import * as SL from '../../types/selection';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
+import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
 import * as F from '../../types/sense/focus';
 // TODO: use UUID v4
@@ -32,6 +33,7 @@ interface StateFromProps {
   senseObject: SO.State;
   senseMap: SM.State;
   editor: OE.State;
+  viewport: V.State;
 }
 
 interface OwnProps {}
@@ -40,7 +42,7 @@ type Props = StateFromProps & OwnProps & ActionProps;
 
 const selectedCardsAndBoxes:
   (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
-  props => props.selection.reduce(
+  props => props.selection.objects.reduce(
     (acc, id) => {
       switch (CS.getObject(props.senseObject, id).objectType) {
         case T.ObjectType.CARD: {
@@ -105,8 +107,9 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canCreateEdge(): boolean {
-    return this.props.selection.length === 2
-      && this.findEdgeID(this.props.selection[0], this.props.selection[1]) === null;
+    const selection = this.props.selection;
+    return SL.count(selection) === 2
+      && this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) === null;
   }
 
   handleCreateEdge(): void {
@@ -114,22 +117,25 @@ class ObjectMenu extends React.PureComponent<Props> {
       return;
     }
     const map  = this.props.senseMap.map;
-    const from = this.props.selection[0];
-    const to   = this.props.selection[1];
+    const selection = this.props.selection;
+    const from = SL.get(selection, 0);
+    const to   = SL.get(selection, 1);
     this.props.actions.senseObject.createEdge(map, from, to);
   }
 
   canRemoveEdge(): boolean {
-    if (this.props.selection.length !== 2) {
+    if (SL.count(this.props.selection) !== 2) {
       return false;
     }
-    return this.findEdgeID(this.props.selection[0], this.props.selection[1]) !== null;
+    const selection = this.props.selection;
+    return this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) !== null;
   }
 
   handleRemoveEdge(): void {
     const map  = this.props.senseMap.map;
-    const from = this.props.selection[0];
-    const to   = this.props.selection[1];
+    const selection = this.props.selection;
+    const from = SL.get(selection, 0);
+    const to   = SL.get(selection, 1);
     const r    = this.findEdgeID(from, to);
     if (r === null) {
       return;
@@ -149,7 +155,7 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   async handleDeleteCard() {
     const { actions: acts, senseObject, selection } = this.props;
-    const { id, data } = CS.getObject(senseObject, selection[0]);
+    const { id, data } = CS.getObject(senseObject, SL.get(selection, 0));
     const card = CS.getCard(senseObject, data);
     // remove the card container object
     await acts.senseObject.removeObject(id);
@@ -188,7 +194,7 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   handleOpenBox(): void {
     const { actions: acts, selection, senseObject } = this.props;
-    const objectId = selection[0];
+    const objectId = SL.get(selection, 0);
     const obj = CS.getObject(senseObject, objectId);
     acts.selection.clearSelection();
     acts.senseMap.openBox(obj.data);
@@ -196,7 +202,7 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   canRemoveCard(): Boolean {
     return this.props.senseMap.scope.type === T.MapScopeType.BOX
-      && this.props.selection.length >= 1;
+      && SL.count(this.props.selection) >= 1;
   }
 
   handleRemoveCard(): void {
@@ -205,7 +211,7 @@ class ObjectMenu extends React.PureComponent<Props> {
     }
     switch (this.props.senseMap.scope.type) {
       case T.MapScopeType.BOX: {
-        const cards = this.props.selection;
+        const cards = this.props.selection.objects;
         const box   = this.props.senseMap.scope.box;
         if (!box) {
           throw Error('This cannot happen: map scope has type BOX with null box ID.');
@@ -215,6 +221,27 @@ class ObjectMenu extends React.PureComponent<Props> {
       }
       case T.MapScopeType.FULL_MAP:
       default:
+    }
+  }
+
+  handleZoom(step: number): void {
+    const { actions: acts, viewport } = this.props;
+    const { level } = viewport;
+    const center = V.getCenter(viewport);
+    acts.viewport.zoomViewport(level * step, center);
+  }
+
+  isWholePicture(): boolean {
+    const { senseMap } = this.props;
+    return senseMap.mode === SM.MapModeType.WHOLE;
+  }
+
+  handleModeChange(): void {
+    const { actions: acts, senseMap } = this.props;
+    if (senseMap.mode === SM.MapModeType.PART) {
+      acts.senseMap.toWholeMode();
+    } else {
+      acts.senseMap.toNormalMode();
     }
   }
 
@@ -361,6 +388,16 @@ class ObjectMenu extends React.PureComponent<Props> {
             }
           </Menu>
         }
+        {
+          <Menu compact inverted icon>
+            <Menu.Item
+              active={this.isWholePicture()}
+              onClick={() => this.handleModeChange()}
+            >
+              <Icon name="eye" />
+            </Menu.Item>
+          </Menu>
+        }
       </div>
     );
   }
@@ -372,6 +409,7 @@ export default connect<StateFromProps, ActionProps>(
     senseObject: state.senseObject,
     senseMap: state.senseMap,
     editor: state.editor,
+    viewport: state.viewport,
   }),
   mapDispatch({ actions }),
 )(ObjectMenu);

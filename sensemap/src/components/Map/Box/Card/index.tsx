@@ -6,12 +6,13 @@ interface Props {
   card: T.CardData;
   x: number;
   y: number;
+  width: number;
+  height: number;
 }
 
 class Card extends React.Component<Props> {
 
   static style = {
-    width: 320,
     height: 70,
     background: {
       color: '#ffffff',
@@ -39,14 +40,14 @@ class Card extends React.Component<Props> {
   };
 
   render() {
-    const { x = 0, y = 0 } = this.props;
+    const { x = 0, y = 0, width = 0, height = 0 } = this.props;
     const text = (this.props.card.summary || this.props.card.description || '')
       .substr(0, Card.style.contents.title.textLimit);
     return (
       <Group x={x} y={y}>
         <Rect
-          width={Card.style.width}
-          height={Card.style.height}
+          width={width}
+          height={height}
           fill={Card.style.background.color}
           stroke={Card.style.border.color}
           strokeWidth={Card.style.border.width}
