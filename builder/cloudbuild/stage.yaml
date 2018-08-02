@@ -10,4 +10,8 @@ steps:
 - name: gcr.io/cloud-builders/gsutil
   args: ['-h', 'Cache-Control:private','cp', '-r', '-a', 'public-read', '/workspace/sensemap/gcs-build/*', 'gs://sensetw/$COMMIT_SHA/']
 - name: gcr.io/cloud-builders/gsutil
+  args: ['setmeta', '-h', 'Cache-Control:no-cache, no-store, max-age=0', 'gs://sensetw/$COMMIT_SHA/service-worker.js']
+- name: gcr.io/cloud-builders/gsutil
   args: ['-h', 'Cache-Control:private', 'cp', '-r', '-a', 'public-read', '/workspace/sensemap/gcs-build/*', 'gs://sensetw/$BRANCH_NAME/']
+- name: gcr.io/cloud-builders/gsutil
+  args: ['setmeta', '-h', 'Cache-Control:no-cache, no-store, max-age=0', 'gs://sensetw/$BRANCH_NAME/service-worker.js']
