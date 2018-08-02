@@ -77,7 +77,7 @@ class CardContent extends React.PureComponent<Props> {
           />
         </Form.Field>
         <Form.Field className="card-content__description">
-          <label>Description</label>
+          <label>Description (最多255字) </label>
           <TextArea
             placeholder="資料原文摘錄與補充資訊"
             value={description}
