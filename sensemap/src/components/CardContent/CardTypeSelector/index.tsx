@@ -24,7 +24,7 @@ function CardTypeSelector(props: Props) {
   return (
     <div className="card-type-selector">{
       Object.keys(CardType).map(ty => (
-        <Form.Field>
+        <Form.Field key={ty}>
           <Checkbox
             radio
             className={`card-type-selector__${ty.toLowerCase()}`}
