@@ -7,6 +7,7 @@ import * as T from '../../types';
 import * as C from '../../types/sense/card';
 import * as B from '../../types/sense/box';
 import { noop } from '../../types/utils';
+import { isLength } from 'validator';
 import './index.css';
 
 type Data
@@ -52,8 +53,10 @@ class ObjectContent extends React.PureComponent<Props> {
     } = this.props;
 
     let content;
+    let isContentValid = true;
     switch (objectType) {
       case T.ObjectType.CARD:
+        isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 255 });
         content = (
           <CardContent
             data={data as T.CardData}
@@ -89,7 +92,7 @@ class ObjectContent extends React.PureComponent<Props> {
             <Button.Or />
             <Button
               positive
-              disabled={submitDisabled}
+              disabled={submitDisabled || !isContentValid}
               onClick={() => onSubmit(data)}
             >
                {submitText || 'Save'}

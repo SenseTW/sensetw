@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Header, Form, TextArea, Input } from 'semantic-ui-react';
+import { Header, Form, TextArea, Input, Message } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import * as C from '../../types/sense/card';
-import { isURL } from 'validator';
+import { isURL, isLength } from 'validator';
 
 interface Props {
   data: C.CardData;
@@ -19,9 +19,10 @@ class CardContent extends React.PureComponent<Props> {
     const { children, data, onKeyUp, onChange } = this.props;
     const { title, summary, description, tags, url, saidBy, stakeholder, cardType } = data;
     const isURLValid = isURL(url, { require_protocol: true });
+    const isDescriptionInvalid = !isLength(description, { max: 255 });
 
     return (
-      <Form className="card-content">
+      <Form className="card-content" error={isDescriptionInvalid}>
         <Header as="h3" color="grey">
         CARD INSPECTOR
         </Header>
@@ -83,6 +84,14 @@ class CardContent extends React.PureComponent<Props> {
             value={description}
             onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
           />
+          {
+            isDescriptionInvalid &&
+            <Message
+              error
+              header="Description is too Long"
+              content="The card description should be less than or equal to 255 characters."
+            />
+          }
         </Form.Field>
         <Form.Field className="card-content__card-type">
           <label>Card Type</label>
