@@ -18,6 +18,8 @@ class Submenu extends React.PureComponent<Props> {
           className={`${className}__annotation`}
           as="a"
           href="https://via.sense.tw/"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Annotation
         </Menu.Item>
