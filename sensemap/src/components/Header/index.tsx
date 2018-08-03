@@ -8,7 +8,7 @@ import Submenu from './Submenu';
 import * as R from '../../types/routes';
 import './index.css';
 import { actions, ActionProps, mapDispatch } from '../../types';
-import AccountMenuItem from './AccountMenuItem';
+// import AccountMenuItem from './AccountMenuItem';
 const logo = require('./logo.png');
 
 type StateFromProps = {
@@ -49,7 +49,9 @@ class Header extends React.Component<Props> {
             <Menu.Item>
               <Icon name="question circle outline" size="large" />
             </Menu.Item>
+            {/*
             <AccountMenuItem />
+            */}
           </Menu.Menu>
         </Menu>
         <div className="sense-header__submenu">
