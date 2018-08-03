@@ -12,7 +12,8 @@ export async function getAllEdges(db): Promise<Edge[]> {
 }
 
 export async function getEdge(db, id: ID): Promise<Edge | null> {
-  return edgesQuery(db).where('id', id);
+  const e = await edgesQuery(db).where('id', id).first();
+  return !!e ? e : null;
 }
 
 export async function createEdge(db, args): Promise<Edge> {
