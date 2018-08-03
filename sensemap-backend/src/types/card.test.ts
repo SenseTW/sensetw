@@ -6,24 +6,43 @@ const { db } = context();
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
-test('Card result fields', async () => {
-  const id = maps[0].cards[0].id;
-  const c = await C.resolvers.Query.Card(null, { id }, { db }, null);
-  expect(c.objects.length).toBeGreaterThanOrEqual(0);
+describe('GraphQL Query', () => {
+  test('Card result fields', async () => {
+    const id = maps[0].cards[0].id;
+    const c = await C.resolvers.Query.Card(null, { id }, { db }, null);
+    expect(c.objects.length).toBeGreaterThanOrEqual(0);
+  });
 });
 
-test('createCard result fields', async () => {
-  const mapId = maps[0].id;
-  const c0 = await C.resolvers.Mutation.createCard(null, {
-    cardType: 'NORMAL',
-    mapId,
-  }, { db });
-  expect(c0.id).toBeTruthy();
-  expect(c0.objects).toEqual([]);
-  expect(c0.map).toBe(mapId);
+describe('GraphQL Mutation', () => {
+  test('createCard result fields', async () => {
+    const mapId = maps[0].id;
+    const c0 = await C.resolvers.Mutation.createCard(null, {
+      cardType: 'NORMAL',
+      mapId,
+    }, { db });
+    expect(c0.id).toBeTruthy();
+    expect(c0.objects).toEqual([]);
+    expect(c0.map).toBe(mapId);
 
-  const c1 = await C.resolvers.Mutation.deleteCard(null, { id: c0.id }, { db });
-  expect(c1.id).toBe(c0.id);
+    const c1 = await C.resolvers.Mutation.deleteCard(null, { id: c0.id }, { db });
+    expect(c1.id).toBe(c0.id);
+  });
+
+  test('card description length', async () => {
+    const description = String.fromCharCode(
+      ...Array(512)
+        .fill(0)
+        .map(() => parseInt(97 + Math.random() * 26))
+    );
+    const mapId = maps[0].id;
+    const c0 = await C.resolvers.Mutation.createCard(null, {
+      cardType: 'NORMAL',
+      mapId,
+      description,
+    }, { db });
+    expect(c0.description).toBe(description);
+  });
 });
 
 describe('getAllCards', () => {
