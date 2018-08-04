@@ -33,11 +33,15 @@ const dropdownOptions: DropdownItemProps[] = [{
   key: 1,
   text: 'edit detail',
   value: MapActionType.EDIT,
-}, {
+}];
+
+/* 
+, {
   key: 2,
   text: 'delete',
   value: MapActionType.REMOVE,
 }];
+*/
 
 class MapCard extends React.Component<Props> {
   render() {
