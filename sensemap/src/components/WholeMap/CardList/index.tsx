@@ -2,7 +2,6 @@ import * as React from 'react';
 import { Path, Group, Rect } from 'react-konva';
 import { TransformerForProps } from '../';
 import { ObjectData, CardData } from '../../../types';
-import { transformObject } from '../../../types/viewport';
 import TextList from '../../Layout/TextList';
 
 interface CaretProps {
@@ -100,28 +99,29 @@ type Props = OwnProps & TransformerForProps;
 class CardList extends React.PureComponent<Props, OwnState> {
   static style = {
     backgroundColor: '#b3e5fc',
-    borderRadius: 18,
+    borderRadius: 6,
     caret: {
       offset: {
         x: 1,
-        y: 12,
+        y: 4,
       },
-      height: 24,
-      base: 24 * Math.sqrt(1 / 3) * 2,
+      height: 8,
+      base: 8 * Math.sqrt(1 / 3) * 2,
     },
     color: '#000',
-    fontSize: 36,
-    width: 630,
+    fontSize: 16,
+    lineHeight: 1.2,
+    width: 200,
     margin: {
-      left: 36,
+      left: 12,
     },
     padding: {
-      top: 18,
-      right: 48,
-      bottom: 18,
-      left: 18,
+      top: 6,
+      right: 6,
+      bottom: 6,
+      left: 6,
     },
-    textGap: 30,
+    textGap: 10,
   };
 
   state = {
@@ -135,15 +135,17 @@ class CardList extends React.PureComponent<Props, OwnState> {
 
   render() {
     const { transform, cards } = this.props;
-    const style = transformObject(transform, CardList.style) as typeof CardList.style;
-    const { x, y, width } = transform({
+    // use the untransformed style
+    const style = CardList.style;
+    const width = style.width;
+    const { x, y } = transform({
       x: this.props.x,
       y: this.props.y,
-      width: CardList.style.width,
     });
-    const textWidth = width - style.padding.left - style.padding.right;
+    const textWidth = style.width - style.padding.left - style.padding.right;
+    const fontSize = style.fontSize;
     const { height: textHeight, direction } = this.state;
-    const height = textHeight + style.padding.top + style.padding.bottom;
+    const height = textHeight + style.padding.top + style.padding.bottom - style.textGap;
     const cardTexts = cards.map(c => c.summary || c.title);
 
     const renderedText = (
@@ -158,7 +160,8 @@ class CardList extends React.PureComponent<Props, OwnState> {
           x={style.padding.left}
           y={style.padding.top}
           width={textWidth}
-          fontSize={style.fontSize}
+          fontSize={fontSize}
+          lineHeight={style.lineHeight}
           margin={style.textGap}
           texts={cardTexts}
           onResize={this.handleResize}
@@ -174,8 +177,8 @@ class CardList extends React.PureComponent<Props, OwnState> {
               left
               x={style.caret.offset.x}
               y={style.caret.offset.y + style.caret.base / 2}
-              base={style.caret.base}
-              height={style.caret.height}
+              base={CardList.style.caret.base}
+              height={CardList.style.caret.height}
               fill={style.backgroundColor}
             />
             {renderedText}

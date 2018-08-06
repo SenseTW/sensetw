@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Node, TextConfig } from 'konva';
-import { Text as KonvaText } from 'react-konva';
+import { TextConfig, Text as KonvaText  } from 'konva';
+import { Text as ReactKonvaText } from 'react-konva';
 
 interface OwnProps {
   onResize?(width: number, height: number): void;
@@ -9,7 +9,7 @@ interface OwnProps {
 type Props = OwnProps & TextConfig;
 
 class Text extends React.PureComponent<Props> {
-  textNode: Node | null = null;
+  textNode: KonvaText | null = null;
   width: number = 0;
   height: number = 0;
 
@@ -40,7 +40,7 @@ class Text extends React.PureComponent<Props> {
 
     return (
       // tslint:disable-next-line:no-any
-      <KonvaText {...props} text={text} ref={(node: any) => this.textNode = node} />
+      <ReactKonvaText {...props} text={text} ref={(node: any) => this.textNode = node} />
     );
   }
 }
