@@ -25,23 +25,22 @@ enum MapActionType {
 }
 
 const dropdownOptions: DropdownItemProps[] = [{
+/*
   key: 0,
   disabled: true,
   text: 'member',
   value: MapActionType.SHOW_MEMBER,
 }, {
+*/
   key: 1,
   text: 'edit detail',
   value: MapActionType.EDIT,
-}];
-
-/* 
-, {
+}, {
   key: 2,
+  disabled: true,
   text: 'delete',
   value: MapActionType.REMOVE,
 }];
-*/
 
 class MapCard extends React.Component<Props> {
   render() {

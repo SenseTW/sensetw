@@ -5,7 +5,7 @@ import { State, ActionProps, actions, mapDispatch, MapID } from '../../types';
 import MapCard from './MapCard';
 import FloatingActionButton from './FloatingActionButton';
 import MapContent from './MapContent';
-import { Container, Search, Card, Modal, Header, Button } from 'semantic-ui-react';
+import { Container, Card, Modal, Header, Button } from 'semantic-ui-react';
 import * as SM from '../../types/sense/map';
 import * as CS from '../../types/cached-storage';
 import * as R from '../../types/routes';
@@ -50,7 +50,6 @@ class DashboardPage extends React.Component<Props, OwnState> {
     return (
       <div className="dashboard-page">
         <Container>
-          <Search disabled />
           <Card.Group stackable itemsPerRow={3}>
             {mapList.map(
               (m) =>
@@ -58,7 +57,6 @@ class DashboardPage extends React.Component<Props, OwnState> {
                   key={m.id}
                   data={m}
                   onEdit={() => acts.editor.focusMap(m.id)}
-                  onRemove={() => acts.senseObject.removeMap(m.id)}
                 />
             )}
           </Card.Group>
