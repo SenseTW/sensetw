@@ -56,7 +56,7 @@ const titleLimit = 32;
 
 const color = {
   [T.CardType.NORMAL]: 'rgba(255, 255, 255, 1)',
-  [T.CardType.NOTE]: 'rgba(255, 255, 255, 1)',
+  [T.CardType.NOTE]: 'rgba(255, 227, 132, 1)',
   [T.CardType.QUESTION]: 'rgba(255, 236, 239, 1)',
   [T.CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
 };
