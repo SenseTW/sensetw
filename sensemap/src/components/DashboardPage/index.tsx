@@ -10,6 +10,7 @@ import * as SM from '../../types/sense/map';
 import * as CS from '../../types/cached-storage';
 import * as R from '../../types/routes';
 import * as U from '../../types/utils';
+import * as copy from 'copy-to-clipboard';
 import { sort } from 'ramda';
 import './index.css';
 
@@ -56,6 +57,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
                 <MapCard
                   key={m.id}
                   data={m}
+                  onShare={copy}
                   onEdit={() => acts.editor.focusMap(m.id)}
                 />
             )}
