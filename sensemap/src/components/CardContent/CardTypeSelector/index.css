@@ -28,10 +28,14 @@
   transform: sacle(0.75);
 }
 
-.card-type-selector .ui.radio.checkbox.card-type-selector__normal input:checked~label:after,
-.card-type-selector .ui.ui.radio.checkbox.card-type-selector__note input:checked~label:after {
+.card-type-selector .ui.radio.checkbox.card-type-selector__normal input:checked~label:after {
   border: 1px solid #979797;
   background-color: #ffffff;
+}
+
+.card-type-selector .ui.ui.radio.checkbox.card-type-selector__note input:checked~label:after {
+  border: 1px solid #ffe384;
+  background-color: #ffe384;
 }
 
 .card-type-selector .ui.radio.checkbox.card-type-selector__question input:checked~label:after {

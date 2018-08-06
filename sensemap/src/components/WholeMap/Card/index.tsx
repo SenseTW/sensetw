@@ -26,7 +26,7 @@ class Card extends React.PureComponent<Props> {
     backgroundColor: {
       [CardType.ANSWER]: '#c0e2d8',
       [CardType.NORMAL]: '#d8d8d8',
-      [CardType.NOTE]: '#d8d8d8',
+      [CardType.NOTE]: '#ffe384',
       [CardType.QUESTION]: '#e5ced1',
     },
     borderRadius: 9,
