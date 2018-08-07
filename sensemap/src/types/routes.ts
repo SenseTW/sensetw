@@ -8,6 +8,8 @@ export const mapList = '/map';
 
 export const map = '/map/:mid';
 
+export const mapSources = '/map/:mid/sources';
+
 export const toMapPath = pathToRegexp.compile(map);
 
 export const submap = '/map/:mid/box/:bid';
