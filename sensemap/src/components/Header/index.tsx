@@ -46,7 +46,12 @@ class Header extends React.Component<Props> {
             Dashboard
           </Menu.Item>
           <Menu.Menu position="right">
-            <Menu.Item>
+            <Menu.Item
+              as="a"
+              href="https://help.sense.tw/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Icon name="question circle outline" size="large" />
             </Menu.Item>
             {/*
