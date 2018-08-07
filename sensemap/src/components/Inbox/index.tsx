@@ -4,8 +4,6 @@ import './index.css';
 import { CardData, State, ActionProps } from '../../types';
 import AddCardButton from './AddCardButton';
 import SyncButton from './SyncButton';
-import Divider from './Divider';
-import Filter from './Filter';
 import CardList from './CardList';
 import { Pager } from '../Pager';
 
@@ -24,8 +22,6 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
     <div className="inbox">
       <div className="inbox__actions">
         <SyncButton mapId={mapId} actions={acts} />
-        <Divider />
-        <Filter />
       </div>
       <AddCardButton mapId={mapId} visible={senseMap.activateInboxPage === 1} actions={acts} />
       <Pager data={cards} pageSize={9} currentPage={senseMap.activateInboxPage} >
