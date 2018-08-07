@@ -19,7 +19,7 @@ class CardContent extends React.PureComponent<Props> {
     const { children, data, onKeyUp, onChange } = this.props;
     const { title, summary, description, tags, url, saidBy, stakeholder, cardType } = data;
     const isURLValid = isURL(url, { require_protocol: true });
-    const isDescriptionInvalid = !isLength(description, { max: 255 });
+    const isDescriptionInvalid = !isLength(description, { max: 5000});
 
     return (
       <Form className="card-content" error={isDescriptionInvalid}>

@@ -56,7 +56,7 @@ class ObjectContent extends React.PureComponent<Props> {
     let isContentValid = true;
     switch (objectType) {
       case T.ObjectType.CARD:
-        isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 255 });
+        isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 5000 });
         content = (
           <CardContent
             data={data as T.CardData}
