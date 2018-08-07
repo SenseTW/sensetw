@@ -9,6 +9,7 @@
     "copy-to-clipboard": "^3.0.8",
     "graphql-request": "^1.5.1",
     "konva": "^2.0.2",
+    "lodash": "^4.17.10",
     "moment": "^2.22.1",
     "ramda": "^0.25.0",
     "react": "^16.3.0",
