@@ -5,7 +5,8 @@ import { connect } from 'react-redux';
 import { Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
 import * as T from '../../../types';
 import { actions, ActionProps, mapDispatch } from '../../../types';
-import { emptyBoxData } from '../../../types/sense/box';
+import * as B from '../../../types/sense/box';
+import * as M from '../../../types/sense/map';
 import { MapScope } from '../../../types/sense-map';
 import * as CS from '../../../types/cached-storage';
 import * as R from '../../../types/routes';
@@ -21,26 +22,28 @@ interface StateFromProps {
 
 type Props = StateFromProps & ActionProps;
 
-class MapSections extends React.PureComponent<Props & { mid: T.MapID }> {
+class MapSections extends React.PureComponent<Props & { map: T.MapData }> {
   componentWillMount() {
-    const { actions: { senseMap }, mid } = this.props;
+    const { actions: { senseMap }, map } = this.props;
 
     // sync the route to the scope
-    senseMap.setMap(mid);
+    senseMap.setMap(map.id);
     senseMap.setScopeToFullmap();
   }
 
   componentDidUpdate() {
-    const { history, scope, mid } = this.props;
+    const { history, scope, map } = this.props;
 
     // sync the scope to the route
     if (scope.type !== T.MapScopeType.FULL_MAP) {
       // XXX: can I get the router basename here?
-      history.push(`${process.env.PUBLIC_URL}${R.toSubmapPath({ mid, bid: scope.box })}`);
+      history.push(`${process.env.PUBLIC_URL}${R.toSubmapPath({ mid: map.id, bid: scope.box })}`);
     }
   }
 
   render() {
+    const { map } = this.props;
+
     return (
       <React.Fragment>
         <SBreadcrumb.Section
@@ -51,33 +54,32 @@ class MapSections extends React.PureComponent<Props & { mid: T.MapID }> {
           Dashboard
         </SBreadcrumb.Section>
         <SBreadcrumb.Divider icon="right angle" />
-        <SBreadcrumb.Section active>Map</SBreadcrumb.Section>
+        <SBreadcrumb.Section active>{map.name || map.id}</SBreadcrumb.Section>
       </React.Fragment>
     );
   }
 }
 
-class MapBoxSections extends React.PureComponent<Props & { mid: T.MapID, bid: T.BoxID }> {
+class MapBoxSections extends React.PureComponent<Props & { map: T.MapData, box: T.BoxData }> {
   componentWillMount() {
-    const { actions: { senseMap }, mid, bid } = this.props;
+    const { actions: { senseMap }, map, box } = this.props;
 
     // sync the route to the scope
-    senseMap.setMap(mid);
-    senseMap.setScopeToBox(bid);
+    senseMap.setMap(map.id);
+    senseMap.setScopeToBox(box.id);
   }
 
   componentDidUpdate() {
-    const { history, scope, mid } = this.props;
+    const { history, scope, map } = this.props;
 
     // sync the scope to the route
     if (scope.type === T.MapScopeType.FULL_MAP) {
-      history.push(`${process.env.PUBLIC_URL}${R.toMapPath({ mid })}`);
+      history.push(`${process.env.PUBLIC_URL}${R.toMapPath({ mid: map.id })}`);
     }
   }
 
   render() {
-    const { actions: { senseMap, selection }, senseObject, mid, bid } = this.props;
-    const box = CS.getBox(senseObject, bid);
+    const { actions: { senseMap, selection }, map, box } = this.props;
 
     return (
       <React.Fragment>
@@ -92,20 +94,18 @@ class MapBoxSections extends React.PureComponent<Props & { mid: T.MapID, bid: T.
         <SBreadcrumb.Section
           link
           as={Link}
-          to={R.toMapPath({ mid })}
+          to={R.toMapPath({ mid: map.id })}
           onClick={() => {
             selection.clearSelection();
             senseMap.setScopeToFullmap();
           }}
         >
-          Map
+          {map.name || map.id}
         </SBreadcrumb.Section>
         <SBreadcrumb.Divider icon="right angle" />
-        <SBreadcrumb.Section active>{
-          box === emptyBoxData
-            ? bid
-            : box.title
-        }</SBreadcrumb.Section>
+        <SBreadcrumb.Section active>
+          {box.title || box.id}
+        </SBreadcrumb.Section>
       </React.Fragment>
     );
   }
@@ -113,6 +113,18 @@ class MapBoxSections extends React.PureComponent<Props & { mid: T.MapID, bid: T.
 
 class Breadcrumb extends React.PureComponent<Props> {
   render() {
+    const { senseObject } = this.props;
+    const getMap = (mid: T.MapID): T.MapData => {
+      let map = CS.getMap(senseObject, mid);
+      map = M.isEmpty(map) ? M.mapData({ id: mid }) : map;
+      return map;
+    };
+    const getBox = (bid: T.BoxID): T.BoxData => {
+      let box = CS.getBox(senseObject, bid);
+      box = B.isEmpty(box) ? B.boxData({ id: bid }) : box;
+      return box;
+    };
+
     return (
       <SBreadcrumb>
         <Switch>
@@ -138,10 +150,11 @@ class Breadcrumb extends React.PureComponent<Props> {
             )}
           </Route>
           <Route exact path={R.map}>
-            {({ match: { params: { mid }} }) => <MapSections {...this.props} mid={mid} />}
+            {({ match: { params: { mid }} }) => <MapSections {...this.props} map={getMap(mid)} />}
           </Route>
           <Route path={R.submap}>
-            {({ match: { params: { mid, bid }} }) => <MapBoxSections {...this.props} mid={mid} bid={bid} />}
+            {({ match: { params: { mid, bid }} }) =>
+                <MapBoxSections {...this.props} map={getMap(mid)} box={getBox(bid)} />}
           </Route>
         </Switch>
       </SBreadcrumb>
