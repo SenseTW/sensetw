@@ -242,11 +242,14 @@ class WholeMap extends React.Component<Props, State> {
     const { transform, inverseTransform, hoverObject } = this.state;
 
     let offsetX = 0;
+    let title: string = '';
     let cards: CardData[] = [];
     if (hoverObject) {
       switch (hoverObject.objectType) {
         case ObjectType.BOX:
           offsetX = Box.style.width;
+          const box = CS.getBox(this.props.senseObject, hoverObject.data);
+          title = box.title || box.summary;
           // cards of the box
           cards = Object
             .values(CS.getCardsInBox(this.props.senseObject, hoverObject.data))
@@ -254,8 +257,10 @@ class WholeMap extends React.Component<Props, State> {
           break;
         case ObjectType.CARD:
           offsetX = Card.style.width;
+          const card = CS.getCard(this.props.senseObject, hoverObject.data);
+          title = card.title || card.summary;
           // the card itself
-          cards = [CS.getCard(this.props.senseObject, hoverObject.data)];
+          cards = [];
           break;
         default:
       }
@@ -264,7 +269,7 @@ class WholeMap extends React.Component<Props, State> {
     cards = cards.filter(c => c.id !== '0');
 
     const cardList =
-      cards.length !== 0 &&
+      (title.length !== 0 || cards.length !== 0) &&
       hoverObject !== undefined && (
         <CardList
           transform={transform}
@@ -272,6 +277,7 @@ class WholeMap extends React.Component<Props, State> {
           mapObject={hoverObject}
           x={hoverObject.x + offsetX}
           y={hoverObject.y}
+          title={title}
           cards={cards}
         />
       );
