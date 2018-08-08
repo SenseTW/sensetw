@@ -30,6 +30,10 @@ const db = Knex({
   },
 });
 
-export const context = ({ req = null } = {}) => ({ db, env });
+export const context = ({ req = null } = {}) => ({
+  db,
+  env,
+  user: !!req ? req.user : null,
+});
 
 export type Context = typeof context;

@@ -15,6 +15,8 @@ import { context } from './context';
 import { router as Login } from './login';
 import { router as Hypothesis } from './hypothesis';
 import { router as HypothesisClient } from './client';
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import { getAccessToken } from './login/oauth';
 
 const PORT = 8000;
 
@@ -29,6 +31,17 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+passport.use(new BearerStrategy((token, done) => {
+  getAccessToken(token)
+    .then(data => {
+      if (!data.user) {
+        return done(null, false);
+      } else {
+        return done(null, data.user, { scope: 'all', message: '' });
+      }
+    })
+    .catch(done);
+}));
 app.set('view engine', 'ejs');
 app.use(Login(context));
 app.use('/h/api', Hypothesis(context));

@@ -77,7 +77,6 @@ function sendAuthResponse() {
 
       // Trigger "message" event listener in the target window.
       clientWindow.dispatchEvent(event);
-      // XXX
       window.close();
     } catch (err) {
       console.error('The "web_message" response mode is not supported in IE', err);
@@ -85,8 +84,8 @@ function sendAuthResponse() {
     return;
   }
 
-  window.opener.postMessage(msg, settings.origin);
-  // XXX
+  // XXX Need to restrict this
+  window.opener.postMessage(msg, '*');
   window.close();
 }
 

@@ -20,7 +20,7 @@ type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
 
 class SignUpPage extends React.PureComponent<Props> {
   render() {
-    const { actions: acts, username, email, password, history } = this.props;
+    const { actions: acts, username, email, password } = this.props;
     const isValidUsername = matches(username, /^[A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*$/);
     const isUsernameInRange = isLength(username, {min: 2});
     const isPasswordInRange = isLength(password, {min: 8});
@@ -31,43 +31,43 @@ class SignUpPage extends React.PureComponent<Props> {
             <Segment>
               <Header>Create new account</Header>
               <Form size="large" method="post">
-                <Form.Input 
-                  name="username" 
-                  fluid={true} 
-                  icon="user circle" 
-                  iconPosition="left" 
-                  placeholder="Username" 
-                  type="text" 
+                <Form.Input
+                  name="username"
+                  fluid={true}
+                  icon="user circle"
+                  iconPosition="left"
+                  placeholder="Username"
+                  type="text"
                   value={username}
                   error={username.length !== 0 && (!isUsernameInRange || ! isValidUsername)}
                   onChange={e => acts.account.updateUsername(e.currentTarget.value)}
                 />
                 {
-                  username.length === 0 || !isUsernameInRange && 
+                  username.length === 0 || !isUsernameInRange &&
                   <span className="signup-page__error">Username must be more than 2 characters.</span>
                 }
                {
                   username.length === 0 || !isValidUsername &&
                   <span className="signup-page__error">Please use only letters, numbers and periods.</span>
                 }
-                <Form.Input 
-                  name="email" 
-                  fluid={true} 
-                  icon="mail" 
-                  iconPosition="left" 
-                  placeholder="Email" 
-                  type="text" 
+                <Form.Input
+                  name="email"
+                  fluid={true}
+                  icon="mail"
+                  iconPosition="left"
+                  placeholder="Email"
+                  type="text"
                   value={email}
                   error={email.length !== 0 && !isEmail(email)}
                   onChange={e => acts.account.updateEmail(e.currentTarget.value)}
                 />
-                <Form.Input 
-                  name="password" 
-                  fluid={true} 
-                  icon="lock" 
-                  iconPosition="left" 
-                  placeholder="Password" 
-                  type="password" 
+                <Form.Input
+                  name="password"
+                  fluid={true}
+                  icon="lock"
+                  iconPosition="left"
+                  placeholder="Password"
+                  type="password"
                   vlaue={password}
                   error={password.length !== 0 && !isPasswordInRange}
                   onChange={e => acts.account.updatePassword(e.currentTarget.value)}
@@ -79,13 +79,13 @@ class SignUpPage extends React.PureComponent<Props> {
                 <span className="signup-page__info" >
                   You are agreeing to our Terms of Service and Community Guidelines.
                 </span>
-                <Button 
-                  fluid={true} 
-                  color="black" 
-                  disabled={!isValid} 
+                <Button
+                  fluid={true}
+                  color="black"
+                  disabled={!isValid}
                   onClick={async e => {
-                    await acts.account.signupRequest(username, email, password, history);
-                  }} 
+                    await acts.account.signupRequest(username, email, password);
+                  }}
                 >
                 SIGN UP
                 </Button>

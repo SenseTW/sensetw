@@ -24,7 +24,7 @@ const getUser = async (id: string): Promise<User> => {
   return U.getUser(db, id);
 };
 
-const getAccessToken = async (accessToken: string): Promise<Token> => {
+export const getAccessToken = async (accessToken: string): Promise<Token> => {
   const rows = await db.select(['accessToken', 'accessTokenExpiresAt', 'refreshToken', 'refreshTokenExpiresAt', 'clientId', 'userId']).from('oauth_token').where('accessToken', accessToken);
   if (rows.length === 0) {
     return null;

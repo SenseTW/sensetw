@@ -2,7 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { withRouter, Link, RouteComponentProps } from 'react-router-dom';
 import { Menu, Icon, Dropdown } from 'semantic-ui-react';
-import { State, actions } from '../../../types';
+import { State, ActionProps, mapDispatch, actions } from '../../../types';
 import * as R from '../../../types/routes';
 
 interface StateFromProps {
@@ -10,25 +10,28 @@ interface StateFromProps {
 }
 
 // tslint:disable:no-any
-type Props = StateFromProps & RouteComponentProps<any>;
+type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
 
 class AccountMenuItem extends React.Component<Props> {
     render() {
-        return !this.props.authenticated 
-            ? this._renderLoginLink() 
+        return !this.props.authenticated
+            ? this._renderLoginLink()
             : this._renderDropdownMenu();
     }
+
     _renderLoginLink() {
+        const { actions: acts } = this.props;
         return (
             <Menu.Item
-                as={Link}
-                to={R.login}
+                onClick={async (e) => await acts.account.loginRequest()}
             >
             Login
             </Menu.Item>
         );
     }
+
     _renderDropdownMenu() {
+        const { actions: acts } = this.props;
         return (
             <Menu.Item>
                 <Dropdown
@@ -49,7 +52,7 @@ class AccountMenuItem extends React.Component<Props> {
                             Settings
                         </Dropdown.Item>
                         <Dropdown.Item
-                            onClick={e => actions.account.logoutRequest(this.props.history)}
+                            onClick={e => acts.account.logoutRequest()}
                         >
                             Logout
                         </Dropdown.Item>
@@ -60,9 +63,10 @@ class AccountMenuItem extends React.Component<Props> {
     }
 }
 
-export default connect<StateFromProps>(
+export default connect<StateFromProps, ActionProps>(
     (state: State) => ({
         authenticated: state.session.authenticated,
         user: state.session.user
-    })
+    }),
+    mapDispatch({ actions }),
 )(withRouter(AccountMenuItem));
