@@ -13,6 +13,7 @@ import SignUpPage from '../SignupPage';
 import SettingsPage from '../SettingsPage';
 import TermsOfServicePage from '../TermsOfServicePage';
 import LoginPage from '../LoginPage';
+import { User } from '../../types';
 import * as R from '../../types/routes';
 import './index.css';
 
@@ -20,7 +21,7 @@ export interface StateFromProps {
   checked: boolean;
   authenticated: boolean;
   // tslint:disable:no-any
-  user: any;
+  user?: User;
 }
 
 export type Props = StateFromProps;
