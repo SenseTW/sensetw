@@ -4,7 +4,6 @@ import { State, actions, ActionProps, mapDispatch } from '../../types';
 import { Menu, Popup, Icon } from 'semantic-ui-react';
 import Card from '../SVGIcon/Card';
 import Box from '../SVGIcon/Box';
-import Unbox from '../SVGIcon/Unbox';
 import Inspector from '../SVGIcon/Inspector';
 import Edge from '../SVGIcon/Edge';
 import RemoveEdge from '../SVGIcon/RemoveEdge';
@@ -78,25 +77,6 @@ class ObjectMenu extends React.PureComponent<Props> {
     acts.senseObject.updateBox(data);
     acts.editor.focusObject(F.focusBox(data.id));
     acts.editor.changeStatus(OE.StatusType.SHOW);
-  }
-
-  canUnbox(): Boolean {
-    return this.props.senseMap.scope.type === T.MapScopeType.BOX;
-  }
-
-  handleUnbox(): void {
-    switch (this.props.senseMap.scope.type) {
-      case T.MapScopeType.BOX: {
-        const box = this.props.senseMap.scope.box;
-        if (!box) {
-          throw Error('Scope BOX without a box ID.');
-        }
-        this.props.actions.senseObject.unboxCards(box);
-        break;
-      }
-      case T.MapScopeType.FULL_MAP:
-      default:
-    }
   }
 
   findEdgeID(from: T.ObjectID, to: T.ObjectID): T.EdgeID[] | null {
@@ -248,7 +228,6 @@ class ObjectMenu extends React.PureComponent<Props> {
   render() {
     const { actions: acts, editor } = this.props;
     const canCreateBox = this.canCreateBox();
-    const canUnbox = this.canUnbox();
     const isInspectorOpen = editor.status === OE.StatusType.SHOW;
     const canCreateEdge = this.canCreateEdge();
     const canRemoveEdge = this.canRemoveEdge();
@@ -275,22 +254,16 @@ class ObjectMenu extends React.PureComponent<Props> {
             {...popupProps}
             trigger={
               <Menu.Item
-                disabled={!canUnbox && !canCreateBox}
-                onClick={() =>
-                  canUnbox
-                    ? this.handleUnbox()
-                    : this.handleBox()
-                }
+                disabled={!canCreateBox}
+                onClick={() => this.handleBox()}
               >
-                {canUnbox ? <Unbox /> : <Box />}
+                <Box />
               </Menu.Item>
             }
             content={
-              canUnbox
-                ? 'Unbox'
-                : canCreateBox
-                  ? 'New Box'
-                  : 'Can\'t Create a Box in a Box'
+              canCreateBox
+                ? 'New Box'
+                : 'Can\'t Create a Box in another Box'
             }
           />
           <Popup
@@ -367,7 +340,7 @@ class ObjectMenu extends React.PureComponent<Props> {
               <Popup
                 {...popupProps}
                 trigger={<Menu.Item onClick={() => this.handleAddCard()}><BoxCard /></Menu.Item>}
-                content="Box Cards"
+                content="Add to Box"
               />
             }
             {
