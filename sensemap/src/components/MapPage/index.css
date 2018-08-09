@@ -23,13 +23,21 @@
   justify-content: center;
 }
 
-.map-page .map-page__menu > .object-menu-2 {
-}
-
 .map-page .inbox__btn {
   position: absolute;
   left: 0;
   top: 0;
   bottom: 0;
   transition: left .5s ease;
+}
+
+.map-page .map-page__login-hint {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.map-page .map-page__login-hint > .ui.segment {
+  padding: 8px 10px;
 }

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { Sidebar } from 'semantic-ui-react';
+import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
+import { Sidebar, Segment } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
@@ -26,11 +26,13 @@ import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as CS from '../../types/cached-storage';
+import * as SS from '../../types/session';
 import * as B from '../../types/sense/box';
 import { Action as BoxAction } from '../../types/sense/box';
 import * as C from '../../types/sense/card';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
+import * as R from '../../types/routes';
 import './index.css';
 import { Key } from 'ts-keycode-enum';
 const background = require('./background-map.png');
@@ -44,6 +46,7 @@ interface StateFromProps {
   editor: OE.State;
   scope: typeof SM.initial.scope;
   showAnotherMode: Boolean;
+  isAuthenticated: Boolean;
 }
 
 type Props = StateFromProps & ActionProps;
@@ -76,7 +79,16 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions: acts, mid, editor, scope, senseMap, senseObject, showAnotherMode } = this.props;
+    const {
+      actions: acts,
+      mid,
+      editor,
+      scope,
+      senseMap,
+      senseObject,
+      showAnotherMode,
+      isAuthenticated,
+    } = this.props;
     const { status, focus } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
 
@@ -108,7 +120,7 @@ class MapPage extends React.Component<Props> {
             direction="left"
             width="wide"
           >
-            <Inbox />
+            {isAuthenticated && <Inbox />}
           </Sidebar>
           <Sidebar
             visible={status !== OE.StatusType.HIDE}
@@ -119,6 +131,7 @@ class MapPage extends React.Component<Props> {
             data
               ? (
                 <ObjectContent
+                  disabled={!isAuthenticated}
                   objectType={focus.objectType}
                   data={data}
                   submitText={isNew ? 'Submit' : 'Update'}
@@ -218,16 +231,28 @@ class MapPage extends React.Component<Props> {
             <div className="map-page__menu">
               <ObjectMenu />
             </div>
-            <InboxToggler
-              className="inbox__btn"
-              style={{ left: isInboxVisible ? 350 : 0 }}
-              open={isInboxVisible}
-              onToggle={open =>
-                open
-                  ? acts.senseMap.openInbox()
-                  : acts.senseMap.closeInbox()
-              }
-            />
+            {
+              isAuthenticated
+                ? (
+                  <InboxToggler
+                    className="inbox__btn"
+                    style={{ left: isInboxVisible ? 350 : 0 }}
+                    open={isInboxVisible}
+                    onToggle={open =>
+                      open
+                        ? acts.senseMap.openInbox()
+                        : acts.senseMap.closeInbox()
+                    }
+                  />
+                )
+                : (
+                  <div className="map-page__login-hint">
+                    <Segment>
+                      <Link to={R.login}>Sign up / Login</Link> to edit the map and create your own map
+                    </Segment>
+                  </div>
+                )
+            }
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>
@@ -240,11 +265,21 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
     const senseMap = state.senseMap;
     const senseObject = state.senseObject;
     const scope = state.senseMap.scope;
+    const session = state.session;
     const { editor } = state;
     const { mid } = router.match.params;
     const showAnotherMode = state.input.keyStatus[Key.Alt];
+    const isAuthenticated = SS.isAuthenticated(session);
 
-    return { mid, senseMap, senseObject, scope, editor, showAnotherMode };
+    return {
+      mid,
+      senseMap,
+      senseObject,
+      scope,
+      editor,
+      showAnotherMode,
+      isAuthenticated
+    };
   },
   mapDispatch({ actions }),
 )(MapPage));

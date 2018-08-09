@@ -9,4 +9,6 @@ export const inital: State = {
     user: {}
 };
 
+export const isAuthenticated = (state: State): boolean => true;
+
 export const reducer = sessionReducer;
