@@ -1,5 +1,11 @@
 import { State, sessionReducer } from 'redux-react-session';
 
+export type User = {
+    id?: string,
+    email?: string,
+    username?: string,
+};
+
 export type State = State;
 
 export const inital: State = {
@@ -8,7 +14,5 @@ export const inital: State = {
     invalid: false,
     user: {}
 };
-
-export const isAuthenticated = (state: State): boolean => true;
 
 export const reducer = sessionReducer;

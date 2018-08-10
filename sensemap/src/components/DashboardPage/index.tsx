@@ -19,6 +19,7 @@ const sortByUpdateTimeDesc = sort((a: SM.MapData, b: SM.MapData) => b.updatedAt 
 interface StateFromProps {
   senseObject: CS.CachedStorage;
   map: MapID;
+  isAuthenticated: boolean;
 }
 
 interface OwnProps {}
@@ -42,7 +43,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
   }
 
   render() {
-    const { actions: acts, senseObject, map } = this.props;
+    const { actions: acts, senseObject, map, isAuthenticated } = this.props;
     const { modalOpen, mid } = this.state;
     const maps = CS.toStorage(senseObject).maps;
     const mapList = sortByUpdateTimeDesc(Object.values(maps));
@@ -56,19 +57,23 @@ class DashboardPage extends React.Component<Props, OwnState> {
               (m) =>
                 <MapCard
                   key={m.id}
+                  disabled={!isAuthenticated}
                   data={m}
                   onShare={copy}
                   onEdit={() => acts.editor.focusMap(m.id)}
                 />
             )}
           </Card.Group>
-          <FloatingActionButton
-            onClick={() => {
-              const newMap = SM.mapData({ id: U.objectId() });
-              acts.senseObject.updateMap(newMap);
-              acts.editor.focusMap(newMap.id);
-            }}
-          />
+          {
+            isAuthenticated &&
+            <FloatingActionButton
+              onClick={() => {
+                const newMap = SM.mapData({ id: U.objectId() });
+                acts.senseObject.updateMap(newMap);
+                acts.editor.focusMap(newMap.id);
+              }}
+            />
+          }
 
           <Prompt
             when={!modalOpen && !isClean}
@@ -114,8 +119,8 @@ class DashboardPage extends React.Component<Props, OwnState> {
 
 export default connect(
   (state: State) => {
-    const { senseObject, senseMap } = state;
-    return { senseObject, map: senseMap.map };
+    const { senseObject, senseMap, session } = state;
+    return { senseObject, map: senseMap.map, isAuthenticated: session.authenticated };
   },
   mapDispatch({ actions })
 )(DashboardPage);

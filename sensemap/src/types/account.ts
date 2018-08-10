@@ -1,7 +1,6 @@
 import { sessionService } from 'redux-react-session';
 import { ActionUnion, emptyAction } from './action';
 import { Dispatch } from './redux';
-import authClient from './auth';
 import axios from 'axios';
 import * as qs from 'qs';
 import { pick } from 'ramda';
@@ -158,9 +157,6 @@ const signupFailure = (errorMsg: string) => {
 const signupRequest = (username: string, email: string, password: string) => {
   return async (dispatch: Dispatch) => {
     try {
-      const {token, user} = await authClient.signup(username, email, password);
-      await sessionService.saveSession({token: token});
-      await sessionService.saveUser(user);
       dispatch(signupSuccess());
     } catch (err) {
       dispatch(signupFailure(err));
@@ -170,7 +166,6 @@ const signupRequest = (username: string, email: string, password: string) => {
 
 // tslint:disable:no-any
 const logoutRequest = () => async (dispatch: Dispatch) => {
-  authClient.logout();
   sessionService.deleteSession();
   sessionService.deleteUser();
 };

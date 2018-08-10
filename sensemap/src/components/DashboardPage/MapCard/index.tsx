@@ -12,6 +12,7 @@ import './index.css';
 const POPUP_DELAY = 500;
 
 interface Props {
+  disabled?: boolean;
   id?: string;
   data: SM.MapData;
   onShare?(url: string): void;
@@ -31,24 +32,6 @@ enum MapActionType {
   LEAVE       = 'LEAVE',
 }
 
-const dropdownOptions: DropdownItemProps[] = [{
-/*
-  key: 0,
-  disabled: true,
-  text: 'member',
-  value: MapActionType.SHOW_MEMBER,
-}, {
-*/
-  key: 1,
-  text: 'edit detail',
-  value: MapActionType.EDIT,
-}, {
-  key: 2,
-  disabled: true,
-  text: 'delete',
-  value: MapActionType.REMOVE,
-}];
-
 class MapCard extends React.Component<Props, State> {
   state = {
     copied: false,
@@ -61,6 +44,7 @@ class MapCard extends React.Component<Props, State> {
 
   render() {
     const {
+      disabled = false,
       id,
       data,
       onShare = U.noop,
@@ -73,6 +57,24 @@ class MapCard extends React.Component<Props, State> {
     const timeHint = data.createdAt === data.updatedAt
       ? `created at ${formattedTime}`
       : `updated at ${formattedTime}`;
+    const dropdownOptions: DropdownItemProps[] = [{
+    /*
+      key: 0,
+      disabled: true,
+      text: 'member',
+      value: MapActionType.SHOW_MEMBER,
+    }, {
+    */
+      key: 1,
+      disabled,
+      text: 'edit detail',
+      value: MapActionType.EDIT,
+    }, {
+      key: 2,
+      disabled: disabled || true,
+      text: 'delete',
+      value: MapActionType.REMOVE,
+    }];
 
     return (
       <Card id={id} className="map-card">

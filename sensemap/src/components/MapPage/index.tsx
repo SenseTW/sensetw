@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps, Link } from 'react-router-dom';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { Sidebar, Segment } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
@@ -26,13 +26,11 @@ import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as CS from '../../types/cached-storage';
-import * as SS from '../../types/session';
 import * as B from '../../types/sense/box';
 import { Action as BoxAction } from '../../types/sense/box';
 import * as C from '../../types/sense/card';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
-import * as R from '../../types/routes';
 import './index.css';
 import { Key } from 'ts-keycode-enum';
 const background = require('./background-map.png');
@@ -248,7 +246,9 @@ class MapPage extends React.Component<Props> {
                 : (
                   <div className="map-page__login-hint">
                     <Segment>
-                      <Link to={R.login}>Sign up / Login</Link> to edit the map and create your own map
+                      <a href="#" onClick={(e) => { e.preventDefault(); acts.account.loginRequest(); }}>
+                        Sign up / Login
+                      </a> to edit the map and create your own map
                     </Segment>
                   </div>
                 )
@@ -269,7 +269,7 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
     const { editor } = state;
     const { mid } = router.match.params;
     const showAnotherMode = state.input.keyStatus[Key.Alt];
-    const isAuthenticated = SS.isAuthenticated(session);
+    const isAuthenticated = session.authenticated;
 
     return {
       mid,

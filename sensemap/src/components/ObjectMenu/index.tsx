@@ -20,7 +20,6 @@ import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
-import * as SS from '../../types/session';
 import * as F from '../../types/sense/focus';
 // TODO: use UUID v4
 import * as U from '../../types/utils';
@@ -418,7 +417,7 @@ class ObjectMenu extends React.PureComponent<Props> {
 
 export default connect<StateFromProps, ActionProps>(
   (state: State) => {
-    const isAuthenticated = SS.isAuthenticated(state.session);
+    const isAuthenticated = state.session.authenticated;
 
     return {
       selection: state.selection,
