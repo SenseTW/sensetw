@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { Pagination, PaginationProps } from 'semantic-ui-react';
-import './index.css';
+import { Pagination, PaginationProps, Modal, Button } from 'semantic-ui-react';
 import { CardData, State, ActionProps } from '../../types';
+import Sources from '../../containers/Sources';
 import AddCardButton from './AddCardButton';
 import SyncButton from './SyncButton';
+import Divider from './Divider';
 import CardList from './CardList';
 import { Pager } from '../Pager';
+import './index.css';
 
 export interface StateFromProps {
   cards: CardData[];
@@ -21,7 +23,22 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
   return (
     <div className="inbox">
       <div className="inbox__actions">
-        <SyncButton mapId={mapId} actions={acts} />
+        <SyncButton className="inbox__action" mapId={mapId} actions={acts} />
+        <Divider />
+        <Modal
+          trigger={
+            <Button
+              basic
+              className="inbox__action"
+            >
+              Show Sources
+            </Button>
+          }
+        >
+          <Modal.Content>
+            <Sources />
+          </Modal.Content>
+        </Modal>
       </div>
       <AddCardButton mapId={mapId} visible={senseMap.activateInboxPage === 1} actions={acts} />
       <Pager data={cards} pageSize={9} currentPage={senseMap.activateInboxPage} >

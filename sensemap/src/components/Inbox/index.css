@@ -13,12 +13,33 @@
   vertical-align: top;
 }
 
-.inbox__actions > .inbox__sync-btn.ui.basic.button {
+.inbox__actions > .inbox__divider {
   margin: 1px 9px 1px 0;
 }
 
-.inbox__actions > .inbox__divider {
+.inbox__action.ui.basic.button {
   margin: 1px 9px 1px 0;
+}
+
+.inbox__action.ui.basic.button:focus {
+  background-color: transparent !important;
+  box-shadow: 0 0 0 1px #909090 inset;
+  color: #909090 !important;
+}
+
+.inbox__action.ui.basic.button:hover {
+  background-color: transparent !important;
+  box-shadow: 0 0 0 1px #909090 inset;
+  color: #909090 !important;
+}
+
+.inbox__action.ui.basic.button {
+  box-shadow: 0 0 0 1px #909090 inset;
+  color: #909090 !important;
+}
+
+.inbox__action.ui.basic.button.disabled {
+  box-shadow: 0 0 0 1px #909090 inset !important;
 }
 
 .inbox__add-card-btn {
