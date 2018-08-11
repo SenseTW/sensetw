@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { Button, Modal, Sidebar, Segment } from 'semantic-ui-react';
+import { Sidebar, Segment } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
@@ -9,7 +9,6 @@ import WholeMap from '../../components/WholeMap';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
-import Sources from '../../containers/Sources';
 import InboxToggler from '../InboxToggler';
 import {
   MapID,
@@ -120,11 +119,6 @@ class MapPage extends React.Component<Props> {
             direction="left"
             width="wide"
           >
-            <Modal trigger={<Button>Show Sources</Button>}>
-              <Modal.Content>
-                <Sources />
-              </Modal.Content>
-            </Modal>
             {isAuthenticated && <Inbox />}
           </Sidebar>
           <Sidebar
