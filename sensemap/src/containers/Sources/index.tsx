@@ -2,7 +2,13 @@ import { connect } from 'react-redux';
 import { State, actions, ActionProps, mapDispatch, CardData } from '../../types';
 import * as CS from '../../types/cached-storage';
 import * as CO from '../../components/Sources';
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'ramda';
+
+interface Source {
+  title: string;
+  url: string;
+  description: string;
+}
 
 function toSource(card: CardData) {
   return {
@@ -12,12 +18,14 @@ function toSource(card: CardData) {
   };
 }
 
+const uniqByUrl = uniqBy((it: Source) => it.url);
+
 // XXX: move this to server side.
 function extractSources(cards: CardData[]) {
   const sources = cards
     .filter(card => card.url.trim() !== '')
     .map(toSource);
-  return uniqBy(sources, 'url');
+  return uniqByUrl(sources);
 }
 
 export default connect<CO.StateFromProps, ActionProps>(
