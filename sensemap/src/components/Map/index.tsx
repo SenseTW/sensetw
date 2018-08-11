@@ -14,6 +14,7 @@ import * as O from '../../types/sense/object';
 import * as F from '../../types/sense/focus';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
+import * as S from '../../types/stage';
 import * as G from '../../graphics/point';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
 
@@ -71,7 +72,7 @@ export class Map extends React.Component<Props, MapState> {
     if (this.props.stage.mouseDown) {
       const dx = e.evt.movementX;
       const dy = e.evt.movementY;
-      this.props.actions.stage.stageMouseMove({ dx, dy });
+      this.props.actions.stage.mouseMove({ dx, dy });
     }
     return;
   }
@@ -87,7 +88,8 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   handleClick(e: KonvaEvent.Mouse) {
-    if (e.target && e.target.nodeType === NodeType.STAGE) {
+    const isMoved = S.isMoved(this.props.stage);
+    if (!isMoved && e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.selection.clearSelection();
     }
   }

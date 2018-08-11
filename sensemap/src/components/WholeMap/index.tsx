@@ -15,6 +15,7 @@ import * as I from '../../types/input';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
 import * as SL from '../../types/selection';
+import * as S from '../../types/stage';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
 
 export interface TransformerForProps {
@@ -50,7 +51,7 @@ class WholeMap extends React.Component<Props, State> {
 
   handleMouseMove = (e: KonvaEvent.Mouse) => {
     if (this.props.stage.mouseDown) {
-      this.props.actions.stage.stageMouseMove({
+      this.props.actions.stage.mouseMove({
         dx: e.evt.movementX,
         dy: e.evt.movementY,
       });
@@ -58,15 +59,18 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   handleMouseDown = (e: KonvaEvent.Mouse) => {
-    if (e.target && e.target.nodeType === NodeType.STAGE) {
-      this.props.actions.stage.stageMouseDown();
-      // TODO: should prevent desection when map has been dragged
-      this.props.actions.selection.clearSelection();
-    }
+    this.props.actions.stage.stageMouseDown();
   }
 
   handleMouseUp = (e: KonvaEvent.Mouse) => {
     this.props.actions.stage.stageMouseUp();
+  }
+
+  handleClick = (e: KonvaEvent.Mouse) => {
+    const isMoved = S.isMoved(this.props.stage);
+    if (!isMoved && e.target && e.target.nodeType === NodeType.STAGE) {
+      this.props.actions.selection.clearSelection();
+    }
   }
 
   handleSelect = (e: KonvaEvent.Mouse, object: ObjectData) => {
@@ -289,6 +293,7 @@ class WholeMap extends React.Component<Props, State> {
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
         onMouseMove={this.handleMouseMove}
+        onClick={this.handleClick}
       >
         <Layer>
           {edges}

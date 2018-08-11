@@ -138,9 +138,6 @@ class Box extends React.Component<Props, State> {
           handleSelect(this.props.mapObject);
           openBox(box.id);
         }}
-        onMouseUp={(e) => {
-          e.cancelBubble = true;
-        }}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}

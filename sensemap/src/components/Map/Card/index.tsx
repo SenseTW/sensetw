@@ -142,9 +142,6 @@ class Card extends React.Component<Props, State> {
           handleSelect(this.props.mapObject);
           openCard(data);
         }}
-        onMouseUp={(e) => {
-          e.cancelBubble = true;
-        }}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
