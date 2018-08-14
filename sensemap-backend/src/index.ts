@@ -16,6 +16,7 @@ import { router as Login } from './login';
 import { router as Hypothesis } from './hypothesis';
 import { router as HypothesisClient } from './client';
 import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import { Strategy as AnonymousStrategy } from 'passport-anonymous';
 import { getAccessToken } from './login/oauth';
 
 const PORT = 8000;
@@ -31,10 +32,11 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+passport.use(new AnonymousStrategy());
 passport.use(new BearerStrategy((token, done) => {
   getAccessToken(token)
     .then(data => {
-      if (!data.user) {
+      if (!data || !data.user) {
         return done(null, false);
       } else {
         return done(null, data.user, { scope: 'all', message: '' });

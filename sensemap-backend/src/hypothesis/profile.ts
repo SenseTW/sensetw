@@ -8,7 +8,7 @@ export function router(context: Context) {
 
   router.get(
     '/',
-    passport.authenticate('bearer', { session: false }),
+    passport.authenticate(['bearer', 'anonymous'], { session: false }),
     (req, res) => {
       const userid = !!req.user ? `acct:${req.user.username}@ggv.tw` : null;
       const sense_user = !!req.user ? req.user : null;
