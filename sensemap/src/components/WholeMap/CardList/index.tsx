@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Path, Group, Rect } from 'react-konva';
-import { TransformerForProps } from '../';
+import { TransformerForProps } from '../../Layout';
 import { ObjectData, CardData } from '../../../types';
 import Text from '../../Layout/Text';
 import TextList from '../../Layout/TextList';

@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { Group, Rect, Circle, Text } from 'react-konva';
+import { TransformerForProps } from '../../Layout';
 import TagList from '../TagList';
 import * as T from '../../../types';
+import { transformObject } from '../../../types/viewport';
 import { noop, toTags } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 import * as G from '../../../graphics/point';
 
-interface Props {
+interface OwnProps {
   isDirty?: boolean;
   mapObject: T.ObjectData;
   card: T.CardData;
@@ -21,38 +23,12 @@ interface Props {
   openCard?(id: T.CardID): void;
 }
 
+type Props = OwnProps & TransformerForProps;
+
 interface State {
   tagHeight: number;
   newlySelected: boolean;
 }
-
-const cornerRadius = 4;
-
-const dirtyRadius = 5;
-const dirtyPadding = 10;
-const dirtyColor = '#3ad8fa';
-
-const summaryPadding = 0;
-const summaryOffsetX = 10 - summaryPadding;
-const summaryOffsetY = 8 - summaryPadding;
-const summaryFontFamily = 'sans-serif';
-const summaryFontSize = 16;
-const summaryAbsoluteLineHegiht = 22;
-const summaryLineHeight = summaryAbsoluteLineHegiht / summaryFontSize;
-const summaryHeight = summaryAbsoluteLineHegiht * 3;
-const summaryColor = '#000000';
-const summaryLimit = 39;
-
-const titlePadding = 0;
-const titleOffsetX = 10 - titlePadding;
-const titleOffsetY = 12 + summaryHeight - summaryPadding - titlePadding;
-const titleFontFamily = 'sans-serif';
-const titleFontSize = 13;
-const titleAbsoluteLineHeight = 16;
-const titleLineHeight = titleAbsoluteLineHeight / titleFontSize;
-const titleHeight = titleAbsoluteLineHeight * 2;
-const titleColor = '#5a5a5a';
-const titleLimit = 32;
 
 const color = {
   [T.CardType.NORMAL]: 'rgba(255, 255, 255, 1)',
@@ -61,28 +37,77 @@ const color = {
   [T.CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
 };
 
-const shadowBlur = 10;
-const shadowColor = '#999';
-const shadowOffsetX = 2;
-const shadowOffsetY = 3;
-
-const selectedOffsetX = -6;
-const selectedOffsetY = -6;
-const selectedCornerRadius = 8;
-const selectedColor = '#3ad8fa';
-const selectedStrokeWidth = 3;
-
-const tagLeft = 8;
-const tagBottom = 8;
+const summaryLimit = 39;
+const titleLimit = 32;
 
 class Card extends React.Component<Props, State> {
+  static style = {
+    borderRadius: 4,
+    dirty: {
+      radius: 5,
+      padding: {
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10,
+      },
+      color: '#3ad8fa',
+    },
+    title: {
+      padding: {
+        top: 12 + 22 * 3,
+        right: 10,
+        bottom: 0,
+        left: 10,
+      },
+      fontFamily: 'sans-serif',
+      fontSize: 13,
+      lineHeight: 16 / 13,
+      height: 32,
+      color: '#5a5a5a',
+    },
+    summary: {
+      padding: {
+        top: 8,
+        right: 10,
+        bottom: 8,
+        left: 10,
+      },
+      fontFamily: 'sans-serif',
+      fontSize: 16,
+      lineHeight: 22 / 16,
+      height: 22 * 3,
+      color: '#000000',
+    },
+    shadow: {
+      blur: 10,
+      color: '#999',
+      offset: { x: 2, y: 3 },
+    },
+    selected: {
+      offset: { x: -6, y: -6 },
+      borderRadius: 8,
+      color: '#3ad8fa',
+      strokeWidth: 3,
+    },
+    tag: {
+      margin: {
+        top: 8,
+        right: 8,
+        bottom: 8,
+        left: 8,
+      },
+    },
+  };
+
   state = {
     tagHeight: 0,
     newlySelected: false,
   };
 
   render() {
-    const { isDirty = false } = this.props;
+    const { transform, isDirty = false } = this.props;
+    const style = transformObject(transform, Card.style) as typeof Card.style;
     const { data } = this.props.mapObject;
     const { x, y, width, height } = this.props.transform({
       x: this.props.mapObject.x,
@@ -94,10 +119,10 @@ class Card extends React.Component<Props, State> {
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedTitle   = title.substr(0, titleLimit);
     const tagHeight = this.state.tagHeight;
-    const selectedWidth = width - selectedOffsetX * 2;
-    const selectedHeight = height - selectedOffsetY * 2;
-    const summaryWidth = width - summaryOffsetX * 2;
-    const titleWidth = width - titleOffsetX * 2;
+    const selectedWidth = width - style.selected.offset.x * 2;
+    const selectedHeight = height - style.selected.offset.y * 2;
+    const summaryWidth = width - style.summary.padding.left - style.summary.padding.right;
+    const titleWidth = width - style.title.padding.left - style.title.padding.right;
 
     const handleSelect    = this.props.handleSelect    || noop;
     const handleDeselect  = this.props.handleDeselect  || noop;
@@ -109,13 +134,13 @@ class Card extends React.Component<Props, State> {
 
     const selected = (
       <Rect
-        x={selectedOffsetX}
-        y={selectedOffsetY}
+        x={style.selected.offset.x}
+        y={style.selected.offset.y}
         width={selectedWidth}
         height={selectedHeight}
-        cornerRadius={selectedCornerRadius}
-        stroke={selectedColor}
-        strokeWidth={selectedStrokeWidth}
+        cornerRadius={style.selected.borderRadius}
+        stroke={style.selected.color}
+        strokeWidth={style.selected.strokeWidth}
       />);
 
     return (
@@ -151,49 +176,49 @@ class Card extends React.Component<Props, State> {
           width={width}
           height={height}
           fill={bgColor}
-          cornerRadius={cornerRadius}
-          shadowBlur={shadowBlur}
-          shadowOffsetX={shadowOffsetX}
-          shadowOffsetY={shadowOffsetY}
-          shadowColor={shadowColor}
+          cornerRadius={style.borderRadius}
+          shadowBlur={style.shadow.blur}
+          shadowOffsetX={style.shadow.offset.x}
+          shadowOffsetY={style.shadow.offset.y}
+          shadowColor={style.shadow.color}
         />
         {
           isDirty &&
           <Circle
-            x={width - dirtyPadding}
-            y={dirtyPadding}
-            radius={dirtyRadius}
-            fill={dirtyColor}
+            x={width - style.dirty.padding.right}
+            y={style.dirty.padding.top}
+            radius={style.dirty.radius}
+            fill={style.dirty.color}
           />
         }
         <Text
-          x={summaryOffsetX}
-          y={summaryOffsetY}
+          x={style.summary.padding.left}
+          y={style.summary.padding.top}
           width={summaryWidth}
-          height={summaryHeight}
-          padding={summaryPadding}
-          fontSize={summaryFontSize}
-          fontFamily={summaryFontFamily}
-          lineHeight={summaryLineHeight}
-          fill={summaryColor}
+          height={style.summary.height}
+          padding={style.summary.padding.left}
+          fontSize={style.summary.fontSize}
+          fontFamily={style.summary.fontFamily}
+          lineHeight={style.summary.lineHeight}
+          fill={style.summary.color}
           text={sanitizedSummary}
         />
         <Text
-          x={titleOffsetX}
-          y={titleOffsetY}
+          x={style.title.padding.left}
+          y={style.title.padding.top}
           width={titleWidth}
-          height={titleHeight}
-          padding={titlePadding}
-          fontSize={titleFontSize}
-          fontFamily={titleFontFamily}
-          lineHeight={titleLineHeight}
-          fill={titleColor}
+          height={style.title.height}
+          padding={style.title.padding.left}
+          fontSize={style.title.fontSize}
+          fontFamily={style.title.fontFamily}
+          lineHeight={style.title.lineHeight}
+          fill={style.title.color}
           text={sanitizedTitle}
         />
         <TagList
-          x={tagLeft}
-          y={height - tagBottom - tagHeight}
-          width={width - 2 * tagLeft}
+          x={style.tag.margin.left}
+          y={height - style.tag.margin.bottom - tagHeight}
+          width={width - style.tag.margin.left - style.tag.margin.right}
           tags={toTags(tags)}
           onResize={(w, h) => this.setState({ tagHeight: h })}
         />

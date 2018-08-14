@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Stage, Layer } from 'react-konva';
 import { Props } from '../Map';
+import { TransformerForProps } from '../Layout';
 import Box from './Box';
 import CardList from './CardList';
 import Card from './Card';
@@ -17,11 +18,6 @@ import * as CS from '../../types/cached-storage';
 import * as SL from '../../types/selection';
 import * as S from '../../types/stage';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
-
-export interface TransformerForProps {
-  transform: G.Transform;
-  inverseTransform: G.Transform;
-}
 
 interface MapState {
   prevDragPoint: G.Point;
