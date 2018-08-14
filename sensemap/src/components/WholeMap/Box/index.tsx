@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import { TransformerForProps } from '../';
+import { TransformerForProps } from '../../Layout';
 import { ObjectData, BoxData } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
