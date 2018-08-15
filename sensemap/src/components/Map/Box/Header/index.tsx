@@ -1,15 +1,19 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import TagList from '../../TagList';
+import { TransformerForProps } from '../../../Layout';
+import { transformObject } from '../../../../types/viewport';
 import { toTags } from '../../../../types/utils';
 
-interface Props {
+interface OwnProps {
   box: { title: string, tags: string };
   x: number;
   y: number;
   width: number;
   height: number;
 }
+
+type Props = OwnProps & TransformerForProps;
 
 interface State {
   tagHeight: number;
@@ -51,33 +55,34 @@ class Header extends React.Component<Props, State> {
   };
 
   render() {
-    const { box, width, height } = this.props;
+    const { transform, box, width, height } = this.props;
     const { tagHeight } = this.state;
+    const style = transformObject(transform, Header.style) as typeof Header.style;
     const sanitizedTitle = box.title.substr(0, Header.style.contents.title.textLimit);
     return (
       <Group>
         <Rect
-          fill={Header.style.background.color}
+          fill={style.background.color}
           width={width}
           height={height}
-          stroke={Header.style.border.color}
-          strokeWidth={Header.style.border.width}
-          cornerRadius={Header.style.cornerRadius}
+          stroke={style.border.color}
+          strokeWidth={style.border.width}
+          cornerRadius={style.cornerRadius}
         />
         <Text
-          x={Header.style.contents.title.left}
-          y={Header.style.contents.title.top}
-          width={Header.style.contents.title.width}
-          fill={Header.style.contents.title.color}
-          fontFamily={Header.style.contents.title.font.family}
-          fontSize={Header.style.contents.title.font.size}
-          lineHeight={Header.style.contents.title.lineHeight}
+          x={style.contents.title.left}
+          y={style.contents.title.top}
+          width={style.contents.title.width}
+          fill={style.contents.title.color}
+          fontFamily={style.contents.title.font.family}
+          fontSize={style.contents.title.font.size}
+          lineHeight={style.contents.title.lineHeight}
           text={sanitizedTitle}
         />
         <TagList
-          x={Header.style.contents.tags.left}
-          y={height - Header.style.contents.tags.bottom - tagHeight}
-          width={width - 2 * Header.style.contents.tags.left}
+          x={style.contents.tags.left}
+          y={height - style.contents.tags.bottom - tagHeight}
+          width={width - 2 * style.contents.tags.left}
           tags={toTags(box.tags)}
           onResize={(w, h) => this.setState({ tagHeight: h })}
         />

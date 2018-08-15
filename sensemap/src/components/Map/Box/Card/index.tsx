@@ -1,14 +1,18 @@
 import * as React from 'react';
-import * as T from '../../../../types';
+import { TransformerForProps } from '../../../Layout';
 import { Group, Rect, Text } from 'react-konva';
+import * as T from '../../../../types';
+import { transformObject } from '../../../../types/viewport';
 
-interface Props {
+interface OwnProps {
   card: T.CardData;
   x: number;
   y: number;
   width: number;
   height: number;
 }
+
+type Props = OwnProps & TransformerForProps;
 
 class Card extends React.Component<Props> {
 
@@ -40,7 +44,8 @@ class Card extends React.Component<Props> {
   };
 
   render() {
-    const { x = 0, y = 0, width = 0, height = 0 } = this.props;
+    const { transform, x = 0, y = 0, width = 0, height = 0 } = this.props;
+    const style = transformObject(transform, Card.style) as typeof Card.style;
     const text = (this.props.card.summary || this.props.card.description || '')
       .substr(0, Card.style.contents.title.textLimit);
     return (
@@ -48,20 +53,20 @@ class Card extends React.Component<Props> {
         <Rect
           width={width}
           height={height}
-          fill={Card.style.background.color}
-          stroke={Card.style.border.color}
-          strokeWidth={Card.style.border.width}
-          cornerRadius={Card.style.cornerRadius}
+          fill={style.background.color}
+          stroke={style.border.color}
+          strokeWidth={style.border.width}
+          cornerRadius={style.cornerRadius}
         />
         <Text
-          x={Card.style.contents.title.left}
-          y={Card.style.contents.title.top}
-          width={Card.style.contents.title.width}
-          height={Card.style.contents.title.height}
-          fill={Card.style.contents.title.color}
-          fontFamily={Card.style.contents.title.font.family}
-          fontSize={Card.style.contents.title.font.size}
-          lineHeight={Card.style.contents.title.lineHeight}
+          x={style.contents.title.left}
+          y={style.contents.title.top}
+          width={style.contents.title.width}
+          height={style.contents.title.height}
+          fill={style.contents.title.color}
+          fontFamily={style.contents.title.font.family}
+          fontSize={style.contents.title.font.size}
+          lineHeight={style.contents.title.lineHeight}
           text={text}
         />
       </Group>
