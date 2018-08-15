@@ -6,15 +6,12 @@ import * as T from '../../../types';
 import { transformObject } from '../../../types/viewport';
 import { noop, toTags } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
-import * as G from '../../../graphics/point';
 
 interface OwnProps {
   isDirty?: boolean;
   mapObject: T.ObjectData;
   card: T.CardData;
   selected?: Boolean;
-  transform: G.Transform;
-  inverseTransform: G.Transform;
   handleSelect?(object: T.ObjectData): void;
   handleDeselect?(object: T.ObjectData): void;
   handleDragStart?(e: KonvaEvent.Mouse): void;
@@ -62,7 +59,7 @@ class Card extends React.Component<Props, State> {
       },
       fontFamily: 'sans-serif',
       fontSize: 13,
-      lineHeight: 16 / 13,
+      lineHeight: 26 / 13,
       height: 32,
       color: '#5a5a5a',
     },
@@ -75,7 +72,7 @@ class Card extends React.Component<Props, State> {
       },
       fontFamily: 'sans-serif',
       fontSize: 16,
-      lineHeight: 22 / 16,
+      lineHeight: 32 / 16,
       height: 22 * 3,
       color: '#000000',
     },
