@@ -10,8 +10,6 @@ type Props = OwnProps & TextConfig;
 
 class Text extends React.PureComponent<Props> {
   textNode: KonvaText | null = null;
-  width: number = 0;
-  height: number = 0;
 
   handleResize() {
     if (!this.textNode) { return; }
@@ -20,11 +18,7 @@ class Text extends React.PureComponent<Props> {
     const width = this.textNode.getWidth();
     const height = this.textNode.getHeight();
 
-    if (this.width !== width || this.height !== height) {
-      if (onResize) { onResize(width, height); }
-      this.width = width;
-      this.height = height;
-    }
+    if (onResize) { onResize(width, height); }
   }
 
   componentDidMount() {

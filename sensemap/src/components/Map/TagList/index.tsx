@@ -19,7 +19,7 @@ interface State {
 
 const tagMargin = 9;
 
-class TagList extends React.Component<Props, State> {
+class TagList extends React.PureComponent<Props, State> {
   state = {
     w: 0,
     h: 0,
@@ -39,10 +39,10 @@ class TagList extends React.Component<Props, State> {
 
   handleRestResize = (w: number, h: number) => {
     const { onResize = noop } = this.props;
-    const { w: width } = this.state;
+    const { w: width, h: height } = this.state;
 
     // My children resized, notify my parent about the new width and height.
-    onResize(width + tagMargin + w, h);
+    onResize(width + tagMargin + w, h > height ? h : height);
   }
 
   render(): React.ReactNode {
