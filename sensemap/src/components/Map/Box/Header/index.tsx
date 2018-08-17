@@ -55,7 +55,7 @@ class Header extends React.Component<Props, State> {
   };
 
   render() {
-    const { transform, box, width, height } = this.props;
+    const { transform, inverseTransform, box, width, height } = this.props;
     const { tagHeight } = this.state;
     const style = transformObject(transform, Header.style) as typeof Header.style;
     const sanitizedTitle = box.title.substr(0, Header.style.contents.title.textLimit);
@@ -80,6 +80,8 @@ class Header extends React.Component<Props, State> {
           text={sanitizedTitle}
         />
         <TagList
+          transform={transform}
+          inverseTransform={inverseTransform}
           x={style.contents.tags.left}
           y={height - style.contents.tags.bottom - tagHeight}
           width={width - 2 * style.contents.tags.left}
