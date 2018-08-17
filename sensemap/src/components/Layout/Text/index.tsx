@@ -8,7 +8,11 @@ interface OwnProps {
 
 type Props = OwnProps & TextConfig;
 
-class Text extends React.PureComponent<Props> {
+/**
+ * The `Text` component should rerender itself anyway and report it's width and
+ * height back to the parent component.
+ */
+class Text extends React.Component<Props> {
   textNode: KonvaText | null = null;
 
   handleResize() {

@@ -103,7 +103,7 @@ class Card extends React.Component<Props, State> {
   };
 
   render() {
-    const { transform, isDirty = false } = this.props;
+    const { transform, inverseTransform, isDirty = false } = this.props;
     const style = transformObject(transform, Card.style) as typeof Card.style;
     const { data } = this.props.mapObject;
     const { x, y, width, height } = this.props.transform({
@@ -213,6 +213,8 @@ class Card extends React.Component<Props, State> {
           text={sanitizedTitle}
         />
         <TagList
+          transform={transform}
+          inverseTransform={inverseTransform}
           x={style.tag.margin.left}
           y={height - style.tag.margin.bottom - tagHeight}
           width={width - style.tag.margin.left - style.tag.margin.right}
