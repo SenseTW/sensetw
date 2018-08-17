@@ -12,7 +12,7 @@ function SignUpPage(props) {
             <Form.Input name="username" error={usernameError.length > 0} fluid={true} icon="user circle" iconPosition="left" placeholder="Username" type="text" />
             <Form.Input name="email" error={emailError.length > 0} fluid={true} icon="mail" iconPosition="left" placeholder="Email" type="text" />
             <Form.Input name="password" error={passwordError.length > 0} fluid={true} icon="lock" iconPosition="left" placeholder="Password" type="password" />
-            <div>You are agreeing to our Terms of Service and Community Guidelines.</div>
+            <div>You are agreeing to our <a href="http://sense.tw/terms-of-service">Terms of Service</a> and Community Guidelines.</div>
             <Button fluid={true} color="black">SIGN UP</Button>
             <div>Already have an account?  <a href="/login">Log in</a></div>
           </Form>
