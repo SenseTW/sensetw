@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Group, Rect, Circle, Text } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
+import Selectable from '../../Layout/Selectable';
 import TagList from '../TagList';
 import * as T from '../../../types';
 import { transformObject } from '../../../types/viewport';
@@ -11,7 +12,7 @@ interface OwnProps {
   isDirty?: boolean;
   mapObject: T.ObjectData;
   card: T.CardData;
-  selected?: Boolean;
+  selected?: boolean;
   handleSelect?(object: T.ObjectData): void;
   handleDeselect?(object: T.ObjectData): void;
   handleDragStart?(e: KonvaEvent.Mouse): void;
@@ -24,7 +25,6 @@ type Props = OwnProps & TransformerForProps;
 
 interface State {
   tagHeight: number;
-  newlySelected: boolean;
 }
 
 const color = {
@@ -99,7 +99,6 @@ class Card extends React.Component<Props, State> {
 
   state = {
     tagHeight: 0,
-    newlySelected: false,
   };
 
   render() {
@@ -141,87 +140,84 @@ class Card extends React.Component<Props, State> {
       />);
 
     return (
-      <Group
-        x={x}
-        y={y}
-        draggable={true}
-        onMouseDown={(e) => {
+      <Selectable
+        selected={this.props.selected}
+        onSelect={(e) => {
           e.cancelBubble = true;
-          if (this.props.selected) {
-            return;
-          }
-          this.setState({ newlySelected: true });
           handleSelect(this.props.mapObject);
         }}
-        onClick={(e) => {
+        onDeselect={(e) => {
           e.cancelBubble = true;
-          if (!this.state.newlySelected) {
-            handleDeselect(this.props.mapObject);
-          }
-          this.setState({ newlySelected: false });
+          handleDeselect(this.props.mapObject);
         }}
-        onDblClick={() => {
-          handleSelect(this.props.mapObject);
-          openCard(data);
-        }}
-        onDragStart={handleDragStart}
-        onDragMove={handleDragMove}
-        onDragEnd={handleDragEnd}
       >
-        {this.props.selected ? selected : null}
-        <Rect
-          width={width}
-          height={height}
-          fill={bgColor}
-          cornerRadius={style.borderRadius}
-          shadowBlur={style.shadow.blur}
-          shadowOffsetX={style.shadow.offset.x}
-          shadowOffsetY={style.shadow.offset.y}
-          shadowColor={style.shadow.color}
-        />
-        {
-          isDirty &&
-          <Circle
-            x={width - style.dirty.padding.right}
-            y={style.dirty.padding.top}
-            radius={style.dirty.radius}
-            fill={style.dirty.color}
+        <Group
+          x={x}
+          y={y}
+          draggable={true}
+          onDblClick={() => {
+            handleSelect(this.props.mapObject);
+            openCard(data);
+          }}
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+        >
+          {this.props.selected ? selected : null}
+          <Rect
+            width={width}
+            height={height}
+            fill={bgColor}
+            cornerRadius={style.borderRadius}
+            shadowBlur={style.shadow.blur}
+            shadowOffsetX={style.shadow.offset.x}
+            shadowOffsetY={style.shadow.offset.y}
+            shadowColor={style.shadow.color}
           />
-        }
-        <Text
-          x={style.summary.padding.left}
-          y={style.summary.padding.top}
-          width={summaryWidth}
-          height={style.summary.height}
-          padding={style.summary.padding.left}
-          fontSize={style.summary.fontSize}
-          fontFamily={style.summary.fontFamily}
-          lineHeight={style.summary.lineHeight}
-          fill={style.summary.color}
-          text={sanitizedSummary}
-        />
-        <Text
-          x={style.title.padding.left}
-          y={style.title.padding.top}
-          width={titleWidth}
-          height={style.title.height}
-          padding={style.title.padding.left}
-          fontSize={style.title.fontSize}
-          fontFamily={style.title.fontFamily}
-          lineHeight={style.title.lineHeight}
-          fill={style.title.color}
-          text={sanitizedTitle}
-        />
-        <TagList
-          transform={transform}
-          inverseTransform={inverseTransform}
-          x={style.tag.margin.left}
-          y={height - style.tag.margin.bottom - tagHeight}
-          width={width - style.tag.margin.left - style.tag.margin.right}
-          tags={toTags(tags)}
-          onResize={(w, h) => this.setState({ tagHeight: h })}
-        />
-      </Group>
+          {
+            isDirty &&
+            <Circle
+              x={width - style.dirty.padding.right}
+              y={style.dirty.padding.top}
+              radius={style.dirty.radius}
+              fill={style.dirty.color}
+            />
+          }
+          <Text
+            x={style.summary.padding.left}
+            y={style.summary.padding.top}
+            width={summaryWidth}
+            height={style.summary.height}
+            padding={style.summary.padding.left}
+            fontSize={style.summary.fontSize}
+            fontFamily={style.summary.fontFamily}
+            lineHeight={style.summary.lineHeight}
+            fill={style.summary.color}
+            text={sanitizedSummary}
+          />
+          <Text
+            x={style.title.padding.left}
+            y={style.title.padding.top}
+            width={titleWidth}
+            height={style.title.height}
+            padding={style.title.padding.left}
+            fontSize={style.title.fontSize}
+            fontFamily={style.title.fontFamily}
+            lineHeight={style.title.lineHeight}
+            fill={style.title.color}
+            text={sanitizedTitle}
+          />
+          <TagList
+            transform={transform}
+            inverseTransform={inverseTransform}
+            x={style.tag.margin.left}
+            y={height - style.tag.margin.bottom - tagHeight}
+            width={width - style.tag.margin.left - style.tag.margin.right}
+            tags={toTags(tags)}
+            onResize={(w, h) => this.setState({ tagHeight: h })}
+          />
+        </Group>
+      </Selectable>
     );
   }
 }

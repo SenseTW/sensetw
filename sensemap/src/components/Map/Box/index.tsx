@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Group, Rect, Circle } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
+import Selectable from '../../Layout/Selectable';
 import Header from './Header';
 import Card from './Card';
 import Toggle from './Toggle';
@@ -24,7 +25,7 @@ interface OwnProps {
   mapObject: T.ObjectData;
   box: T.BoxData;
   cards: ObjectMap<T.CardData>;
-  selected?: Boolean;
+  selected?: boolean;
   handleSelect?(data: T.ObjectData): void;
   handleSetDropTarget?(data: T.ObjectData): void;
   handleUnsetDropTarget?(data: T.ObjectData): void;
@@ -38,7 +39,6 @@ interface OwnProps {
 type Props = OwnProps & TransformerForProps;
 
 interface State {
-  newlySelected: boolean;
   listDisplay: ListDisplay;
 }
 
@@ -88,7 +88,6 @@ class Box extends React.Component<Props, State> {
   };
 
   state = {
-    newlySelected: false,
     listDisplay: ListDisplay.COLLAPSED,
   };
 
@@ -137,73 +136,70 @@ class Box extends React.Component<Props, State> {
       />);
 
     return (
-      <Group
-        x={x}
-        y={y}
-        draggable={true}
-        onMouseDown={(e) => {
+      <Selectable
+        selected={this.props.selected}
+        onSelect={(e) => {
           e.cancelBubble = true;
-          if (this.props.selected) {
-            return;
-          }
-          this.setState({ newlySelected: true });
           handleSelect(this.props.mapObject);
         }}
-        onClick={(e) => {
+        onDeselect={(e) => {
           e.cancelBubble = true;
-          if (!this.state.newlySelected) {
-            handleDeselect(this.props.mapObject);
-          }
-          this.setState({ newlySelected: false });
+          handleDeselect(this.props.mapObject);
         }}
-        onDblClick={() => {
-          handleSelect(this.props.mapObject);
-          openBox(box.id);
-        }}
-        onDragStart={handleDragStart}
-        onDragMove={handleDragMove}
-        onDragEnd={handleDragEnd}
-        onMouseEnter={handleSetDropTarget}
-        onMouseLeave={handleUnsetDropTarget}
       >
-        {this.props.selected ? selected : null}
-        <Header
-          transform={transform}
-          inverseTransform={inverseTransform}
-          box={box}
-          x={0}
-          y={0}
-          width={width}
-          height={height}
-        />
-        {
-          isDirty &&
-          <Circle
-            x={width - style.dirty.padding.left}
-            y={style.dirty.padding.top}
-            radius={style.dirty.radius}
-            fill={style.dirty.color}
+        <Group
+          x={x}
+          y={y}
+          draggable={true}
+          onDblClick={() => {
+            handleSelect(this.props.mapObject);
+            openBox(box.id);
+          }}
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+          onMouseEnter={handleSetDropTarget}
+          onMouseLeave={handleUnsetDropTarget}
+        >
+          {this.props.selected ? selected : null}
+          <Header
+            transform={transform}
+            inverseTransform={inverseTransform}
+            box={box}
+            x={0}
+            y={0}
+            width={width}
+            height={height}
           />
-        }
-        {this.state.listDisplay === ListDisplay.COLLAPSED
-          ? null : boxCards(transform, inverseTransform, { cardHeight, width, height }, cards)}
-        <Toggle
-          transform={transform}
-          inverseTransform={inverseTransform}
-          x={0}
-          y={
-            height
-            + (this.state.listDisplay === ListDisplay.COLLAPSED
-               ? 0
-               : cardHeight * cards.length
-              )
+          {
+            isDirty &&
+            <Circle
+              x={width - style.dirty.padding.left}
+              y={style.dirty.padding.top}
+              radius={style.dirty.radius}
+              fill={style.dirty.color}
+            />
           }
-          width={width}
-          height={toggleHeight}
-          show={this.state.listDisplay === ListDisplay.EXPANDED}
-          action={this.handleToggleListDisplay}
-        />
-      </Group>
+          {this.state.listDisplay === ListDisplay.COLLAPSED
+            ? null : boxCards(transform, inverseTransform, { cardHeight, width, height }, cards)}
+          <Toggle
+            transform={transform}
+            inverseTransform={inverseTransform}
+            x={0}
+            y={
+              height
+              + (this.state.listDisplay === ListDisplay.COLLAPSED
+                ? 0
+                : cardHeight * cards.length
+                )
+            }
+            width={width}
+            height={toggleHeight}
+            show={this.state.listDisplay === ListDisplay.EXPANDED}
+            action={this.handleToggleListDisplay}
+          />
+        </Group>
+      </Selectable>
     );
   }
 }

@@ -50,7 +50,7 @@ export const initial: State = {
   boundingBox: emptyBoundingBox,
 };
 
-export const contains = (selection: State, id: ObjectID): Boolean =>
+export const contains = (selection: State, id: ObjectID): boolean =>
   selection.objects.indexOf(id) >= 0;
 
 export const get = (selection: State, index: number): ObjectID =>
