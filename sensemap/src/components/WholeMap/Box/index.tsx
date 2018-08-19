@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
+import Selectable from '../../Layout/Selectable';
 import { ObjectData, BoxID, BoxData } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
@@ -9,7 +10,7 @@ import { Event as KonvaEvent } from '../../../types/konva';
 
 interface OwnProps {
   mapObject: ObjectData;
-  selected?: Boolean;
+  selected?: boolean;
   onMouseOver?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onMouseOut?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
@@ -20,13 +21,9 @@ interface OwnProps {
   onOpen?(e: KonvaEvent.Mouse, data: BoxID): void;
 }
 
-interface OwnState {
-  newlySelected: boolean;
-}
-
 type Props = OwnProps & BoundingBox & BoxData & TransformerForProps;
 
-class Box extends React.PureComponent<Props, OwnState> {
+class Box extends React.PureComponent<Props> {
   static style = {
     backgroundColor: '#4d4d4d',
     borderRadius: 18,
@@ -81,7 +78,6 @@ class Box extends React.PureComponent<Props, OwnState> {
       onDragEnd = noop,
       onOpen = noop,
     } = this.props;
-    const { newlySelected } = this.state;
     const { x, y, width, height } = transform({
       x: this.props.x,
       y: this.props.y,
@@ -108,50 +104,49 @@ class Box extends React.PureComponent<Props, OwnState> {
     const textHeight = height - style.padding.top - style.padding.bottom;
 
     return (
-      <Group
-        draggable
-        x={x}
-        y={y}
-        onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
-        onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
-        onMouseDown={(e: KonvaEvent.Mouse) => {
+      <Selectable
+        selected={selected}
+        onSelect={(e: KonvaEvent.Mouse) => {
           e.cancelBubble = true;
-          if (selected) { return; }
-          this.setState({ newlySelected: true });
           onSelect(e, mapObject);
         }}
-        onClick={(e: KonvaEvent.Mouse) => {
+        onDeselect={(e: KonvaEvent.Mouse) => {
           e.cancelBubble = true;
-          if (!newlySelected) {
-            onDeselect(e, mapObject);
-          }
-          this.setState({ newlySelected: false });
+          onDeselect(e, mapObject);
         }}
-        onDblClick={(e: KonvaEvent.Mouse) => {
-          onSelect(e, mapObject);
-          onOpen(e, mapObject.data);
-        }}
-        onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
-        onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
-        onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
       >
-        {selectedRect}
-        <Rect
-          width={width}
-          height={height}
-          cornerRadius={style.borderRadius}
-          fill={style.backgroundColor}
-        />
-        <Text
-          x={style.padding.left}
-          y={style.padding.top}
-          width={textWidth}
-          height={textHeight}
-          fontSize={style.fontSize}
-          fill={style.color}
-          text={title}
-        />
-      </Group>
+        <Group
+          draggable
+          x={x}
+          y={y}
+          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
+          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
+          onDblClick={(e: KonvaEvent.Mouse) => {
+            onSelect(e, mapObject);
+            onOpen(e, mapObject.data);
+          }}
+          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
+          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
+          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
+        >
+          {selectedRect}
+          <Rect
+            width={width}
+            height={height}
+            cornerRadius={style.borderRadius}
+            fill={style.backgroundColor}
+          />
+          <Text
+            x={style.padding.left}
+            y={style.padding.top}
+            width={textWidth}
+            height={textHeight}
+            fontSize={style.fontSize}
+            fill={style.color}
+            text={title}
+          />
+        </Group>
+      </Selectable>
     );
   }
 }
