@@ -83,7 +83,7 @@ class WholeMap extends React.Component<Props, State> {
     }
   }
 
-  handleDeselect(e: KonvaEvent.Mouse, object: ObjectData) {
+  handleDeselect = (e: KonvaEvent.Mouse, object: ObjectData) => {
     const { actions: acts, inScope, selection } = this.props;
 
     acts.selection.removeObjectFromSelection(object.id);
@@ -103,7 +103,7 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   // XXX: duplicated
-  handleObjectDragMove(e: KonvaEvent.Mouse) {
+  handleObjectDragMove = (e: KonvaEvent.Mouse) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
@@ -117,7 +117,7 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   // XXX: duplicated
-  handleObjectDragEnd(e: KonvaEvent.Mouse) {
+  handleObjectDragEnd = (e: KonvaEvent.Mouse) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
@@ -164,6 +164,9 @@ class WholeMap extends React.Component<Props, State> {
             height={Box.style.height}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
+            onDragStart={this.handleObjectDragStart}
+            onDragMove={this.handleObjectDragMove}
+            onDragEnd={this.handleObjectDragEnd}
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
           />
@@ -190,6 +193,9 @@ class WholeMap extends React.Component<Props, State> {
             height={Card.style.height}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
+            onDragStart={this.handleObjectDragStart}
+            onDragMove={this.handleObjectDragMove}
+            onDragEnd={this.handleObjectDragEnd}
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
           />
