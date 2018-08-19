@@ -103,7 +103,7 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   // XXX: duplicated
-  handleObjectDragMove = (e: KonvaEvent.Mouse) => {
+  handleObjectDragMove = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
@@ -113,11 +113,11 @@ class WholeMap extends React.Component<Props, State> {
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
     this.props.actions.cachedStorage.updateObjects(objects);
-    this.setState({ prevDragPoint });
+    this.setState({ hoverObject, prevDragPoint });
   }
 
   // XXX: duplicated
-  handleObjectDragEnd = (e: KonvaEvent.Mouse) => {
+  handleObjectDragEnd = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
@@ -126,7 +126,7 @@ class WholeMap extends React.Component<Props, State> {
       const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
-    this.setState({ prevDragPoint: { x: 0, y: 0 } });
+    this.setState({ hoverObject, prevDragPoint: { x: 0, y: 0 } });
   }
 
   handleMouseOver = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
