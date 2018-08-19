@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
-import { ObjectData, BoxData } from '../../../types';
+import { ObjectData, BoxID, BoxData } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
@@ -17,6 +17,7 @@ interface OwnProps {
   onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onOpen?(e: KonvaEvent.Mouse, data: BoxID): void;
 }
 
 interface OwnState {
@@ -77,8 +78,10 @@ class Box extends React.PureComponent<Props, OwnState> {
       onDeselect = noop,
       onDragStart = noop,
       onDragMove = noop,
-      onDragEnd = noop
+      onDragEnd = noop,
+      onOpen = noop,
     } = this.props;
+    const { newlySelected } = this.state;
     const { x, y, width, height } = transform({
       x: this.props.x,
       y: this.props.y,
@@ -105,7 +108,33 @@ class Box extends React.PureComponent<Props, OwnState> {
     const textHeight = height - style.padding.top - style.padding.bottom;
 
     return (
-      <Group x={x} y={y}>
+      <Group
+        draggable
+        x={x}
+        y={y}
+        onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
+        onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
+        onMouseDown={(e: KonvaEvent.Mouse) => {
+          e.cancelBubble = true;
+          if (selected) { return; }
+          this.setState({ newlySelected: true });
+          onSelect(e, mapObject);
+        }}
+        onClick={(e: KonvaEvent.Mouse) => {
+          e.cancelBubble = true;
+          if (!newlySelected) {
+            onDeselect(e, mapObject);
+          }
+          this.setState({ newlySelected: false });
+        }}
+        onDblClick={(e: KonvaEvent.Mouse) => {
+          onSelect(e, mapObject);
+          onOpen(e, mapObject.data);
+        }}
+        onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
+        onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
+        onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
+      >
         {selectedRect}
         <Rect
           width={width}
@@ -121,19 +150,6 @@ class Box extends React.PureComponent<Props, OwnState> {
           fontSize={style.fontSize}
           fill={style.color}
           text={title}
-        />
-        <Rect
-          width={width}
-          height={height}
-          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
-          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
-          onMouseDown={
-            (e: KonvaEvent.Mouse) =>
-              selected ? onDeselect(e, mapObject) : onSelect(e, mapObject)
-          }
-          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
-          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
-          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
         />
       </Group>
     );

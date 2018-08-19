@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Group, Rect } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
-import { ObjectData, CardData, CardType } from '../../../types';
+import { ObjectData, CardID, CardData, CardType } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
@@ -17,11 +17,16 @@ interface OwnProps {
   onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
+  onOpen?(e: KonvaEvent.Mouse, data: CardID): void;
 }
 
 type Props = OwnProps & BoundingBox & CardData & TransformerForProps;
 
-class Card extends React.PureComponent<Props> {
+type OwnState = {
+  newlySelected: boolean;
+};
+
+class Card extends React.PureComponent<Props, OwnState> {
   static style = {
     backgroundColor: {
       [CardType.ANSWER]: '#c0e2d8',
@@ -49,6 +54,10 @@ class Card extends React.PureComponent<Props> {
     }
   };
 
+  state = {
+    newlySelected: false,
+  };
+
   render() {
     const {
       transform,
@@ -62,7 +71,9 @@ class Card extends React.PureComponent<Props> {
       onDragStart = noop,
       onDragMove = noop,
       onDragEnd = noop,
+      onOpen = noop,
     } = this.props;
+    const { newlySelected } = this.state;
     // TODO: should I use the object dimension or the style dimension?
     const { x, y, width, height } = transform({
       x: this.props.x,
@@ -87,22 +98,39 @@ class Card extends React.PureComponent<Props> {
     );
 
     return (
-      <Group x={x} y={y}>
+      <Group
+        draggable
+        x={x}
+        y={y}
+        onMouseDown={(e: KonvaEvent.Mouse) => {
+          e.cancelBubble = true;
+          if (selected) { return; }
+          this.setState({ newlySelected: true });
+          onSelect(e, mapObject);
+        }}
+        onClick={(e: KonvaEvent.Mouse) => {
+          e.cancelBubble = true;
+          if (!newlySelected) {
+            onDeselect(e, mapObject);
+          }
+          this.setState({ newlySelected: false });
+        }}
+        onDblClick={(e: KonvaEvent.Mouse) => {
+          onSelect(e, mapObject);
+          onOpen(e, mapObject.data);
+        }}
+        onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
+        onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
+        onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
+        onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
+        onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
+      >
         {selectedRect}
         <Rect
           width={width}
           height={height}
           cornerRadius={style.borderRadius}
           fill={style.backgroundColor[cardType]}
-          onMouseDown={
-            (e: KonvaEvent.Mouse) =>
-              selected ? onDeselect(e, mapObject) : onSelect(e, mapObject)
-          }
-          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
-          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
-          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
-          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
-          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
         />
       </Group>
     );
