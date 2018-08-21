@@ -31,6 +31,14 @@
   transition: left .5s ease;
 }
 
+.map-page .inspector__btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  transition: right .5s ease;
+}
+
 .map-page .map-page__login-hint {
   position: absolute;
   left: 16px;

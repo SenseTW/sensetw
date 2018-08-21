@@ -83,7 +83,9 @@ class ObjectContent extends React.PureComponent<Props> {
 
     return (
       <div className="object-content">
-        {content}
+        <div className="object-content__content">
+          {content}
+        </div>
         {!disabled && <Divider />}
         {
           !disabled &&
