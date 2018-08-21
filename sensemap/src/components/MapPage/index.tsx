@@ -9,7 +9,7 @@ import WholeMap from '../../components/WholeMap';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
-import InboxToggler from '../InboxToggler';
+import SidebarToggler from '../SidebarToggler';
 import {
   MapID,
   CardData,
@@ -89,6 +89,7 @@ class MapPage extends React.Component<Props> {
     } = this.props;
     const { status, focus } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
+    const isInspectorOpen = editor.status === OE.StatusType.SHOW;
 
     let data: BoxData | CardData | null = null;
     let isDirty: boolean = false;
@@ -233,7 +234,7 @@ class MapPage extends React.Component<Props> {
             {
               isAuthenticated
                 ? (
-                  <InboxToggler
+                  <SidebarToggler
                     className="inbox__btn"
                     style={{ left: isInboxVisible ? 350 : 0 }}
                     open={isInboxVisible}
@@ -254,6 +255,17 @@ class MapPage extends React.Component<Props> {
                   </div>
                 )
             }
+            <SidebarToggler
+              right
+              className="inspector__btn"
+              style={{ right: isInspectorOpen ? 350 : 0 }}
+              open={isInspectorOpen}
+              onToggle={open =>
+                open
+                  ? acts.editor.changeStatus(OE.StatusType.SHOW)
+                  : acts.editor.changeStatus(OE.StatusType.HIDE)
+              }
+            />
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>

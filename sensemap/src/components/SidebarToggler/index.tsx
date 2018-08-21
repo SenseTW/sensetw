@@ -7,13 +7,16 @@ interface Props {
   className?: string;
   // tslint:disable-next-line:no-any
   style?: any;
+  right?: boolean;
   open: boolean;
   onToggle?(open: boolean): void;
 }
 
-class InboxToggler extends React.PureComponent<Props> {
+class SidebarToggler extends React.PureComponent<Props> {
   render() {
-    const { className = '', style, open, onToggle = U.noop } = this.props;
+    const { className = '', style, right = false, open, onToggle = U.noop } = this.props;
+    const openIconName = right ? 'caret right' : 'caret left';
+    const closeIconName = right ? 'caret left' : 'caret right';
 
     return (
       <div
@@ -21,14 +24,10 @@ class InboxToggler extends React.PureComponent<Props> {
         style={style}
         onClick={() => onToggle(!open)}
       >
-      {
-        open
-          ? <Icon name="caret left" />
-          : <Icon name="caret right" />
-      }
+      <Icon name={open ? openIconName : closeIconName} />
       </div>
     );
   }
 }
 
-export default InboxToggler;
+export default SidebarToggler;
