@@ -291,9 +291,10 @@ const removeCardFromBox =
 const removeCardsFromBox =
   (cardObjects: ObjectID[], box: BoxID) =>
   async (dispatch: Dispatch) => {
-    await Promise.all(
-      cardObjects.map(id => removeCardFromBox(id, box)(dispatch))
-    );
+    await Promise.all(cardObjects.map(
+      id => G.removeCardFromBox(id, box)
+        .then(() => dispatch(CS.updateNotInBox(id, box, TargetType.PERMANENT)))
+    ));
     return dispatch(SL.actions.clearSelection());
   };
 
@@ -309,6 +310,18 @@ const removeObject =
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
     return GO.remove(objectID)
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => loadObjects(map, true)(dispatch))
+      .then(() => loadCards(map, true)(dispatch))
+      .then(() => loadBoxes(map, true)(dispatch));
+  };
+
+const removeObjects =
+  (objectIDList: ObjectID[]) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseMap: { map } } = getState();
+    const ps = objectIDList.map(id => GO.remove(id));
+    return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
       .then(() => loadObjects(map, true)(dispatch))
       .then(() => loadCards(map, true)(dispatch))
@@ -338,6 +351,18 @@ const removeBox =
     const { senseMap: { map } } = getState();
     return GB.remove(boxID)
       .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => loadBoxes(map, true)(dispatch))
+      .then(() => loadObjects(map, true)(dispatch));
+  };
+
+const removeBoxes =
+  (boxIDList: BoxID[]) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseMap: { map } } = getState();
+    const ps = boxIDList.map(boxID => GB.remove(boxID));
+    return Promise.all(ps)
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => loadCards(map, true)(dispatch))
       .then(() => loadBoxes(map, true)(dispatch))
       .then(() => loadObjects(map, true)(dispatch));
   };
@@ -385,6 +410,7 @@ export const actions = {
   updateBox,
   saveBox,
   removeBox,
+  removeBoxes,
   loadMaps,
   cleanUp,
   loadObjects,
@@ -404,6 +430,7 @@ export const actions = {
   unboxCards,
   removeMap,
   removeObject,
+  removeObjects,
   removeCardWithObject,
   removeBoxWithObject,
   removeEdge,
