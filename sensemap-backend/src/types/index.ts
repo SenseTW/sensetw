@@ -60,7 +60,6 @@ export const typeDefs = gql`
       tags: String,
       image: String,
       type: String,
-      ownerId: ID,
       boxesIds: [ID!],
       cardsIds: [ID!],
       edgesIds: [ID!],
@@ -87,7 +86,6 @@ export const typeDefs = gql`
       tags: String,
       image: String,
       type: String,
-      ownerId: ID,
     ): Map
     updateBox(
       id: ID!,
@@ -243,6 +241,7 @@ export const typeDefs = gql`
     objects: [Object!]! @relation(name: "ObjectCard")
     mapId: ID
     map: Map @relation(name: "MapCards")
+    owner: User
   }
 
   type Box @model {

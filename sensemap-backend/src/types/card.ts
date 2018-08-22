@@ -2,6 +2,7 @@ import { ID, Map, Card, CardType, cardFields, cardDataFields, cardWithTargetFiel
 import { getMap, getCardsInMap, MapFilter } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
+import * as A from './oauth';
 
 export type CardFilter = {
   id?: ID;
@@ -107,7 +108,10 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createCard: async (_, args, { db }, info) => {
+    createCard: async (_, args, { db, authorization }, info) => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      args.ownerId = !!u ? u.id : null;
+      console.log(u, authorization);
       return createCard(db, args);
     },
 
@@ -134,5 +138,6 @@ export const resolvers = {
     mapId:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.mapId       : (await getCard(db, o)).mapId,
     map:         async (o, _, { db }, info): Promise<Map>      => typeof(o) !== 'string' ? o.map         : (await getCard(db, o)).mapId,
     objects:     async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects : getObjectsForCard(db, o),
+    owner:       async (o, _, { db }, info): Promise<Map>      => typeof(o) !== 'string' ? o.owner       : (await getCard(db, o)).ownerId,
   },
 };
