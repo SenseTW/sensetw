@@ -34,7 +34,10 @@ function CardActions({ card, actions: acts, senseMap }: Props) {
         icon="plus square outline"
         onClick={() => acts.senseObject.createObjectForCard(senseMap.map, card.id, box)}
       />
-      <Button icon="trash" />
+      <Button
+        icon="trash"
+        onClick={() => acts.senseObject.removeCardWithObject(card.id)}
+      />
     </div>
   );
 }
