@@ -88,14 +88,16 @@ export type Card = HasID & HasTimestamps & {
   title: string,
   url: string,
   mapId: ID,
+  ownerId: ID,
 }
 
-export const cardDataFields = [ 'cardType', 'description', 'saidBy', 'stakeholder', 'summary', 'tags', 'title', 'url', 'mapId' ];
+export const cardDataFields = [ 'cardType', 'description', 'saidBy', 'stakeholder', 'summary', 'tags', 'title', 'url', 'mapId', 'ownerId' ];
 
 export const cardFields = (db) => [
   ...hasTimestampFields,
   ...cardDataFields,
   db.column('mapId').as('map'),
+  db.column('ownerId').as('owner'),
   db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"cardId" = "card"."id"')),
 ];
 
