@@ -150,18 +150,31 @@ class ObjectMenu extends React.PureComponent<Props> {
     const { isAuthenticated } = this.props;
     if (!isAuthenticated) { return false; }
 
-    const { cards } = selectedCardsAndBoxes(this.props);
-    return cards.length === 1;
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    return cards.length > 0 || boxes.length > 0;
   }
 
   async handleDeleteCard() {
-    const { actions: acts, senseObject, selection } = this.props;
-    const { id, data } = CS.getObject(senseObject, SL.get(selection, 0));
-    const card = CS.getCard(senseObject, data);
-    // remove the card container object
-    await acts.senseObject.removeObject(id);
-    // clear any local modifications
-    acts.cachedStorage.removeCard(card);
+    const { actions: acts, senseObject } = this.props;
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    try {
+      if (cards.length > 0) {
+        // remove card container objects
+        // we don't remove cards and leave them in the inbox
+        await acts.senseObject.removeObjects(cards);
+      }
+      if (boxes.length > 0) {
+        const boxIDList =
+          boxes.map(objID => CS.getObject(senseObject, objID).data as T.BoxID);
+        // remove box container objects
+        await acts.senseObject.removeObjects(boxes);
+        // remove boxes
+        await acts.senseObject.removeBoxes(boxIDList);
+      }
+    } catch (err) {
+      // tslint:disable-next-line:no-console
+      console.error(err);
+    }
     acts.editor.focusObject(F.focusNothing());
   }
 
