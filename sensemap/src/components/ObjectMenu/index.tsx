@@ -9,7 +9,6 @@ import Edge from '../SVGIcon/Edge';
 import RemoveEdge from '../SVGIcon/RemoveEdge';
 import Copy from '../SVGIcon/Copy';
 import Delete from '../SVGIcon/Delete';
-import BatchTag from '../SVGIcon/BatchTag';
 import BoxCard from '../SVGIcon/BoxCard';
 import OpenBox from '../SVGIcon/OpenBox';
 import Eject from '../SVGIcon/Eject';
@@ -279,12 +278,11 @@ class ObjectMenu extends React.PureComponent<Props> {
     const canRemoveEdge = this.canRemoveEdge();
     const canCopy = this.canCopy();
     const canDeleteCard = this.canDeleteCard();
-    const canBatchTag = this.canBatchTag();
     const canAddCard = this.canAddCard();
     const canOpenBox = this.canOpenBox();
     const canRemoveCard = this.canRemoveCard();
     const showSecondMenu =
-      canCopy || canDeleteCard || canBatchTag || canAddCard || canOpenBox || canRemoveCard;
+      canCopy || canDeleteCard || canAddCard || canOpenBox || canRemoveCard;
     // setup the popup props and force the position to be a string literal
     const popupProps = { inverted: true, position: 'bottom center' as 'bottom center' };
 
@@ -377,14 +375,6 @@ class ObjectMenu extends React.PureComponent<Props> {
                 {...popupProps}
                 trigger={<Menu.Item onClick={() => this.handleDeleteCard()}><Delete /></Menu.Item>}
                 content="Delete"
-              />
-            }
-            {
-              canBatchTag &&
-              <Popup
-                {...popupProps}
-                trigger={<Menu.Item disabled onClick={U.noop}><BatchTag /></Menu.Item>}
-                content="Batch Tag"
               />
             }
             {

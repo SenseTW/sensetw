@@ -348,8 +348,11 @@ const removeCardWithObject =
 const removeBox =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    return GB.remove(boxID)
+    const { senseMap: { map }, senseObject } = getState();
+    const box = CS.getBox(senseObject, boxID);
+    const objects = Object.keys(box.contains);
+    return removeObjects(objects)(dispatch, getState)
+      .then(() => GB.remove(boxID))
       .then(() => dispatch(SL.actions.clearSelection()))
       .then(() => loadBoxes(map, true)(dispatch))
       .then(() => loadObjects(map, true)(dispatch));
@@ -358,11 +361,16 @@ const removeBox =
 const removeBoxes =
   (boxIDList: BoxID[]) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    const ps = boxIDList.map(boxID => GB.remove(boxID));
+    const { senseMap: { map }, senseObject } = getState();
+    const ps = boxIDList.map(boxID => {
+      const box = CS.getBox(senseObject, boxID);
+      // remove all objects from the box
+      const objects = Object.keys(box.contains);
+      return removeObjects(objects)(dispatch, getState)
+        .then(() => GB.remove(boxID));
+    });
     return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => loadCards(map, true)(dispatch))
       .then(() => loadBoxes(map, true)(dispatch))
       .then(() => loadObjects(map, true)(dispatch));
   };
