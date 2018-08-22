@@ -31,8 +31,8 @@ const db = Knex({
 });
 
 export const context = ({ req = null } = {}) => {
-  const user = null;
-  return { db, env, user };
+  const authorization = !!req ? req.headers.authorization : null;
+  return { db, env, authorization };
 };
 
 export type Context = typeof context;
