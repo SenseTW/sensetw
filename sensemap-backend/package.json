@@ -52,7 +52,8 @@
     "typescript": "^2.9.1"
   },
   "dependencies": {
-    "apollo-server": "^2.0.0-beta.4",
+    "apollo-server": "^2.0.5",
+    "apollo-server-express": "^2.0.4",
     "async-file": "^2.0.2",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",

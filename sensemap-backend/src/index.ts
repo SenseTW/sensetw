@@ -8,8 +8,7 @@ import * as session from 'express-session';
 import * as cors from 'cors';
 import flash = require('connect-flash');
 import * as passport from 'passport';
-import { registerServer } from 'apollo-server-express';
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './types'
 import { context } from './context';
 import { router as Login } from './login';
@@ -50,6 +49,6 @@ app.use('/h/api', Hypothesis(context));
 app.use(HypothesisClient(context));
 
 const server = new ApolloServer({ typeDefs, resolvers, context });
-registerServer({ server, app });
+server.applyMiddleware({ app });
 
 app.listen(PORT, () => console.log(`Listening at port ${PORT}`));
