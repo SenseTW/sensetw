@@ -4,6 +4,7 @@ import { objectsQuery } from './object';
 import { boxesQuery } from './box';
 import { cardsQuery } from './card';
 import { edgesQuery } from './edge';
+import * as A from './oauth';
 
 export type MapFilter = {
   id?: ID;
@@ -86,7 +87,9 @@ export const resolvers = {
   },
 
   Mutation: {
-    createMap: async (_, args, { db }, info): Promise<Map> => {
+    createMap: async (_, args, { db, authorization }, info): Promise<Map> => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      args.ownerId = !!u ? u.id : null;
       return createMap(db, args);
     },
 
