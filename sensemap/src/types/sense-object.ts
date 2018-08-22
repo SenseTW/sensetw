@@ -17,15 +17,16 @@ import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
 import * as SM from './sense-map';
+import * as SN from './session';
 
 export type State = CachedStorage;
 
 export const initial: State = CS.initial;
 
 const createMap =
-  (map: MapData) =>
+  (map: MapData, user: SN.User) =>
   async (dispatch: Dispatch) => {
-    return GM.create(map)
+    return GM.create(map, user)
       .then((newMap) => {
         // add the new map
         dispatch(CS.updateMaps(
