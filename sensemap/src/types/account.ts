@@ -77,7 +77,7 @@ const loginRequest = () => (dispatch: Dispatch) => {
       const token = await tokenRequest(code);
       const profile = await profileRequest(token.access_token);
       await sessionService.saveSession({ token });
-      await sessionService.saveUser(profile);
+      await sessionService.saveUser({ ...profile, ...token });
       return dispatch(loginSuccess());
     })
     .catch((err) => dispatch(loginFailure(err)));
