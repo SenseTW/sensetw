@@ -1,26 +1,11 @@
 import { sessionService } from 'redux-react-session';
 import { ActionUnion, emptyAction } from './action';
+import { profileRequest, tokenRequest, AuthorizationCode } from './auth';
 import { Dispatch } from './redux';
-import axios from 'axios';
-import * as qs from 'qs';
-import { pick } from 'ramda';
 import { sanitizeURL } from './utils';
 
 const apiRoot = sanitizeURL(process.env.REACT_APP_SENSEMAP_API_ROOT) || 'https://api.sense.tw';
-
-// XXX should be in session
-/*
-type Token = {
-  access_token: string,
-  refresh_token: string,
-};
-*/
-
-type Profile = {
-  id: string,
-  email: string,
-  username: string,
-};
+const loginURL = `${apiRoot}/login`;
 
 export type State = {
     username: string,
@@ -73,45 +58,6 @@ const loginFailure = (errorMsg: string) => {
   };
 };
 
-type AuthorizationCode = {
-  type: 'authorization_response',
-  code: string,
-  state: string,
-};
-
-const tokenRequest = (authCode: AuthorizationCode) => {
-  const { code } = authCode;
-  return axios
-    .post(
-      `${apiRoot}/h/token`,
-      qs.stringify({
-        client_id: '00e468bc-c948-11e7-9ada-33c411fb1c8a',
-        grant_type: 'authorization_code',
-        code,
-        client_secret: 'thereisnospoon',
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }
-    )
-    .then(({ data }) => ({
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-    }));
-};
-
-const profileRequest = (token: string): Promise<Profile> => {
-  return axios
-    .get(`${apiRoot}/h/api/profile`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-    .then(({ data }) => data.sense_user);
-};
-
 const loginRequest = () => (dispatch: Dispatch) => {
   return new Promise(resolve => {
     // tslint:disable:no-any
@@ -123,13 +69,13 @@ const loginRequest = () => (dispatch: Dispatch) => {
     };
     const login = window.open('about:blank', 'Login to Sensemap');
     if (login) {
-      login.location.href = `${apiRoot}/login`;
+      login.location.href = loginURL;
       window.addEventListener('message', receiveCode);
     }
   })
     .then(async (code: AuthorizationCode) => {
-      const token = pick(['access_token', 'refresh_token'], await tokenRequest(code));
-      const profile = pick(['id', 'email', 'username'], await profileRequest(token.access_token));
+      const token = await tokenRequest(code);
+      const profile = await profileRequest(token.access_token);
       await sessionService.saveSession({ token });
       await sessionService.saveUser(profile);
       return dispatch(loginSuccess());
