@@ -46,7 +46,7 @@ export const loadMaps =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client.request(query)
+    return client().request(query)
       .then(({ allMaps }) => allMaps.map(toMapData));
   };
 
@@ -61,7 +61,7 @@ export const create =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client.request(query, map)
+    return client().request(query, map)
       .then(({ createMap }) => toMapData(createMap));
   };
 
@@ -76,7 +76,7 @@ export const update =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client.request(query, map)
+    return client().request(query, map)
       .then(({ updateMap }) => toMapData(updateMap));
   };
 
@@ -90,6 +90,6 @@ export const remove =
       ${graphQLUserFieldsFragment}
     `;
     const variables = { mapID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ deleteMap }) => toMapData(deleteMap));
   };

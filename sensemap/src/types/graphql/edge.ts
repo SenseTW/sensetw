@@ -35,7 +35,7 @@ export const load =
       ${graphQLEdgeFieldsFragment}
     `;
     const variables = { id };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ allEdges }) => allEdges.map(toEdge));
   };
 
@@ -54,7 +54,7 @@ export const create =
       ${graphQLEdgeFieldsFragment}
     `;
     const variables = { map, from, to };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ createEdge }) => toEdge(createEdge));
   };
 
@@ -69,5 +69,5 @@ export const remove =
     `;
     const variables = { edge };
     // XXX Graphcool return value lacks map, from, to?
-    return client.request(query, variables);
+    return client().request(query, variables);
   };

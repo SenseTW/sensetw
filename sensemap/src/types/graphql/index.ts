@@ -15,7 +15,7 @@ export const addCardToBox =
       }
     `;
     const variables = { cardObject, box };
-    return client.request(query, variables);
+    return client().request(query, variables);
   };
 
 export const removeCardFromBox =
@@ -28,7 +28,7 @@ export const removeCardFromBox =
       }
     `;
     const variables = { cardObject, box };
-    return client.request(query, variables);
+    return client().request(query, variables);
   };
 
 export const deleteObjectsByCard =
@@ -40,7 +40,7 @@ export const deleteObjectsByCard =
       ${GC.graphQLCardFieldsFragment}
     `;
     const variables = { cardID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ Card }: { Card: { objects: { id: ObjectID }[] } }) =>
             Card.objects.map(({ id }) => id))
       .then((ids) => Promise.all(ids.map(GO.remove)));
@@ -54,7 +54,7 @@ export const deleteObjectsByBox =
       }
     `;
     const variables = { boxID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
             Box.objects.map(({ id }) => id))
       .then((ids) => Promise.all(ids.map(GO.remove)));

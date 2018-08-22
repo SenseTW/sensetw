@@ -56,7 +56,7 @@ export const loadCards =
       }
     `;
     const variables = { id };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData));
   };
 
@@ -90,7 +90,7 @@ export const create =
       }
       ${graphQLCardFieldsFragment}
     `;
-    return client.request(query, { ...card, mapId })
+    return client().request(query, { ...card, mapId })
       .then(({ createCard }) => toCardData(createCard));
   };
 
@@ -124,7 +124,7 @@ export const update =
       }
       ${graphQLCardFieldsFragment}
     `;
-    return client.request(query, card)
+    return client().request(query, card)
       .then(({ updateCard }) => toCardData(updateCard));
   };
 
@@ -137,6 +137,6 @@ export const remove =
       ${graphQLCardFieldsFragment}
     `;
     const variables = { cardID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ deleteCard }) => toCardData(deleteCard));
   };
