@@ -9,4 +9,4 @@ export const endpoint
           ? `${sanitizeURL(process.env.REACT_APP_SENSEMAP_API_ROOT)}/graphql`
           : 'https://api.sense.tw/graphql';
 
-export const client = new GraphQLClient(endpoint);
+export const client = () => new GraphQLClient(endpoint);
