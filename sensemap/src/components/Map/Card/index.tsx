@@ -35,7 +35,7 @@ const color = {
 };
 
 const summaryLimit = 39;
-const titleLimit = 32;
+const descriptionLimit = 64;
 
 class Card extends React.Component<Props, State> {
   static style = {
@@ -50,7 +50,7 @@ class Card extends React.Component<Props, State> {
       },
       color: '#3ad8fa',
     },
-    title: {
+    description: {
       padding: {
         top: 12 + 22 * 3,
         right: 10,
@@ -59,8 +59,8 @@ class Card extends React.Component<Props, State> {
       },
       fontFamily: 'sans-serif',
       fontSize: 13,
-      lineHeight: 26 / 13,
-      height: 32,
+      lineHeight: 20 / 13,
+      height: 64,
       color: '#5a5a5a',
     },
     summary: {
@@ -111,14 +111,14 @@ class Card extends React.Component<Props, State> {
       width: this.props.mapObject.width,
       height: this.props.mapObject.height,
     });
-    const {title, summary, cardType, tags} = this.props.card;
+    const {summary, description, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
-    const sanitizedTitle   = title.substr(0, titleLimit);
+    const sanitizedDescription   = description.substr(0, descriptionLimit);
     const tagHeight = this.state.tagHeight;
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
     const summaryWidth = width - style.summary.padding.left - style.summary.padding.right;
-    const titleWidth = width - style.title.padding.left - style.title.padding.right;
+    const descriptionWidth = width - style.description.padding.left - style.description.padding.right;
 
     const handleSelect    = this.props.handleSelect    || noop;
     const handleDeselect  = this.props.handleDeselect  || noop;
@@ -196,16 +196,16 @@ class Card extends React.Component<Props, State> {
             text={sanitizedSummary}
           />
           <Text
-            x={style.title.padding.left}
-            y={style.title.padding.top}
-            width={titleWidth}
-            height={style.title.height}
-            padding={style.title.padding.left}
-            fontSize={style.title.fontSize}
-            fontFamily={style.title.fontFamily}
-            lineHeight={style.title.lineHeight}
-            fill={style.title.color}
-            text={sanitizedTitle}
+            x={style.description.padding.left}
+            y={style.description.padding.top}
+            width={descriptionWidth}
+            height={style.description.height}
+            padding={style.description.padding.left}
+            fontSize={style.description.fontSize}
+            fontFamily={style.description.fontFamily}
+            lineHeight={style.description.lineHeight}
+            fill={style.description.color}
+            text={sanitizedDescription}
           />
           <TagList
             transform={transform}
