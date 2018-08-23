@@ -36,6 +36,14 @@ export async function createMap(db, args: Map): Promise<Map> {
 export async function updateMap(db, id: ID, args): Promise<Map> {
   const fields = pick(mapDataFields, args);
   const rows = await db('map').where('id', id).update(fields).returning(mapFields(db));
+  await updateMapUpdatedAt(db, id);
+  return rows[0];
+}
+
+export async function updateMapUpdatedAt(db, id: ID): Promise<Map> {
+  const rows = await db('map').where('id', id)
+    .update({ updatedAt: new Date() })
+    .returning(mapFields(db));
   return rows[0];
 }
 
