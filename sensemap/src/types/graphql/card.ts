@@ -3,6 +3,7 @@ import { ObjectID } from '../sense/object';
 import { MapID } from '../sense/map';
 import { CardID, CardData, stringToType as stringToCardType } from '../sense/card';
 import { client } from './client';
+import * as SN from '../session';
 import * as moment from 'moment';
 
 export const graphQLCardFieldsFragment = `
@@ -61,7 +62,7 @@ export const loadCards =
   };
 
 export const create =
-  (mapId: MapID, card: CardData) => {
+  (mapId: MapID, card: CardData, user: SN.User) => {
     const query = `
       mutation CreateCard(
         $title: String,
@@ -90,7 +91,7 @@ export const create =
       }
       ${graphQLCardFieldsFragment}
     `;
-    return client().request(query, { ...card, mapId })
+    return client(user).request(query, { ...card, mapId })
       .then(({ createCard }) => toCardData(createCard));
   };
 

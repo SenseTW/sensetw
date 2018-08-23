@@ -57,9 +57,9 @@ const saveMap =
   };
 
 const createCard =
-  (mapId: MapID, card: CardData) =>
+  (mapId: MapID, card: CardData, user: SN.User) =>
   async (dispatch: Dispatch) => {
-    return GC.create(mapId, card)
+    return GC.create(mapId, card, user)
       .then((newCard) => dispatch(
         CS.updateCards(
           H.toIDMap<CardID, CardData>([newCard]),
@@ -257,9 +257,9 @@ const createObjectForCard =
   };
 
 const createCardObject =
-  (mapId: MapID, card: CardData) =>
+  (mapId: MapID, card: CardData, user: SN.User) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const action = await createCard(mapId, card)(dispatch);
+    const action = await createCard(mapId, card, user)(dispatch);
     const { id = '' } = Object.values(action.payload.cards)[0] || {};
     return createObjectForCard(mapId, id)(dispatch, getState);
   };
