@@ -3,6 +3,8 @@ import { Header, Form, TextArea, Input, Message } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import * as C from '../../types/sense/card';
 import { isURL, isLength } from 'validator';
+import * as moment from 'moment';
+import * as U from '../../types/utils';
 
 interface Props {
   disabled?: boolean;
@@ -18,14 +20,16 @@ class CardContent extends React.PureComponent<Props> {
 
   render() {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
-    const { title, summary, description, tags, url, saidBy, stakeholder, cardType } = data;
+    const { title, summary, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
     const isURLValid = isURL(url, { require_protocol: true });
     const isDescriptionInvalid = !isLength(description, { max: 5000});
+    const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
     return (
       <Form className="card-content" error={isDescriptionInvalid}>
         <Header as="h3" color="grey">
-        CARD INSPECTOR
+          CARD INSPECTOR
+          <h4>last updated on {updateTime}</h4>
         </Header>
         <Form.Field className="card-content__summary">
           <label>Summary</label>
