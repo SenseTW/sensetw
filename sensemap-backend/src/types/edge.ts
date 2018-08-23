@@ -1,5 +1,5 @@
 import { ID, Map, SenseObject, Edge, edgeFields, edgeDataFields } from './sql';
-import { getMap, getEdgesInMap } from './map';
+import { getMap, getEdgesInMap, updateMapUpdatedAt } from './map';
 import { getObject } from './object';
 import { pick } from 'ramda';
 
@@ -19,17 +19,20 @@ export async function getEdge(db, id: ID): Promise<Edge | null> {
 export async function createEdge(db, args): Promise<Edge> {
   const fields = pick(edgeDataFields, args);
   const rows = await db('edge').insert(fields).returning(edgeFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function updateEdge(db, id: ID, args): Promise<Edge | null> {
   const fields = pick(edgeDataFields, args);
   const rows = await db('edge').where('id', id).update(fields).returning(edgeFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function deleteEdge(db, id: ID): Promise<Edge | null> {
   const rows = await db('edge').where('id', id).delete().returning(edgeFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 

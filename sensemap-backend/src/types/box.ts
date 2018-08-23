@@ -1,5 +1,5 @@
-import { ID, Map, Box, boxFields, boxDataFields, SenseObject } from './sql';
-import { getMap, getBoxesInMap } from './map';
+import { ID, Map, Box, boxFields, objectFields, boxDataFields, SenseObject } from './sql';
+import { getMap, getBoxesInMap, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
 
@@ -27,22 +27,26 @@ export async function getObjectsInBox(db, id: ID): Promise<SenseObject[]> {
 export async function createBox(db, args): Promise<Box> {
   const fields = pick(boxDataFields, args);
   const rows = await db('box').insert(fields).returning(boxFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function deleteBox(db, id: ID): Promise<Box> {
   const rows = await db('box').where('id', id).delete().returning(boxFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function updateBox(db, id: ID, args): Promise<Box | null> {
   const fields = pick(boxDataFields, args);
   const rows = await db('box').where('id', id).update(fields).returning(boxFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function addObjectToBox(db, obj: ID, box: ID) {
-  await db('object').where('id', obj).update({ belongsToId: box });
+  const rows = await db('object').where('id', obj).update({ belongsToId: box }).returning(objectFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return {
     containsObject: obj,
     belongsToBox: box,
@@ -50,7 +54,8 @@ export async function addObjectToBox(db, obj: ID, box: ID) {
 }
 
 export async function removeObjectFromBox(db, obj: ID, box: ID) {
-  await db('object').where('id', obj).update({ belongsToId: db.raw('NULL') });
+  const rows = await db('object').where('id', obj).update({ belongsToId: db.raw('NULL') }).returning(objectFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return {
     containsObject: obj,
     belongsToBox: box,

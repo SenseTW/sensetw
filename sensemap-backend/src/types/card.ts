@@ -1,5 +1,5 @@
 import { ID, Map, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
-import { getMap, getCardsInMap, MapFilter } from './map';
+import { getMap, getCardsInMap, MapFilter, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
 import * as A from './oauth';
@@ -79,17 +79,20 @@ export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
 export async function createCard(db, args): Promise<Card> {
   const fields = pick(cardDataFields, args);
   const rows = await db('card').insert(fields).returning(cardFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function deleteCard(db, id: ID): Promise<Card | null> {
   const rows = await db('card').where('id', id).delete().returning(cardFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function updateCard(db, id: ID, args): Promise<Card | null> {
   const fields = pick(cardDataFields, args);
   const rows = await db('card').where('id', id).update(fields).returning(cardFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
