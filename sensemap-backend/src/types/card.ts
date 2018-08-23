@@ -111,7 +111,6 @@ export const resolvers = {
     createCard: async (_, args, { db, authorization }, info) => {
       const u = await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
-      console.log(u, authorization);
       return createCard(db, args);
     },
 
