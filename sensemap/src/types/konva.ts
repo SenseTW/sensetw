@@ -22,6 +22,14 @@ export namespace Event {
       cancelBubble: boolean;
   }
 
+  export interface Touch {
+    type: 'touchstart' | 'touchmove' | 'touchend';
+    target: Node & { nodeType: NodeType };
+    currentTarget: Node;
+    evt: TouchEvent;
+    cancelBubble: boolean;
+  }
+
   export interface MouseWheel {
       type: 'mousewheel';
       target: Node;

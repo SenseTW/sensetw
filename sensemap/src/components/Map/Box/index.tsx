@@ -33,6 +33,9 @@ interface OwnProps {
   handleDragStart?(e: KonvaEvent.Mouse): void;
   handleDragMove?(e: KonvaEvent.Mouse): void;
   handleDragEnd?(e: KonvaEvent.Mouse): void;
+  handleTouchStart?(e: KonvaEvent.Touch): void;
+  handleTouchMove?(e: KonvaEvent.Touch): void;
+  handleTouchEnd?(e: KonvaEvent.Touch): void;
   openBox?(box: T.BoxID): void;
 }
 
@@ -115,11 +118,14 @@ class Box extends React.Component<Props, State> {
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
 
-    const handleSelect    = this.props.handleSelect    || noop;
-    const handleDeselect  = this.props.handleDeselect  || noop;
-    const handleDragStart = this.props.handleDragStart || noop;
-    const handleDragMove  = this.props.handleDragMove  || noop;
-    const handleDragEnd   = this.props.handleDragEnd   || noop;
+    const handleSelect     = this.props.handleSelect     || noop;
+    const handleDeselect   = this.props.handleDeselect   || noop;
+    const handleDragStart  = this.props.handleDragStart  || noop;
+    const handleDragMove   = this.props.handleDragMove   || noop;
+    const handleDragEnd    = this.props.handleDragEnd    || noop;
+    const handleTouchStart = this.props.handleTouchStart || noop;
+    const handleTouchMove  = this.props.handleTouchMove  || noop;
+    const handleTouchEnd   = this.props.handleTouchEnd   || noop;
     const handleSetDropTarget   = this.props.handleSetDropTarget   || noop;
     const handleUnsetDropTarget = this.props.handleUnsetDropTarget || noop;
     const openBox         = this.props.openBox         || noop;
@@ -158,6 +164,9 @@ class Box extends React.Component<Props, State> {
           onDragStart={handleDragStart}
           onDragMove={handleDragMove}
           onDragEnd={handleDragEnd}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
           onMouseEnter={handleSetDropTarget}
           onMouseLeave={handleUnsetDropTarget}
         >
