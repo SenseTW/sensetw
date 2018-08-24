@@ -102,15 +102,13 @@ export class Map extends React.Component<Props, MapState> {
     this.setState({ dropTarget: {} });
   }
 
-  handleObjectDragStart(e: KonvaEvent.Mouse) {
-    const prevDragPoint =
-      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+  _handleObjectDragStart(x: number, y: number) {
+    const prevDragPoint = this.state.inverseTransform({ x, y });
     this.setState({ prevDragPoint });
   }
 
-  handleObjectDragMove(e: KonvaEvent.Mouse) {
-    const prevDragPoint =
-      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+  _handleObjectDragMove(x: number, y: number) {
+    const prevDragPoint = this.state.inverseTransform({ x, y });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
     const dy = prevDragPoint.y - this.state.prevDragPoint.y;
     const objects = this.props.selection.objects.map(id => {
@@ -121,9 +119,8 @@ export class Map extends React.Component<Props, MapState> {
     this.setState({ prevDragPoint });
   }
 
-  handleObjectDragEnd(e: KonvaEvent.Mouse) {
-    const prevDragPoint =
-      this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
+  _handleObjectDragEnd(x: number, y: number) {
+    const prevDragPoint = this.state.inverseTransform({ x, y });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
     const dy = prevDragPoint.y - this.state.prevDragPoint.y;
     this.props.selection.objects.forEach(id => {
@@ -131,6 +128,48 @@ export class Map extends React.Component<Props, MapState> {
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
     this.setState({ prevDragPoint: { x: 0, y: 0 } });
+  }
+
+  handleObjectDragStart = (e: KonvaEvent.Mouse) => {
+    this._handleObjectDragStart(e.evt.layerX, e.evt.layerY);
+  }
+
+  handleObjectDragMove = (e: KonvaEvent.Mouse) => {
+    this._handleObjectDragMove(e.evt.layerX, e.evt.layerY);
+  }
+
+  handleObjectDragEnd = (e: KonvaEvent.Mouse) => {
+    this._handleObjectDragEnd(e.evt.layerX, e.evt.layerY);
+  }
+
+  handleObjectTouchStart = (e: KonvaEvent.Touch) => {
+    // tslint:disable-next-line:no-console
+    console.log('touch start', e);
+
+    if (e.evt.touches.length === 1) {
+      const touch = e.evt.touches[0];
+      this._handleObjectDragStart(touch.clientX, touch.clientY);
+    }
+  }
+
+  handleObjectTouchMove = (e: KonvaEvent.Touch) => {
+    // tslint:disable-next-line:no-console
+    console.log('touch move', e);
+
+    if (e.evt.touches.length === 1) {
+      const touch = e.evt.touches[0];
+      this._handleObjectDragMove(touch.clientX, touch.clientY);
+    }
+  }
+
+  handleObjectTouchEnd = (e: KonvaEvent.Touch) => {
+    // tslint:disable-next-line:no-console
+    console.log('touch end', e);
+
+    if (e.evt.touches.length === 1) {
+      const touch = e.evt.touches[0];
+      this._handleObjectDragEnd(touch.clientX, touch.clientY);
+    }
   }
 
   render() {
@@ -204,6 +243,9 @@ export class Map extends React.Component<Props, MapState> {
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}
+            handleTouchStart={this.handleObjectTouchStart}
+            handleTouchMove={this.handleObjectTouchMove}
+            handleTouchEnd={this.handleObjectTouchEnd}
             openCard={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
           />);
       }
@@ -226,6 +268,9 @@ export class Map extends React.Component<Props, MapState> {
             handleDragStart={this.handleObjectDragStart}
             handleDragMove={this.handleObjectDragMove}
             handleDragEnd={this.handleObjectDragEnd}
+            handleTouchStart={this.handleObjectTouchStart}
+            handleTouchMove={this.handleObjectTouchMove}
+            handleTouchEnd={this.handleObjectTouchEnd}
             handleSetDropTarget={this.handleObjectSetDropTarget}
             handleUnsetDropTarget={this.handleObjectUnsetDropTarget}
             openBox={() => acts.editor.changeStatus(OE.StatusType.SHOW)}

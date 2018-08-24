@@ -58,6 +58,25 @@ class Selectable extends React.PureComponent<Props, State> {
   }
 
   // tslint:disable-next-line:no-any
+  handleTap = (e: any) => {
+    const { selected, onTap, onSelect, onDeselect } = this.props;
+    const { moved } = this.state;
+
+    if (!moved) {
+      if (typeof onSelect === 'function' && !selected) {
+        onSelect(e);
+      }
+      if (typeof onDeselect === 'function' && selected) {
+        onDeselect(e);
+      }
+    }
+
+    if (typeof onTap === 'function') {
+      onTap(e);
+    }
+  }
+
+  // tslint:disable-next-line:no-any
   handleMouseMove = (e: any) => {
     const { onMouseMove } = this.props;
 
@@ -69,7 +88,7 @@ class Selectable extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { children, onMouseDown, onClick, onMouseMove, ...props } = this.props;
+    const { children, onMouseDown, onClick, onTap, onMouseMove, ...props } = this.props;
     const child = React.Children.only(children);
 
     return React.cloneElement(child, {
@@ -77,6 +96,7 @@ class Selectable extends React.PureComponent<Props, State> {
       onMouseDown: this.handleMouseDown,
       onClick: this.handleClick,
       onMouseMove: this.handleMouseMove,
+      onTap: this.handleTap,
     });
   }
 }
