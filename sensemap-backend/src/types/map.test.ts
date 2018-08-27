@@ -35,7 +35,7 @@ describe('GraphQL', () => {
     expect(m0.createdAt).toBeTruthy();
     expect(m0.updatedAt).toBeTruthy();
     expect(m0.name).toBeNull();
-    expect(m0.owner).toBe(users[0].id);
+    expect(m0.owner).toBeNull();
 
     const m1 = await M.resolvers.Mutation.updateMap(null, { id: m0.id, name: 'baz', type: 'someothertype' }, { db }, null);
 
