@@ -3,6 +3,7 @@ import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import * as B from '../../types/sense/box';
 import * as U from '../../types/utils';
 import * as moment from 'moment';
+import './index.css';
 
 interface Props {
   disabled?: boolean;
@@ -23,8 +24,8 @@ class BoxContent extends React.PureComponent<Props> {
 
     return (
       <Form className="box-content">
-        <Header as="h3" color="grey">
-          BOX INSPECTOR
+        <Header color="grey">
+          <h3>BOX INSPECTOR</h3>
           <h4>last updated on {updateTime}</h4>
         </Header>
         <Form.Field className="box-content__title">

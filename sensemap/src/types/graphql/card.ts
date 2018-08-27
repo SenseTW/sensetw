@@ -2,16 +2,18 @@ import * as H from '../sense/has-id';
 import { ObjectID } from '../sense/object';
 import { MapID } from '../sense/map';
 import { CardID, CardData, stringToType as stringToCardType } from '../sense/card';
+import * as U from './user';
 import { client } from './client';
 import * as SN from '../session';
 import * as moment from 'moment';
+import { anonymousUserData } from '../sense/user';
 
 export const graphQLCardFieldsFragment = `
   fragment cardFields on Card {
     id,
     createdAt, updatedAt,
     title, summary, description, tags, saidBy, stakeholder, url, cardType,
-    objects { id }, map { id }
+    objects { id }, map { id }, owner { id }
   }`;
 
 interface GraphQLCardFields {
@@ -28,6 +30,7 @@ interface GraphQLCardFields {
   cardType:    string;
   objects:     H.HasID<ObjectID>[];
   map?:        H.HasID<MapID>;
+  owner:       U.GraphQLUserFields;
 }
 
 const toCardData: (c: GraphQLCardFields) => CardData =
@@ -44,6 +47,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     url:         c.url,
     cardType:    stringToCardType(c.cardType),
     objects:     H.toIDMap(c.objects),
+    owner:       U.toUserData(c.owner) || anonymousUserData,
   });
 
 export const loadCards =
@@ -52,7 +56,7 @@ export const loadCards =
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
           id, createdAt, updatedAt, title, summary, description, tags, saidBy, stakeholder,
-          url, cardType, objects { id }
+          url, cardType, objects { id }, owner { id }
         }
       }
     `;

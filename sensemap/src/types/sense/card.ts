@@ -1,5 +1,6 @@
 import { HasID } from './has-id';
 import { ObjectID } from './object';
+import { UserData, anonymousUserData } from './user';
 import { ActionUnion, emptyAction } from '../action';
 import { TimeStamp } from '../utils';
 import { equals } from 'ramda';
@@ -62,6 +63,7 @@ export interface CardData extends HasID<CardID> {
   stakeholder: string;
   url: string;
   cardType: CardType;
+  owner: UserData;
 }
 
 /**
@@ -98,7 +100,8 @@ export const emptyCardData: CardData = {
   saidBy: '',
   stakeholder: '',
   url: '',
-  cardType: CardType.NORMAL
+  cardType: CardType.NORMAL,
+  owner: anonymousUserData,
 };
 
 /**
