@@ -37,6 +37,9 @@ const color = {
   [T.CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
 };
 
+const colorFromType = (cardType: T.CardType): string =>
+  color[cardType] || 'rgba(255, 255, 255, 1)';
+
 const summaryLimit = 39;
 const descriptionLimit = 64;
 
@@ -132,7 +135,7 @@ class Card extends React.Component<Props, State> {
     const handleTouchMove  = this.props.handleTouchMove  || noop;
     const handleTouchEnd   = this.props.handleTouchEnd   || noop;
     const openCard         = this.props.openCard         || noop;
-    const bgColor          = color[cardType];
+    const bgColor          = colorFromType(cardType);
 
     const selected = (
       <Rect

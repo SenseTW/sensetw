@@ -19,12 +19,19 @@ const capitalize = (str: string): string => {
   return str[0] + str.slice(1).toLowerCase();
 };
 
+const legacyCardTypes = [
+  CardType.NORMAL,
+  CardType.QUESTION,
+  CardType.ANSWER,
+  CardType.NOTE,
+];
+
 function CardTypeSelector(props: Props) {
   const { disabled = false, cardType, onChange = noop } = props;
 
   return (
     <div className="card-type-selector">{
-      Object.keys(CardType).map(ty => (
+      legacyCardTypes.map(ty => (
         <Form.Field key={ty}>
           <Checkbox
             disabled={disabled}

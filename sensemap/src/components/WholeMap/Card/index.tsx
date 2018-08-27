@@ -23,14 +23,18 @@ interface OwnProps {
 
 type Props = OwnProps & BoundingBox & CardData & TransformerForProps;
 
+const colors = {
+  [CardType.ANSWER]: '#c0e2d8',
+  [CardType.NORMAL]: '#d8d8d8',
+  [CardType.NOTE]: '#ffe384',
+  [CardType.QUESTION]: '#e5ced1',
+};
+
+const colorFromType = (cardType: CardType): string =>
+  colors[cardType] || '#ffffff';
+
 class Card extends React.PureComponent<Props> {
   static style = {
-    backgroundColor: {
-      [CardType.ANSWER]: '#c0e2d8',
-      [CardType.NORMAL]: '#d8d8d8',
-      [CardType.NOTE]: '#ffe384',
-      [CardType.QUESTION]: '#e5ced1',
-    },
     borderRadius: 9,
     width: 126,
     height: 84,
@@ -124,7 +128,7 @@ class Card extends React.PureComponent<Props> {
             width={width}
             height={height}
             cornerRadius={style.borderRadius}
-            fill={style.backgroundColor[cardType]}
+            fill={colorFromType(cardType)}
           />
         </Group>
       </Selectable>
