@@ -4,7 +4,7 @@ import * as U from './user';
 import { User } from './sql';
 
 export async function getUser(db: Knex, accessToken: string): Promise<User | null> {
-  const rows = await db.select(['accessToken', 'accessTokenExpiresAt', 'refreshToken', 'refreshTokenExpiresAt', 'clientId', 'userId']).from('oauth_token').where('accessToken', accessToken);
+  const rows = await db.select(['userId']).from('oauth_token').where('accessToken', accessToken);
   if (rows.length === 0) {
     return null;
   }
