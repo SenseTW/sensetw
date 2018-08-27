@@ -4,7 +4,6 @@ import { Container, Header, Form, Input, Divider, List, Button } from 'semantic-
 import { MapID, State, ActionProps, actions, mapDispatch } from '../../types';
 import * as HA from '../../types/hypothesis/annotation';
 import * as IP from '../../types/importer';
-import * as SN from '../../types/session';
 import { noop } from '../../types/utils';
 import { map } from 'ramda';
 
@@ -12,7 +11,6 @@ interface StateFromProps {
   mapId: MapID;
   url: string;
   logs: IP.ImportLog[];
-  session: SN.State;
 }
 
 type Props = StateFromProps & ActionProps;
@@ -55,11 +53,11 @@ class ImportPage extends React.PureComponent<Props> {
   }
 
   handleImport = async (e: React.FormEvent<HTMLButtonElement>, annotations: HA.Annotation[]) => {
-    const { actions: { senseObject }, mapId, session } = this.props;
+    const { actions: { senseObject }, mapId } = this.props;
 
     for (const ann of annotations) {
       try {
-        await senseObject.createCard(mapId, HA.toCardData(ann), session.user);
+        await senseObject.createCard(mapId, HA.toCardData(ann));
       } catch (error) {
         // tslint:disable-next-line:no-console
         console.error('Fail to create card from annotation:', ann);
@@ -99,8 +97,7 @@ export default connect<StateFromProps, ActionProps>(
   (state: State) => {
     const { map: mapId } = state.senseMap;
     const { url, logs } = state.importer;
-    const { session } = state;
-    return { mapId, url, logs, session };
+    return { mapId, url, logs };
   },
   mapDispatch({ actions })
 )(ImportPage);

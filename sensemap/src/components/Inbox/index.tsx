@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Pagination, PaginationProps, Modal, Button } from 'semantic-ui-react';
 import { CardData, State, ActionProps } from '../../types';
-import * as SN from '../../types/session';
 import Sources from '../../containers/Sources';
 import AddCardButton from './AddCardButton';
 import SyncButton from './SyncButton';
@@ -13,14 +12,13 @@ import './index.css';
 export interface StateFromProps {
   cards: CardData[];
   senseMap: State['senseMap'];
-  session: SN.State;
 }
 
 export interface OwnProps {}
 
 export type Props = StateFromProps & ActionProps & OwnProps;
 
-export function Inbox({ cards, senseMap, session, actions: acts }: Props) {
+export function Inbox({ cards, senseMap, actions: acts }: Props) {
   const mapId = senseMap.map;
   return (
     <div className="inbox">
@@ -42,7 +40,7 @@ export function Inbox({ cards, senseMap, session, actions: acts }: Props) {
           </Modal.Content>
         </Modal>
       </div>
-      <AddCardButton mapId={mapId} visible={senseMap.activateInboxPage === 1} actions={acts} session={session} />
+      <AddCardButton mapId={mapId} visible={senseMap.activateInboxPage === 1} actions={acts} />
       <Pager data={cards} pageSize={9} currentPage={senseMap.activateInboxPage} >
         {({ data, totalPages, currentPage, handlePageChange }) => {
           return (

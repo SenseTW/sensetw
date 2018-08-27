@@ -17,15 +17,15 @@ import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
 import * as SM from './sense-map';
-import * as SN from './session';
 
 export type State = CachedStorage;
 
 export const initial: State = CS.initial;
 
 const createMap =
-  (map: MapData, user: SN.User) =>
-  async (dispatch: Dispatch) => {
+  (map: MapData) =>
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
     return GM.create(map, user)
       .then((newMap) => {
         // add the new map
@@ -57,8 +57,9 @@ const saveMap =
   };
 
 const createCard =
-  (mapId: MapID, card: CardData, user: SN.User) =>
-  async (dispatch: Dispatch) => {
+  (mapId: MapID, card: CardData) =>
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
     return GC.create(mapId, card, user)
       .then((newCard) => dispatch(
         CS.updateCards(
@@ -257,9 +258,9 @@ const createObjectForCard =
   };
 
 const createCardObject =
-  (mapId: MapID, card: CardData, user: SN.User) =>
+  (mapId: MapID, card: CardData) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const action = await createCard(mapId, card, user)(dispatch);
+    const action = await createCard(mapId, card)(dispatch, getState);
     const { id = '' } = Object.values(action.payload.cards)[0] || {};
     return createObjectForCard(mapId, id)(dispatch, getState);
   };
