@@ -30,7 +30,10 @@ export function router(context: Context) {
   });
 
   router.get('/login', passLoggedIn(), async (req, res) => {
-    res.send(await render(LoginPage));
+    const messages = {
+      error: req.flash('error'),
+    };
+    res.send(await render(LoginPage, { messages }));
   });
 
   router.post('/login',

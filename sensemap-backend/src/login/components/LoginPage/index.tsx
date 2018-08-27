@@ -1,13 +1,19 @@
 import * as React from 'react';
-import { Grid, Segment, Header, Form, Button } from 'semantic-ui-react';
+import { Grid, Segment, Header, Form, Button, Message } from 'semantic-ui-react';
 
 function LoginPage(props) {
+  const { error } = props.messages;
   return (
     <Grid textAlign="center" verticalAlign="middle" style={{ height: '100%', background: '#b3e5fc' }}>
       <Grid.Column style={{ maxWidth: 400 }}>
         <Segment>
           <Header>Welcome Back</Header>
           <Form size="large" method="post">
+            {
+              error.length > 0
+              ? <Message negative>{error.join('')}</Message>
+              : null
+            }
             <Form.Input name="email" fluid={true} icon="mail" iconPosition="left" placeholder="Hello@sense.tw" type="text" />
             <Form.Input name="password" fluid={true} icon="lock" iconPosition="left" placeholder="Password" type="password" />
             <div>

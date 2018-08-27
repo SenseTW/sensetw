@@ -12,7 +12,7 @@
     "build": "rimraf dist && tsc",
     "prestart": "yarn build",
     "start": "node dist",
-    "dev": "nodemon --watch src --ext ts --exec ts-node src",
+    "dev": "nodemon --watch src --ext ts --ext tsx --exec ts-node src",
     "debug": "nodemon --inspect-brk --watch src --ext ts --exec ts-node src",
     "test": "jest --runInBand",
     "test:watch": "yarn test --watch",
