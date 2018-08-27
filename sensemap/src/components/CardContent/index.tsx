@@ -5,6 +5,7 @@ import * as C from '../../types/sense/card';
 import { isURL, isLength } from 'validator';
 import * as moment from 'moment';
 import * as U from '../../types/utils';
+import './index.css';
 
 interface Props {
   disabled?: boolean;
@@ -27,8 +28,9 @@ class CardContent extends React.PureComponent<Props> {
 
     return (
       <Form className="card-content" error={isDescriptionInvalid}>
-        <Header as="h3" color="grey">
-          CARD INSPECTOR
+        <Header color="grey">
+          <h3>CARD INSPECTOR</h3>
+          <h4>{data.owner.username}</h4>
           <h4>last updated on {updateTime}</h4>
         </Header>
         <Form.Field className="card-content__summary">
