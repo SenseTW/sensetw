@@ -26,7 +26,6 @@ import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as CS from '../../types/cached-storage';
-import * as SN from '../../types/session';
 import * as B from '../../types/sense/box';
 import { Action as BoxAction } from '../../types/sense/box';
 import * as C from '../../types/sense/card';
@@ -46,7 +45,6 @@ interface StateFromProps {
   scope: typeof SM.initial.scope;
   showAnotherMode: Boolean;
   isAuthenticated: Boolean;
-  session: SN.State;
 }
 
 type Props = StateFromProps & ActionProps;
@@ -88,7 +86,6 @@ class MapPage extends React.Component<Props> {
       senseObject,
       showAnotherMode,
       isAuthenticated,
-      session,
     } = this.props;
     const { status, focus } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
@@ -176,7 +173,7 @@ class MapPage extends React.Component<Props> {
                         case ObjectType.CARD:
                           const action =
                             // tslint:disable-next-line:no-any
-                            await acts.senseObject.createCardObject(mid, newData as CardData, session.user) as any;
+                            await acts.senseObject.createCardObject(mid, newData as CardData) as any;
                           const { payload: { objects } } = action as ReturnType<typeof CS.actions.updateObjects>;
                           if (scope.type === MapScopeType.BOX) {
                             const obj = Object.values(objects)[0];
@@ -283,7 +280,6 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
       editor,
       showAnotherMode,
       isAuthenticated,
-      session,
     };
   },
   mapDispatch({ actions }),

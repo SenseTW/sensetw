@@ -4,7 +4,6 @@ import { State, actions, ActionProps, MapID, MapData, mapDispatch } from '../../
 import { Modal, Header, Button, Form, TextArea, Input, Radio } from 'semantic-ui-react';
 import * as SM from '../../../types/sense/map';
 import * as CS from '../../../types/cached-storage';
-import * as SN from '../../../types/session';
 import './index.css';
 
 interface StateFromProps {
@@ -12,7 +11,6 @@ interface StateFromProps {
   map?: MapData;
   isNew?: boolean;
   isDirty?: boolean;
-  session: SN.State;
 }
 
 type Props = StateFromProps & ActionProps;
@@ -39,7 +37,7 @@ class MapContent extends React.PureComponent<Props> {
       return false;
     }
 
-    const { actions: acts, map, isNew, isDirty, session } = this.props;
+    const { actions: acts, map, isNew, isDirty } = this.props;
     const disabled = !(isNew && map && map.name) && !isDirty;
 
     return (
@@ -114,7 +112,7 @@ class MapContent extends React.PureComponent<Props> {
               onClick={async () => {
                 if (map) {
                   if (isNew) {
-                    await acts.senseObject.createMap(map, session.user);
+                    await acts.senseObject.createMap(map);
                   } else if (isDirty) {
                     await acts.senseObject.saveMap(map);
                   }
@@ -134,15 +132,14 @@ class MapContent extends React.PureComponent<Props> {
 export default connect<StateFromProps, ActionProps>(
   (state: State) => {
     const { map: mid } = state.editor;
-    const { session } = state;
-    if (mid === undefined) { return { session }; }
+    if (mid === undefined) { return {}; }
 
     const { senseObject } = state;
     const map = CS.getMap(senseObject, mid);
     const isNew = CS.isMapNew(senseObject, mid);
     const isDirty = CS.isMapDirty(senseObject, mid);
 
-    return { mid, map, isNew, isDirty, session };
+    return { mid, map, isNew, isDirty };
   },
   mapDispatch({ actions })
 )(MapContent);
