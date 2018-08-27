@@ -30,7 +30,7 @@ class CardContent extends React.PureComponent<Props> {
       <Form className="card-content" error={isDescriptionInvalid}>
         <Header color="grey">
           <h3>CARD INSPECTOR</h3>
-          <h4>{data.owner.username}</h4>
+          <h4>created by {data.owner.username}</h4>
           <h4>last updated on {updateTime}</h4>
         </Header>
         <Form.Field className="card-content__summary">
