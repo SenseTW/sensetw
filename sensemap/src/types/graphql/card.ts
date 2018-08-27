@@ -13,7 +13,7 @@ export const graphQLCardFieldsFragment = `
     id,
     createdAt, updatedAt,
     title, summary, description, tags, saidBy, stakeholder, url, cardType,
-    objects { id }, map { id }, owner { id }
+    objects { id }, map { id }, owner { id, email, username }
   }`;
 
 interface GraphQLCardFields {
@@ -56,7 +56,7 @@ export const loadCards =
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
           id, createdAt, updatedAt, title, summary, description, tags, saidBy, stakeholder,
-          url, cardType, objects { id }, owner { id }
+          url, cardType, objects { id }, owner { id, email, username }
         }
       }
     `;
