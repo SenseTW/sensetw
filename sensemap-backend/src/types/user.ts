@@ -63,11 +63,13 @@ export async function createUser(db: Knex, args: UserData, password: string): Pr
 }
 
 export async function findUserByUsername(db: Knex, username: string): Promise<User | null> {
-  return db.select(userFields(db)).from('user').where('username', username);
+  const rows = await db.select(userFields(db)).from('user').where('username', username);
+  return rows.length > 0 ? rows[0] : null;
 }
 
 export async function findUserByEmail(db: Knex, email: string): Promise<User | null> {
-  return db.select(userFields(db)).from('user').where('email', email);
+  const rows = await db.select(userFields(db)).from('user').where('email', email);
+  return rows.length > 0 ? rows[0] : null;
 }
 
 export async function deleteUser(db: Knex, id: ID): Promise<User | null> {
