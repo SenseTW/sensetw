@@ -1,6 +1,5 @@
 import { ID, Map, SenseObject, Edge, edgeFields, edgeDataFields } from './sql';
-import { getMap, getEdgesInMap, updateMapUpdatedAt } from './map';
-import { getObject } from './object';
+import { getEdgesInMap, updateMapUpdatedAt } from './map';
 import { pick } from 'ramda';
 
 export function edgesQuery(db) {

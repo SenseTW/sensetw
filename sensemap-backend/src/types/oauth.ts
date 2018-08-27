@@ -1,4 +1,3 @@
-import { Token } from 'oauth2-server';
 import * as Knex from 'knex';
 import * as U from './user';
 import { User } from './sql';

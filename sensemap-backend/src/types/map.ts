@@ -1,5 +1,5 @@
 import { pick } from 'ramda';
-import { ID, Map, mapFields, mapDataFields, SenseObject, objectFields, Card, Box, Edge } from './sql';
+import { ID, Map, mapFields, mapDataFields, SenseObject, Card, Box, Edge } from './sql';
 import { objectsQuery } from './object';
 import { boxesQuery } from './box';
 import { cardsQuery } from './card';
@@ -66,16 +66,6 @@ export async function getCardsInMap(db, mapId: ID): Promise<Card[]> {
 
 export async function getBoxesInMap(db, mapId: ID): Promise<Box[]> {
   return boxesQuery(db).where('mapId', mapId);
-}
-
-function getValue(db, o, key, query) {
-  if (typeof(o) === 'string') {
-    return query(db, o);
-  } else if (key in o) {
-    return o[key];
-  } else {
-    return query(db, o.id);
-  }
 }
 
 export const resolvers = {

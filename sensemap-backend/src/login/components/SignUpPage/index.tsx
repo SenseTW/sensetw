@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Grid, Segment, Header, Form, Button, Message } from 'semantic-ui-react';
+import { Grid, Segment, Header, Form, Button } from 'semantic-ui-react';
 
 function SignUpPage(props) {
-  const { error, usernameError, emailError, passwordError } = props.messages;
+  const { usernameError, emailError, passwordError } = props.messages;
   return (
     <Grid textAlign="center" verticalAlign="middle" style={{ height: '100%', background: '#b3fcfb' }}>
       <Grid.Column style={{ maxWidth: 400 }}>

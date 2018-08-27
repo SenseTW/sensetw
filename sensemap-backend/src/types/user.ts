@@ -99,7 +99,7 @@ export function decrypt_token(siteSecret: string, token: string): TokenPayload {
   const decipher = crypto.createDecipher(token_algorithm, siteSecret);
   let decrypted = decipher.update(token, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
-  const [ version, id, _, expireTimestamp ] = decrypted.split(':');
+  const [ version, id, {}, expireTimestamp ] = decrypted.split(':');
   return { id, version: +version, expire: new Date(expireTimestamp) };
 }
 

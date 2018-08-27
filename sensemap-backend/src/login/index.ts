@@ -3,7 +3,6 @@ import * as fs from 'async-file';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import PromiseRouter from 'express-promise-router';
-import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
@@ -81,7 +80,7 @@ export function router(context: Context) {
     }
 
     const { db } = context({ req });
-    const u = await U.createUser(db, { username, email }, password);
+    await U.createUser(db, { username, email }, password);
     res.redirect('/login');
   });
 

@@ -37,7 +37,7 @@ export const getAccessToken = async (accessToken: string): Promise<Token> => {
 };
 
 const saveToken = async (token: Token, client: Client, user: User): Promise<Token> => {
-  const rows = await db('oauth_token').insert({
+  await db('oauth_token').insert({
     accessToken: token.accessToken,
     accessTokenExpiresAt: token.accessTokenExpiresAt,
     refreshToken: token.refreshToken,
@@ -77,7 +77,7 @@ const saveAuthorizationCode = async (code: AuthorizationCode, client: Client, us
     client,
     user,
   };
-  const rows = await db('oauth_authorization_code').insert({
+  await db('oauth_authorization_code').insert({
     authorizationCode: code.authorizationCode,
     expiresAt: code.expiresAt,
     redirectUri: code.redirectUri,

@@ -1,5 +1,5 @@
 import { ID, Map, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
-import { getMap, getCardsInMap, MapFilter, updateMapUpdatedAt } from './map';
+import { MapFilter, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
 import * as A from './oauth';

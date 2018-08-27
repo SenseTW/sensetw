@@ -1,5 +1,5 @@
-import { ID, Map, Box, boxFields, objectFields, boxDataFields, SenseObject } from './sql';
-import { getMap, getBoxesInMap, updateMapUpdatedAt } from './map';
+import { ID, Box, boxFields, objectFields, boxDataFields, SenseObject } from './sql';
+import { getBoxesInMap, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
 

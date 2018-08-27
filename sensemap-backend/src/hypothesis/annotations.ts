@@ -3,9 +3,6 @@ import { Context } from '../context';
 import * as T from '../types/sql';
 import * as A from '../types/annotation';
 
-type AnnotationQuery = {
-};
-
 function fromAnnotation(env, annotation: T.Annotation): any {
   return {
     id: annotation.id,
@@ -90,7 +87,7 @@ export function router(context: Context) {
   });
 
   router.delete('/:id', async (req, res) => {
-    const { db, env } = context({ req });
+    //const { db, env } = context({ req });
     //const a = await A.deleteAnnotation(db, req.params.id);
     const a = {
       id: req.params.id,
