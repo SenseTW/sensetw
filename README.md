@@ -7,3 +7,6 @@ Gigantic repository.
 
 ## Get Involved
 1. workspace :: https://beta.hackfoldr.org/sense-tw
+
+## License
+- MIT
