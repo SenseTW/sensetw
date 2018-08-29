@@ -105,6 +105,43 @@ export function checkPassword(password: string): string {
   return '';
 }
 
+type ResetPasswordToken = {
+  userId: ID,
+  token: string,
+};
+
+const resetPasswordTokenFields = ['userId', 'token'];
+
+function resetPasswordTokenQuery(db: Knex) {
+  return db.select(resetPasswordTokenFields)
+    .from('reset_password_token')
+    .whereRaw(`"createdAt" >= (current_timestamp - interval '1 day')`);
+}
+
+export async function clearOutdatedResetPasswordTokens(db: Knex) {
+  return db('reset_password_token').whereRaw(`"createdAt" < (current_timestamp - interval '1 day')`).del();
+}
+
+export async function clearResetPasswordTokensForUser(db: Knex, id: ID) {
+  return db('reset_password_token').where('userId', id).del();
+}
+
+export async function createResetPasswordToken(db: Knex, id: ID): Promise<ResetPasswordToken> {
+  const rows = await db('reset_password_token').insert({
+    userId: id,
+    token: db.raw(`encode(gen_random_bytes(32), 'hex')`),
+  }).returning(resetPasswordTokenFields);
+  return rows[0];
+}
+
+export async function findUserByResetPasswordToken(db: Knex, token: string): Promise<User | null> {
+  const t = await resetPasswordTokenQuery(db).where('token', token).first();
+  if (!t) {
+    return null;
+  }
+  return getUser(db, t.userId);
+}
+
 export const resolvers = {
   Query: {
     User: async (_, args, { db }, info): Promise<User | null> => {
