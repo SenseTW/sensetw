@@ -65,19 +65,6 @@ test('authenticate', async () => {
   expect(u3.id).toBe(u0.id);
 });
 
-test('token', async () => {
-  const token0 = U.generate_token('mysitesecret', { id: nonExistentID, version: 1337 });
-  expect(token0.length > 64).toBeTruthy();
-
-  //const token1 = U.generate_token(nonExistentID, 'mysitesecret');
-  //expect(token1).not.toBe(token0);
-
-  const data = U.decrypt_token('mysitesecret', token0);
-  expect(data.id).toBe(nonExistentID);
-  expect(data.version).toBe(1337);
-  expect(data.expire).toBeTruthy();
-});
-
 test('checkUsername', () => {
   expect(U.checkUsername('ab')).toBe('Username must be between 3 and 30 characters.');
   expect(U.checkUsername('32aaaaaaaaaaaaaabbbbbbbbbbbbbbbb')).toBe('Username must be between 3 and 30 characters.');
