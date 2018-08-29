@@ -1,33 +1,39 @@
 import * as React from 'react';
-import { Grid, Segment, Header, Form, Button, Message } from 'semantic-ui-react';
+import Layout from '../Layout';
+import { Form, Button, Message } from 'semantic-ui-react';
 
-function LoginPage(props) {
-  const { error } = props.messages;
+const LoginPage = (props) => {
+  const errorMessages = props.messages.error.map(m => <Message negative>{m}</Message>);
   return (
-    <Grid textAlign="center" verticalAlign="middle" style={{ height: '100%', background: '#b3e5fc' }}>
-      <Grid.Column style={{ maxWidth: 400 }}>
-        <Segment>
-          <Header>Welcome Back</Header>
-          <Form size="large" method="post">
-            {
-              error.length > 0
-              ? <Message negative>{error.join('')}</Message>
-              : null
-            }
-            <Form.Input name="email" fluid={true} icon="mail" iconPosition="left" placeholder="Hello@sense.tw" type="text" />
-            <Form.Input name="password" fluid={true} icon="lock" iconPosition="left" placeholder="Password" type="password" />
-            <div>
-              <a href="mailto:hello@sense.tw">Forget Password?</a>
-            </div>
-            <Button fluid={true} color="black">LOG IN</Button>
-            <div>
-              Don't have a Sense.tw account?  <a href="/signup">Sign up</a>
-            </div>
-          </Form>
-        </Segment>
-      </Grid.Column>
-    </Grid>
-  )
+    <Layout header='Welcome Back'>
+      <Form size='large' method='post'>
+        {errorMessages}
+        <Form.Input
+          name='email'
+          type='text'
+          placeholder='Hello@sense.tw'
+          fluid={true}
+          icon='mail'
+          iconPosition='left'
+          />
+        <Form.Input
+          name='password'
+          type='password'
+          placeholder='Password'
+          fluid={true}
+          icon='lock'
+          iconPosition='left'
+          />
+        <div>
+          <a href='/forget-password'>Forget Password?</a>
+        </div>
+        <Button fluid={true} color='black'>LOG IN</Button>
+        <div>
+          Don't have a Sense.tw account?  <a href="/signup">Sign up</a>
+        </div>
+      </Form>
+    </Layout>
+  );
 }
 
 export default LoginPage;

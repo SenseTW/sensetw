@@ -80,3 +80,20 @@ describe('GraphQL', () => {
     expect(u.maps).toBeTruthy();
   });
 });
+
+describe('Reset password token', () => {
+  test('createResetPasswordToken', async () => {
+    const u0 = await U.createUser(db, { username: 'foo', email: 'foo@example.com' }, 'mysecret');
+    const t0 = await U.createResetPasswordToken(db, u0.id);
+    expect(t0.userId).toBe(u0.id);
+    expect(t0.token).toBeTruthy();
+    expect(t0.token.length).toBeGreaterThan(63);
+  });
+
+  test('findUserByResetPasswordToken', async () => {
+    const u0 = await U.createUser(db, { username: 'foo', email: 'foo@example.com' }, 'mysecret');
+    const t0 = await U.createResetPasswordToken(db, u0.id);
+    const u1 = await U.findUserByResetPasswordToken(db, t0);
+    expect(u1.id).toBe(u0.id);
+  });
+});

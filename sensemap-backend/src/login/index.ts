@@ -1,36 +1,26 @@
 import * as express from 'express';
-import * as fs from 'async-file';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
-import PromiseRouter from 'express-promise-router';
-import * as ReactDOMServer from 'react-dom/server';
+import Router from 'express-promise-router';
+import { render } from './react-render';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
+import ForgetPasswordPage from './components/ForgetPasswordPage';
+import ResetPasswordPage from './components/ResetPasswordPage';
 import oauth, { hypothesisClient, revokeUserToken } from './oauth';
 import { Context } from '../context';
 import passport = require('./passport');
 import * as U from '../types/user';
-import { passLoggedIn, requireLoggedIn } from './redirect';
+import { bypassAuthenticated, requireAuthentication } from './redirect';
 import * as isemail from 'isemail';
 
-async function render(component, props = {}) {
-  const html = ReactDOMServer.renderToStaticMarkup(component(props));
-  const data = await fs.readFile(__dirname + '/../../public/index.html', 'utf8');
-  const document = data.replace(/<body>[\s\S]*<\/body>/, `<body>${html}</body>`);
-  return document;
-}
-
 export function router(context: Context) {
-  const router = PromiseRouter();
+  const router = Router();
   router.use(bodyParser.urlencoded({ extended: false }));
   router.use(cookieParser());
   router.use(express.static('public'));
 
-  router.get('/login-success', requireLoggedIn(), async (req, res) => {
-    return res.redirect(`/oauth/authorize?client_id=${hypothesisClient.id}&state=login&response_type=code`);
-  });
-
-  router.get('/login', passLoggedIn(), async (req, res) => {
+  router.get('/login', bypassAuthenticated(), async (req, res) => {
     const messages = {
       error: req.flash('error'),
     };
@@ -38,7 +28,7 @@ export function router(context: Context) {
   });
 
   router.post('/login',
-    passLoggedIn(),
+    bypassAuthenticated(),
     passport.authenticate('local', {
       failureRedirect: '/login',
       failureFlash: 'Invalid e-mail or password',
@@ -48,11 +38,11 @@ export function router(context: Context) {
       if (req.query.next) {
         return res.redirect(req.query.next);
       }
-      return res.redirect('/login-success');
+      return res.redirect('/oauth/success');
     }
   );
 
-  router.get('/signup', passLoggedIn(), async (req, res) => {
+  router.get('/signup', bypassAuthenticated(), async (req, res) => {
     const messages = {
       error: req.flash('error'),
       usernameError: req.flash('usernameError'),
@@ -62,7 +52,7 @@ export function router(context: Context) {
     res.send(await render(SignUpPage, { messages }));
   });
 
-  router.post('/signup', passLoggedIn(), async (req, res) => {
+  router.post('/signup', bypassAuthenticated(), async (req, res) => {
     if (!req.body.username || !req.body.password || !req.body.email) {
       req.flash('error', 'Invalid form data.');
       return res.redirect('/signup');
@@ -104,13 +94,103 @@ export function router(context: Context) {
     res.redirect('/login');
   });
 
+  router.get(
+    '/forget-password',
+    bypassAuthenticated(),
+    async (req, res) => {
+      const messages = {
+        emailError: req.flash('emailError'),
+      };
+      return res.send(await render(ForgetPasswordPage, { messages }));
+    });
+
+  router.post(
+    '/forget-password',
+    bypassAuthenticated(),
+    async (req, res) => {
+      const { db } = context({ req });
+      const email = req.body.email.toLowerCase();
+      if (!isemail.validate(email)) {
+        req.flash('emailError', 'Email must be a valid Email');
+        return res.redirect('/forget-password');
+      }
+
+      const user = await U.findUserByEmail(db, email);
+      if (!user) {
+        req.flash('emailError', 'Sorry, an account with this email address does not exist.');
+        return res.redirect('/forget-password');
+      }
+
+      const token = await U.createResetPasswordToken(db, user.id);
+      console.log(token);
+      // XXX send email
+
+      return res.send(await render(ForgetPasswordPage, { type: 'RESULT' }));
+    });
+
+  router.get(
+    '/reset-password',
+    bypassAuthenticated(),
+    async (req, res) => {
+      const token = req.query.token;
+      if (!token) {
+        return res.redirect('/login');
+      }
+
+      const { db } = context({ req });
+      const u = await U.findUserByResetPasswordToken(db, token);
+      if (!u) {
+        return res.redirect('/login');
+      }
+
+      const messages = {
+        passwordError: req.flash('passwordError'),
+      };
+
+      return res.send(await render(ResetPasswordPage, { token, messages }));
+    });
+
+  router.post(
+    '/reset-password',
+    bypassAuthenticated(),
+    async (req, res) => {
+      const { token, password } = req.body;
+      if (!token || !password) {
+        return res.redirect('/login');
+      }
+
+      const { db } = context({ req });
+      const u = await U.findUserByResetPasswordToken(db, token);
+      if (!u) {
+        return res.redirect('/login');
+      }
+
+      const passwordMsg = U.checkPassword(password);
+      if (passwordMsg !== '') {
+        req.flash('passwordError', passwordMsg);
+        return res.redirect(`/reset-password?token=${token}`);
+      }
+
+      await U.updateUserPassword(db, u.id, password);
+      await U.clearResetPasswordTokensForUser(db, u.id);
+
+      return res.send(await render(ResetPasswordPage, { type: 'RESULT' }));
+    });
+
   router.get('/logout', async (req, res) => {
     req.logout();
     return res.redirect('/login');
   });
 
+  router.post('/h/token', (req, res, next) => {
+    const { env } = context({ req });
+    // XXX to support web_message response_type
+    req.query.redirect_uri = `${env.PUBLIC_URL}/oauth/web_message`;
+    next();
+  }, oauth.token());
+
   router.all('/oauth/authorize',
-    requireLoggedIn(),
+    requireAuthentication(),
     oauth.authorize({
       authenticateHandler: {
         handle: async (req, res) => {
@@ -120,14 +200,12 @@ export function router(context: Context) {
       },
     }),
   );
-  router.post('/h/token', (req, res, next) => {
-    const { env } = context({ req });
-    // XXX to support web_message response_type
-    req.query.redirect_uri = `${env.PUBLIC_URL}/oauth/web_message`;
-    next();
-  }, oauth.token());
+
+  router.get('/oauth/success', requireAuthentication(), async (req, res) => {
+    return res.redirect(`/oauth/authorize?client_id=${hypothesisClient.id}&state=login&response_type=code`);
+  });
   router.all('/oauth/revoke',
-    requireLoggedIn(),
+    requireAuthentication(),
     async (req, res) => {
       await revokeUserToken(req.user);
       req.logout();
@@ -135,7 +213,7 @@ export function router(context: Context) {
     });
 
   router.get('/oauth/web_message',
-    requireLoggedIn(),
+    requireAuthentication(),
     async (req, res) => {
       const { env } = context({ req });
       const { code, origin = env.PUBLIC_URL, state } = req.query;
