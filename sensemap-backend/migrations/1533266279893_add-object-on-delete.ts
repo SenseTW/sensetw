@@ -26,4 +26,23 @@ export const up = (pgm: MigrationBuilder) => {
   });
 };
 
-// export const down = (pgm: MigrationBuilder) => { };
+export const down = (pgm: MigrationBuilder) => {
+  pgm.dropConstraint('edge', 'edge_fromId_fkey');
+  pgm.addConstraint('edge', 'edge_fromId_fkey', {
+    foreignKeys: [
+      {
+        columns: 'fromId',
+        references: 'object(id)',
+      },
+    ],
+  });
+  pgm.dropConstraint('edge', 'edge_toId_fkey');
+  pgm.addConstraint('edge', 'edge_toId_fkey', {
+    foreignKeys: [
+      {
+        columns: 'toId',
+        references: 'object(id)',
+      },
+    ],
+  });
+};

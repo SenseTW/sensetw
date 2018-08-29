@@ -10,4 +10,10 @@ export const up = (pgm: MigrationBuilder) => {
   });
 };
 
-// export const down = (pgm: MigrationBuilder) => {};
+export const down = (pgm: MigrationBuilder) => {
+  pgm.alterColumn('card', 'description', {
+    type: 'varchar(255)',
+    notNull: true,
+    default: '',
+  });
+};
