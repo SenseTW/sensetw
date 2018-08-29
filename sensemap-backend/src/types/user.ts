@@ -1,10 +1,7 @@
 import { ID, User, UserData, userFields, Map } from './sql';
 import * as Knex from 'knex';
 import { pick } from 'ramda';
-import * as crypto from 'crypto';
 import { mapsQuery } from './map';
-
-const token_algorithm = 'aes-256-ctr';
 
 export function usersQuery(db: Knex) {
   return db.select(userFields(db)).from('user');
@@ -86,24 +83,6 @@ export type TokenPayload = {
   expire?: Date,
   version?: number,
 };
-
-// XXX need stronger encryption in the future
-export function generate_token(siteSecret: string, payload: TokenPayload): string {
-  const expireTimestamp = (payload.expire || new Date()).valueOf() + 86400000 * 365;
-  const version = payload.version || 0;
-  const cipher = crypto.createCipher(token_algorithm, siteSecret);
-  let crypted = cipher.update(`${version}:${payload.id}:${siteSecret}:${expireTimestamp}`, 'utf8', 'hex');
-  crypted += cipher.final('hex');
-  return crypted;
-}
-
-export function decrypt_token(siteSecret: string, token: string): TokenPayload {
-  const decipher = crypto.createDecipher(token_algorithm, siteSecret);
-  let decrypted = decipher.update(token, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  const [ version, id, {}, expireTimestamp ] = decrypted.split(':');
-  return { id, version: +version, expire: new Date(expireTimestamp) };
-}
 
 export function checkUsername(username: string): string {
   if (username.length < 3 || username.length > 30) {
