@@ -5,6 +5,7 @@ import Selectable from '../../Layout/Selectable';
 import Header from './Header';
 import Card from './Card';
 import Toggle from './Toggle';
+import * as D from '../../../graphics/drawing';
 import * as T from '../../../types';
 import { ObjectMap } from '../../../types/sense/has-id';
 import * as G from '../../../graphics/point';
@@ -106,17 +107,20 @@ class Box extends React.Component<Props, State> {
   render() {
     const { transform, inverseTransform, box, isDirty = false } = this.props;
     const style = transformObject(transform, Box.style) as typeof Box.style;
-    const { x, y, width, height } = transform({
+    const transformed = transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
       width: this.props.mapObject.width,
       height: this.props.mapObject.height,
+      anchor: this.props.mapObject.anchor,
     });
+    const { width, height } = transformed;
+    const { left: x, top: y } = D.rectFromBox(transformed);
     const cards = Object.values(this.props.cards);
     const { height: cardHeight } = this.props.transform({ height: Card.style.height });
     const { height: toggleHeight } = this.props.transform({ height: Toggle.style.height });
-    const selectedWidth = width - style.selected.offset.x * 2;
-    const selectedHeight = height - style.selected.offset.y * 2;
+    const selectedWidth = transformed.width - style.selected.offset.x * 2;
+    const selectedHeight = transformed.height - style.selected.offset.y * 2;
 
     const handleSelect     = this.props.handleSelect     || noop;
     const handleDeselect   = this.props.handleDeselect   || noop;

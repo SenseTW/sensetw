@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Group, Rect } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
+import { rectFromBox } from '../../../graphics/drawing';
 import { ObjectData, CardID, CardData, CardType } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
@@ -75,12 +76,14 @@ class Card extends React.PureComponent<Props> {
       onOpen = noop,
     } = this.props;
     // TODO: should I use the object dimension or the style dimension?
-    const { x, y, width, height } = transform({
+    const transformed = transform({
       x: this.props.x,
       y: this.props.y,
       width: this.props.width,
       height: this.props.height,
     });
+    const { width, height } = transformed;
+    const { left: x, top: y } = rectFromBox(transformed);
     const style = transformObject(transform, Card.style) as typeof Card.style;
 
     const selectedWidth = width - style.selected.offset.x * 2;

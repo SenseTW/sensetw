@@ -162,6 +162,7 @@ class WholeMap extends React.Component<Props, State> {
             y={y}
             width={Box.style.width}
             height={Box.style.height}
+            anchor={object.anchor}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
             onDragStart={this.handleObjectDragStart}
@@ -191,6 +192,7 @@ class WholeMap extends React.Component<Props, State> {
             y={y}
             width={Card.style.width}
             height={Card.style.height}
+            anchor={object.anchor}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
             onDragStart={this.handleObjectDragStart}
@@ -209,7 +211,7 @@ class WholeMap extends React.Component<Props, State> {
   renderEdge(edge: EdgeData) {
     const transformers = this.state;
     let o = CS.getObject(this.props.inScope, edge.from);
-    const from = O.getCenter({
+    const from = {
       ...o,
       width: o.objectType === ObjectType.BOX
         ? Box.style.width
@@ -217,9 +219,9 @@ class WholeMap extends React.Component<Props, State> {
       height: o.objectType === ObjectType.BOX
         ? Box.style.height
         : Card.style.height,
-    });
+    };
     o = CS.getObject(this.props.inScope, edge.to);
-    const to = O.getCenter({
+    const to = {
       ...o,
       width: o.objectType === ObjectType.BOX
         ? Box.style.width
@@ -227,7 +229,7 @@ class WholeMap extends React.Component<Props, State> {
       height: o.objectType === ObjectType.BOX
         ? Box.style.height
         : Card.style.height,
-    });
+    };
     const edgeProps = { from, to };
 
     return (

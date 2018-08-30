@@ -1,6 +1,6 @@
 import { ActionUnion, emptyAction } from '../action';
 import { HasID } from './has-id';
-import { Position, Dimension, getCenter as getBoxCenter } from '../../graphics/drawing';
+import { Position, Dimension, AnchorType, Anchor } from '../../graphics/drawing';
 import { ObjectType } from './object-type';
 import { TimeStamp } from '../utils';
 import { CardID } from './card';
@@ -17,7 +17,7 @@ export type ObjectID = string;
  *
  * @extends {HasID<ObjectID>}
  */
-export interface ObjectData extends HasID<ObjectID>, Position, Dimension {
+export interface ObjectData extends HasID<ObjectID>, Position, Dimension, Anchor {
   createdAt:  TimeStamp;
   updatedAt:  TimeStamp;
   zIndex:     number;
@@ -40,6 +40,7 @@ export const emptyObjectData = {
   y: 0,
   width: 0,
   height: 0,
+  anchor: AnchorType.CENTER,
   zIndex: 0,
   objectType: ObjectType.NONE,
   data: '0',
@@ -54,6 +55,7 @@ interface PartialObjectData {
   y?:          number;
   width?:      number;
   height?:     number;
+  anchor?:     AnchorType;
   zIndex?:     number;
   objectType?: ObjectType;
   data?:       CardID | BoxID;
@@ -90,18 +92,6 @@ export const toFocus = (object: ObjectData): F.Focus => {
     default:              return F.focusNothing();
   }
 };
-
-export function getCenter(o: ObjectData): Position {
-  switch (o.objectType) {
-    case ObjectType.CARD:
-    case ObjectType.BOX: {
-      return getBoxCenter(o);
-    }
-    default: {
-      return getBoxCenter({ x: o.x, y: o.y, width: 0, height: 0 });
-    }
-  }
-}
 
 const UPDATE_POSITION = 'UPDATE_POSITION';
 /**

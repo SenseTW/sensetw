@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
+import { rectFromBox } from '../../../graphics/drawing';
 import { ObjectData, BoxID, BoxData } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
@@ -78,12 +79,14 @@ class Box extends React.PureComponent<Props> {
       onDragEnd = noop,
       onOpen = noop,
     } = this.props;
-    const { x, y, width, height } = transform({
+    const transformed = transform({
       x: this.props.x,
       y: this.props.y,
       width: this.props.width,
       height: this.props.height,
     });
+    const { width, height } = transformed;
+    const { left: x, top: y } = rectFromBox(transformed);
     const style = transformObject(transform, Box.style) as typeof Box.style;
 
     const selectedWidth = width  - style.selected.offset.x * 2;

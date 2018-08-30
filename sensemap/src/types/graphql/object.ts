@@ -3,6 +3,7 @@ import * as OT from '../sense/object-type';
 import { MapID } from '../sense/map';
 import { ObjectType } from '../sense/object-type';
 import { ObjectID, ObjectData } from '../sense/object';
+import { AnchorType } from '../../graphics/drawing';
 import {
   CardID,
   DEFAULT_WIDTH as DEFAULT_CARD_WIDTH,
@@ -85,6 +86,7 @@ const toObjectData: (o: GraphQLObjectFields, isDeleted?: boolean) => ObjectData 
     y:          o.y,
     width:      o.width || getDefaultWidth(OT.fromString(o.objectType)),
     height:     o.height || getDefaultHeight(OT.fromString(o.objectType)),
+    anchor:     AnchorType.CENTER,
     zIndex:     o.zIndex,
     objectType: OT.fromString(o.objectType),
     data:       toObjectDataFieldData(o, isDeleted),
