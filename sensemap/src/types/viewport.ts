@@ -35,11 +35,13 @@ export const makeTransform: StateToTransform =
     y = emptyBoundingBox.y,
     width = emptyBoundingBox.width,
     height = emptyBoundingBox.height,
+    anchor = emptyBoundingBox.anchor,
   } = {}) => ({
     x: (x - left) * level,
     y: (y - top) * level,
     width: width * level,
     height: height * level,
+    anchor,
   });
 
 export const makeInverseTransform: StateToTransform =
@@ -48,11 +50,13 @@ export const makeInverseTransform: StateToTransform =
     y = emptyBoundingBox.y,
     width = emptyBoundingBox.width,
     height = emptyBoundingBox.height,
+    anchor = emptyBoundingBox.anchor,
   } = {}) => ({
     x: x / level + left,
     y: y / level + top,
     width: width / level,
     height: height / level,
+    anchor,
   });
 
 export const transformObject = (trans: G.Transform, style: Object): Object => {

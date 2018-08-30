@@ -301,8 +301,8 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(e: EdgeData) {
     const edgeProps = {
-      from: O.getCenter(CS.getObject(this.props.inScope, e.from)),
-      to: O.getCenter(CS.getObject(this.props.inScope, e.to)),
+      from: CS.getObject(this.props.inScope, e.from),
+      to: CS.getObject(this.props.inScope, e.to),
       transform: this.state.transform,
       inverseTransform: this.state.inverseTransform,
     };

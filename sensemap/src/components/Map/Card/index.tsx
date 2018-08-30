@@ -3,6 +3,7 @@ import { Group, Rect, Circle, Text } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
 import TagList from '../TagList';
+import * as D from '../../../graphics/drawing';
 import * as T from '../../../types';
 import { transformObject } from '../../../types/viewport';
 import { noop, toTags } from '../../../types/utils';
@@ -111,12 +112,14 @@ class Card extends React.Component<Props, State> {
     const { transform, inverseTransform, isDirty = false } = this.props;
     const style = transformObject(transform, Card.style) as typeof Card.style;
     const { data } = this.props.mapObject;
-    const { x, y, width, height } = this.props.transform({
+    const transformed = this.props.transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
       width: this.props.mapObject.width,
       height: this.props.mapObject.height,
     });
+    const { width, height } = transformed;
+    const { left: x, top: y } = D.rectFromBox(transformed);
     const {summary, description, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedDescription   = description.substr(0, descriptionLimit);

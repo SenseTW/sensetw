@@ -141,9 +141,8 @@ const toWholeMode =
     // XXX: should use render width and height
     const objects = Object.values(CS.toStorage(inScope).objects);
     // caculate the bounding box
-    let box = D.flatten(objects);
+    let box = D.flatten(objects, D.AnchorType.TOP_LEFT);
     const boxRatio = box.width / box.height;
-    const center = D.getCenter(box);
     const screenRatio = viewport.width / viewport.height;
     // save the old viewport
     dispatch(V.actions.save());
@@ -151,13 +150,15 @@ const toWholeMode =
     if (boxRatio < screenRatio) {
       // fit height
       const level = viewport.height / box.height;
+      const centerX = box.x + box.width / 2;
       const globalWidth = viewport.width / level;
-      dispatch(V.actions.setViewport({ left: center.x - globalWidth / 2, top: box.y, level }));
+      dispatch(V.actions.setViewport({ left: centerX - globalWidth / 2, top: box.y, level }));
     } else {
       // fit width
       const level = viewport.width / box.width;
+      const centerY = box.y + box.height / 2;
       const globalHeight = viewport.height / level;
-      dispatch(V.actions.setViewport({ left: box.x, top: center.y - globalHeight / 2, level }));
+      dispatch(V.actions.setViewport({ left: box.x, top: centerY - globalHeight / 2, level }));
     }
   };
 
@@ -173,12 +174,11 @@ const toNormalMode =
       // get the selected objects
       const objects = selection.objects.map(id => CS.getObject(senseObject, id));
       // caculate the bounding box
-      const box = D.flatten(objects);
-      const center = D.getCenter(box);
+      const box = D.flatten(objects, D.AnchorType.CENTER);
       // set the new viewport
       dispatch(V.actions.setViewport({
-        left: center.x - viewport.width / 2,
-        top: center.y - viewport.height / 2,
+        left: box.x - viewport.width / 2,
+        top: box.y - viewport.height / 2,
         level: 1.0
       }));
     }
