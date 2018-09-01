@@ -22,6 +22,12 @@ export type AuthorizationCode = {
   state: string,
 };
 
+/**
+ * The profile remote request.
+ *
+ * @param {string} token The access token.
+ * @returns {Promise<Profile>} A profile promise.
+ */
 export const profileRequest = (token: string): Promise<Profile> => {
   return axios
     .get(`${apiRoot}/h/api/profile`, {
@@ -32,6 +38,12 @@ export const profileRequest = (token: string): Promise<Profile> => {
     .then(({ data }) => pick<Profile, string>(['id', 'email', 'username'], data.sense_user));
 };
 
+/**
+ * The token request.
+ *
+ * @param {AuthorizationCode} authCode The authorization code struct.
+ * @returns {Promise<Token>} A promise with the access token and the refresh token.
+ */
 export const tokenRequest = (authCode: AuthorizationCode): Promise<Token> => {
   const { code } = authCode;
   return axios
