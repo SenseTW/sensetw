@@ -396,6 +396,13 @@ export const actions = {
 
 export type Action = ActionUnion<typeof actions>;
 
+/**
+ * The storage reducer.
+ *
+ * @param {Storage} [state=initial] The current storage state.
+ * @param {Action} [action=emptyAction] The storage action.
+ * @returns {Storage} A new storage state.
+ */
 export const reducer = (state: Storage = initial, action: Action = emptyAction): Storage => {
   switch (action.type) {
     case UPDATE_MAPS: {
