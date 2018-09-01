@@ -27,6 +27,12 @@ export const initial = {
   [TargetType.TEMPORARY]: S.initial,
 };
 
+/**
+ * Creates a storage from a cached storage.
+ *
+ * @param {CachedStorage} storage A cached storage.
+ * @returns {S.Storage} The flattened storage.
+ */
 export const toStorage = (storage: CachedStorage): S.Storage => {
   return {
     maps: {
@@ -52,75 +58,238 @@ export const toStorage = (storage: CachedStorage): S.Storage => {
   };
 };
 
+/**
+ * Gets a map by it's ID. It always returns a map.
+ * Please use `doesMapExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {MapID} id The map ID.
+ * @returns {MapData} The target map.
+ */
 export const getMap =
   (storage: CachedStorage, id: MapID): MapData =>
   storage[TargetType.TEMPORARY].maps[id] || storage[TargetType.PERMANENT].maps[id] || emptyMapData;
 
+/**
+ * Gets a display object by it's ID. It always returns a object.
+ * Please use `doseObjectExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {ObjectID} id The display object ID.
+ * @returns {ObjectData} The target display object.
+ */
 export const getObject =
   (storage: CachedStorage, id: ObjectID): ObjectData =>
   storage[TargetType.TEMPORARY].objects[id] || storage[TargetType.PERMANENT].objects[id] || emptyObjectData;
 
+/**
+ * Gets a card by it's ID. It always returns a card.
+ * Please use `doseCardExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {CardID} id The card ID.
+ * @returns {CardData} The target card data.
+ */
 export const getCard =
   (storage: CachedStorage, id: CardID): CardData =>
   storage[TargetType.TEMPORARY].cards[id] || storage[TargetType.PERMANENT].cards[id] || emptyCardData;
 
+/**
+ * Gets a box by it's ID. It always returns a box.
+ * Please use `doesBoxExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {BoxID} id The box ID.
+ * @returns {BoxData} The target box data.
+ */
 export const getBox =
   (storage: CachedStorage, id: BoxID): BoxData =>
   storage[TargetType.TEMPORARY].boxes[id] || storage[TargetType.PERMANENT].boxes[id] || emptyBoxData;
 
+/**
+ * Gets a edge by it's ID. It always returns a edge.
+ * Please use `doesEdgeExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {EdgeID} id The edge id.
+ * @returns {Edge} The target edge data.
+ */
 export const getEdge =
   (storage: CachedStorage, id: EdgeID): Edge =>
   storage[TargetType.TEMPORARY].edges[id] || storage[TargetType.PERMANENT].edges[id] || emptyEdge;
 
-// XXX: duplicated
+/**
+ * Gets cards in a box by it's box ID.
+ *
+ * @todo It duplicates with the same function in the storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {BoxID} id The box ID.
+ * @returns {ObjectMap<CardData>} Card data in the box.
+ */
 export const getCardsInBox = (storage: CachedStorage, id: BoxID): ObjectMap<CardData> =>
   Object.keys(getBox(storage, id).contains)
     .map(oid => getObject(storage, oid).data )
     .map(cid => getCard(storage, cid))
     .reduce((a, c) => { a[c.id] = c; return a; }, {});
 
+/**
+ * Checks if a map exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {MapID} id The map ID.
+ * @returns {boolean} If the map exists or not.
+ */
 export const doesMapExist = (storage: CachedStorage, id: MapID): boolean =>
   S.doesMapExist(storage[TargetType.TEMPORARY], id) || S.doesMapExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a display object exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {ObjectID} id The display object ID.
+ * @returns {boolean} If the object exists or not.
+ */
 export const doesObjectExist = (storage: CachedStorage, id: ObjectID): boolean =>
   S.doesObjectExist(storage[TargetType.TEMPORARY], id) || S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a card exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {CardID} id The card ID.
+ * @returns {boolean} If the card exists or not.
+ */
 export const doesCardExist = (storage: CachedStorage, id: CardID): boolean =>
   S.doesCardExist(storage[TargetType.TEMPORARY], id) || S.doesCardExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a box exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {BoxID} id The box ID.
+ * @returns {boolean} If the box exists or not.
+ */
 export const doesBoxExist = (storage: CachedStorage, id: BoxID): boolean =>
   S.doesBoxExist(storage[TargetType.TEMPORARY], id) || S.doesBoxExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if an edge exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {EdgeID} id The edge ID.
+ * @returns {boolean} If the edge exists or not.
+ */
 export const doesEdgeExist = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) || S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a map is a new map by it's ID.
+ * A map is a new map if it only exists in the temporary storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {MapID} id The map ID.
+ * @returns {boolean} If the given map is a new map.
+ */
 export const isMapNew = (storage: CachedStorage, id: MapID): boolean =>
   S.doesMapExist(storage[TargetType.TEMPORARY], id) && !S.doesMapExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a display object is a new object by it's ID.
+ * A object is a new object if it only exists in the temporary storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {ObjectID} id The display object ID.
+ * @returns {boolean} If the given object is a new map.
+ */
 export const isObjectNew = (storage: CachedStorage, id: ObjectID): boolean =>
   S.doesObjectExist(storage[TargetType.TEMPORARY], id) && !S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a card is a new card by it's ID.
+ * A card is a new card if it only exists in the temporary storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {CardID} id The card ID.
+ * @returns {boolean} If the given card is a new card.
+ */
 export const isCardNew = (storage: CachedStorage, id: CardID): boolean =>
   S.doesCardExist(storage[TargetType.TEMPORARY], id) && !S.doesCardExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if a box is a new box by it's ID.
+ * A box is a new box if it only exists in the temporary storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {BoxID} id The box ID.
+ * @returns {boolean} If the given box is a new box.
+ */
 export const isBoxNew = (storage: CachedStorage, id: BoxID): boolean =>
   S.doesBoxExist(storage[TargetType.TEMPORARY], id) && !S.doesBoxExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if an edge is a new edge by it's ID.
+ * An edge is a new edge if it only exists in the temporay sorage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {EdgeID} id The edge ID.
+ * @returns {boolean} If the given edge is a new edge.
+ */
 export const isEdgeNew = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && !S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Check if a map is modified(dirty).
+ * A map is modified if it appears in both the temporary and the permanent storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {MapID} id The map ID.
+ * @returns {boolean} If the map is dirty.
+ */
 export const isMapDirty = (storage: CachedStorage, id: MapID): boolean =>
   S.doesMapExist(storage[TargetType.TEMPORARY], id) && S.doesMapExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Check if a display object is modified(dirty).
+ * An object is modified if it appears in both the temporary and the permanent storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {ObjectID} id The object ID.
+ * @returns {boolean} If the object is dirty.
+ */
 export const isObjectDirty = (storage: CachedStorage, id: ObjectID): boolean =>
   S.doesObjectExist(storage[TargetType.TEMPORARY], id) && S.doesObjectExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Check if a card is modified(dirty).
+ * A card is modified if it appears in both the temporary and the permanent storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {CardID} id The card ID.
+ * @returns {boolean} If the card is dirty.
+ */
 export const isCardDirty = (storage: CachedStorage, id: CardID): boolean =>
   S.doesCardExist(storage[TargetType.TEMPORARY], id) && S.doesCardExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Check if a box is modified(dirty).
+ * A box is modified if it appears in both the temporary and the permanent storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {BoxID} id The box ID.
+ * @returns {boolean} If the box is dirty.
+ */
 export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
   S.doesBoxExist(storage[TargetType.TEMPORARY], id) && S.doesBoxExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Check if an edge is modified(dirty).
+ * A edge is modified if it appears in both the temporary and the permanent storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {EdgeID} id The edge ID.
+ * @returns {boolean} If the edge is dirty.
+ */
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
