@@ -22,6 +22,12 @@ export const initial: State = {
 };
 
 const UPDATE_USERNAME = 'UPDATE_USERNAME';
+/**
+ * The username updating action constructor.
+ *
+ * @param {string} username The username.
+ * @returns A username updating action.
+ */
 const updateUsername =
   (username: string) => ({
     type: UPDATE_USERNAME as typeof UPDATE_USERNAME,
@@ -29,6 +35,12 @@ const updateUsername =
   });
 
 const UPDATE_EMAIL = 'UPDATE_EMAIL';
+/**
+ * The email updating action constructor.
+ *
+ * @param {string} email The email.
+ * @returns A email updating action.
+ */
 const updateEmail =
   (email: string) => ({
     type: UPDATE_EMAIL as typeof UPDATE_EMAIL,
@@ -36,6 +48,12 @@ const updateEmail =
 });
 
 const UPDATE_PASSWORD = 'UPDATE_PASSWORD';
+/**
+ * The password updating action constructor.
+ *
+ * @param {string} password The password.
+ * @returns A password updating action.
+ */
 const updatePassword =
   (password: string) => ({
     type: UPDATE_PASSWORD as typeof UPDATE_PASSWORD,
@@ -43,6 +61,11 @@ const updatePassword =
   });
 
 const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+/**
+ * The successful login action constructor.
+ *
+ * @returns A successful login action.
+ */
 const loginSuccess = () => {
   return {
     type: LOGIN_SUCCESS as typeof LOGIN_SUCCESS,
@@ -51,6 +74,12 @@ const loginSuccess = () => {
 };
 
 const LOGIN_FAILURE = 'LOGIN_FAILURE';
+/**
+ * The failed login action constructor.
+ *
+ * @param {string} errorMsg The error message.
+ * @returns A failed login action.
+ */
 const loginFailure = (errorMsg: string) => {
   return {
     type: LOGIN_FAILURE as typeof LOGIN_FAILURE,
@@ -58,6 +87,12 @@ const loginFailure = (errorMsg: string) => {
   };
 };
 
+/**
+ * The login action.
+ * It's an async action which is composed by many plain actions.
+ *
+ * @returns A login result promise.
+ */
 const loginRequest = () => (dispatch: Dispatch) => {
   return new Promise(resolve => {
     // tslint:disable:no-any
@@ -84,6 +119,11 @@ const loginRequest = () => (dispatch: Dispatch) => {
 };
 
 const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS';
+/**
+ * The successful signup action constructor.
+ *
+ * @returns A successful signup action.
+ */
 const signupSuccess = () => {
   return {
     type: SIGNUP_SUCCESS as typeof SIGNUP_SUCCESS,
@@ -92,6 +132,12 @@ const signupSuccess = () => {
 };
 
 const SIGNUP_FAILURE = 'SIGNUP_FAILURE';
+/**
+ * The failed signup action constructor.
+ *
+ * @param {string} errorMsg The error message.
+ * @returns A failed signup action.
+ */
 const signupFailure = (errorMsg: string) => {
   return {
     type: SIGNUP_FAILURE as typeof SIGNUP_FAILURE,
@@ -99,7 +145,14 @@ const signupFailure = (errorMsg: string) => {
   };
 };
 
-// tslint:disable:no-any
+/**
+ * The signup action.
+ *
+ * @param {string} username The username.
+ * @param {string} email The email.
+ * @param {string} password The password.
+ * @returns A signup result promise.
+ */
 const signupRequest = (username: string, email: string, password: string) => {
   return async (dispatch: Dispatch) => {
     try {
@@ -110,12 +163,17 @@ const signupRequest = (username: string, email: string, password: string) => {
   };
 };
 
-// tslint:disable:no-any
+/**
+ * The logout action.
+ */
 const logoutRequest = () => async (dispatch: Dispatch) => {
   sessionService.deleteSession();
   sessionService.deleteUser();
 };
 
+/**
+ * Plain(sync) actions.
+ */
 export const syncActions = {
     updateUsername,
     updateEmail,
@@ -126,6 +184,9 @@ export const syncActions = {
     signupFailure,
 };
 
+/**
+ * Async actions.
+ */
 export const actions = {
   ...syncActions,
   signupRequest,
@@ -135,6 +196,13 @@ export const actions = {
 
 export type Action = ActionUnion<typeof syncActions>;
 
+/**
+ * The account action reducer.
+ *
+ * @param {State} [state=initial] The current account state.
+ * @param {Action} [action=emptyAction] The action.
+ * @returns The new account state.
+ */
 export const reducer = (state: State = initial, action: Action = emptyAction) => {
   switch (action.type) {
     case UPDATE_USERNAME: {
