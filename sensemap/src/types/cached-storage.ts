@@ -293,16 +293,52 @@ export const isBoxDirty = (storage: CachedStorage, id: BoxID): boolean =>
 export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
+/**
+ * Checks if all maps are not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If the maps are clean.
+ */
 export const areMapsClean = (storage: CachedStorage): boolean => S.hasNoMap(storage[TargetType.TEMPORARY]);
 
+/**
+ * Checks if all maps are not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If maps are clean.
+ */
 export const areObjectsClean = (storage: CachedStorage): boolean => S.hasNoObject(storage[TargetType.TEMPORARY]);
 
+/**
+ * Checks if all cards are not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If cards are clean.
+ */
 export const areCardsClean = (storage: CachedStorage): boolean => S.hasNoCard(storage[TargetType.TEMPORARY]);
 
+/**
+ * Checks if all boxes are not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If boxes are clean.
+ */
 export const areBoxesClean = (storage: CachedStorage): boolean => S.hasNoBox(storage[TargetType.TEMPORARY]);
 
+/**
+ * Checks if all edges are not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If edges are clean.
+ */
 export const areEdgesClean = (storage: CachedStorage): boolean => S.hasNoEdge(storage[TargetType.TEMPORARY]);
 
+/**
+ * Checks if everything is not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If everything is clean.
+ */
 export const isClean = (storage: CachedStorage): boolean =>
   areMapsClean(storage) &&
   areObjectsClean(storage) &&
@@ -310,6 +346,14 @@ export const isClean = (storage: CachedStorage): boolean =>
   areBoxesClean(storage) &&
   areEdgesClean(storage);
 
+/**
+ * Crteas a sub object map from a key list.
+ *
+ * @template T The object type.
+ * @param {string[]} keys The given keys.
+ * @param {ObjectMap<T>} objmap The source object map.
+ * @returns {ObjectMap<T>} The subset object map.
+ */
 const submapByKeys = <T>(keys: string[], objmap: ObjectMap<T>): ObjectMap<T> =>
   keys.reduce((acc, key) => { acc[key] = objmap[key]; return acc; }, {});
 
@@ -344,7 +388,15 @@ export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolea
   return result;
 };
 
-// XXX: duplicated
+/**
+ * Creates a sub cached storage by a box.
+ *
+ * @todo duplicated
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {BoxID} id The box ID.
+ * @returns {CachedStorage} The cached storage inside the box.
+ */
 export const scopedToBox = (storage: CachedStorage, id: BoxID): CachedStorage => {
   const { contains } = getBox(storage, id);
   const filter = (key: ObjectID): boolean => !!contains[key];
@@ -352,26 +404,62 @@ export const scopedToBox = (storage: CachedStorage, id: BoxID): CachedStorage =>
 };
 
 // XXX: duplicated
+/**
+ * Creates a sub cached storage by a map.
+ *
+ * @todo duplicated
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {CachedStorage} The cached storage inside the map.
+ */
 export const scopedToMap = (storage: CachedStorage): CachedStorage => {
   const filter = (key: ObjectID): boolean => !getObject(storage, key).belongsTo;
   return scoped(storage, filter);
 };
 
+/**
+ * The maps updating action contructor.
+ *
+ * @param {ObjectMap<MapData>} maps Map data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A maps updating action.
+ */
 export const updateMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_MAPS as typeof S.UPDATE_MAPS,
   payload: { maps, target },
 });
 
+/**
+ * The maps overwriting action constructor.
+ *
+ * @param {ObjectMap<MapData>} maps Map data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A maps overwriting action.
+ */
 export const overwriteMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_MAPS as typeof S.OVERWRITE_MAPS,
   payload: { maps, target },
 });
 
+/**
+ * The maps removing action constructor.
+ *
+ * @param {ObjectMap<MapData>} maps Map data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A maps removing action.
+ */
 export const removeMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_MAPS as typeof S.REMOVE_MAPS,
   payload: { maps, target },
 });
 
+/**
+ * A shortcut action to remove one map.
+ *
+ * @param {MapData} map The map data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A maps removing action.
+ */
 export const removeMap = (map: MapData, target: TargetType = TargetType.TEMPORARY) =>
   removeMaps(toIDMap<MapID, MapData>([map]));
 
