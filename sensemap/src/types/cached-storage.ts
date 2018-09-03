@@ -463,84 +463,212 @@ export const removeMaps = (maps: ObjectMap<MapData>, target: TargetType = Target
 export const removeMap = (map: MapData, target: TargetType = TargetType.TEMPORARY) =>
   removeMaps(toIDMap<MapID, MapData>([map]));
 
+/**
+ * The display objects updating action constructor.
+ *
+ * @param {ObjectMap<ObjectData>} objects Display object data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A objects updating action.
+ */
 export const updateObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_OBJECTS as typeof S.UPDATE_OBJECTS,
   payload: { objects, target },
 });
 
+/**
+ * The display objects overiting action constructor.
+ *
+ * @param {ObjectMap<ObjectData>} objects Display object data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A objects overiting action.
+ */
 export const overwriteObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_OBJECTS as typeof S.OVERWRITE_OBJECTS,
   payload: { objects, target },
 });
 
+/**
+ * The display objects removing action constructor.
+ *
+ * @param {ObjectMap<ObjectData>} objects Display object data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A objects removing action.
+ */
 export const removeObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_OBJECTS as typeof S.REMOVE_OBJECTS,
   payload: { objects, target },
 });
 
+/**
+ * A shortcut action to remove one display object.
+ *
+ * @param {ObjectData} object The display object.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A objects removing action.
+ */
 export const removeObject = (object: ObjectData, target: TargetType = TargetType.TEMPORARY) =>
   removeObjects(toIDMap<ObjectID, ObjectData>([object]));
 
+/**
+ * The cards updating action constructor.
+ *
+ * @param {ObjectMap<CardData>} cards Card data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A cards updating action.
+ */
 export const updateCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_CARDS as typeof S.UPDATE_CARDS,
   payload: { cards, target },
 });
 
+/**
+ * The cards overwriting action constructor.
+ *
+ * @param {ObjectMap<CardData>} cards Card data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A cards overwriting action.
+ */
 export const overwriteCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_CARDS as typeof S.OVERWRITE_CARDS,
   payload: { cards, target },
 });
 
+/**
+ * The cards removing action constructor.
+ *
+ * @param {ObjectMap<CardData>} cards Card data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A cards removing action.
+ */
 export const removeCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_CARDS as typeof S.REMOVE_CARDS,
   payload: { cards, target },
 });
 
+/**
+ * A shortcut action to remove one card.
+ *
+ * @param {CardData} card The card data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A cards removing action.
+ */
 export const removeCard = (card: CardData, target: TargetType = TargetType.TEMPORARY) =>
   removeCards(toIDMap<CardID, CardData>([card]));
 
+/**
+ * The boxes updating action constructor.
+ *
+ * @param {ObjectMap<BoxData>} boxes Box data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A boxes removing action.
+ */
 export const updateBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_BOXES as typeof S.UPDATE_BOXES,
   payload: { boxes, target },
 });
 
+/**
+ * The boxes overwriting action constructor.
+ *
+ * @param {ObjectMap<BoxData>} boxes Box data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A boxes overwriting action.
+ */
 export const overwriteBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_BOXES as typeof S.OVERWRITE_BOXES,
   payload: { boxes, target },
 });
 
+/**
+ * The boxes removing action constructor.
+ *
+ * @param {ObjectMap<BoxData>} boxes Box data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A boxes removing action.
+ */
 export const removeBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_BOXES as typeof S.REMOVE_BOXES,
   payload: { boxes, target },
 });
 
+/**
+ * A shortuct action to remove one box.
+ *
+ * @param {BoxData} box The box data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A boxes removing action.
+ */
 export const removeBox = (box: BoxData, target: TargetType = TargetType.TEMPORARY) =>
   removeBoxes(toIDMap<BoxID, BoxData>([box]));
 
+/**
+ * The edges updating action constructor.
+ *
+ * @param {ObjectMap<Edge>} edges Edge data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An edges updating action.
+ */
 export const updateEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.UPDATE_EDGES as typeof S.UPDATE_EDGES,
   payload: { edges, target },
 });
 
+/**
+ * The edges overwriting action constructor.
+ *
+ * @param {ObjectMap<Edge>} edges Edge data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An edges overwriting action.
+ */
 export const overwriteEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.OVERWRITE_EDGES as typeof S.OVERWRITE_EDGES,
   payload: { edges, target },
 });
 
+/**
+ * The edges removing action constructor.
+ *
+ * @param {ObjectMap<Edge>} edges Edge data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An edges removing action.
+ */
 export const removeEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_EDGES as typeof S.REMOVE_EDGES,
   payload: { edges, target },
 });
 
+/**
+ * A shortcut action to remove one edge.
+ *
+ * @param {Edge} edge The edge data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An edges removing action.
+ */
 export const removeEdge = (edge: Edge, target: TargetType = TargetType.TEMPORARY) =>
   removeEdges(toIDMap<EdgeID, Edge>([edge]));
 
+/**
+ * An action constructor for moving a card out of a given box.
+ *
+ * @param {ObjectID} cardObject The display object to hold the card.
+ * @param {BoxID} box The box ID.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An updating action.
+ */
 export const updateNotInBox =
   (cardObject: ObjectID, box: BoxID, target: TargetType = TargetType.TEMPORARY) => ({
     type: S.UPDATE_NOT_IN_BOX as typeof S.UPDATE_NOT_IN_BOX,
     payload: { cardObject, box, target },
   });
 
+/**
+ * An action constructor for moving a card into a given box.
+ *
+ * @param {ObjectID} cardObject The display object to hold the card.
+ * @param {BoxID} box The box ID.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An updating action.
+ */
 export const updateInBox =
   (cardObject: ObjectID, box: BoxID, target: TargetType = TargetType.TEMPORARY) => ({
     type: S.UPDATE_IN_BOX as typeof S.UPDATE_IN_BOX,
@@ -574,6 +702,13 @@ export const actions = {
 
 export type Action = ActionUnion<typeof actions>;
 
+/**
+ * The cached storage reducer.
+ *
+ * @param {CachedStorage} [state=initial] The current cached storage.
+ * @param {Action} [action=emptyAction] A cached storage action.
+ * @returns {CachedStorage} A new cached storage.
+ */
 export const reducer = (state: CachedStorage = initial, action: Action = emptyAction): CachedStorage => {
   switch (action.type) {
     case S.UPDATE_MAPS:
