@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Group } from 'react-konva';
 import Nothing from './Nothing';
 import { Transform } from '../../graphics/point';
-import { noop } from '../../types/utils';
+import { GetComponentProps, noop } from '../../types/utils';
 
 export interface TransformerForProps {
   transform: Transform;
@@ -10,19 +10,17 @@ export interface TransformerForProps {
 }
 
 export interface LayoutForProps {
-  onResize(width: number, height: number): void;
+  onResize?(width: number, height: number): void;
 }
 
 interface OwnProps {
   children: React.ReactNode;
   direction?: 'row' | 'column';
-  x?: number;
-  y?: number;
   margin?: number;
 }
 
 // XXX: should I pass transformers automatically?
-type Props = OwnProps & LayoutForProps;
+type Props = OwnProps & GetComponentProps<Group> & LayoutForProps;
 
 interface State {
   width: number;
@@ -40,7 +38,14 @@ class Layout extends React.PureComponent<Props, State> {
   }
 
   handleTailResize = (width: number, height: number): void => {
-    const { direction = 'row', margin = 0, onResize = noop } = this.props;
+    const { direction = 'row', onResize = noop } = this.props;
+
+    // XXX: a dirty hack to remove the trailing margin
+    let { margin = 0 } = this.props;
+    if (width === 0 && height === 0) {
+      margin = 0;
+    }
+
     onResize(
       direction === 'row'
         ? this.state.width + margin + width
@@ -59,6 +64,7 @@ class Layout extends React.PureComponent<Props, State> {
       y = 0,
       margin = 0,
       onResize = noop,
+      ...props
     } = this.props;
     const { width, height } = this.state;
     const [c, ...cs] = React.Children.toArray(children);
@@ -69,17 +75,18 @@ class Layout extends React.PureComponent<Props, State> {
     }
 
     return (
-      <Group x={x} y={y}>
+      <Group {...props} x={x} y={y}>
         {
           React.cloneElement(
             c as React.ReactElement<LayoutForProps>,
-            { onResize: this.handleHeadResize }
+            { onResize: this.handleHeadResize } as LayoutForProps
           )
         }
         {
           headRendered &&
           <Layout
             direction={direction}
+            margin={margin}
             onResize={this.handleTailResize}
             {...(
               direction === 'row'

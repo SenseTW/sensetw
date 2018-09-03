@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Group, Rect, Circle, Text } from 'react-konva';
-import { TransformerForProps } from '../../Layout';
+import { Group, Rect, Circle } from 'react-konva';
+import Layout, { TransformerForProps } from '../../Layout';
+import Text from '../../Layout/Text';
 import Selectable from '../../Layout/Selectable';
 import TagList from '../TagList';
 import * as D from '../../../graphics/drawing';
@@ -28,7 +29,8 @@ interface OwnProps {
 type Props = OwnProps & TransformerForProps;
 
 interface State {
-  tagHeight: number;
+  containerWidth: number;
+  containerHeight: number;
 }
 
 const color = {
@@ -41,12 +43,19 @@ const color = {
 const colorFromType = (cardType: T.CardType): string =>
   color[cardType] || 'rgba(255, 255, 255, 1)';
 
-const summaryLimit = 39;
-const descriptionLimit = 64;
+const summaryLimit = Infinity;
+const descriptionLimit = Infinity;
 
-class Card extends React.Component<Props, State> {
+class Card extends React.PureComponent<Props, State> {
   static style = {
     borderRadius: 4,
+    padding: {
+      top: 8,
+      right: 10,
+      bottom: 8,
+      left: 10,
+    },
+    textGap: 10,
     dirty: {
       radius: 5,
       padding: {
@@ -58,29 +67,15 @@ class Card extends React.Component<Props, State> {
       color: '#3ad8fa',
     },
     description: {
-      padding: {
-        top: 12 + 22 * 3,
-        right: 10,
-        bottom: 0,
-        left: 10,
-      },
       fontFamily: 'sans-serif',
       fontSize: 13,
       lineHeight: 20 / 13,
-      height: 64,
       color: '#5a5a5a',
     },
     summary: {
-      padding: {
-        top: 8,
-        right: 10,
-        bottom: 8,
-        left: 10,
-      },
       fontFamily: 'sans-serif',
       fontSize: 16,
-      lineHeight: 32 / 16,
-      height: 22 * 3,
+      lineHeight: 24 / 16,
       color: '#000000',
     },
     shadow: {
@@ -94,40 +89,41 @@ class Card extends React.Component<Props, State> {
       color: '#3ad8fa',
       strokeWidth: 3,
     },
-    tag: {
-      margin: {
-        top: 8,
-        right: 8,
-        bottom: 8,
-        left: 8,
-      },
-    },
   };
 
   state = {
-    tagHeight: 0,
+    containerWidth: 0,
+    containerHeight: 0,
   };
+
+  handleContainerResize = (containerWidth: number, containerHeight: number): void => {
+    this.setState({ containerWidth, containerHeight });
+  }
 
   render() {
     const { transform, inverseTransform, isDirty = false } = this.props;
+    const { containerWidth, containerHeight } = this.state;
     const style = transformObject(transform, Card.style) as typeof Card.style;
     const { data } = this.props.mapObject;
-    const transformed = this.props.transform({
+    let transformed = this.props.transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
+      // XXX: deprecated
       width: this.props.mapObject.width,
+      // XXX deprecated
       height: this.props.mapObject.height,
     });
-    const { width, height } = transformed;
+    const { width } = transformed;
+    const textWidth = width - style.padding.left - style.padding.right;
+    transformed.width = containerWidth;
+    transformed.height = containerHeight;
     const { left: x, top: y } = D.rectFromBox(transformed);
     const {summary, description, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedDescription   = description.substr(0, descriptionLimit);
-    const tagHeight = this.state.tagHeight;
+    const height = style.padding.top + containerHeight + style.padding.bottom;
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
-    const summaryWidth = width - style.summary.padding.left - style.summary.padding.right;
-    const descriptionWidth = width - style.description.padding.left - style.description.padding.right;
 
     const handleSelect     = this.props.handleSelect     || noop;
     const handleDeselect   = this.props.handleDeselect   || noop;
@@ -198,39 +194,54 @@ class Card extends React.Component<Props, State> {
               fill={style.dirty.color}
             />
           }
-          <Text
-            x={style.summary.padding.left}
-            y={style.summary.padding.top}
-            width={summaryWidth}
-            height={style.summary.height}
-            padding={style.summary.padding.left}
-            fontSize={style.summary.fontSize}
-            fontFamily={style.summary.fontFamily}
-            lineHeight={style.summary.lineHeight}
-            fill={style.summary.color}
-            text={sanitizedSummary}
-          />
-          <Text
-            x={style.description.padding.left}
-            y={style.description.padding.top}
-            width={descriptionWidth}
-            height={style.description.height}
-            padding={style.description.padding.left}
-            fontSize={style.description.fontSize}
-            fontFamily={style.description.fontFamily}
-            lineHeight={style.description.lineHeight}
-            fill={style.description.color}
-            text={sanitizedDescription}
-          />
-          <TagList
-            transform={transform}
-            inverseTransform={inverseTransform}
-            x={style.tag.margin.left}
-            y={height - style.tag.margin.bottom - tagHeight}
-            width={width - style.tag.margin.left - style.tag.margin.right}
-            tags={toTags(tags)}
-            onResize={(w, h) => this.setState({ tagHeight: h })}
-          />
+          <Layout
+            direction="column"
+            x={style.padding.left}
+            y={style.padding.top}
+            margin={style.textGap}
+            onResize={this.handleContainerResize}
+          >
+            {
+              sanitizedSummary.length === 0
+                ? null
+                : (
+                  <Text
+                    width={textWidth}
+                    fontSize={style.summary.fontSize}
+                    fontFamily={style.summary.fontFamily}
+                    lineHeight={style.summary.lineHeight}
+                    fill={style.summary.color}
+                    text={sanitizedSummary}
+                  />
+                )
+            }
+            {
+              sanitizedDescription.length === 0
+                ? null
+                : (
+                  <Text
+                    width={textWidth}
+                    fontSize={style.description.fontSize}
+                    fontFamily={style.description.fontFamily}
+                    lineHeight={style.description.lineHeight}
+                    fill={style.description.color}
+                    text={sanitizedDescription}
+                  />
+                )
+            }
+            {
+              tags.length === 0
+                ? null
+                : (
+                  <TagList
+                    transform={transform}
+                    inverseTransform={inverseTransform}
+                    width={textWidth}
+                    tags={toTags(tags)}
+                  />
+                )
+            }
+          </Layout>
         </Group>
       </Selectable>
     );
