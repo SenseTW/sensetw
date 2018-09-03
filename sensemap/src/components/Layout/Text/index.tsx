@@ -1,12 +1,9 @@
 import * as React from 'react';
+import { LayoutForProps } from '../';
 import { TextConfig, Text as KonvaText  } from 'konva';
 import { Text as ReactKonvaText } from 'react-konva';
 
-interface OwnProps {
-  onResize?(width: number, height: number): void;
-}
-
-type Props = OwnProps & TextConfig;
+type Props = LayoutForProps & TextConfig;
 
 /**
  * The `Text` component should rerender itself anyway and report it's width and
