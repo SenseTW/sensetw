@@ -102,7 +102,7 @@ class Card extends React.PureComponent<Props, State> {
 
   render() {
     const { transform, inverseTransform, isDirty = false } = this.props;
-    const { containerWidth, containerHeight } = this.state;
+    const { containerHeight } = this.state;
     const style = transformObject(transform, Card.style) as typeof Card.style;
     const { data } = this.props.mapObject;
     let transformed = this.props.transform({
@@ -112,16 +112,17 @@ class Card extends React.PureComponent<Props, State> {
       width: this.props.mapObject.width,
       // XXX deprecated
       height: this.props.mapObject.height,
+      anchor: this.props.mapObject.anchor,
     });
     const { width } = transformed;
+    const height = style.padding.top + containerHeight + style.padding.bottom;
     const textWidth = width - style.padding.left - style.padding.right;
-    transformed.width = containerWidth;
-    transformed.height = containerHeight;
+    transformed.width = width;
+    transformed.height = height;
     const { left: x, top: y } = D.rectFromBox(transformed);
     const {summary, description, cardType, tags} = this.props.card;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedDescription   = description.substr(0, descriptionLimit);
-    const height = style.padding.top + containerHeight + style.padding.bottom;
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
 
