@@ -68,7 +68,6 @@ class Layout extends React.PureComponent<Props, State> {
     } = this.props;
     const { width, height } = this.state;
     const [c, ...cs] = React.Children.toArray(children);
-    const headRendered = width !== 0 || height !== 0;
 
     if (c === undefined) {
       return <Nothing onResize={onResize} />;
@@ -82,23 +81,20 @@ class Layout extends React.PureComponent<Props, State> {
             { onResize: this.handleHeadResize } as LayoutForProps
           )
         }
-        {
-          headRendered &&
-          <Layout
-            direction={direction}
-            margin={margin}
-            onResize={this.handleTailResize}
-            {...(
-              direction === 'row'
-                ? { x: width + margin }
-                : direction === 'column'
-                    ? { y: height + margin }
-                    : null as never
-            )}
-          >
-            {cs}
-          </Layout>
-        }
+        <Layout
+          direction={direction}
+          margin={margin}
+          onResize={this.handleTailResize}
+          {...(
+            direction === 'row'
+              ? { x: width + margin }
+              : direction === 'column'
+                  ? { y: height + margin }
+                  : null as never
+          )}
+        >
+          {cs}
+        </Layout>
       </Group>
     );
   }

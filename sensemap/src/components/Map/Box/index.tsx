@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Group, Rect, Circle } from 'react-konva';
-import { TransformerForProps } from '../../Layout';
+import { TransformerForProps, LayoutForProps } from '../../Layout';
+import Layout from '../../Layout';
+import Nothing from '../../Layout/Nothing';
 import Selectable from '../../Layout/Selectable';
 import Header from './Header';
 import Card from './Card';
@@ -40,47 +42,46 @@ interface OwnProps {
   openBox?(box: T.BoxID): void;
 }
 
-type Props = OwnProps & TransformerForProps;
+type Props = OwnProps & LayoutForProps & TransformerForProps;
 
 interface State {
   listDisplay: ListDisplay;
+  width: number;
+  height: number;
 }
 
 function boxCards(
   transform: G.Transform, inverseTransform: G.Transform,
-  { cardHeight, width, height }: { cardHeight: number, width: number, height: number },
+  { width }: { width: number },
   cards: T.CardData[]
 ) {
-  const top = height;
   return (
-    <Group x={0} y={top}>
+    <Layout direction="column">
       {cards.map(
-        (card, i) =>
+        (card) =>
           <Card
+            key={card.id}
             transform={transform}
             inverseTransform={inverseTransform}
             card={card}
-            x={0}
-            y={i * cardHeight}
             width={width}
-            height={cardHeight}
-            key={card.id}
           />
       )}
-    </Group>
+    </Layout>
   );
 }
 
-class Box extends React.Component<Props, State> {
+class Box extends React.PureComponent<Props, State> {
+
   static style = {
+    padding: {
+      top: 10,
+      right: 10,
+      bottom: 10,
+      left: 10,
+    },
     dirty: {
       radius: 5,
-      padding: {
-        top: 10,
-        right: 10,
-        bottom: 10,
-        left: 10,
-      },
       color: '#3ad8fa',
     },
     selected: {
@@ -93,6 +94,8 @@ class Box extends React.Component<Props, State> {
 
   state = {
     listDisplay: ListDisplay.COLLAPSED,
+    width: 0,
+    height: 0,
   };
 
   constructor(props: Props) {
@@ -104,23 +107,34 @@ class Box extends React.Component<Props, State> {
     this.setState({ listDisplay: toggleListDisplay(this.state.listDisplay) });
   }
 
+  handleResize = (width: number, height: number): void => {
+    const { transform, onResize = noop } = this.props;
+    const { padding } = transformObject(transform, Box.style) as typeof Box.style;
+    this.setState({ width, height });
+    onResize(
+      padding.left + width + padding.right,
+      padding.top + height + padding.bottom,
+    );
+  }
+
   render() {
     const { transform, inverseTransform, box, isDirty = false } = this.props;
+    const { height } = this.state;
     const style = transformObject(transform, Box.style) as typeof Box.style;
-    const transformed = transform({
+    let transformed = transform({
       x: this.props.mapObject.x,
       y: this.props.mapObject.y,
       width: this.props.mapObject.width,
       height: this.props.mapObject.height,
       anchor: this.props.mapObject.anchor,
     });
-    const { width, height } = transformed;
+    const { width } = transformed;
+    transformed.width = width;
+    transformed.height = height;
     const { left: x, top: y } = D.rectFromBox(transformed);
     const cards = Object.values(this.props.cards);
-    const { height: cardHeight } = this.props.transform({ height: Card.style.height });
-    const { height: toggleHeight } = this.props.transform({ height: Toggle.style.height });
-    const selectedWidth = transformed.width - style.selected.offset.x * 2;
-    const selectedHeight = transformed.height - style.selected.offset.y * 2;
+    const selectedWidth = width - style.selected.offset.x * 2;
+    const selectedHeight = height - style.selected.offset.y * 2;
 
     const handleSelect     = this.props.handleSelect     || noop;
     const handleDeselect   = this.props.handleDeselect   || noop;
@@ -179,38 +193,33 @@ class Box extends React.Component<Props, State> {
             transform={transform}
             inverseTransform={inverseTransform}
             box={box}
-            x={0}
-            y={0}
             width={width}
-            height={height}
+            onResize={this.handleResize}
           />
           {
             isDirty &&
             <Circle
-              x={width - style.dirty.padding.left}
-              y={style.dirty.padding.top}
+              x={width - style.padding.left}
+              y={style.padding.top}
               radius={style.dirty.radius}
               fill={style.dirty.color}
             />
           }
-          {this.state.listDisplay === ListDisplay.COLLAPSED
-            ? null : boxCards(transform, inverseTransform, { cardHeight, width, height }, cards)}
-          <Toggle
-            transform={transform}
-            inverseTransform={inverseTransform}
-            x={0}
-            y={
-              height
-              + (this.state.listDisplay === ListDisplay.COLLAPSED
-                ? 0
-                : cardHeight * cards.length
-                )
+          <Layout y={height} direction="column">
+            {
+              this.state.listDisplay === ListDisplay.COLLAPSED
+                ? <Nothing />
+                : boxCards(transform, inverseTransform, { width }, cards)
             }
-            width={width}
-            height={toggleHeight}
-            show={this.state.listDisplay === ListDisplay.EXPANDED}
-            action={this.handleToggleListDisplay}
-          />
+            <Toggle
+              disabled={cards.length === 0}
+              transform={transform}
+              inverseTransform={inverseTransform}
+              width={width}
+              show={this.state.listDisplay === ListDisplay.EXPANDED}
+              action={this.handleToggleListDisplay}
+            />
+          </Layout>
         </Group>
       </Selectable>
     );

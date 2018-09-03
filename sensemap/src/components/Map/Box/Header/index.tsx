@@ -1,26 +1,37 @@
 import * as React from 'react';
-import { Group, Rect, Text } from 'react-konva';
+import { Group, Rect } from 'react-konva';
 import TagList from '../../TagList';
-import { TransformerForProps } from '../../../Layout';
+import { TransformerForProps, LayoutForProps } from '../../../Layout';
+import Layout from '../../../Layout';
+import Text from '../../../Layout/Text';
 import { transformObject } from '../../../../types/viewport';
-import { toTags } from '../../../../types/utils';
+import { toTags, noop } from '../../../../types/utils';
 
 interface OwnProps {
   box: { title: string, tags: string };
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
+  width?: number;
+}
+
+type Props = OwnProps & LayoutForProps & TransformerForProps;
+
+interface State {
   width: number;
   height: number;
 }
 
-type Props = OwnProps & TransformerForProps;
+class Header extends React.PureComponent<Props, State> {
 
-interface State {
-  tagHeight: number;
-}
-
-class Header extends React.Component<Props, State> {
   static style = {
+    width: 320,
+    padding: {
+      top: 18,
+      right: 20,
+      bottom: 18,
+      left: 20,
+    },
+    textGap: 10,
     background: {
       color: '#ffffff',
     },
@@ -30,37 +41,44 @@ class Header extends React.Component<Props, State> {
       width: 1
     },
     contents: {
-      title: {
-        left: 20,
-        top: 18,
-        color: '#000000',
-        width: 320 - 20 * 2,
-        height: 48,
-        textLimit: 14 * 2,
-        font: {
-          family: 'sans-serif',
-          size: 20,
-        },
-        lineHeight: 22 / 20,
+      color: '#000000',
+      font: {
+        family: 'sans-serif',
+        size: 20,
       },
-      tags: {
-        left: 21,
-        bottom: 8,
-      }
+      lineHeight: 22 / 20,
+    },
+    tags: {
+      left: 21,
+      bottom: 8,
     },
   };
 
   state = {
-    tagHeight: 0,
+    width: 0,
+    height: 0,
   };
 
+  handleResize = (width: number, height: number): void => {
+    const { transform, onResize = noop } = this.props;
+    const { padding } = transformObject(transform, Header.style) as typeof Header.style;
+    this.setState({ width, height });
+    onResize(
+      padding.left + width + padding.right,
+      padding.top + height + padding.bottom,
+    );
+  }
+
   render() {
-    const { transform, inverseTransform, box, width, height } = this.props;
-    const { tagHeight } = this.state;
+    const { transform, inverseTransform, box, x = 0, y = 0, width = 0 } = this.props;
     const style = transformObject(transform, Header.style) as typeof Header.style;
-    const sanitizedTitle = box.title.substr(0, Header.style.contents.title.textLimit);
+    const { height: innerHeight } = this.state;
+    const innerWidth = width - style.padding.left - style.padding.right;
+    const height = style.padding.top + innerHeight + style.padding.bottom;
+    const sanitizedTitle = box.title;
+
     return (
-      <Group>
+      <Group x={x} y={y}>
         <Rect
           fill={style.background.color}
           width={width}
@@ -69,25 +87,33 @@ class Header extends React.Component<Props, State> {
           strokeWidth={style.border.width}
           cornerRadius={style.cornerRadius}
         />
-        <Text
-          x={style.contents.title.left}
-          y={style.contents.title.top}
-          width={style.contents.title.width}
-          fill={style.contents.title.color}
-          fontFamily={style.contents.title.font.family}
-          fontSize={style.contents.title.font.size}
-          lineHeight={style.contents.title.lineHeight}
-          text={sanitizedTitle}
-        />
-        <TagList
-          transform={transform}
-          inverseTransform={inverseTransform}
-          x={style.contents.tags.left}
-          y={height - style.contents.tags.bottom - tagHeight}
-          width={width - 2 * style.contents.tags.left}
-          tags={toTags(box.tags)}
-          onResize={(w, h) => this.setState({ tagHeight: h })}
-        />
+        <Layout
+          direction="column"
+          x={style.padding.left}
+          y={style.padding.top}
+          onResize={this.handleResize}
+        >
+          <Text
+            width={innerWidth}
+            fill={style.contents.color}
+            fontFamily={style.contents.font.family}
+            fontSize={style.contents.font.size}
+            lineHeight={style.contents.lineHeight}
+            text={sanitizedTitle}
+          />
+          {
+            box.tags.length === 0
+              ? null
+              : (
+                <TagList
+                  transform={transform}
+                  inverseTransform={inverseTransform}
+                  width={innerWidth}
+                  tags={toTags(box.tags)}
+                />
+              )
+          }
+        </Layout>
       </Group>
     );
   }

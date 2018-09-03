@@ -1,23 +1,35 @@
 import * as React from 'react';
-import { TransformerForProps } from '../../../Layout';
-import { Group, Rect, Text } from 'react-konva';
+import { TransformerForProps, LayoutForProps } from '../../../Layout';
+import Text from '../../../Layout/Text';
+import { Group, Rect } from 'react-konva';
 import * as T from '../../../../types';
+import { noop } from '../../../../types/utils';
 import { transformObject } from '../../../../types/viewport';
 
 interface OwnProps {
   card: T.CardData;
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
+  width?: number;
+}
+
+type Props = OwnProps & LayoutForProps & TransformerForProps;
+
+interface State {
   width: number;
   height: number;
 }
 
-type Props = OwnProps & TransformerForProps;
-
-class Card extends React.Component<Props> {
+class Card extends React.PureComponent<Props, State> {
 
   static style = {
-    height: 70,
+    width: 320,
+    padding: {
+      top: 17,
+      right: 20,
+      bottom: 17,
+      left: 20,
+    },
     background: {
       color: '#ffffff',
     },
@@ -27,27 +39,39 @@ class Card extends React.Component<Props> {
       width: 1,
     },
     contents: {
-      title: {
-        left: 20,
-        top: 17,
-        color: '#000000',
-        height: 40,
-        width: 320 - 20 * 2,
-        textLimit: 34,
-        font: {
-          family: 'sans-serif',
-          size: 16,
-        },
-        lineHeight: 20 / 16,
+      color: '#000000',
+      font: {
+        family: 'sans-serif',
+        size: 16,
       },
+      lineHeight: 20 / 16,
     },
   };
 
+  state = {
+    width: 0,
+    height: 0,
+  };
+
+  handleResize = (width: number, height: number): void => {
+    const { transform, onResize = noop } = this.props;
+    const { padding } = transformObject(transform, Card.style) as typeof Card.style;
+
+    this.setState({ width, height });
+    onResize(
+      padding.left + width + padding.right,
+      padding.top + height + padding.bottom,
+    );
+  }
+
   render() {
-    const { transform, x = 0, y = 0, width = 0, height = 0 } = this.props;
+    const { transform, x = 0, y = 0, width = 0 } = this.props;
     const style = transformObject(transform, Card.style) as typeof Card.style;
-    const text = (this.props.card.summary || this.props.card.description || '')
-      .substr(0, Card.style.contents.title.textLimit);
+    const { height: innerHeight } = this.state;
+    const innerWidth = width - style.padding.left - style.padding.right;
+    const height = style.padding.top + innerHeight + style.padding.bottom;
+    const text = (this.props.card.summary || this.props.card.description || '');
+
     return (
       <Group x={x} y={y}>
         <Rect
@@ -59,15 +83,15 @@ class Card extends React.Component<Props> {
           cornerRadius={style.cornerRadius}
         />
         <Text
-          x={style.contents.title.left}
-          y={style.contents.title.top}
-          width={style.contents.title.width}
-          height={style.contents.title.height}
-          fill={style.contents.title.color}
-          fontFamily={style.contents.title.font.family}
-          fontSize={style.contents.title.font.size}
-          lineHeight={style.contents.title.lineHeight}
+          x={style.padding.left}
+          y={style.padding.top}
+          width={innerWidth}
+          fill={style.contents.color}
+          fontFamily={style.contents.font.family}
+          fontSize={style.contents.font.size}
+          lineHeight={style.contents.lineHeight}
           text={text}
+          onResize={this.handleResize}
         />
       </Group>
     );
