@@ -13,6 +13,7 @@ import passport = require('./passport');
 import * as U from '../types/user';
 import { bypassAuthenticated, requireAuthentication } from './redirect';
 import * as isemail from 'isemail';
+import { sendEmail } from './smtp';
 
 export function router(context: Context) {
   const router = Router();
@@ -122,8 +123,12 @@ export function router(context: Context) {
       }
 
       const token = await U.createResetPasswordToken(db, user.id);
-      console.log(token);
-      // XXX send email
+
+      await sendEmail(
+        user.email,
+        'Reset password on Sense.tw',
+        `Please reset your password at ${process.env.PUBLIC_URL}/reset-password?token=${token.token}`
+      );
 
       return res.send(await render(ForgetPasswordPage, { type: 'RESULT' }));
     });
