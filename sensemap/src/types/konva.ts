@@ -1,4 +1,4 @@
-import { Node } from 'konva';
+import * as Konva from 'konva';
 
 // XXX: 1?
 // see: https://github.com/konvajs/konva/blob/f8bd25cbfe073e7093120503d530459f22d2292a/src/Util.js#L476
@@ -16,24 +16,24 @@ export namespace Event {
       type: 'mousedown' | 'mouseup'     | 'mouseover'   |
             'mouseout'  | 'mouseenter'  | 'mouseleave'  |
             'mousemove';
-      target: Node & { nodeType: NodeType };
-      currentTarget: Node;
+      target: Konva.Node & { nodeType: NodeType };
+      currentTarget: Konva.Node;
       evt: MouseEvent;
       cancelBubble: boolean;
   }
 
   export interface Touch {
     type: 'touchstart' | 'touchmove' | 'touchend';
-    target: Node & { nodeType: NodeType };
-    currentTarget: Node;
+    target: Konva.Node & { nodeType: NodeType };
+    currentTarget: Konva.Node;
     evt: TouchEvent;
     cancelBubble: boolean;
   }
 
   export interface MouseWheel {
       type: 'mousewheel';
-      target: Node;
-      currentTarget: Node;
+      target: Konva.Node;
+      currentTarget: Konva.Node;
       evt: MouseWheelEvent;
   }
 

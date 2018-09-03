@@ -1,3 +1,8 @@
+import * as React from 'react';
+
+export type GetComponentProps<T>
+  = T extends React.ComponentType<infer P> | React.Component<infer P> ? P : never;
+
 export type TimeStamp = number;
 
 export const TIME_FORMAT = 'YYYY-M-DD HH:mm';
