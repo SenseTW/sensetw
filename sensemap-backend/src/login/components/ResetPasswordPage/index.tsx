@@ -15,7 +15,7 @@ const ResetPasswordPage = (props: Props = { type: 'FORM', token: '' }) => {
   if (props.type === 'RESULT') {
     return (
       <Layout header='Reset Password' style={{ background: '#fcb3d7' }}>
-        <div>Your password has been reset!  <a href="/login">LOG IN!</a></div>
+        <div>Your password has been successfully reset. <a href="/login">LOG IN</a> now!</div>
       </Layout>
     );
   } else {
