@@ -109,7 +109,7 @@ export function router(context: Context) {
     '/forget-password',
     bypassAuthenticated(),
     async (req, res) => {
-      const { db } = context({ req });
+      const { db, env } = context({ req });
       const email = req.body.email.toLowerCase();
       if (!isemail.validate(email)) {
         req.flash('emailError', 'Email must be a valid Email');
@@ -124,11 +124,22 @@ export function router(context: Context) {
 
       const token = await U.createResetPasswordToken(db, user.id);
 
-      await sendEmail(
-        user.email,
-        'Reset password on Sense.tw',
-        `Please reset your password at ${process.env.PUBLIC_URL}/reset-password?token=${token.token}`
-      );
+      const resetLink = `${env.PUBLIC_URL}/reset-password?token=${token.token}`;
+
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset password on Sense.tw',
+        text: `Hi ${user.username},
+
+Forgot your password? Let's reset your password at: ${resetLink}
+
+If you don’t want to change it, just ignore this email. Your password will stay the same.
+If you have more questions, send us a note at hello@sense.tw . We’d love to help!`,
+        html: `<p>Hi ${user.username},</p>
+<p>Forgot your password? Let’s reset your password at: <a href="${resetLink}">${resetLink}</a></p>
+<p>If you don’t want to change it, just ignore this email. Your password will stay the same. If you have more questions, send us a note at <a href="mailto:hello@sense.tw">hello@sense.tw</a>. We’d love to help!</p>
+  `,
+      });
 
       return res.send(await render(ForgetPasswordPage, { type: 'RESULT' }));
     });
