@@ -44,3 +44,10 @@ export namespace Arr {
     ];
   }
 }
+
+export function sanitizeURL(a?: string): string {
+  if (!a) {
+    return '';
+  }
+  return a.replace(/\/+$/, '');
+}

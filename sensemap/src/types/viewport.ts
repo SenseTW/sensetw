@@ -169,6 +169,7 @@ export const reducer = (state: State = initial, action: Action): State => {
     case PAN_VIEWPORT: {
       return {
         ...state,
+        // XXX: doesn't work as expected in Safari
         left: state.left - action.payload.x / state.level,
         top:  state.top  - action.payload.y / state.level,
       };

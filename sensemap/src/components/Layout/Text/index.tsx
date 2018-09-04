@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Node, TextConfig } from 'konva';
-import { Text as KonvaText } from 'react-konva';
+import { TextConfig, Text as KonvaText  } from 'konva';
+import { Text as ReactKonvaText } from 'react-konva';
 
 interface OwnProps {
   onResize?(width: number, height: number): void;
@@ -8,10 +8,12 @@ interface OwnProps {
 
 type Props = OwnProps & TextConfig;
 
-class Text extends React.PureComponent<Props> {
-  textNode: Node | null = null;
-  width: number = 0;
-  height: number = 0;
+/**
+ * The `Text` component should rerender itself anyway and report it's width and
+ * height back to the parent component.
+ */
+class Text extends React.Component<Props> {
+  textNode: KonvaText | null = null;
 
   handleResize() {
     if (!this.textNode) { return; }
@@ -20,11 +22,7 @@ class Text extends React.PureComponent<Props> {
     const width = this.textNode.getWidth();
     const height = this.textNode.getHeight();
 
-    if (this.width !== width || this.height !== height) {
-      if (onResize) { onResize(width, height); }
-      this.width = width;
-      this.height = height;
-    }
+    if (onResize) { onResize(width, height); }
   }
 
   componentDidMount() {
@@ -40,7 +38,7 @@ class Text extends React.PureComponent<Props> {
 
     return (
       // tslint:disable-next-line:no-any
-      <KonvaText {...props} text={text} ref={(node: any) => this.textNode = node} />
+      <ReactKonvaText {...props} text={text} ref={(node: any) => this.textNode = node} />
     );
   }
 }

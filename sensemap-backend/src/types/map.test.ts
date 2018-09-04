@@ -35,7 +35,7 @@ describe('GraphQL', () => {
     expect(m0.createdAt).toBeTruthy();
     expect(m0.updatedAt).toBeTruthy();
     expect(m0.name).toBeNull();
-    expect(m0.owner).toBe(users[0].id);
+    expect(m0.owner).toBeNull();
 
     const m1 = await M.resolvers.Mutation.updateMap(null, { id: m0.id, name: 'baz', type: 'someothertype' }, { db }, null);
 
@@ -64,8 +64,16 @@ describe('GraphQL', () => {
   });
 });
 
+describe('Basics', () => {
+  test('getObjectsInMap', async () => {
+    const objects = await M.getObjectsInMap(db, maps[0].id);
+    expect(objects[0].map).toEqual(maps[0].id);
+  });
 
-test('getObjectsInMap', async () => {
-  const objects = await M.getObjectsInMap(db, maps[0].id);
-  expect(objects[0].map).toEqual(maps[0].id);
+  test('updateMapUpdatedAt', async () => {
+    const m0 = await M.getMap(db, maps[0].id);
+    const old = m0.updatedAt;
+    const m1 = await M.updateMapUpdatedAt(db, maps[0].id);
+    expect(m1.updatedAt.valueOf()).toBeGreaterThan(old.valueOf());
+  });
 });

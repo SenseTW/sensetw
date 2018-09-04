@@ -1,5 +1,6 @@
 import { HasID } from './has-id';
 import { ObjectID } from './object';
+import { UserData, anonymousUserData } from './user';
 import { ActionUnion, emptyAction } from '../action';
 import { TimeStamp } from '../utils';
 import { equals } from 'ramda';
@@ -12,6 +13,10 @@ export enum CardType {
   QUESTION = 'QUESTION',
   ANSWER = 'ANSWER',
   NOTE = 'NOTE',
+  STATEMENT = 'STATEMENT',
+  DEFINITION = 'DEFINITION',
+  PROBLEM = 'PROBLEM',
+  SOLUTION = 'SOLUTION',
 }
 
 /**
@@ -30,13 +35,14 @@ export const DEFAULT_HEIGHT = 160;
 export const typeToString = (type: CardType) => {
   switch (type) {
     case CardType.NORMAL:
-      return 'NORMAL';
     case CardType.QUESTION:
-      return 'CARD';
     case CardType.ANSWER:
-      return 'ANSWER';
     case CardType.NOTE:
-      return 'NOTE';
+    case CardType.STATEMENT:
+    case CardType.DEFINITION:
+    case CardType.PROBLEM:
+    case CardType.SOLUTION:
+      return type as string;
     default:
       return 'UNKNOWN';
   }
@@ -62,6 +68,7 @@ export interface CardData extends HasID<CardID> {
   stakeholder: string;
   url: string;
   cardType: CardType;
+  owner: UserData;
 }
 
 /**
@@ -98,7 +105,8 @@ export const emptyCardData: CardData = {
   saidBy: '',
   stakeholder: '',
   url: '',
-  cardType: CardType.NORMAL
+  cardType: CardType.NORMAL,
+  owner: anonymousUserData,
 };
 
 /**

@@ -1,5 +1,4 @@
 import * as express from 'express';
-import { pick } from 'ramda';
 import * as C from '../types/card';
 import { translateAnnotation } from './card';
 
@@ -16,17 +15,17 @@ type SearchQuery = {
   any?: string,
 };
 
-function getURL(url: any): string | undefined {
+function getURL(url: any): string {
   if (typeof url === 'string') {
     return url;
   } else if (Array.isArray(url)) {
     return url[0];
   }
-  return;
+  return '';
 }
 
 function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
-  const { limit, offset, sort, order, uri, url, user, group, tag } = query;
+  const { limit, offset, sort, order, uri, url, group, tag } = query;
 
   let filter: C.CardFilter = {};
   if (uri || url) {

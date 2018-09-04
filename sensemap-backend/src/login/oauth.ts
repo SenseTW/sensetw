@@ -24,7 +24,7 @@ const getUser = async (id: string): Promise<User> => {
   return U.getUser(db, id);
 };
 
-const getAccessToken = async (accessToken: string): Promise<Token> => {
+export const getAccessToken = async (accessToken: string): Promise<Token> => {
   const rows = await db.select(['accessToken', 'accessTokenExpiresAt', 'refreshToken', 'refreshTokenExpiresAt', 'clientId', 'userId']).from('oauth_token').where('accessToken', accessToken);
   if (rows.length === 0) {
     return null;
@@ -37,7 +37,7 @@ const getAccessToken = async (accessToken: string): Promise<Token> => {
 };
 
 const saveToken = async (token: Token, client: Client, user: User): Promise<Token> => {
-  const rows = await db('oauth_token').insert({
+  await db('oauth_token').insert({
     accessToken: token.accessToken,
     accessTokenExpiresAt: token.accessTokenExpiresAt,
     refreshToken: token.refreshToken,
@@ -77,7 +77,7 @@ const saveAuthorizationCode = async (code: AuthorizationCode, client: Client, us
     client,
     user,
   };
-  const rows = await db('oauth_authorization_code').insert({
+  await db('oauth_authorization_code').insert({
     authorizationCode: code.authorizationCode,
     expiresAt: code.expiresAt,
     redirectUri: code.redirectUri,

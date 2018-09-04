@@ -24,8 +24,9 @@ export const initial: State = CS.initial;
 
 const createMap =
   (map: MapData) =>
-  async (dispatch: Dispatch) => {
-    return GM.create(map)
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GM.create(map, user)
       .then((newMap) => {
         // add the new map
         dispatch(CS.updateMaps(
@@ -57,8 +58,9 @@ const saveMap =
 
 const createCard =
   (mapId: MapID, card: CardData) =>
-  async (dispatch: Dispatch) => {
-    return GC.create(mapId, card)
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GC.create(mapId, card, user)
       .then((newCard) => dispatch(
         CS.updateCards(
           H.toIDMap<CardID, CardData>([newCard]),
@@ -258,7 +260,7 @@ const createObjectForCard =
 const createCardObject =
   (mapId: MapID, card: CardData) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const action = await createCard(mapId, card)(dispatch);
+    const action = await createCard(mapId, card)(dispatch, getState);
     const { id = '' } = Object.values(action.payload.cards)[0] || {};
     return createObjectForCard(mapId, id)(dispatch, getState);
   };
@@ -289,9 +291,10 @@ const removeCardFromBox =
 const removeCardsFromBox =
   (cardObjects: ObjectID[], box: BoxID) =>
   async (dispatch: Dispatch) => {
-    await Promise.all(
-      cardObjects.map(id => removeCardFromBox(id, box)(dispatch))
-    );
+    await Promise.all(cardObjects.map(
+      id => G.removeCardFromBox(id, box)
+        .then(() => dispatch(CS.updateNotInBox(id, box, TargetType.PERMANENT)))
+    ));
     return dispatch(SL.actions.clearSelection());
   };
 
@@ -307,6 +310,18 @@ const removeObject =
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map } } = getState();
     return GO.remove(objectID)
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => loadObjects(map, true)(dispatch))
+      .then(() => loadCards(map, true)(dispatch))
+      .then(() => loadBoxes(map, true)(dispatch));
+  };
+
+const removeObjects =
+  (objectIDList: ObjectID[]) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseMap: { map } } = getState();
+    const ps = objectIDList.map(id => GO.remove(id));
+    return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
       .then(() => loadObjects(map, true)(dispatch))
       .then(() => loadCards(map, true)(dispatch))
@@ -333,8 +348,28 @@ const removeCardWithObject =
 const removeBox =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    return GB.remove(boxID)
+    const { senseMap: { map }, senseObject } = getState();
+    const box = CS.getBox(senseObject, boxID);
+    const objects = Object.keys(box.contains);
+    return removeObjects(objects)(dispatch, getState)
+      .then(() => GB.remove(boxID))
+      .then(() => dispatch(SL.actions.clearSelection()))
+      .then(() => loadBoxes(map, true)(dispatch))
+      .then(() => loadObjects(map, true)(dispatch));
+  };
+
+const removeBoxes =
+  (boxIDList: BoxID[]) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseMap: { map }, senseObject } = getState();
+    const ps = boxIDList.map(boxID => {
+      const box = CS.getBox(senseObject, boxID);
+      // remove all objects from the box
+      const objects = Object.keys(box.contains);
+      return removeObjects(objects)(dispatch, getState)
+        .then(() => GB.remove(boxID));
+    });
+    return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
       .then(() => loadBoxes(map, true)(dispatch))
       .then(() => loadObjects(map, true)(dispatch));
@@ -383,6 +418,7 @@ export const actions = {
   updateBox,
   saveBox,
   removeBox,
+  removeBoxes,
   loadMaps,
   cleanUp,
   loadObjects,
@@ -402,6 +438,7 @@ export const actions = {
   unboxCards,
   removeMap,
   removeObject,
+  removeObjects,
   removeCardWithObject,
   removeBoxWithObject,
   removeEdge,

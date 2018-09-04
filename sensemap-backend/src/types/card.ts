@@ -1,7 +1,8 @@
 import { ID, Map, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
-import { getMap, getCardsInMap, MapFilter } from './map';
+import { MapFilter, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
+import * as A from './oauth';
 
 export type CardFilter = {
   id?: ID;
@@ -78,17 +79,20 @@ export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
 export async function createCard(db, args): Promise<Card> {
   const fields = pick(cardDataFields, args);
   const rows = await db('card').insert(fields).returning(cardFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function deleteCard(db, id: ID): Promise<Card | null> {
   const rows = await db('card').where('id', id).delete().returning(cardFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function updateCard(db, id: ID, args): Promise<Card | null> {
   const fields = pick(cardDataFields, args);
   const rows = await db('card').where('id', id).update(fields).returning(cardFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
@@ -107,7 +111,9 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createCard: async (_, args, { db }, info) => {
+    createCard: async (_, args, { db, authorization }, info) => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      args.ownerId = !!u ? u.id : null;
       return createCard(db, args);
     },
 
@@ -134,5 +140,6 @@ export const resolvers = {
     mapId:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.mapId       : (await getCard(db, o)).mapId,
     map:         async (o, _, { db }, info): Promise<Map>      => typeof(o) !== 'string' ? o.map         : (await getCard(db, o)).mapId,
     objects:     async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects : getObjectsForCard(db, o),
+    owner:       async (o, _, { db }, info): Promise<Map>      => typeof(o) !== 'string' ? o.owner       : (await getCard(db, o)).ownerId,
   },
 };

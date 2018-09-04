@@ -2,6 +2,7 @@ import { MapID, MapType, MapData } from '../sense/map';
 import { anonymousUserData } from '../sense/user';
 import { graphQLUserFieldsFragment, GraphQLUserFields, toUserData } from './user';
 import { client } from './client';
+import * as SN from '../session';
 import * as moment from 'moment';
 
 const graphQLMapFieldsFragment = `
@@ -46,12 +47,12 @@ export const loadMaps =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client.request(query)
+    return client().request(query)
       .then(({ allMaps }) => allMaps.map(toMapData));
   };
 
 export const create =
-  (map: MapData) => {
+  (map: MapData, user: SN.User) => {
     const query = `
       mutation CreateMap($type: String, $name: String, $description: String, $tags: String, $image: String) {
         createMap(type: $type, name: $name, description: $description, tags: $tags, image: $image) {
@@ -61,7 +62,7 @@ export const create =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client.request(query, map)
+    return client(user).request(query, map)
       .then(({ createMap }) => toMapData(createMap));
   };
 
@@ -76,7 +77,7 @@ export const update =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client.request(query, map)
+    return client().request(query, map)
       .then(({ updateMap }) => toMapData(updateMap));
   };
 
@@ -90,6 +91,6 @@ export const remove =
       ${graphQLUserFieldsFragment}
     `;
     const variables = { mapID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ deleteMap }) => toMapData(deleteMap));
   };

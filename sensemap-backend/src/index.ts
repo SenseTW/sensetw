@@ -8,13 +8,15 @@ import * as session from 'express-session';
 import * as cors from 'cors';
 import flash = require('connect-flash');
 import * as passport from 'passport';
-import { registerServer } from 'apollo-server-express';
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './types'
 import { context } from './context';
 import { router as Login } from './login';
 import { router as Hypothesis } from './hypothesis';
 import { router as HypothesisClient } from './client';
+import { Strategy as BearerStrategy } from 'passport-http-bearer';
+import { Strategy as AnonymousStrategy } from 'passport-anonymous';
+import { getAccessToken } from './login/oauth';
 
 const PORT = 8000;
 
@@ -29,12 +31,24 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+passport.use(new AnonymousStrategy());
+passport.use(new BearerStrategy((token, done) => {
+  getAccessToken(token)
+    .then(data => {
+      if (!data || !data.user) {
+        return done(null, false);
+      } else {
+        return done(null, data.user, { scope: 'all', message: '' });
+      }
+    })
+    .catch(done);
+}));
 app.set('view engine', 'ejs');
 app.use(Login(context));
 app.use('/h/api', Hypothesis(context));
 app.use(HypothesisClient(context));
 
 const server = new ApolloServer({ typeDefs, resolvers, context });
-registerServer({ server, app });
+server.applyMiddleware({ app });
 
 app.listen(PORT, () => console.log(`Listening at port ${PORT}`));

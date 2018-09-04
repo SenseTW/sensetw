@@ -1,9 +1,10 @@
 import { pick } from 'ramda';
-import { ID, Map, mapFields, mapDataFields, SenseObject, objectFields, Card, Box, Edge } from './sql';
+import { ID, Map, mapFields, mapDataFields, SenseObject, Card, Box, Edge } from './sql';
 import { objectsQuery } from './object';
 import { boxesQuery } from './box';
 import { cardsQuery } from './card';
 import { edgesQuery } from './edge';
+import * as A from './oauth';
 
 export type MapFilter = {
   id?: ID;
@@ -35,6 +36,14 @@ export async function createMap(db, args: Map): Promise<Map> {
 export async function updateMap(db, id: ID, args): Promise<Map> {
   const fields = pick(mapDataFields, args);
   const rows = await db('map').where('id', id).update(fields).returning(mapFields(db));
+  await updateMapUpdatedAt(db, id);
+  return rows[0];
+}
+
+export async function updateMapUpdatedAt(db, id: ID): Promise<Map> {
+  const rows = await db('map').where('id', id)
+    .update({ updatedAt: new Date() })
+    .returning(mapFields(db));
   return rows[0];
 }
 
@@ -59,16 +68,6 @@ export async function getBoxesInMap(db, mapId: ID): Promise<Box[]> {
   return boxesQuery(db).where('mapId', mapId);
 }
 
-function getValue(db, o, key, query) {
-  if (typeof(o) === 'string') {
-    return query(db, o);
-  } else if (key in o) {
-    return o[key];
-  } else {
-    return query(db, o.id);
-  }
-}
-
 export const resolvers = {
   Query: {
     allMaps: async (_, args: AllMapsArgs, { db }, info): Promise<Map[]> => {
@@ -86,7 +85,9 @@ export const resolvers = {
   },
 
   Mutation: {
-    createMap: async (_, args, { db }, info): Promise<Map> => {
+    createMap: async (_, args, { db, authorization }, info): Promise<Map> => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      args.ownerId = !!u ? u.id : null;
       return createMap(db, args);
     },
 

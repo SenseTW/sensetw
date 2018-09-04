@@ -46,7 +46,7 @@ export const loadBoxes =
       ${graphQLBoxFieldsFragment}
     `;
     const variables = { id };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ allBoxes }) => allBoxes.map(toBoxData));
   };
 
@@ -60,7 +60,7 @@ export const create =
       }
       ${graphQLBoxFieldsFragment}
     `;
-    return client.request(query, { ...box, mapId })
+    return client().request(query, { ...box, mapId })
       .then(({ createBox }) => toBoxData(createBox));
   };
 
@@ -74,7 +74,7 @@ export const update =
       }
       ${graphQLBoxFieldsFragment}
     `;
-    return client.request(query, box)
+    return client().request(query, box)
       .then(({ updateBox }) => toBoxData(updateBox));
   };
 
@@ -87,6 +87,6 @@ export const remove =
       ${graphQLBoxFieldsFragment}
     `;
     const variables = { boxID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ deleteBox }) => toBoxData(deleteBox));
   };

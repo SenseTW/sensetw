@@ -102,7 +102,7 @@ export const loadRawObjects =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ allObjects }) => allObjects);
   };
 
@@ -145,7 +145,7 @@ export const create =
       }
       ${graphQLObjectFieldsFragment}
     `;
-    return client.request(query, { ...data, mapId })
+    return client().request(query, { ...data, mapId })
       .then(({ createObject }) => toObjectData(createObject));
   };
 
@@ -160,7 +160,7 @@ export const move =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id, x, y };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ updateObject }) => toObjectData(updateObject));
   };
 
@@ -175,7 +175,7 @@ export const updateObjectType =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id, objectType };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ updateObject }) => toObjectData(updateObject));
   };
 
@@ -188,7 +188,7 @@ export const remove =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { objectID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ deleteObject }) => {
         // patch the object type, because Graphcool will not sync it with the
         // box/card field for us

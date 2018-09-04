@@ -2,6 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { CardData, MapScopeType, State, actions, ActionProps, mapDispatch } from '../../../types';
 import * as F from '../../../types/sense/focus';
+import * as OE from '../../../types/object-editor';
 import { Button } from 'semantic-ui-react';
 import './index.css';
 
@@ -24,13 +25,19 @@ function CardActions({ card, actions: acts, senseMap }: Props) {
     <div className="card-actions">
       <Button
         icon="edit"
-        onClick={() => acts.editor.focusObject(F.focusCard(card.id))}
+        onClick={() => {
+          acts.editor.focusObject(F.focusCard(card.id));
+          acts.editor.changeStatus(OE.StatusType.SHOW);
+        }}
       />
       <Button
         icon="plus square outline"
         onClick={() => acts.senseObject.createObjectForCard(senseMap.map, card.id, box)}
       />
-      <Button icon="trash" />
+      <Button
+        icon="trash"
+        onClick={() => acts.senseObject.removeCardWithObject(card.id)}
+      />
     </div>
   );
 }

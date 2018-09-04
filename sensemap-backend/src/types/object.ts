@@ -1,7 +1,5 @@
-import { ID, Map, Card, Box, SenseObject, objectFields, objectDataFields } from './sql';
-import { getMap, getObjectsInMap } from './map';
-import { getCard } from './card';
-import { getBox } from './box';
+import { ID, SenseObject, objectFields, objectDataFields } from './sql';
+import { getObjectsInMap, updateMapUpdatedAt } from './map';
 import { pick } from 'ramda';
 
 export function objectsQuery(db) {
@@ -20,17 +18,20 @@ export async function getObject(db, id: ID): Promise<SenseObject> {
 export async function createObject(db, args): Promise<SenseObject> {
   const fields = pick(objectDataFields, args);
   const rows = await db('object').insert(fields).returning(objectFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function updateObject(db, id: ID, args): Promise<SenseObject | null> {
   const fields = pick(objectDataFields, args);
   const rows = await db('object').where('id', id).update(fields).returning(objectFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function deleteObject(db, id: ID): Promise<SenseObject | null> {
   const rows = await db('object').where('id', id).del().returning(objectFields(db));
+  await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 

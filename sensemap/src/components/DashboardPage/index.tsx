@@ -5,11 +5,12 @@ import { State, ActionProps, actions, mapDispatch, MapID } from '../../types';
 import MapCard from './MapCard';
 import FloatingActionButton from './FloatingActionButton';
 import MapContent from './MapContent';
-import { Container, Search, Card, Modal, Header, Button } from 'semantic-ui-react';
+import { Container, Card, Modal, Header, Button } from 'semantic-ui-react';
 import * as SM from '../../types/sense/map';
 import * as CS from '../../types/cached-storage';
 import * as R from '../../types/routes';
 import * as U from '../../types/utils';
+import * as copy from 'copy-to-clipboard';
 import { sort } from 'ramda';
 import './index.css';
 
@@ -18,6 +19,7 @@ const sortByUpdateTimeDesc = sort((a: SM.MapData, b: SM.MapData) => b.updatedAt 
 interface StateFromProps {
   senseObject: CS.CachedStorage;
   map: MapID;
+  isAuthenticated: boolean;
 }
 
 interface OwnProps {}
@@ -41,7 +43,7 @@ class DashboardPage extends React.Component<Props, OwnState> {
   }
 
   render() {
-    const { actions: acts, senseObject, map } = this.props;
+    const { actions: acts, senseObject, map, isAuthenticated } = this.props;
     const { modalOpen, mid } = this.state;
     const maps = CS.toStorage(senseObject).maps;
     const mapList = sortByUpdateTimeDesc(Object.values(maps));
@@ -50,25 +52,28 @@ class DashboardPage extends React.Component<Props, OwnState> {
     return (
       <div className="dashboard-page">
         <Container>
-          <Search disabled />
           <Card.Group stackable itemsPerRow={3}>
             {mapList.map(
               (m) =>
                 <MapCard
                   key={m.id}
+                  disabled={!isAuthenticated}
                   data={m}
+                  onShare={copy}
                   onEdit={() => acts.editor.focusMap(m.id)}
-                  onRemove={() => acts.senseObject.removeMap(m.id)}
                 />
             )}
           </Card.Group>
-          <FloatingActionButton
-            onClick={() => {
-              const newMap = SM.mapData({ id: U.objectId() });
-              acts.senseObject.updateMap(newMap);
-              acts.editor.focusMap(newMap.id);
-            }}
-          />
+          {
+            isAuthenticated &&
+            <FloatingActionButton
+              onClick={() => {
+                const newMap = SM.mapData({ id: U.objectId() });
+                acts.senseObject.updateMap(newMap);
+                acts.editor.focusMap(newMap.id);
+              }}
+            />
+          }
 
           <Prompt
             when={!modalOpen && !isClean}
@@ -114,8 +119,8 @@ class DashboardPage extends React.Component<Props, OwnState> {
 
 export default connect(
   (state: State) => {
-    const { senseObject, senseMap } = state;
-    return { senseObject, map: senseMap.map };
+    const { senseObject, senseMap, session } = state;
+    return { senseObject, map: senseMap.map, isAuthenticated: session.authenticated };
   },
   mapDispatch({ actions })
 )(DashboardPage);

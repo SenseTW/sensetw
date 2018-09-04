@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import { TransformerForProps } from '../';
-import { ObjectData, BoxData } from '../../../types';
+import { TransformerForProps } from '../../Layout';
+import Selectable from '../../Layout/Selectable';
+import { ObjectData, BoxID, BoxData } from '../../../types';
 import { BoundingBox } from '../../../graphics/drawing';
 import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
@@ -9,7 +10,7 @@ import { Event as KonvaEvent } from '../../../types/konva';
 
 interface OwnProps {
   mapObject: ObjectData;
-  selected?: Boolean;
+  selected?: boolean;
   onMouseOver?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onMouseOut?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
@@ -17,15 +18,12 @@ interface OwnProps {
   onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
   onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
-}
-
-interface OwnState {
-  newlySelected: boolean;
+  onOpen?(e: KonvaEvent.Mouse, data: BoxID): void;
 }
 
 type Props = OwnProps & BoundingBox & BoxData & TransformerForProps;
 
-class Box extends React.PureComponent<Props, OwnState> {
+class Box extends React.PureComponent<Props> {
   static style = {
     backgroundColor: '#4d4d4d',
     borderRadius: 18,
@@ -77,7 +75,8 @@ class Box extends React.PureComponent<Props, OwnState> {
       onDeselect = noop,
       onDragStart = noop,
       onDragMove = noop,
-      onDragEnd = noop
+      onDragEnd = noop,
+      onOpen = noop,
     } = this.props;
     const { x, y, width, height } = transform({
       x: this.props.x,
@@ -105,37 +104,49 @@ class Box extends React.PureComponent<Props, OwnState> {
     const textHeight = height - style.padding.top - style.padding.bottom;
 
     return (
-      <Group x={x} y={y}>
-        {selectedRect}
-        <Rect
-          width={width}
-          height={height}
-          cornerRadius={style.borderRadius}
-          fill={style.backgroundColor}
-        />
-        <Text
-          x={style.padding.left}
-          y={style.padding.top}
-          width={textWidth}
-          height={textHeight}
-          fontSize={style.fontSize}
-          fill={style.color}
-          text={title}
-        />
-        <Rect
-          width={width}
-          height={height}
+      <Selectable
+        selected={selected}
+        onSelect={(e: KonvaEvent.Mouse) => {
+          e.cancelBubble = true;
+          onSelect(e, mapObject);
+        }}
+        onDeselect={(e: KonvaEvent.Mouse) => {
+          e.cancelBubble = true;
+          onDeselect(e, mapObject);
+        }}
+      >
+        <Group
+          draggable
+          x={x}
+          y={y}
           onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
           onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
-          onMouseDown={
-            (e: KonvaEvent.Mouse) =>
-              selected ? onDeselect(e, mapObject) : onSelect(e, mapObject)
-          }
+          onDblClick={(e: KonvaEvent.Mouse) => {
+            onSelect(e, mapObject);
+            onOpen(e, mapObject.data);
+          }}
           onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
           onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
           onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
-        />
-      </Group>
+        >
+          {selectedRect}
+          <Rect
+            width={width}
+            height={height}
+            cornerRadius={style.borderRadius}
+            fill={style.backgroundColor}
+          />
+          <Text
+            x={style.padding.left}
+            y={style.padding.top}
+            width={textWidth}
+            height={textHeight}
+            fontSize={style.fontSize}
+            fill={style.color}
+            text={title}
+          />
+        </Group>
+      </Selectable>
     );
   }
 }

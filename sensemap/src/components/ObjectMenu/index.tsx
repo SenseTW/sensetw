@@ -4,13 +4,11 @@ import { State, actions, ActionProps, mapDispatch } from '../../types';
 import { Menu, Popup, Icon } from 'semantic-ui-react';
 import Card from '../SVGIcon/Card';
 import Box from '../SVGIcon/Box';
-import Unbox from '../SVGIcon/Unbox';
 import Inspector from '../SVGIcon/Inspector';
 import Edge from '../SVGIcon/Edge';
 import RemoveEdge from '../SVGIcon/RemoveEdge';
 import Copy from '../SVGIcon/Copy';
 import Delete from '../SVGIcon/Delete';
-import BatchTag from '../SVGIcon/BatchTag';
 import BoxCard from '../SVGIcon/BoxCard';
 import OpenBox from '../SVGIcon/OpenBox';
 import Eject from '../SVGIcon/Eject';
@@ -34,6 +32,7 @@ interface StateFromProps {
   senseMap: SM.State;
   editor: OE.State;
   viewport: V.State;
+  isAuthenticated: boolean;
 }
 
 interface OwnProps {}
@@ -60,6 +59,11 @@ const selectedCardsAndBoxes:
   );
 
 class ObjectMenu extends React.PureComponent<Props> {
+  canCreateCard(): boolean {
+    const { isAuthenticated } = this.props;
+    return isAuthenticated;
+  }
+
   handleCreateCard(): void {
     const { actions: acts } = this.props;
     const data = cardData({ id: U.objectId() });
@@ -69,7 +73,11 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canCreateBox(): boolean {
-    return this.props.senseMap.scope.type === T.MapScopeType.FULL_MAP;
+    const { isAuthenticated } = this.props;
+    return (
+      isAuthenticated
+      && this.props.senseMap.scope.type === T.MapScopeType.FULL_MAP
+    );
   }
 
   handleBox(): void {
@@ -80,25 +88,6 @@ class ObjectMenu extends React.PureComponent<Props> {
     acts.editor.changeStatus(OE.StatusType.SHOW);
   }
 
-  canUnbox(): Boolean {
-    return this.props.senseMap.scope.type === T.MapScopeType.BOX;
-  }
-
-  handleUnbox(): void {
-    switch (this.props.senseMap.scope.type) {
-      case T.MapScopeType.BOX: {
-        const box = this.props.senseMap.scope.box;
-        if (!box) {
-          throw Error('Scope BOX without a box ID.');
-        }
-        this.props.actions.senseObject.unboxCards(box);
-        break;
-      }
-      case T.MapScopeType.FULL_MAP:
-      default:
-    }
-  }
-
   findEdgeID(from: T.ObjectID, to: T.ObjectID): T.EdgeID[] | null {
     const r = Object.values(CS.toStorage(this.props.senseObject).edges)
       .filter(edge => (edge.from === from && edge.to === to) || (edge.from === to && edge.to === from))
@@ -107,9 +96,13 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canCreateEdge(): boolean {
-    const selection = this.props.selection;
-    return SL.count(selection) === 2
-      && this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) === null;
+    const { selection, isAuthenticated } = this.props;
+
+    return (
+      isAuthenticated
+      && SL.count(selection) === 2
+      && this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) === null
+    );
   }
 
   handleCreateEdge(): void {
@@ -124,10 +117,11 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canRemoveEdge(): boolean {
-    if (SL.count(this.props.selection) !== 2) {
-      return false;
-    }
-    const selection = this.props.selection;
+    const { selection, isAuthenticated } = this.props;
+
+    if (!isAuthenticated) { return false; }
+    if (SL.count(selection) !== 2) { return false; }
+
     return this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) !== null;
   }
 
@@ -144,35 +138,62 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canCopy(): boolean {
+    const { isAuthenticated } = this.props;
+    if (!isAuthenticated) { return false; }
+
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
     return cards.length + boxes.length === 1;
   }
 
   canDeleteCard(): boolean {
-    const { cards } = selectedCardsAndBoxes(this.props);
-    return cards.length === 1;
+    const { isAuthenticated } = this.props;
+    if (!isAuthenticated) { return false; }
+
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    return cards.length > 0 || boxes.length > 0;
   }
 
   async handleDeleteCard() {
-    const { actions: acts, senseObject, selection } = this.props;
-    const { id, data } = CS.getObject(senseObject, SL.get(selection, 0));
-    const card = CS.getCard(senseObject, data);
-    // remove the card container object
-    await acts.senseObject.removeObject(id);
-    // clear any local modifications
-    acts.cachedStorage.removeCard(card);
+    const { actions: acts, senseObject } = this.props;
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    try {
+      if (cards.length > 0) {
+        // remove card container objects
+        // we don't remove cards and leave them in the inbox
+        await acts.senseObject.removeObjects(cards);
+      }
+      if (boxes.length > 0) {
+        const boxIDList =
+          boxes.map(objID => CS.getObject(senseObject, objID).data as T.BoxID);
+        // remove box container objects
+        await acts.senseObject.removeObjects(boxes);
+        // remove boxes
+        await acts.senseObject.removeBoxes(boxIDList);
+      }
+    } catch (err) {
+      // tslint:disable-next-line:no-console
+      console.error(err);
+    }
     acts.editor.focusObject(F.focusNothing());
   }
 
   canBatchTag(): boolean {
+    const { isAuthenticated } = this.props;
+    if (!isAuthenticated) { return false; }
+
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
     return cards.length + boxes.length > 1;
   }
 
   canAddCard(): boolean {
+    const { isAuthenticated } = this.props;
+
+    if (!isAuthenticated) { return false; }
+
     if (this.props.senseMap.scope.type !== T.MapScopeType.FULL_MAP) {
       return false;
     }
+
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
     return cards.length >= 1 && boxes.length === 1;
   }
@@ -201,8 +222,11 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   canRemoveCard(): Boolean {
-    return this.props.senseMap.scope.type === T.MapScopeType.BOX
-      && SL.count(this.props.selection) >= 1;
+    return (
+      this.props.isAuthenticated
+      && this.props.senseMap.scope.type === T.MapScopeType.BOX
+      && SL.count(this.props.selection) >= 1
+    );
   }
 
   handleRemoveCard(): void {
@@ -247,19 +271,18 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   render() {
     const { actions: acts, editor } = this.props;
+    const canCreateCard = this.canCreateCard();
     const canCreateBox = this.canCreateBox();
-    const canUnbox = this.canUnbox();
     const isInspectorOpen = editor.status === OE.StatusType.SHOW;
     const canCreateEdge = this.canCreateEdge();
     const canRemoveEdge = this.canRemoveEdge();
     const canCopy = this.canCopy();
     const canDeleteCard = this.canDeleteCard();
-    const canBatchTag = this.canBatchTag();
     const canAddCard = this.canAddCard();
     const canOpenBox = this.canOpenBox();
     const canRemoveCard = this.canRemoveCard();
     const showSecondMenu =
-      canCopy || canDeleteCard || canBatchTag || canAddCard || canOpenBox || canRemoveCard;
+      canCopy || canDeleteCard || canAddCard || canOpenBox || canRemoveCard;
     // setup the popup props and force the position to be a string literal
     const popupProps = { inverted: true, position: 'bottom center' as 'bottom center' };
 
@@ -268,29 +291,29 @@ class ObjectMenu extends React.PureComponent<Props> {
         <Menu compact inverted icon>
           <Popup
             {...popupProps}
-            trigger={<Menu.Item onClick={() => this.handleCreateCard()}><Card /></Menu.Item>}
+            trigger={
+              <Menu.Item
+                disabled={!canCreateCard}
+                onClick={() => this.handleCreateCard()}
+              >
+                <Card />
+              </Menu.Item>}
             content="New Card"
           />
           <Popup
             {...popupProps}
             trigger={
               <Menu.Item
-                disabled={!canUnbox && !canCreateBox}
-                onClick={() =>
-                  canUnbox
-                    ? this.handleUnbox()
-                    : this.handleBox()
-                }
+                disabled={!canCreateBox}
+                onClick={() => this.handleBox()}
               >
-                {canUnbox ? <Unbox /> : <Box />}
+                <Box />
               </Menu.Item>
             }
             content={
-              canUnbox
-                ? 'Unbox'
-                : canCreateBox
-                  ? 'New Box'
-                  : 'Can\'t Create a Box in a Box'
+              canCreateBox
+                ? 'New Box'
+                : 'Can\'t Create a Box in another Box'
             }
           />
           <Popup
@@ -355,19 +378,11 @@ class ObjectMenu extends React.PureComponent<Props> {
               />
             }
             {
-              canBatchTag &&
-              <Popup
-                {...popupProps}
-                trigger={<Menu.Item disabled onClick={U.noop}><BatchTag /></Menu.Item>}
-                content="Batch Tag"
-              />
-            }
-            {
               canAddCard &&
               <Popup
                 {...popupProps}
                 trigger={<Menu.Item onClick={() => this.handleAddCard()}><BoxCard /></Menu.Item>}
-                content="Box Cards"
+                content="Add to Box"
               />
             }
             {
@@ -390,11 +405,17 @@ class ObjectMenu extends React.PureComponent<Props> {
         }
         {
           <Menu compact inverted icon>
+            <Menu.Item onClick={() => this.handleZoom(0.9)}>
+              <Icon name="minus" />
+            </Menu.Item>
             <Menu.Item
               active={this.isWholePicture()}
               onClick={() => this.handleModeChange()}
             >
               <Icon name="eye" />
+            </Menu.Item>
+            <Menu.Item onClick={() => this.handleZoom(1.1)}>
+              <Icon name="plus" />
             </Menu.Item>
           </Menu>
         }
@@ -404,12 +425,17 @@ class ObjectMenu extends React.PureComponent<Props> {
 }
 
 export default connect<StateFromProps, ActionProps>(
-  (state: State) => ({
-    selection: state.selection,
-    senseObject: state.senseObject,
-    senseMap: state.senseMap,
-    editor: state.editor,
-    viewport: state.viewport,
-  }),
+  (state: State) => {
+    const isAuthenticated = state.session.authenticated;
+
+    return {
+      selection: state.selection,
+      senseObject: state.senseObject,
+      senseMap: state.senseMap,
+      editor: state.editor,
+      viewport: state.viewport,
+      isAuthenticated,
+    };
+  },
   mapDispatch({ actions }),
 )(ObjectMenu);

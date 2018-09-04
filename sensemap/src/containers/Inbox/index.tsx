@@ -7,8 +7,10 @@ export default connect<CO.StateFromProps, ActionProps, CO.OwnProps>(
   (state: State) => {
     const cards = Array(...Object.values(CS.toStorage(state.senseObject).cards))
       .sort((a, b) => b.updatedAt - a.updatedAt);
+    const { session } = state;
     return {
       cards,
+      session,
       senseMap: state.senseMap,
     };
   },

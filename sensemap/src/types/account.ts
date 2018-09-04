@@ -1,8 +1,11 @@
 import { sessionService } from 'redux-react-session';
 import { ActionUnion, emptyAction } from './action';
+import { profileRequest, tokenRequest, AuthorizationCode } from './auth';
 import { Dispatch } from './redux';
-import authClient from './auth';
-import * as R from './routes';
+import { sanitizeURL } from './utils';
+
+const apiRoot = sanitizeURL(process.env.REACT_APP_SENSEMAP_API_ROOT) || 'https://api.sense.tw';
+const loginURL = `${apiRoot}/login`;
 
 export type State = {
     username: string,
@@ -55,20 +58,29 @@ const loginFailure = (errorMsg: string) => {
   };
 };
 
-// tslint:disable:no-any
-const loginRequest = (username: string, password: string, history: any) => {
-  return async (dispatch: Dispatch) => {
-    try {
-      const data = await authClient.login(username, password);
-      const { token, user } = data;
-      await sessionService.saveSession({token: token});
-      await sessionService.saveUser(user);
-      dispatch(loginSuccess());
-      history.push(R.index);
-    } catch (err) {
-      dispatch(loginFailure(err));
+const loginRequest = () => (dispatch: Dispatch) => {
+  return new Promise(resolve => {
+    // tslint:disable:no-any
+    const receiveCode = (e: any) => {
+      if (e && e.data) {
+        window.removeEventListener('message', receiveCode);
+        resolve(e.data);
+      }
+    };
+    const login = window.open('about:blank', 'Login to Sensemap');
+    if (login) {
+      login.location.href = loginURL;
+      window.addEventListener('message', receiveCode);
     }
-  };
+  })
+    .then(async (code: AuthorizationCode) => {
+      const token = await tokenRequest(code);
+      const profile = await profileRequest(token.access_token);
+      await sessionService.saveSession({ token });
+      await sessionService.saveUser({ ...profile, ...token });
+      return dispatch(loginSuccess());
+    })
+    .catch((err) => dispatch(loginFailure(err)));
 };
 
 const SIGNUP_SUCCESS = 'SIGNUP_SUCCESS';
@@ -88,14 +100,10 @@ const signupFailure = (errorMsg: string) => {
 };
 
 // tslint:disable:no-any
-const signupRequest = (username: string, email: string, password: string, history: any) => {
+const signupRequest = (username: string, email: string, password: string) => {
   return async (dispatch: Dispatch) => {
     try {
-      const {token, user} = await authClient.signup(username, email, password);
-      await sessionService.saveSession({token: token});
-      await sessionService.saveUser(user);
       dispatch(signupSuccess());
-      history.push(R.index);
     } catch (err) {
       dispatch(signupFailure(err));
     }
@@ -103,11 +111,9 @@ const signupRequest = (username: string, email: string, password: string, histor
 };
 
 // tslint:disable:no-any
-const logoutRequest = (history: any) => {
-  authClient.logout();
+const logoutRequest = () => async (dispatch: Dispatch) => {
   sessionService.deleteSession();
   sessionService.deleteUser();
-  history.push(R.index);
 };
 
 export const syncActions = {
@@ -124,7 +130,7 @@ export const actions = {
   ...syncActions,
   signupRequest,
   loginRequest,
-  logoutRequest
+  logoutRequest,
 };
 
 export type Action = ActionUnion<typeof syncActions>;
@@ -134,7 +140,7 @@ export const reducer = (state: State = initial, action: Action = emptyAction) =>
     case UPDATE_USERNAME: {
       const { username } = action.payload;
       return {
-        ...state, username 
+        ...state, username
       };
     }
     case UPDATE_EMAIL: {

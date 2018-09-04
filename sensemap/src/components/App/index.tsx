@@ -7,12 +7,14 @@ import {
 import Analytics from '../Analytics';
 import Header from '../Header';
 import MapPage from '../MapPage';
+import Sources from '../Sources';
 import DashboardPage from '../DashboardPage';
 import ImportPage from '../ImportPage';
 import SignUpPage from '../SignupPage';
 import SettingsPage from '../SettingsPage';
 import TermsOfServicePage from '../TermsOfServicePage';
 import LoginPage from '../LoginPage';
+import { User } from '../../types';
 import * as R from '../../types/routes';
 import './index.css';
 
@@ -20,7 +22,7 @@ export interface StateFromProps {
   checked: boolean;
   authenticated: boolean;
   // tslint:disable:no-any
-  user: any;
+  user?: User;
 }
 
 export type Props = StateFromProps;
@@ -47,6 +49,7 @@ export class App extends React.Component<Props> {
               <Route exact path={R.mapList} component={DashboardPage} />
               <Route exact path={R.map} component={MapPage} />
               <Route path={R.submap} component={MapPage} />
+              <Route path={R.mapSources} component={Sources} />
               <Route path={R.signup} component={SignUpPage} />
               <Route path={R.login} component={LoginPage} />
               <Route path={R.termsOfService} component={TermsOfServicePage} />

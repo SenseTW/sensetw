@@ -15,6 +15,7 @@ type Data
   | T.BoxData;
 
 interface Props {
+  disabled?: boolean;
   objectType: T.ObjectType;
   data: Data;
   submitText?: string;
@@ -42,6 +43,7 @@ class ObjectContent extends React.PureComponent<Props> {
 
   render() {
     const {
+      disabled = false,
       objectType,
       submitText,
       submitDisabled = false,
@@ -56,9 +58,10 @@ class ObjectContent extends React.PureComponent<Props> {
     let isContentValid = true;
     switch (objectType) {
       case T.ObjectType.CARD:
-        isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 255 });
+        isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 5000 });
         content = (
           <CardContent
+            disabled={disabled}
             data={data as T.CardData}
             onKeyUp={this.handleKey}
             onChange={onUpdate}
@@ -68,6 +71,7 @@ class ObjectContent extends React.PureComponent<Props> {
       case T.ObjectType.BOX:
         content = (
           <BoxContent
+            disabled={disabled}
             data={data as T.BoxData}
             onKeyUp={this.handleKey}
             onChange={onUpdate}
@@ -79,26 +83,31 @@ class ObjectContent extends React.PureComponent<Props> {
 
     return (
       <div className="object-content">
-        {content}
-        <Divider />
-        <div className="object-content__actions">
-          <Button.Group>
-            <Button
-              disabled={cancelDisabled}
-              onClick={() => onCancel()}
-            >
-              Cancel
-            </Button>
-            <Button.Or />
-            <Button
-              positive
-              disabled={submitDisabled || !isContentValid}
-              onClick={() => onSubmit(data)}
-            >
-               {submitText || 'Save'}
-            </Button>
-          </Button.Group>
+        <div className="object-content__content">
+          {content}
         </div>
+        {!disabled && <Divider />}
+        {
+          !disabled &&
+          <div className="object-content__actions">
+            <Button.Group>
+              <Button
+                disabled={cancelDisabled}
+                onClick={() => onCancel()}
+              >
+                Cancel
+              </Button>
+              <Button.Or />
+              <Button
+                positive
+                disabled={submitDisabled || !isContentValid}
+                onClick={() => onSubmit(data)}
+              >
+                {submitText || 'Save'}
+              </Button>
+            </Button.Group>
+          </div>
+        }
       </div>
     );
   }

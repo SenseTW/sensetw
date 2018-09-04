@@ -22,6 +22,7 @@ class Map extends React.Component<Props> {
     //   or remove the warning prompt from the dashboard
     this.props.actions.senseObject.cleanUp();
     this.props.actions.viewport.resetViewPort();
+    this.props.actions.senseObject.loadMaps();
     this.props.actions.senseObject.loadObjects(this.props.id);
     this.props.actions.senseObject.loadCards(this.props.id);
     this.props.actions.senseObject.loadBoxes(this.props.id);
@@ -32,6 +33,7 @@ class Map extends React.Component<Props> {
     if (prevProps.id !== this.props.id) {
       this.props.actions.senseObject.cleanUp();
       this.props.actions.viewport.resetViewPort();
+      this.props.actions.senseObject.loadMaps();
       this.props.actions.senseObject.loadObjects(this.props.id);
       this.props.actions.senseObject.loadCards(this.props.id);
       this.props.actions.senseObject.loadBoxes(this.props.id);

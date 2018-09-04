@@ -3,6 +3,7 @@ import { UserData, anonymousUserData } from './user';
 import { TimeStamp } from '../utils';
 import { ActionUnion, emptyAction } from '../action';
 import * as moment from 'moment';
+import { equals } from 'ramda';
 
 export type MapID = string;
 
@@ -36,6 +37,8 @@ export const emptyMapData: MapData = {
   image: '',
   owner: anonymousUserData,
 };
+
+export const isEmpty = (map: MapData): boolean => equals(emptyMapData, map);
 
 export const mapData = (partial: PartialMapData = {}): MapData => {
   const now = +moment();

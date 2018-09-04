@@ -6,6 +6,7 @@ import * as C from './card';
 import * as B from './box';
 import * as O from './object';
 import * as E from './edge';
+import * as P from './profile';
 
 
 export const typeDefs = gql`
@@ -18,6 +19,7 @@ export const typeDefs = gql`
     allEdges(filter: EdgeFilter): [Edge!]!
     allMaps(filter: MapFilter): [Map!]!
     allObjects(filter: ObjectFilter): [Object!]!
+    Profile: User
     User(id: ID): User
     Box(id: ID): Box
     Card(id: ID): Card
@@ -58,7 +60,6 @@ export const typeDefs = gql`
       tags: String,
       image: String,
       type: String,
-      ownerId: ID,
       boxesIds: [ID!],
       cardsIds: [ID!],
       edgesIds: [ID!],
@@ -85,7 +86,6 @@ export const typeDefs = gql`
       tags: String,
       image: String,
       type: String,
-      ownerId: ID,
     ): Map
     updateBox(
       id: ID!,
@@ -241,6 +241,7 @@ export const typeDefs = gql`
     objects: [Object!]! @relation(name: "ObjectCard")
     mapId: ID
     map: Map @relation(name: "MapCards")
+    owner: User
   }
 
   type Box @model {
@@ -303,5 +304,6 @@ export const resolvers =
       O.resolvers,
       E.resolvers,
       U.resolvers,
+      P.resolvers,
     ]
   ) as IResolvers<any, any>;

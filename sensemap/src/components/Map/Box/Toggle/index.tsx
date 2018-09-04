@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Group, Rect, Line } from 'react-konva';
+import { TransformerForProps } from '../../../Layout';
+import { transformObject } from '../../../../types/viewport';
 
-interface Props {
+interface OwnProps {
   x: number;
   y: number;
   width: number;
@@ -10,16 +12,18 @@ interface Props {
   action: () => void;
 }
 
-const TriangleUp = (x: number, y: number) => (
+type Props = OwnProps & TransformerForProps;
+
+const TriangleUp = (x: number, y: number, base: number, height: number) => (
   <Line
-    points={[x + 5, y + 0, x + 10, y + 5, x + 0, y + 5]}
+    points={[x + base / 2, y + 0, x + base, y + height, x + 0, y + height]}
     closed={true}
     fill="#4a4a4a"
   />);
 
-const TriangleDown = (x: number, y: number) => (
+const TriangleDown = (x: number, y: number, base: number, height: number) => (
   <Line
-    points={[x + 0, y + 0, x + 10, y + 0, x + 5, y + 5]}
+    points={[x + 0, y + 0, x + base, y + 0, x + base / 2, y + height]}
     closed={true}
     fill="#4a4a4a"
   />);
@@ -36,10 +40,19 @@ class Toggle extends React.Component<Props> {
       width: 1,
     },
     cornerRadius: 4,
+    triangle: {
+      base: 10,
+      height: 5,
+      x: -5,
+      yUp: 8.5,
+      yDown: 6.5,
+    },
   };
 
   render() {
-    const { x, y, width, height } = this.props;
+    const { transform, x, y, width, height } = this.props;
+    const style = transformObject(transform, Toggle.style) as typeof Toggle.style;
+
     return (
       <Group x={x} y={y} onClick={this.props.action}>
         <Rect
@@ -47,14 +60,24 @@ class Toggle extends React.Component<Props> {
           y={0}
           width={width}
           height={height}
-          fill={Toggle.style.background.color}
-          stroke={Toggle.style.border.color}
-          strokeWidth={Toggle.style.border.width}
-          cornerRadius={Toggle.style.cornerRadius}
+          fill={style.background.color}
+          stroke={style.border.color}
+          strokeWidth={style.border.width}
+          cornerRadius={style.cornerRadius}
         />
         {this.props.show
-          ? TriangleUp(width / 2 - 5, 8.5)
-          : TriangleDown(width / 2 - 5, 6.5)}
+          ? TriangleUp(
+            width / 2 + style.triangle.x,
+            style.triangle.yUp,
+            style.triangle.base,
+            style.triangle.height
+          )
+          : TriangleDown(
+            width / 2 + style.triangle.x,
+            style.triangle.yDown,
+            style.triangle.base,
+            style.triangle.height
+          )}
       </Group>
     );
   }

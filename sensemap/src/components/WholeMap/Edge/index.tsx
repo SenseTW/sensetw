@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Line } from 'react-konva';
-import { TransformerForProps } from '../';
+import { TransformerForProps } from '../../Layout';
 import { Point, toTuple } from '../../../graphics/point';
 import { transformObject } from '../../../types/viewport';
 

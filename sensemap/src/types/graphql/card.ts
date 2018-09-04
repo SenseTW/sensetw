@@ -2,15 +2,18 @@ import * as H from '../sense/has-id';
 import { ObjectID } from '../sense/object';
 import { MapID } from '../sense/map';
 import { CardID, CardData, stringToType as stringToCardType } from '../sense/card';
+import * as U from './user';
 import { client } from './client';
+import * as SN from '../session';
 import * as moment from 'moment';
+import { anonymousUserData } from '../sense/user';
 
 export const graphQLCardFieldsFragment = `
   fragment cardFields on Card {
     id,
     createdAt, updatedAt,
     title, summary, description, tags, saidBy, stakeholder, url, cardType,
-    objects { id }, map { id }
+    objects { id }, map { id }, owner { id, email, username }
   }`;
 
 interface GraphQLCardFields {
@@ -27,6 +30,7 @@ interface GraphQLCardFields {
   cardType:    string;
   objects:     H.HasID<ObjectID>[];
   map?:        H.HasID<MapID>;
+  owner:       U.GraphQLUserFields;
 }
 
 const toCardData: (c: GraphQLCardFields) => CardData =
@@ -43,6 +47,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     url:         c.url,
     cardType:    stringToCardType(c.cardType),
     objects:     H.toIDMap(c.objects),
+    owner:       U.toUserData(c.owner) || anonymousUserData,
   });
 
 export const loadCards =
@@ -51,17 +56,17 @@ export const loadCards =
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
           id, createdAt, updatedAt, title, summary, description, tags, saidBy, stakeholder,
-          url, cardType, objects { id }
+          url, cardType, objects { id }, owner { id, email, username }
         }
       }
     `;
     const variables = { id };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData));
   };
 
 export const create =
-  (mapId: MapID, card: CardData) => {
+  (mapId: MapID, card: CardData, user: SN.User) => {
     const query = `
       mutation CreateCard(
         $title: String,
@@ -90,7 +95,7 @@ export const create =
       }
       ${graphQLCardFieldsFragment}
     `;
-    return client.request(query, { ...card, mapId })
+    return client(user).request(query, { ...card, mapId })
       .then(({ createCard }) => toCardData(createCard));
   };
 
@@ -124,7 +129,7 @@ export const update =
       }
       ${graphQLCardFieldsFragment}
     `;
-    return client.request(query, card)
+    return client().request(query, card)
       .then(({ updateCard }) => toCardData(updateCard));
   };
 
@@ -137,6 +142,6 @@ export const remove =
       ${graphQLCardFieldsFragment}
     `;
     const variables = { cardID };
-    return client.request(query, variables)
+    return client().request(query, variables)
       .then(({ deleteCard }) => toCardData(deleteCard));
   };

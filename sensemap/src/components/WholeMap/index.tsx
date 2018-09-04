@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Stage, Layer } from 'react-konva';
 import { Props } from '../Map';
+import { TransformerForProps } from '../Layout';
 import Box from './Box';
 import CardList from './CardList';
 import Card from './Card';
@@ -15,12 +16,8 @@ import * as I from '../../types/input';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
 import * as SL from '../../types/selection';
+import * as S from '../../types/stage';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
-
-export interface TransformerForProps {
-  transform: G.Transform;
-  inverseTransform: G.Transform;
-}
 
 interface MapState {
   prevDragPoint: G.Point;
@@ -50,7 +47,7 @@ class WholeMap extends React.Component<Props, State> {
 
   handleMouseMove = (e: KonvaEvent.Mouse) => {
     if (this.props.stage.mouseDown) {
-      this.props.actions.stage.stageMouseMove({
+      this.props.actions.stage.mouseMove({
         dx: e.evt.movementX,
         dy: e.evt.movementY,
       });
@@ -58,15 +55,18 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   handleMouseDown = (e: KonvaEvent.Mouse) => {
-    if (e.target && e.target.nodeType === NodeType.STAGE) {
-      this.props.actions.stage.stageMouseDown();
-      // TODO: should prevent desection when map has been dragged
-      this.props.actions.selection.clearSelection();
-    }
+    this.props.actions.stage.stageMouseDown();
   }
 
   handleMouseUp = (e: KonvaEvent.Mouse) => {
     this.props.actions.stage.stageMouseUp();
+  }
+
+  handleClick = (e: KonvaEvent.Mouse) => {
+    const isMoved = S.isMoved(this.props.stage);
+    if (!isMoved && e.target && e.target.nodeType === NodeType.STAGE) {
+      this.props.actions.selection.clearSelection();
+    }
   }
 
   handleSelect = (e: KonvaEvent.Mouse, object: ObjectData) => {
@@ -83,7 +83,7 @@ class WholeMap extends React.Component<Props, State> {
     }
   }
 
-  handleDeselect(e: KonvaEvent.Mouse, object: ObjectData) {
+  handleDeselect = (e: KonvaEvent.Mouse, object: ObjectData) => {
     const { actions: acts, inScope, selection } = this.props;
 
     acts.selection.removeObjectFromSelection(object.id);
@@ -103,7 +103,7 @@ class WholeMap extends React.Component<Props, State> {
   }
 
   // XXX: duplicated
-  handleObjectDragMove(e: KonvaEvent.Mouse) {
+  handleObjectDragMove = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
@@ -113,11 +113,11 @@ class WholeMap extends React.Component<Props, State> {
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
     this.props.actions.cachedStorage.updateObjects(objects);
-    this.setState({ prevDragPoint });
+    this.setState({ hoverObject, prevDragPoint });
   }
 
   // XXX: duplicated
-  handleObjectDragEnd(e: KonvaEvent.Mouse) {
+  handleObjectDragEnd = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
     const prevDragPoint =
       this.state.inverseTransform({ x: e.evt.layerX, y: e.evt.layerY });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
@@ -126,7 +126,7 @@ class WholeMap extends React.Component<Props, State> {
       const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
-    this.setState({ prevDragPoint: { x: 0, y: 0 } });
+    this.setState({ hoverObject, prevDragPoint: { x: 0, y: 0 } });
   }
 
   handleMouseOver = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
@@ -164,6 +164,9 @@ class WholeMap extends React.Component<Props, State> {
             height={Box.style.height}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
+            onDragStart={this.handleObjectDragStart}
+            onDragMove={this.handleObjectDragMove}
+            onDragEnd={this.handleObjectDragEnd}
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
           />
@@ -190,6 +193,9 @@ class WholeMap extends React.Component<Props, State> {
             height={Card.style.height}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
+            onDragStart={this.handleObjectDragStart}
+            onDragMove={this.handleObjectDragMove}
+            onDragEnd={this.handleObjectDragEnd}
             onMouseOver={this.handleMouseOver}
             onMouseOut={this.handleMouseOut}
           />
@@ -242,11 +248,14 @@ class WholeMap extends React.Component<Props, State> {
     const { transform, inverseTransform, hoverObject } = this.state;
 
     let offsetX = 0;
+    let title: string = '';
     let cards: CardData[] = [];
     if (hoverObject) {
       switch (hoverObject.objectType) {
         case ObjectType.BOX:
           offsetX = Box.style.width;
+          const box = CS.getBox(this.props.senseObject, hoverObject.data);
+          title = box.title || box.summary;
           // cards of the box
           cards = Object
             .values(CS.getCardsInBox(this.props.senseObject, hoverObject.data))
@@ -254,8 +263,10 @@ class WholeMap extends React.Component<Props, State> {
           break;
         case ObjectType.CARD:
           offsetX = Card.style.width;
+          const card = CS.getCard(this.props.senseObject, hoverObject.data);
+          title = card.title || card.summary;
           // the card itself
-          cards = [CS.getCard(this.props.senseObject, hoverObject.data)];
+          cards = [];
           break;
         default:
       }
@@ -264,7 +275,7 @@ class WholeMap extends React.Component<Props, State> {
     cards = cards.filter(c => c.id !== '0');
 
     const cardList =
-      cards.length !== 0 &&
+      (title.length !== 0 || cards.length !== 0) &&
       hoverObject !== undefined && (
         <CardList
           transform={transform}
@@ -272,6 +283,7 @@ class WholeMap extends React.Component<Props, State> {
           mapObject={hoverObject}
           x={hoverObject.x + offsetX}
           y={hoverObject.y}
+          title={title}
           cards={cards}
         />
       );
@@ -283,6 +295,7 @@ class WholeMap extends React.Component<Props, State> {
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
         onMouseMove={this.handleMouseMove}
+        onClick={this.handleClick}
       >
         <Layer>
           {edges}

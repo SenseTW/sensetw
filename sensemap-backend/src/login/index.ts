@@ -3,7 +3,6 @@ import * as fs from 'async-file';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import PromiseRouter from 'express-promise-router';
-import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import LoginPage from './components/LoginPage';
 import SignUpPage from './components/SignUpPage';
@@ -12,6 +11,7 @@ import { Context } from '../context';
 import passport = require('./passport');
 import * as U from '../types/user';
 import { passLoggedIn, requireLoggedIn } from './redirect';
+import * as isemail from 'isemail';
 
 async function render(component, props = {}) {
   const html = ReactDOMServer.renderToStaticMarkup(component(props));
@@ -31,7 +31,10 @@ export function router(context: Context) {
   });
 
   router.get('/login', passLoggedIn(), async (req, res) => {
-    res.send(await render(LoginPage));
+    const messages = {
+      error: req.flash('error'),
+    };
+    res.send(await render(LoginPage, { messages }));
   });
 
   router.post('/login',
@@ -74,6 +77,11 @@ export function router(context: Context) {
       return res.redirect('/signup');
     }
 
+    if (!isemail.validate(email)) {
+      req.flash('emailError', 'Email must be a valid Email');
+      return res.redirect('/signup');
+    }
+
     const passwordMsg = U.checkPassword(password);
     if (passwordMsg !== '') {
       req.flash('passwordError', passwordMsg);
@@ -81,7 +89,18 @@ export function router(context: Context) {
     }
 
     const { db } = context({ req });
-    const u = await U.createUser(db, { username, email }, password);
+
+    if (await U.findUserByUsername(db, username)) {
+      req.flash('usernameError', 'Sorry, an account with this username already exists.');
+      return res.redirect('/signup');
+    }
+
+    if (await U.findUserByEmail(db, email)) {
+      req.flash('emailError', 'Sorry, an account with this email address already exists.');
+      return res.redirect('/signup');
+    }
+
+    await U.createUser(db, { username, email }, password);
     res.redirect('/login');
   });
 

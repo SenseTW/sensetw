@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
-import { Sidebar } from 'semantic-ui-react';
+import { Sidebar, Segment } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
@@ -9,7 +9,7 @@ import WholeMap from '../../components/WholeMap';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
-import InboxToggler from '../InboxToggler';
+import SidebarToggler from '../SidebarToggler';
 import {
   MapID,
   CardData,
@@ -44,6 +44,7 @@ interface StateFromProps {
   editor: OE.State;
   scope: typeof SM.initial.scope;
   showAnotherMode: Boolean;
+  isAuthenticated: Boolean;
 }
 
 type Props = StateFromProps & ActionProps;
@@ -76,9 +77,19 @@ class MapPage extends React.Component<Props> {
   }
 
   render() {
-    const { actions: acts, mid, editor, scope, senseMap, senseObject, showAnotherMode } = this.props;
+    const {
+      actions: acts,
+      mid,
+      editor,
+      scope,
+      senseMap,
+      senseObject,
+      showAnotherMode,
+      isAuthenticated,
+    } = this.props;
     const { status, focus } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
+    const isInspectorOpen = editor.status === OE.StatusType.SHOW;
 
     let data: BoxData | CardData | null = null;
     let isDirty: boolean = false;
@@ -101,6 +112,7 @@ class MapPage extends React.Component<Props> {
 
     return (
       <div className="map-page">
+
         <Sidebar.Pushable style={{ backgroundImage: `url(${background})` }}>
           <Sidebar
             visible={isInboxVisible}
@@ -108,7 +120,7 @@ class MapPage extends React.Component<Props> {
             direction="left"
             width="wide"
           >
-            <Inbox />
+            {isAuthenticated && <Inbox />}
           </Sidebar>
           <Sidebar
             visible={status !== OE.StatusType.HIDE}
@@ -119,6 +131,7 @@ class MapPage extends React.Component<Props> {
             data
               ? (
                 <ObjectContent
+                  disabled={!isAuthenticated}
                   objectType={focus.objectType}
                   data={data}
                   submitText={isNew ? 'Submit' : 'Update'}
@@ -218,14 +231,39 @@ class MapPage extends React.Component<Props> {
             <div className="map-page__menu">
               <ObjectMenu />
             </div>
-            <InboxToggler
-              className="inbox__btn"
-              style={{ left: isInboxVisible ? 350 : 0 }}
-              open={isInboxVisible}
+            {
+              isAuthenticated
+                ? (
+                  <SidebarToggler
+                    className="inbox__btn"
+                    style={{ left: isInboxVisible ? 350 : 0 }}
+                    open={isInboxVisible}
+                    onToggle={open =>
+                      open
+                        ? acts.senseMap.openInbox()
+                        : acts.senseMap.closeInbox()
+                    }
+                  />
+                )
+                : (
+                  <div className="map-page__login-hint">
+                    <Segment>
+                      <a href="#" onClick={(e) => { e.preventDefault(); acts.account.loginRequest(); }}>
+                        Sign up / Login
+                      </a> to edit the map and create your own map
+                    </Segment>
+                  </div>
+                )
+            }
+            <SidebarToggler
+              right
+              className="inspector__btn"
+              style={{ right: isInspectorOpen ? 350 : 0 }}
+              open={isInspectorOpen}
               onToggle={open =>
                 open
-                  ? acts.senseMap.openInbox()
-                  : acts.senseMap.closeInbox()
+                  ? acts.editor.changeStatus(OE.StatusType.SHOW)
+                  : acts.editor.changeStatus(OE.StatusType.HIDE)
               }
             />
           </Sidebar.Pusher>
@@ -240,11 +278,21 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
     const senseMap = state.senseMap;
     const senseObject = state.senseObject;
     const scope = state.senseMap.scope;
+    const session = state.session;
     const { editor } = state;
     const { mid } = router.match.params;
     const showAnotherMode = state.input.keyStatus[Key.Alt];
+    const isAuthenticated = session.authenticated;
 
-    return { mid, senseMap, senseObject, scope, editor, showAnotherMode };
+    return {
+      mid,
+      senseMap,
+      senseObject,
+      scope,
+      editor,
+      showAnotherMode,
+      isAuthenticated,
+    };
   },
   mapDispatch({ actions }),
 )(MapPage));

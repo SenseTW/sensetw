@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Image, Label, Button, Icon, Dropdown } from 'semantic-ui-react';
+import { Card, Image, Label, Button, Icon, Dropdown, Popup } from 'semantic-ui-react';
 import { DropdownProps } from 'semantic-ui-react/src/modules/Dropdown';
 import { DropdownItemProps } from 'semantic-ui-react/src/modules/Dropdown/DropdownItem';
 import * as R from '../../../types/routes';
@@ -9,11 +9,19 @@ import * as U from '../../../types/utils';
 import * as moment from 'moment';
 import './index.css';
 
+const POPUP_DELAY = 500;
+
 interface Props {
+  disabled?: boolean;
   id?: string;
   data: SM.MapData;
+  onShare?(url: string): void;
   onEdit?(map: SM.MapData): void;
   onRemove?(map: SM.MapData): void;
+}
+
+interface State {
+  copied: boolean;
 }
 
 enum MapActionType {
@@ -24,33 +32,49 @@ enum MapActionType {
   LEAVE       = 'LEAVE',
 }
 
-const dropdownOptions: DropdownItemProps[] = [{
-  key: 0,
-  disabled: true,
-  text: 'member',
-  value: MapActionType.SHOW_MEMBER,
-}, {
-  key: 1,
-  text: 'edit detail',
-  value: MapActionType.EDIT,
-}, {
-  key: 2,
-  text: 'delete',
-  value: MapActionType.REMOVE,
-}];
+class MapCard extends React.Component<Props, State> {
+  state = {
+    copied: false,
+  };
 
-class MapCard extends React.Component<Props> {
+  handleShare = () => {
+    this.setState({ copied: true });
+    setTimeout(() => this.setState({ copied: false }), POPUP_DELAY);
+  }
+
   render() {
     const {
+      disabled = false,
       id,
       data,
+      onShare = U.noop,
       onEdit = U.noop,
       onRemove = U.noop,
     } = this.props;
+    const { copied } = this.state;
+    const mapUrl = R.toMapPath({ mid: data.id });
     const formattedTime = moment(data.updatedAt).format(U.TIME_FORMAT);
     const timeHint = data.createdAt === data.updatedAt
       ? `created at ${formattedTime}`
       : `updated at ${formattedTime}`;
+    const dropdownOptions: DropdownItemProps[] = [{
+    /*
+      key: 0,
+      disabled: true,
+      text: 'member',
+      value: MapActionType.SHOW_MEMBER,
+    }, {
+    */
+      key: 1,
+      disabled,
+      text: 'edit detail',
+      value: MapActionType.EDIT,
+    }, {
+      key: 2,
+      disabled: disabled || true,
+      text: 'delete',
+      value: MapActionType.REMOVE,
+    }];
 
     return (
       <Card id={id} className="map-card">
@@ -79,8 +103,25 @@ class MapCard extends React.Component<Props> {
         </Card.Content>
         <Card.Content extra className="map-card__actions">
           <Button.Group widths={2}>
-            <Button as={Link} to={R.toMapPath({ mid: data.id })}>enter</Button>
-            <Button disabled>share</Button>
+            <Button as={Link} to={mapUrl}>enter</Button>
+            <Popup
+              inverted
+              open={copied}
+              position="top center"
+              trigger={
+                <Button
+                  onClick={() => {
+                    const fullUrl =
+                      location.protocol + '//' + location.hostname + ':' + location.port + mapUrl;
+                    onShare(fullUrl);
+                    this.handleShare();
+                  }}
+                >
+                    share
+                </Button>
+              }
+              content="URL copied!"
+            />
           </Button.Group>
           <Dropdown
             icon="ellipsis horizontal"

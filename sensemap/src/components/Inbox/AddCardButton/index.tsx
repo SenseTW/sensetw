@@ -19,7 +19,7 @@ export default function AddCardButton({mapId, visible, actions: acts}: Props) {
   const className = visible ? 'inbox__add-card-btn' : 'inbox__add-card-btn hidden';
   return (
     <div className={className}>
-      <Button icon="plus" size="tiny" color="grey" onClick={onClick} /> 
+      <Button icon="plus" size="tiny" color="grey" onClick={onClick} />
     </div>
   );
 }

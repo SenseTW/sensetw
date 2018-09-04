@@ -3,8 +3,12 @@ import { Header, Form, TextArea, Input, Message } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import * as C from '../../types/sense/card';
 import { isURL, isLength } from 'validator';
+import * as moment from 'moment';
+import * as U from '../../types/utils';
+import './index.css';
 
 interface Props {
+  disabled?: boolean;
   data: C.CardData;
   onKeyUp? (e: React.KeyboardEvent<HTMLInputElement>): void;
   onChange? (action: C.Action): void;
@@ -16,19 +20,23 @@ class CardContent extends React.PureComponent<Props> {
   };
 
   render() {
-    const { children, data, onKeyUp, onChange } = this.props;
-    const { title, summary, description, tags, url, saidBy, stakeholder, cardType } = data;
+    const { children, disabled = false, data, onKeyUp, onChange } = this.props;
+    const { title, summary, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
     const isURLValid = isURL(url, { require_protocol: true });
-    const isDescriptionInvalid = !isLength(description, { max: 255 });
+    const isDescriptionInvalid = !isLength(description, { max: 5000});
+    const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
     return (
       <Form className="card-content" error={isDescriptionInvalid}>
-        <Header as="h3" color="grey">
-        CARD INSPECTOR
+        <Header color="grey">
+          <h3>CARD INSPECTOR</h3>
+          <h4>created by {data.owner.username}</h4>
+          <h4>last updated on {updateTime}</h4>
         </Header>
         <Form.Field className="card-content__summary">
           <label>Summary</label>
           <TextArea
+            disabled={disabled}
             placeholder="說重點"
             value={summary}
             onChange={e => onChange && onChange(C.updateSummary(e.currentTarget.value))}
@@ -37,6 +45,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__tags">
           <label>Tag</label>
           <Input
+            disabled={disabled}
             placeholder="tag1, tag2, tag3"
             value={tags}
             onKeyUp={onKeyUp}
@@ -46,6 +55,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__title">
           <label>Source Title</label>
           <TextArea
+            disabled={disabled}
             placeholder="資料來源，e.g. 【AI全面啟動Ⅱ：台灣企業行不行？關鍵在老闆｜天下雜誌】"
             value={title}
             onChange={e => onChange && onChange(C.updateTitle(e.currentTarget.value))}
@@ -54,6 +64,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__url">
           <label>Source Link</label>
           <Input
+            disabled={disabled}
             placeholder="https://o.sense.tw/abcd"
             value={url}
             action={{
@@ -78,8 +89,9 @@ class CardContent extends React.PureComponent<Props> {
           />
         </Form.Field>
         <Form.Field className="card-content__description">
-          <label>Description (最多255字) </label>
+          <label>Description</label>
           <TextArea
+            disabled={disabled}
             placeholder="資料原文摘錄與補充資訊"
             value={description}
             onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
@@ -96,6 +108,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__card-type">
           <label>Card Type</label>
           <CardTypeSelector
+            disabled={disabled}
             cardType={cardType}
             onChange={type => onChange && onChange(C.updateCardType(type))}
           />
@@ -103,6 +116,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__said-by" inline>
           <label>Said By</label>
           <Input
+            disabled={disabled}
             placeholder="誰提出的意見？ e.g. XX 大學校長 XXX"
             value={saidBy}
             onKeyUp={onKeyUp}
@@ -112,6 +126,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__stakeholder" inline>
           <label>Stakeholders</label>
           <Input
+            disabled={disabled}
             placeholder="誰會被影響？（用逗號隔開）e.g. 經濟部, 半導體廠商, 大學"
             value={stakeholder}
             onKeyUp={onKeyUp}
