@@ -61,6 +61,7 @@ export default connect<StateFromProps, ActionProps, OwnProps>(
     scope: state.senseMap.scope,
     input: state.input,
     stage: state.stage,
+    level: state.viewport.level,
   }),
   mapDispatch({ actions }),
 )(Map);

@@ -126,6 +126,8 @@ class Box extends React.PureComponent<Props, State> {
     const onTouchStart = this.props.onTouchStart || noop;
     const onTouchMove  = this.props.onTouchMove  || noop;
     const onTouchEnd   = this.props.onTouchEnd   || noop;
+    const onMouseOver  = this.props.onMouseOver  || noop;
+    const onMouseOut   = this.props.onMouseOut   || noop;
     const onOpen       = this.props.onOpen       || noop;
     const onSetDropTarget   = this.props.onSetDropTarget   || noop;
     const onUnsetDropTarget = this.props.onUnsetDropTarget || noop;
@@ -169,6 +171,8 @@ class Box extends React.PureComponent<Props, State> {
           onTouchEnd={(e) => onTouchEnd(e, object)}
           onMouseEnter={(e) => onSetDropTarget(e, object)}
           onMouseLeave={(e) => onUnsetDropTarget(e, object)}
+          onMouseOver={(e) => onMouseOver(e, object)}
+          onMouseOut={(e) => onMouseOut(e, object)}
         >
           {this.props.selected ? selected : null}
           <Header

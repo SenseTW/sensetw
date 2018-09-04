@@ -4,9 +4,12 @@ import { Stage, Layer } from 'react-konva';
 import Box from './Box';
 import Card from './Card';
 import Edge from './Edge';
+import AltBox from '../WholeMap/Box';
+import AltCard from '../WholeMap/Card';
+import CardList from '../WholeMap/CardList';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
-import { Edge as EdgeData, ObjectType, ObjectData, State, ActionProps } from '../../types';
+import { Edge as EdgeData, ObjectType, ObjectData, CardData, State, ActionProps } from '../../types';
 import { ObjectMap } from '../../types/sense/has-id';
 import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
@@ -24,6 +27,7 @@ export interface StateFromProps {
   inScope:     CS.CachedStorage;
   input:       State['input'];
   stage:       State['stage'];
+  level:       number;
 }
 
 type ViewportState = State['viewport'];
@@ -38,6 +42,7 @@ interface MapState {
   dropTarget: ObjectMap<ObjectData>;
   transform: G.Transform;
   inverseTransform: G.Transform;
+  hoverObject?: ObjectData;
 }
 
 export class Map extends React.Component<Props, MapState> {
@@ -57,6 +62,7 @@ export class Map extends React.Component<Props, MapState> {
       dropTarget: {},
       transform: V.makeTransform(this.props),
       inverseTransform: V.makeInverseTransform(this.props),
+      hoverObject: undefined,
     };
   }
 
@@ -157,12 +163,22 @@ export class Map extends React.Component<Props, MapState> {
     this._handleObjectDragStart(e.evt.layerX, e.evt.layerY);
   }
 
-  handleObjectDragMove = (e: KonvaEvent.Mouse) => {
+  handleObjectDragMove = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
     this._handleObjectDragMove(e.evt.layerX, e.evt.layerY);
+    this.setState({ hoverObject });
   }
 
-  handleObjectDragEnd = (e: KonvaEvent.Mouse) => {
+  handleObjectDragEnd = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
     this._handleObjectDragEnd(e.evt.layerX, e.evt.layerY);
+    this.setState({ hoverObject });
+  }
+
+  handleMouseOver = (e: KonvaEvent.Mouse, hoverObject: ObjectData) => {
+    this.setState({ hoverObject });
+  }
+
+  handleMouseOut = () => {
+    this.setState({ hoverObject: undefined });
   }
 
   handleObjectTouchStart = (e: KonvaEvent.Touch) => {
@@ -213,9 +229,56 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   render() {
+    const useAltLayout = this.props.level < 0.66;
+    const { transform, inverseTransform, hoverObject } = this.state;
     const storage = CS.toStorage(this.props.inScope);
     const objects = Object.values(storage.objects).map(o => this.renderObject(o));
     const edges =   Object.values(storage.edges).map(e => this.renderEdge(e));
+
+    let offsetX = 0;
+    let offsetY = 0;
+    let title: string = '';
+    let cards: CardData[] = [];
+    if (hoverObject) {
+      switch (hoverObject.objectType) {
+        case ObjectType.BOX:
+          offsetX = AltBox.style.width / 2;
+          offsetY = -AltBox.style.height / 2;
+          const box = CS.getBox(this.props.senseObject, hoverObject.data);
+          title = box.title || box.summary;
+          // cards of the box
+          cards = Object
+            .values(CS.getCardsInBox(this.props.senseObject, hoverObject.data))
+            .filter(c => c.id !== '0');
+          break;
+        case ObjectType.CARD:
+          offsetX = AltCard.style.width / 2;
+          offsetY = -AltCard.style.height / 2;
+          const card = CS.getCard(this.props.senseObject, hoverObject.data);
+          title = card.title || card.summary;
+          // the card itself
+          cards = [];
+          break;
+        default:
+      }
+    }
+    // filter out the empty card
+    cards = cards.filter(c => c.id !== '0');
+
+    const cardList =
+      useAltLayout &&
+      (title.length !== 0 || cards.length !== 0) &&
+      hoverObject !== undefined && (
+        <CardList
+          transform={transform}
+          inverseTransform={inverseTransform}
+          mapObject={hoverObject}
+          x={hoverObject.x + offsetX}
+          y={hoverObject.y + offsetY}
+          title={title}
+          cards={cards}
+        />
+      );
 
     return (
       <Stage
@@ -232,6 +295,7 @@ export class Map extends React.Component<Props, MapState> {
         <Layer>
           {edges}
           {objects}
+          {cardList}
         </Layer>
       </Stage>
     );
@@ -240,6 +304,7 @@ export class Map extends React.Component<Props, MapState> {
   renderObject(o: ObjectData) {
     const acts = this.props.actions;
     const isSelected = SL.contains(this.props.selection, o.id);
+    const useAltLayout = this.props.level < 0.66;
 
     switch (o.objectType) {
       case ObjectType.NONE: {
@@ -249,52 +314,81 @@ export class Map extends React.Component<Props, MapState> {
         if (!CS.doesCardExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
-        return (
-          <Card
-            key={o.id}
-            transform={this.state.transform}
-            inverseTransform={this.state.inverseTransform}
-            object={o}
-            data={CS.getCard(this.props.senseObject, o.data)}
-            isDirty={CS.isCardDirty(this.props.inScope, o.data)}
-            selected={isSelected}
-            onSelect={this.handleObjectSelect}
-            onDeselect={this.handleObjectDeselect}
-            onDragStart={this.handleObjectDragStart}
-            onDragMove={this.handleObjectDragMove}
-            onDragEnd={this.handleObjectDragEnd}
-            onTouchStart={this.handleObjectTouchStart}
-            onTouchMove={this.handleObjectTouchMove}
-            onTouchEnd={this.handleObjectTouchEnd}
-            onOpen={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
-          />);
+
+        const props = {
+          key: o.id,
+          transform: this.state.transform,
+          inverseTransform: this.state.inverseTransform,
+          data: CS.getCard(this.props.senseObject, o.data),
+          isDirty: CS.isCardDirty(this.props.senseObject, o.data),
+          selected: isSelected,
+          onSelect: this.handleObjectSelect,
+          onDeselect: this.handleObjectDeselect,
+          onDragStart: this.handleObjectDragStart,
+          onDragMove: this.handleObjectDragMove,
+          onDragEnd: this.handleObjectDragEnd,
+          onTouchStart: this.handleObjectTouchStart,
+          onTouchMove: this.handleObjectTouchMove,
+          onTouchEnd: this.handleObjectTouchEnd,
+          onMouseOver: this.handleMouseOver,
+          onMouseOut: this.handleMouseOut,
+          onOpen: () => acts.editor.changeStatus(OE.StatusType.SHOW),
+        };
+
+        if (useAltLayout) {
+          return (
+            <AltCard
+              {...props}
+              object={{ ...o, width: AltCard.style.width, height: AltCard.style.height }}
+            />
+          );
+        } else {
+          return <Card {...props} object={o} />;
+        }
       }
       case ObjectType.BOX: {
         if (!CS.doesBoxExist(this.props.inScope, o.data)) {
           return <Group key={o.id} />;
         }
-        return (
-          <Box
-            key={o.id}
-            transform={this.state.transform}
-            inverseTransform={this.state.inverseTransform}
-            object={o}
-            data={CS.getBox(this.props.senseObject, o.data)}
-            isDirty={CS.isBoxDirty(this.props.inScope, o.data)}
-            cards={CS.getCardsInBox(this.props.senseObject, o.data)}
-            selected={isSelected}
-            onSelect={this.handleObjectSelect}
-            onDeselect={this.handleObjectDeselect}
-            onDragStart={this.handleObjectDragStart}
-            onDragMove={this.handleObjectDragMove}
-            onDragEnd={this.handleObjectDragEnd}
-            onTouchStart={this.handleObjectTouchStart}
-            onTouchMove={this.handleObjectTouchMove}
-            onTouchEnd={this.handleObjectTouchEnd}
-            onSetDropTarget={this.handleObjectSetDropTarget}
-            onUnsetDropTarget={this.handleObjectUnsetDropTarget}
-            onOpen={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
-          />);
+
+        const props = {
+          key: o.id,
+          transform: this.state.transform,
+          inverseTransform: this.state.inverseTransform,
+          data: CS.getBox(this.props.senseObject, o.data),
+          isDirty: CS.isBoxDirty(this.props.senseObject, o.data),
+          selected: isSelected,
+          onSelect: this.handleObjectSelect,
+          onDeselect: this.handleObjectDeselect,
+          onDragStart: this.handleObjectDragStart,
+          onDragMove: this.handleObjectDragMove,
+          onDragEnd: this.handleObjectDragEnd,
+          onTouchStart: this.handleObjectTouchStart,
+          onTouchMove: this.handleObjectTouchMove,
+          onTouchEnd: this.handleObjectTouchEnd,
+          onMouseOver: this.handleMouseOver,
+          onMouseOut: this.handleMouseOut,
+          onOpen: () => acts.editor.changeStatus(OE.StatusType.SHOW),
+        };
+
+        if (useAltLayout) {
+          return (
+            <AltBox
+              {...props}
+              object={{ ...o, width: AltBox.style.width, height: AltBox.style.height }}
+            />
+          );
+        } else {
+          return (
+            <Box
+              {...props}
+              object={o}
+              cards={CS.getCardsInBox(this.props.senseObject, o.data)}
+              onSetDropTarget={this.handleObjectSetDropTarget}
+              onUnsetDropTarget={this.handleObjectUnsetDropTarget}
+            />
+          );
+        }
       }
       default: {
         throw Error(`Unknown ObjectData type ${o.objectType}`);

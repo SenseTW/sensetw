@@ -24,6 +24,8 @@ export interface MapObjectForProps<T extends HasID<BoxID | CardID>> extends Tran
   onTouchStart?(e: any, object: ObjectData): void;
   onTouchMove?(e: any, object: ObjectData): void;
   onTouchEnd?(e: any, object: ObjectData): void;
+  onMouseOver?(e: any, object: ObjectData): void;
+  onMouseOut?(e: any, object: ObjectData): void;
   onOpen?(e: any, data: T extends HasID<infer R> ? R : never): void;
   // tslint:enable
 }
