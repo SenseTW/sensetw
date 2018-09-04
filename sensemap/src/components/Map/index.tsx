@@ -117,11 +117,11 @@ export class Map extends React.Component<Props, MapState> {
     }
   }
 
-  handleObjectSetDropTarget = (data: ObjectData) => {
+  handleObjectSetDropTarget = (e: KonvaEvent.Mouse, data: ObjectData) => {
     this.setState({ dropTarget: { [data.id]: data } });
   }
 
-  handleObjectUnsetDropTarget = (data: ObjectData) => {
+  handleObjectUnsetDropTarget = (e: KonvaEvent.Mouse, data: ObjectData) => {
     this.setState({ dropTarget: {} });
   }
 
@@ -186,6 +186,32 @@ export class Map extends React.Component<Props, MapState> {
     }
   }
 
+  handleObjectSelect = (e: KonvaEvent.Mouse, o: ObjectData) => {
+    const acts = this.props.actions;
+    const isMultiSelectable = I.isMultiSelectable(this.props.input);
+
+    if (isMultiSelectable) {
+      acts.editor.focusObject(F.focusNothing());
+      acts.selection.addObjectToSelection(o.id);
+    } else {
+      acts.selection.clearSelection();
+      acts.editor.focusObject(O.toFocus(o));
+      acts.selection.addObjectToSelection(o.id);
+    }
+  }
+
+  handleObjectDeselect = (e: KonvaEvent.Mouse, o: ObjectData) => {
+    const acts = this.props.actions;
+    const selection = this.props.selection;
+
+    acts.selection.removeObjectFromSelection(o.id);
+    if (SL.count(selection) === 1) {
+      acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
+    } else {
+      acts.editor.focusObject(F.focusNothing());
+    }
+  }
+
   render() {
     const storage = CS.toStorage(this.props.inScope);
     const objects = Object.values(storage.objects).map(o => this.renderObject(o));
@@ -213,30 +239,7 @@ export class Map extends React.Component<Props, MapState> {
 
   renderObject(o: ObjectData) {
     const acts = this.props.actions;
-
-    const isMultiSelectable = I.isMultiSelectable(this.props.input);
     const isSelected = SL.contains(this.props.selection, o.id);
-
-    const handleObjectSelect = (data: ObjectData) => {
-      if (isMultiSelectable) {
-        acts.editor.focusObject(F.focusNothing());
-        acts.selection.addObjectToSelection(data.id);
-      } else {
-        acts.selection.clearSelection();
-        acts.editor.focusObject(O.toFocus(data));
-        acts.selection.addObjectToSelection(data.id);
-      }
-    };
-
-    const handleObjectDeselect = (data: ObjectData) => {
-      const selection = this.props.selection;
-      acts.selection.removeObjectFromSelection(data.id);
-      if (SL.count(selection) === 1) {
-        acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
-      } else {
-        acts.editor.focusObject(F.focusNothing());
-      }
-    };
 
     switch (o.objectType) {
       case ObjectType.NONE: {
@@ -249,21 +252,21 @@ export class Map extends React.Component<Props, MapState> {
         return (
           <Card
             key={o.id}
-            isDirty={CS.isCardDirty(this.props.inScope, o.data)}
-            mapObject={o}
             transform={this.state.transform}
             inverseTransform={this.state.inverseTransform}
-            card={CS.getCard(this.props.senseObject, o.data)}
+            object={o}
+            data={CS.getCard(this.props.senseObject, o.data)}
+            isDirty={CS.isCardDirty(this.props.inScope, o.data)}
             selected={isSelected}
-            handleSelect={handleObjectSelect}
-            handleDeselect={handleObjectDeselect}
-            handleDragStart={this.handleObjectDragStart}
-            handleDragMove={this.handleObjectDragMove}
-            handleDragEnd={this.handleObjectDragEnd}
-            handleTouchStart={this.handleObjectTouchStart}
-            handleTouchMove={this.handleObjectTouchMove}
-            handleTouchEnd={this.handleObjectTouchEnd}
-            openCard={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
+            onSelect={this.handleObjectSelect}
+            onDeselect={this.handleObjectDeselect}
+            onDragStart={this.handleObjectDragStart}
+            onDragMove={this.handleObjectDragMove}
+            onDragEnd={this.handleObjectDragEnd}
+            onTouchStart={this.handleObjectTouchStart}
+            onTouchMove={this.handleObjectTouchMove}
+            onTouchEnd={this.handleObjectTouchEnd}
+            onOpen={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
           />);
       }
       case ObjectType.BOX: {
@@ -273,24 +276,24 @@ export class Map extends React.Component<Props, MapState> {
         return (
           <Box
             key={o.id}
-            isDirty={CS.isBoxDirty(this.props.inScope, o.data)}
-            mapObject={o}
             transform={this.state.transform}
             inverseTransform={this.state.inverseTransform}
-            box={CS.getBox(this.props.senseObject, o.data)}
+            object={o}
+            data={CS.getBox(this.props.senseObject, o.data)}
+            isDirty={CS.isBoxDirty(this.props.inScope, o.data)}
             cards={CS.getCardsInBox(this.props.senseObject, o.data)}
             selected={isSelected}
-            handleSelect={handleObjectSelect}
-            handleDeselect={handleObjectDeselect}
-            handleDragStart={this.handleObjectDragStart}
-            handleDragMove={this.handleObjectDragMove}
-            handleDragEnd={this.handleObjectDragEnd}
-            handleTouchStart={this.handleObjectTouchStart}
-            handleTouchMove={this.handleObjectTouchMove}
-            handleTouchEnd={this.handleObjectTouchEnd}
-            handleSetDropTarget={this.handleObjectSetDropTarget}
-            handleUnsetDropTarget={this.handleObjectUnsetDropTarget}
-            openBox={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
+            onSelect={this.handleObjectSelect}
+            onDeselect={this.handleObjectDeselect}
+            onDragStart={this.handleObjectDragStart}
+            onDragMove={this.handleObjectDragMove}
+            onDragEnd={this.handleObjectDragEnd}
+            onTouchStart={this.handleObjectTouchStart}
+            onTouchMove={this.handleObjectTouchMove}
+            onTouchEnd={this.handleObjectTouchEnd}
+            onSetDropTarget={this.handleObjectSetDropTarget}
+            onUnsetDropTarget={this.handleObjectUnsetDropTarget}
+            onOpen={() => acts.editor.changeStatus(OE.StatusType.SHOW)}
           />);
       }
       default: {

@@ -1,28 +1,14 @@
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import { TransformerForProps } from '../../Layout';
+import { MapObjectForProps } from '../../Map/props';
 import Selectable from '../../Layout/Selectable';
 import { rectFromBox } from '../../../graphics/drawing';
-import { ObjectData, BoxID, BoxData } from '../../../types';
-import { BoundingBox } from '../../../graphics/drawing';
+import { BoxData } from '../../../types';
 import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 
-interface OwnProps {
-  mapObject: ObjectData;
-  selected?: boolean;
-  onMouseOver?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onMouseOut?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDeselect?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onOpen?(e: KonvaEvent.Mouse, data: BoxID): void;
-}
-
-type Props = OwnProps & BoundingBox & BoxData & TransformerForProps;
+type Props = MapObjectForProps<BoxData>;
 
 class Box extends React.PureComponent<Props> {
   static style = {
@@ -67,9 +53,9 @@ class Box extends React.PureComponent<Props> {
   render() {
     const {
       transform,
-      mapObject,
+      object,
+      data,
       selected = false,
-      title,
       onMouseOver = noop,
       onMouseOut = noop,
       onSelect = noop,
@@ -79,12 +65,7 @@ class Box extends React.PureComponent<Props> {
       onDragEnd = noop,
       onOpen = noop,
     } = this.props;
-    const transformed = transform({
-      x: this.props.x,
-      y: this.props.y,
-      width: this.props.width,
-      height: this.props.height,
-    });
+    const transformed = transform(object);
     const { width, height } = transformed;
     const { left: x, top: y } = rectFromBox(transformed);
     const style = transformObject(transform, Box.style) as typeof Box.style;
@@ -111,26 +92,26 @@ class Box extends React.PureComponent<Props> {
         selected={selected}
         onSelect={(e: KonvaEvent.Mouse) => {
           e.cancelBubble = true;
-          onSelect(e, mapObject);
+          onSelect(e, object);
         }}
         onDeselect={(e: KonvaEvent.Mouse) => {
           e.cancelBubble = true;
-          onDeselect(e, mapObject);
+          onDeselect(e, object);
         }}
       >
         <Group
           draggable
           x={x}
           y={y}
-          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
-          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
+          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, object)}
+          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, object)}
           onDblClick={(e: KonvaEvent.Mouse) => {
-            onSelect(e, mapObject);
-            onOpen(e, mapObject.data);
+            onSelect(e, object);
+            onOpen(e, data.id);
           }}
-          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
-          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
-          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
+          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, object)}
+          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, object)}
+          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, object)}
         >
           {selectedRect}
           <Rect
@@ -146,7 +127,7 @@ class Box extends React.PureComponent<Props> {
             height={textHeight}
             fontSize={style.fontSize}
             fill={style.color}
-            text={title}
+            text={data.title}
           />
         </Group>
       </Selectable>

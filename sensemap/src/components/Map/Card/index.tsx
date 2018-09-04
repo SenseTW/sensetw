@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Group, Rect, Circle } from 'react-konva';
-import Layout, { TransformerForProps } from '../../Layout';
+import Layout from '../../Layout';
+import { MapObjectForProps } from '../props';
 import Text from '../../Layout/Text';
 import Selectable from '../../Layout/Selectable';
 import TagList from '../TagList';
@@ -8,25 +9,8 @@ import * as D from '../../../graphics/drawing';
 import * as T from '../../../types';
 import { transformObject } from '../../../types/viewport';
 import { noop, toTags } from '../../../types/utils';
-import { Event as KonvaEvent } from '../../../types/konva';
 
-interface OwnProps {
-  isDirty?: boolean;
-  mapObject: T.ObjectData;
-  card: T.CardData;
-  selected?: boolean;
-  handleSelect?(object: T.ObjectData): void;
-  handleDeselect?(object: T.ObjectData): void;
-  handleDragStart?(e: KonvaEvent.Mouse): void;
-  handleDragMove?(e: KonvaEvent.Mouse): void;
-  handleDragEnd?(e: KonvaEvent.Mouse): void;
-  handleTouchStart?(e: KonvaEvent.Touch): void;
-  handleTouchMove?(e: KonvaEvent.Touch): void;
-  handleTouchEnd?(e: KonvaEvent.Touch): void;
-  openCard?(id: T.CardID): void;
-}
-
-type Props = OwnProps & TransformerForProps;
+type Props = MapObjectForProps<T.CardData>;
 
 interface State {
   containerWidth: number;
@@ -101,41 +85,32 @@ class Card extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { transform, inverseTransform, isDirty = false } = this.props;
+    const { transform, inverseTransform, object, data, isDirty = false } = this.props;
     const { containerHeight } = this.state;
     const style = transformObject(transform, Card.style) as typeof Card.style;
-    const { data } = this.props.mapObject;
-    let transformed = this.props.transform({
-      x: this.props.mapObject.x,
-      y: this.props.mapObject.y,
-      // XXX: deprecated
-      width: this.props.mapObject.width,
-      // XXX deprecated
-      height: this.props.mapObject.height,
-      anchor: this.props.mapObject.anchor,
-    });
+    let transformed = this.props.transform(object);
     const { width } = transformed;
     const height = style.padding.top + containerHeight + style.padding.bottom;
     const textWidth = width - style.padding.left - style.padding.right;
     transformed.width = width;
     transformed.height = height;
     const { left: x, top: y } = D.rectFromBox(transformed);
-    const {summary, description, cardType, tags} = this.props.card;
+    const {summary, description, cardType, tags} = data;
     const sanitizedSummary = summary.substr(0, summaryLimit);
     const sanitizedDescription   = description.substr(0, descriptionLimit);
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
 
-    const handleSelect     = this.props.handleSelect     || noop;
-    const handleDeselect   = this.props.handleDeselect   || noop;
-    const handleDragStart  = this.props.handleDragStart  || noop;
-    const handleDragMove   = this.props.handleDragMove   || noop;
-    const handleDragEnd    = this.props.handleDragEnd    || noop;
-    const handleTouchStart = this.props.handleTouchStart || noop;
-    const handleTouchMove  = this.props.handleTouchMove  || noop;
-    const handleTouchEnd   = this.props.handleTouchEnd   || noop;
-    const openCard         = this.props.openCard         || noop;
-    const bgColor          = colorFromType(cardType);
+    const onSelect     = this.props.onSelect     || noop;
+    const onDeselect   = this.props.onDeselect   || noop;
+    const onDragStart  = this.props.onDragStart  || noop;
+    const onDragMove   = this.props.onDragMove   || noop;
+    const onDragEnd    = this.props.onDragEnd    || noop;
+    const onTouchStart = this.props.onTouchStart || noop;
+    const onTouchMove  = this.props.onTouchMove  || noop;
+    const onTouchEnd   = this.props.onTouchEnd   || noop;
+    const onOpen       = this.props.onOpen       || noop;
+    const bgColor      = colorFromType(cardType);
 
     const selected = (
       <Rect
@@ -153,27 +128,27 @@ class Card extends React.PureComponent<Props, State> {
         selected={this.props.selected}
         onSelect={(e) => {
           e.cancelBubble = true;
-          handleSelect(this.props.mapObject);
+          onSelect(e, object);
         }}
         onDeselect={(e) => {
           e.cancelBubble = true;
-          handleDeselect(this.props.mapObject);
+          onDeselect(e, object);
         }}
       >
         <Group
           x={x}
           y={y}
           draggable={true}
-          onDblClick={() => {
-            handleSelect(this.props.mapObject);
-            openCard(data);
+          onDblClick={(e) => {
+            onSelect(e, object);
+            onOpen(e, data.id);
           }}
-          onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+          onDragStart={(e) => onDragStart(e, object)}
+          onDragMove={(e) => onDragMove(e, object)}
+          onDragEnd={(e) => onDragEnd(e, object)}
+          onTouchStart={(e) => onTouchStart(e, object)}
+          onTouchMove={(e) => onTouchMove(e, object)}
+          onTouchEnd={(e) => onTouchEnd(e, object)}
         >
           {this.props.selected ? selected : null}
           <Rect

@@ -1,28 +1,14 @@
 import * as React from 'react';
 import { Group, Rect } from 'react-konva';
-import { TransformerForProps } from '../../Layout';
+import { MapObjectForProps } from '../../Map/props';
 import Selectable from '../../Layout/Selectable';
 import { rectFromBox } from '../../../graphics/drawing';
-import { ObjectData, CardID, CardData, CardType } from '../../../types';
-import { BoundingBox } from '../../../graphics/drawing';
+import { CardData, CardType } from '../../../types';
 import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 
-interface OwnProps {
-  mapObject: ObjectData;
-  selected?: boolean;
-  onSelect?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDeselect?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onMouseOver?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onMouseOut?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDragStart?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDragMove?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onDragEnd?(e: KonvaEvent.Mouse, object: ObjectData): void;
-  onOpen?(e: KonvaEvent.Mouse, data: CardID): void;
-}
-
-type Props = OwnProps & BoundingBox & CardData & TransformerForProps;
+type Props = MapObjectForProps<CardData>;
 
 const colors = {
   [CardType.ANSWER]: '#c0e2d8',
@@ -63,9 +49,9 @@ class Card extends React.PureComponent<Props> {
   render() {
     const {
       transform,
-      mapObject,
+      object,
+      data,
       selected = false,
-      cardType,
       onSelect = noop,
       onDeselect = noop,
       onMouseOver = noop,
@@ -76,12 +62,7 @@ class Card extends React.PureComponent<Props> {
       onOpen = noop,
     } = this.props;
     // TODO: should I use the object dimension or the style dimension?
-    const transformed = transform({
-      x: this.props.x,
-      y: this.props.y,
-      width: this.props.width,
-      height: this.props.height,
-    });
+    const transformed = transform(object);
     const { width, height } = transformed;
     const { left: x, top: y } = rectFromBox(transformed);
     const style = transformObject(transform, Card.style) as typeof Card.style;
@@ -105,11 +86,11 @@ class Card extends React.PureComponent<Props> {
         selected={selected}
         onSelect={(e: KonvaEvent.Mouse) => {
           e.cancelBubble = true;
-          onSelect(e, mapObject);
+          onSelect(e, object);
         }}
         onDeselect={(e: KonvaEvent.Mouse) => {
           e.cancelBubble = true;
-          onDeselect(e, mapObject);
+          onDeselect(e, object);
         }}
       >
         <Group
@@ -117,21 +98,21 @@ class Card extends React.PureComponent<Props> {
           x={x}
           y={y}
           onDblClick={(e: KonvaEvent.Mouse) => {
-            onSelect(e, mapObject);
-            onOpen(e, mapObject.data);
+            onSelect(e, object);
+            onOpen(e, object.data);
           }}
-          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, mapObject)}
-          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, mapObject)}
-          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, mapObject)}
-          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, mapObject)}
-          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, mapObject)}
+          onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, object)}
+          onMouseOut={(e: KonvaEvent.Mouse) => onMouseOut(e, object)}
+          onDragStart={(e: KonvaEvent.Mouse) => onDragStart(e, object)}
+          onDragMove={(e: KonvaEvent.Mouse) => onDragMove(e, object)}
+          onDragEnd={(e: KonvaEvent.Mouse) => onDragEnd(e, object)}
         >
           {selectedRect}
           <Rect
             width={width}
             height={height}
             cornerRadius={style.borderRadius}
-            fill={colorFromType(cardType)}
+            fill={colorFromType(data.cardType)}
           />
         </Group>
       </Selectable>
