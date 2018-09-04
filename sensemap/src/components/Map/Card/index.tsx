@@ -109,6 +109,8 @@ class Card extends React.PureComponent<Props, State> {
     const onTouchStart = this.props.onTouchStart || noop;
     const onTouchMove  = this.props.onTouchMove  || noop;
     const onTouchEnd   = this.props.onTouchEnd   || noop;
+    const onMouseOver  = this.props.onMouseOver  || noop;
+    const onMouseOut   = this.props.onMouseOut   || noop;
     const onOpen       = this.props.onOpen       || noop;
     const bgColor      = colorFromType(cardType);
 
@@ -149,6 +151,8 @@ class Card extends React.PureComponent<Props, State> {
           onTouchStart={(e) => onTouchStart(e, object)}
           onTouchMove={(e) => onTouchMove(e, object)}
           onTouchEnd={(e) => onTouchEnd(e, object)}
+          onMouseOver={(e) => onMouseOver(e, object)}
+          onMouseOut={(e) => onMouseOut(e, object)}
         >
           {this.props.selected ? selected : null}
           <Rect
