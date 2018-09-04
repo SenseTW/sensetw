@@ -16,10 +16,14 @@ MAILGUN_NAME=$10
 
 PUBLIC_URL=https\\:\\/\\/staging.api.sense.tw\\/
 DB_NAME=sensemap
+
+if [ "$1" != "release" ]; then
+  MAILGUN_NAME="${BRANCH_NAME}.${MAILGUN_NAME}"
+fi
+
 if [ "$1" != "release" ] && [ "$1" != "master" ]; then
   DB_NAME="sensemap_${BRANCH_NAME}"
   PUBLIC_URL="https\\:\\/\\/${BRANCH_NAME}.staging.api.sense.tw\\/"
-  MAILGUN_NAME="${BRANCH_NAME}.${MAILGUN_NAME}"
 fi
 
 if [ -z "$SESSION_SECRET" ]; then
