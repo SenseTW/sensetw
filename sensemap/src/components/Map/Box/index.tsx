@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Group, Rect, Circle } from 'react-konva';
-import { TransformerForProps, LayoutForProps } from '../../Layout';
+import { LayoutForProps } from '../../Layout';
+import { MapObjectForProps } from '../props';
 import Layout from '../../Layout';
 import Nothing from '../../Layout/Nothing';
 import Selectable from '../../Layout/Selectable';
@@ -24,25 +25,12 @@ const toggleListDisplay = (d: ListDisplay) =>
   d === ListDisplay.EXPANDED ? ListDisplay.COLLAPSED : ListDisplay.EXPANDED;
 
 interface OwnProps {
-  isDirty?: boolean;
-  mapObject: T.ObjectData;
-  box: T.BoxData;
   cards: ObjectMap<T.CardData>;
-  selected?: boolean;
-  handleSelect?(data: T.ObjectData): void;
-  handleSetDropTarget?(data: T.ObjectData): void;
-  handleUnsetDropTarget?(data: T.ObjectData): void;
-  handleDeselect?(data: T.ObjectData): void;
-  handleDragStart?(e: KonvaEvent.Mouse): void;
-  handleDragMove?(e: KonvaEvent.Mouse): void;
-  handleDragEnd?(e: KonvaEvent.Mouse): void;
-  handleTouchStart?(e: KonvaEvent.Touch): void;
-  handleTouchMove?(e: KonvaEvent.Touch): void;
-  handleTouchEnd?(e: KonvaEvent.Touch): void;
-  openBox?(box: T.BoxID): void;
+  onSetDropTarget?(e: KonvaEvent.Mouse, o: T.ObjectData): void;
+  onUnsetDropTarget?(e: KonvaEvent.Mouse, o: T.ObjectData): void;
 }
 
-type Props = OwnProps & LayoutForProps & TransformerForProps;
+type Props = OwnProps & LayoutForProps & MapObjectForProps<T.BoxData>;
 
 interface State {
   listDisplay: ListDisplay;
@@ -118,16 +106,10 @@ class Box extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { transform, inverseTransform, box, isDirty = false } = this.props;
+    const { transform, inverseTransform, object, data, isDirty = false } = this.props;
     const { height } = this.state;
     const style = transformObject(transform, Box.style) as typeof Box.style;
-    let transformed = transform({
-      x: this.props.mapObject.x,
-      y: this.props.mapObject.y,
-      width: this.props.mapObject.width,
-      height: this.props.mapObject.height,
-      anchor: this.props.mapObject.anchor,
-    });
+    let transformed = transform(object);
     const { width } = transformed;
     transformed.width = width;
     transformed.height = height;
@@ -136,17 +118,17 @@ class Box extends React.PureComponent<Props, State> {
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
 
-    const handleSelect     = this.props.handleSelect     || noop;
-    const handleDeselect   = this.props.handleDeselect   || noop;
-    const handleDragStart  = this.props.handleDragStart  || noop;
-    const handleDragMove   = this.props.handleDragMove   || noop;
-    const handleDragEnd    = this.props.handleDragEnd    || noop;
-    const handleTouchStart = this.props.handleTouchStart || noop;
-    const handleTouchMove  = this.props.handleTouchMove  || noop;
-    const handleTouchEnd   = this.props.handleTouchEnd   || noop;
-    const handleSetDropTarget   = this.props.handleSetDropTarget   || noop;
-    const handleUnsetDropTarget = this.props.handleUnsetDropTarget || noop;
-    const openBox         = this.props.openBox         || noop;
+    const onSelect     = this.props.onSelect     || noop;
+    const onDeselect   = this.props.onDeselect   || noop;
+    const onDragStart  = this.props.onDragStart  || noop;
+    const onDragMove   = this.props.onDragMove   || noop;
+    const onDragEnd    = this.props.onDragEnd    || noop;
+    const onTouchStart = this.props.onTouchStart || noop;
+    const onTouchMove  = this.props.onTouchMove  || noop;
+    const onTouchEnd   = this.props.onTouchEnd   || noop;
+    const onOpen       = this.props.onOpen       || noop;
+    const onSetDropTarget   = this.props.onSetDropTarget   || noop;
+    const onUnsetDropTarget = this.props.onUnsetDropTarget || noop;
 
     const selected = (
       <Rect
@@ -164,35 +146,35 @@ class Box extends React.PureComponent<Props, State> {
         selected={this.props.selected}
         onSelect={(e) => {
           e.cancelBubble = true;
-          handleSelect(this.props.mapObject);
+          onSelect(e, object);
         }}
         onDeselect={(e) => {
           e.cancelBubble = true;
-          handleDeselect(this.props.mapObject);
+          onDeselect(e, object);
         }}
       >
         <Group
           x={x}
           y={y}
           draggable={true}
-          onDblClick={() => {
-            handleSelect(this.props.mapObject);
-            openBox(box.id);
+          onDblClick={(e) => {
+            onSelect(e, object);
+            onOpen(e, data.id);
           }}
-          onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseEnter={handleSetDropTarget}
-          onMouseLeave={handleUnsetDropTarget}
+          onDragStart={(e) => onDragStart(e, object)}
+          onDragMove={(e) => onDragMove(e, object)}
+          onDragEnd={(e) => onDragEnd(e, object)}
+          onTouchStart={(e) => onTouchStart(e, object)}
+          onTouchMove={(e) => onTouchMove(e, object)}
+          onTouchEnd={(e) => onTouchEnd(e, object)}
+          onMouseEnter={(e) => onSetDropTarget(e, object)}
+          onMouseLeave={(e) => onUnsetDropTarget(e, object)}
         >
           {this.props.selected ? selected : null}
           <Header
             transform={transform}
             inverseTransform={inverseTransform}
-            box={box}
+            box={data}
             width={width}
             onResize={this.handleResize}
           />

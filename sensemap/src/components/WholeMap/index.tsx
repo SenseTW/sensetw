@@ -144,7 +144,6 @@ class WholeMap extends React.Component<Props, State> {
 
     switch (object.objectType) {
       case ObjectType.BOX: {
-        const { x, y } = object;
         const box = CS.getBox(senseObject, object.data);
 
         if (B.isEmpty(box)) {
@@ -154,15 +153,10 @@ class WholeMap extends React.Component<Props, State> {
         return (
           <Box
             {...transformers}
-            {...box}
             key={object.id}
-            mapObject={object}
+            object={object}
+            data={box}
             selected={isSelected}
-            x={x}
-            y={y}
-            width={Box.style.width}
-            height={Box.style.height}
-            anchor={object.anchor}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
             onDragStart={this.handleObjectDragStart}
@@ -174,7 +168,6 @@ class WholeMap extends React.Component<Props, State> {
         );
       }
       case ObjectType.CARD: {
-        const { x, y } = object;
         const card = CS.getCard(senseObject, object.data);
 
         if (C.isEmpty(card)) {
@@ -184,15 +177,10 @@ class WholeMap extends React.Component<Props, State> {
         return (
           <Card
             {...transformers}
-            {...card}
             key={object.id}
-            mapObject={object}
+            object={object}
+            data={card}
             selected={isSelected}
-            x={x}
-            y={y}
-            width={Card.style.width}
-            height={Card.style.height}
-            anchor={object.anchor}
             onSelect={this.handleSelect}
             onDeselect={this.handleDeselect}
             onDragStart={this.handleObjectDragStart}
