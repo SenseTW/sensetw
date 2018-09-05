@@ -228,8 +228,12 @@ export class Map extends React.Component<Props, MapState> {
     }
   }
 
+  isAltLayout(): boolean {
+    return this.props.level < 0.33;
+  }
+
   render() {
-    const useAltLayout = this.props.level < 0.66;
+    const useAltLayout = this.isAltLayout();
     const { transform, inverseTransform, hoverObject } = this.state;
     const storage = CS.toStorage(this.props.inScope);
     const objects = Object.values(storage.objects).map(o => this.renderObject(o));
@@ -304,7 +308,7 @@ export class Map extends React.Component<Props, MapState> {
   renderObject(o: ObjectData) {
     const acts = this.props.actions;
     const isSelected = SL.contains(this.props.selection, o.id);
-    const useAltLayout = this.props.level < 0.66;
+    const useAltLayout = this.isAltLayout();
 
     switch (o.objectType) {
       case ObjectType.NONE: {
