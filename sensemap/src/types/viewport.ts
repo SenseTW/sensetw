@@ -9,6 +9,7 @@ export type State = {
   height: number;
   top:    number;
   left:   number;
+  baseLevel: ZoomLevel;
   level:  ZoomLevel;
   prevViewport?: State;
 };
@@ -20,6 +21,7 @@ export const initial: State = {
   height: 800,
   top:    0,
   left:   0,
+  baseLevel: 1.0,
   level:  1.0,
   prevViewport: undefined,
 };
@@ -30,32 +32,32 @@ export const viewport = (v: Partial<State>): State => ({
 });
 
 export const makeTransform: StateToTransform =
-  ({ top, left, level }) => ({
+  ({ top, left, level, baseLevel }) => ({
     x = emptyBoundingBox.x,
     y = emptyBoundingBox.y,
     width = emptyBoundingBox.width,
     height = emptyBoundingBox.height,
     anchor = emptyBoundingBox.anchor,
   } = {}) => ({
-    x: (x - left) * level,
-    y: (y - top) * level,
-    width: width * level,
-    height: height * level,
+    x: (x - left) * level * baseLevel,
+    y: (y - top) * level * baseLevel,
+    width: width * level * baseLevel,
+    height: height * level * baseLevel,
     anchor,
   });
 
 export const makeInverseTransform: StateToTransform =
-  ({ top, left, level }) => ({
+  ({ top, left, level, baseLevel }) => ({
     x = emptyBoundingBox.x,
     y = emptyBoundingBox.y,
     width = emptyBoundingBox.width,
     height = emptyBoundingBox.height,
     anchor = emptyBoundingBox.anchor,
   } = {}) => ({
-    x: x / level + left,
-    y: y / level + top,
-    width: width / level,
-    height: height / level,
+    x: x / level / baseLevel + left,
+    y: y / level / baseLevel + top,
+    width: width / level / baseLevel,
+    height: height / level / baseLevel,
     anchor,
   });
 
@@ -103,6 +105,18 @@ const panViewport =
   (pos: Position) => ({
     type: PAN_VIEWPORT as typeof PAN_VIEWPORT,
     payload: pos,
+  });
+
+const SET_BASE_LEVEL = 'SET_BASE_LEVEL';
+/**
+ * Sets the base zoom level of the map.
+ *
+ * @param {ZoomLevel} baseLevel The base zoom level.
+ */
+const setBaseLevel =
+  (baseLevel: ZoomLevel) => ({
+    type: SET_BASE_LEVEL as typeof SET_BASE_LEVEL,
+    payload: { baseLevel },
   });
 
 const ZOOM_VIEWPORT = 'ZOOM_VIEWPORT';
@@ -153,6 +167,7 @@ const load =
 export const actions = {
   setViewport,
   panViewport,
+  setBaseLevel,
   zoomViewport,
   resizeViewport,
   resetViewPort,
@@ -176,6 +191,13 @@ export const reducer = (state: State = initial, action: Action): State => {
         // XXX: doesn't work as expected in Safari
         left: state.left - action.payload.x / state.level,
         top:  state.top  - action.payload.y / state.level,
+      };
+    }
+    case SET_BASE_LEVEL: {
+      const { baseLevel } = action.payload;
+      return {
+        ...state,
+        baseLevel,
       };
     }
     case ZOOM_VIEWPORT: {
