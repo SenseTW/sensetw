@@ -49,8 +49,18 @@ type Props = StateFromProps & ActionProps;
 class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions: acts } = this.props;
-    // the header height is 105px
-    acts.viewport.resizeViewport({ width, height: height - 105 });
+    // the header height is 95px
+    acts.viewport.resizeViewport({ width, height: height - 95 });
+
+    if (width <= 640) {
+      acts.viewport.setBaseLevel(0.5);
+    } else if (width <= 800) {
+      acts.viewport.setBaseLevel(0.6);
+    } else if (width <= 1024) {
+      acts.viewport.setBaseLevel(0.7);
+    } else {
+      acts.viewport.setBaseLevel(1.0);
+    }
   }
 
   handleKeyUp = (e: KeyboardEvent) => {
