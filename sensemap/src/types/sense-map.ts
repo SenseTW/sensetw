@@ -39,11 +39,6 @@ export enum InboxVisibility {
   HIDDEN  = 'HIDDEN',
 }
 
-export enum MapModeType {
-  PART = 'PART',
-  WHOLE = 'WHOLE',
-}
-
 const SET_SCOPE_TO_BOX = 'SET_SCOPE_TO_BOX';
 /**
  * A message to set the scope to a box.
@@ -114,17 +109,9 @@ const closeBox =
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
-const SET_MAP_MODE = 'SET_MAP_MODE';
-const setMode =
-  (mode: MapModeType) => ({
-    type: SET_MAP_MODE as typeof SET_MAP_MODE,
-    payload: { mode },
-  });
-
 const toWholeMode =
   () =>
   (dispatch: Dispatch, getState: GetState) => {
-    dispatch(setMode(MapModeType.WHOLE));
     const state = getState();
     // get scoped objects
     const { senseMap, senseObject, viewport } = state;
@@ -165,7 +152,6 @@ const toWholeMode =
 const toNormalMode =
   () =>
   (dispatch: Dispatch, getState: GetState) => {
-    dispatch(setMode(MapModeType.PART));
     // recover the old viewport
     const state = getState();
     const { selection, senseObject, viewport } = state;
@@ -194,7 +180,6 @@ const syncActions = {
   openInbox,
   activateInboxPage,
   closeInbox,
-  setMode,
 };
 
 export const actions = {
@@ -211,7 +196,6 @@ export type State = {
   // we need the current map id to check if we are transitioning to a new map
   map: MapID,
   scope: MapScope,
-  mode: MapModeType,
   inbox: InboxVisibility,
   activateInboxPage: number
 };
@@ -221,7 +205,6 @@ export const initial: State = {
   scope: {
     type: MapScopeType.FULL_MAP,
   },
-  mode: MapModeType.PART,
   inbox: InboxVisibility.HIDDEN,
   activateInboxPage: 1
 };
@@ -251,10 +234,6 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     }
     case CLOSE_INBOX: {
       return { ...state, inbox: InboxVisibility.HIDDEN };
-    }
-    case SET_MAP_MODE: {
-      const { mode } = action.payload;
-      return { ...state, mode };
     }
     default:
       return state;

@@ -221,7 +221,7 @@ class ObjectMenu extends React.PureComponent<Props> {
     acts.senseMap.openBox(obj.data);
   }
 
-  canRemoveCard(): Boolean {
+  canRemoveCard(): boolean {
     return (
       this.props.isAuthenticated
       && this.props.senseMap.scope.type === T.MapScopeType.BOX
@@ -256,17 +256,28 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   isWholePicture(): boolean {
-    const { senseMap } = this.props;
-    return senseMap.mode === SM.MapModeType.WHOLE;
+    const { viewport } = this.props;
+    return !!viewport.prevViewport;
   }
 
   handleModeChange(): void {
-    const { actions: acts, senseMap } = this.props;
-    if (senseMap.mode === SM.MapModeType.PART) {
+    const { actions: acts, viewport } = this.props;
+    if (!viewport.prevViewport) {
       acts.senseMap.toWholeMode();
     } else {
       acts.senseMap.toNormalMode();
     }
+  }
+
+  canReset(): boolean {
+    const { viewport } = this.props;
+    return Math.abs(viewport.level - 1.0) >= Number.EPSILON;
+  }
+
+  resetZoomLevel(): void {
+    const { actions: acts, viewport } = this.props;
+    const center = V.getCenter(viewport);
+    acts.viewport.zoomViewport(1.0, center);
   }
 
   render() {
@@ -406,16 +417,22 @@ class ObjectMenu extends React.PureComponent<Props> {
         {
           <Menu compact inverted icon>
             <Menu.Item onClick={() => this.handleZoom(0.9)}>
-              <Icon name="minus" />
+              <Icon name="zoom out" />
+            </Menu.Item>
+            <Menu.Item
+              disabled={!this.canReset()}
+              onClick={() => this.resetZoomLevel()}
+            >
+              <Icon name="crosshairs" />
+            </Menu.Item>
+            <Menu.Item onClick={() => this.handleZoom(1.1)}>
+              <Icon name="zoom in" />
             </Menu.Item>
             <Menu.Item
               active={this.isWholePicture()}
               onClick={() => this.handleModeChange()}
             >
-              <Icon name="eye" />
-            </Menu.Item>
-            <Menu.Item onClick={() => this.handleZoom(1.1)}>
-              <Icon name="plus" />
+              <Icon name="globe" />
             </Menu.Item>
           </Menu>
         }

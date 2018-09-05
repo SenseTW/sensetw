@@ -5,7 +5,6 @@ import { Sidebar, Segment } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
-import WholeMap from '../../components/WholeMap';
 import ObjectMenu from '../ObjectMenu';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
@@ -32,7 +31,6 @@ import * as C from '../../types/sense/card';
 import { Action as CardAction } from '../../types/sense/card';
 import * as F from '../../types/sense/focus';
 import './index.css';
-import { Key } from 'ts-keycode-enum';
 const background = require('./background-map.png');
 
 type RouteProps = RouteComponentProps<{ mid: MapID, bid: BoxID }>;
@@ -43,7 +41,6 @@ interface StateFromProps {
   senseObject: SO.State;
   editor: OE.State;
   scope: typeof SM.initial.scope;
-  showAnotherMode: Boolean;
   isAuthenticated: Boolean;
 }
 
@@ -84,7 +81,6 @@ class MapPage extends React.Component<Props> {
       scope,
       senseMap,
       senseObject,
-      showAnotherMode,
       isAuthenticated,
     } = this.props;
     const { status, focus } = editor;
@@ -107,8 +103,6 @@ class MapPage extends React.Component<Props> {
         break;
       default:
     }
-    const isWholePicture = senseMap.mode === SM.MapModeType.WHOLE;
-    const shouldShowWholePicture = showAnotherMode ? !isWholePicture : isWholePicture;
 
     return (
       <div className="map-page">
@@ -222,11 +216,7 @@ class MapPage extends React.Component<Props> {
           <Sidebar.Pusher>
             <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
             <Viewport>
-              {(props) => (
-                shouldShowWholePicture
-                  ? <Map id={mid} {...props} component={WholeMap} />
-                  : <Map id={mid} {...props} />
-              )}
+              {(props) => <Map id={mid} {...props} />}
             </Viewport>
             <div className="map-page__menu">
               <ObjectMenu />
@@ -281,7 +271,6 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
     const session = state.session;
     const { editor } = state;
     const { mid } = router.match.params;
-    const showAnotherMode = state.input.keyStatus[Key.Alt];
     const isAuthenticated = session.authenticated;
 
     return {
@@ -290,7 +279,6 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
       senseObject,
       scope,
       editor,
-      showAnotherMode,
       isAuthenticated,
     };
   },
