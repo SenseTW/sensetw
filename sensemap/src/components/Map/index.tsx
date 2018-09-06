@@ -1,5 +1,5 @@
-
 import * as React from 'react';
+import { History } from 'history';
 import { Stage, Layer } from 'react-konva';
 import Box from './Box';
 import Card from './Card';
@@ -20,6 +20,7 @@ import * as V from '../../types/viewport';
 import * as S from '../../types/stage';
 import * as G from '../../graphics/point';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
+import * as qs from 'qs';
 
 export interface StateFromProps {
   selection:   State['selection'];
@@ -28,6 +29,8 @@ export interface StateFromProps {
   input:       State['input'];
   stage:       State['stage'];
   level:       number;
+  history:     History;
+  promisedObjects: Promise<ObjectMap<ObjectData>>;
 }
 
 type ViewportState = State['viewport'];
@@ -64,6 +67,20 @@ export class Map extends React.Component<Props, MapState> {
       inverseTransform: V.makeInverseTransform(this.props),
       hoverObject: undefined,
     };
+  }
+
+  // center to the queried object
+  async componentDidMount() {
+    const { actions: acts, promisedObjects } = this.props;
+    const query = location.search.substr(1);
+    type Query = { object: string };
+    const { object: oid } = qs.parse(query) as Query;
+
+    if (oid) {
+      await promisedObjects;
+      acts.viewport.panToObject(oid);
+      acts.selection.toggleObjectSelection(oid);
+    }
   }
 
   handleMouseMove = (e: KonvaEvent.Mouse) => {
@@ -120,6 +137,7 @@ export class Map extends React.Component<Props, MapState> {
     const isMoved = S.isMoved(this.props.stage);
     if (!isMoved && e.target && e.target.nodeType === NodeType.STAGE) {
       this.props.actions.selection.clearSelection();
+      this.props.history.replace('?');
     }
   }
 
@@ -203,24 +221,29 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   handleObjectSelect = (e: KonvaEvent.Mouse, o: ObjectData) => {
+    const history = this.props.history;
     const acts = this.props.actions;
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
 
     if (isMultiSelectable) {
       acts.editor.focusObject(F.focusNothing());
       acts.selection.addObjectToSelection(o.id);
+      history.replace('?');
     } else {
       acts.selection.clearSelection();
       acts.editor.focusObject(O.toFocus(o));
       acts.selection.addObjectToSelection(o.id);
+      history.replace(`?object=${o.id}`);
     }
   }
 
   handleObjectDeselect = (e: KonvaEvent.Mouse, o: ObjectData) => {
+    const history = this.props.history;
     const acts = this.props.actions;
     const selection = this.props.selection;
 
     acts.selection.removeObjectFromSelection(o.id);
+    history.replace('?');
     if (SL.count(selection) === 1) {
       acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
     } else {
