@@ -1,6 +1,8 @@
 import { ActionUnion } from './action';
 import { Position, Dimension, emptyBoundingBox } from '../graphics/drawing';
 import * as G from '../graphics/point';
+import { Dispatch, GetState, ObjectID } from './';
+import * as CS from './cached-storage';
 
 type ZoomLevel = number;
 
@@ -164,7 +166,16 @@ const load =
     type: LOAD_VIEWPORT as typeof LOAD_VIEWPORT,
   });
 
-export const actions = {
+const panToObject =
+  (oid: ObjectID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseObject, viewport: v } = getState();
+    const { x = 0, y = 0 } = CS.getObject(senseObject, oid);
+    const pt = { x: v.width / 2 - x, y: v.height / 2 - y };
+    dispatch(panViewport(pt));
+  };
+
+export const syncActions = {
   setViewport,
   panViewport,
   setBaseLevel,
@@ -175,7 +186,12 @@ export const actions = {
   load,
 };
 
-export type Action = ActionUnion<typeof actions>;
+export const actions = {
+  ...syncActions,
+  panToObject,
+};
+
+export type Action = ActionUnion<typeof syncActions>;
 
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {

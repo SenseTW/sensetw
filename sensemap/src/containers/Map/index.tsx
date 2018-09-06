@@ -1,32 +1,55 @@
 import * as React from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import * as CO from '../../components/Map';
-import { MapScopeType, MapID, BoxID, State, actions, ActionProps, mapDispatch } from '../../types';
+import { ObjectMap } from '../../types/sense/has-id';
+import { MapScopeType, MapID, BoxID, ObjectData, State, actions, ActionProps, mapDispatch } from '../../types';
 import * as CS from '../../types/cached-storage';
+
+// tslint:disable-next-line:no-any
+type MyRouteProps = RouteComponentProps<any>;
 
 interface StateFromProps extends CO.StateFromProps {
   scope: { type: MapScopeType, box?: BoxID };
 }
 
-interface OwnProps extends CO.OwnProps {
+interface OwnProps extends CO.OwnProps, MyRouteProps {
   id: MapID;
   component?: React.ComponentClass<CO.Props>; // defaults to CO.Map
 }
 
 type Props = StateFromProps & ActionProps & OwnProps;
 
-class Map extends React.Component<Props> {
-  componentDidMount() {
+interface OwnState {
+  promisedObjects: Promise<ObjectMap<ObjectData>>;
+}
+
+class Map extends React.Component<Props, OwnState> {
+  state = {
+    promisedObjects: Promise.resolve({}),
+  };
+
+  componentWillMount() {
     // TODO:
     //   should test if the current map has been loaded
     //   or remove the warning prompt from the dashboard
     this.props.actions.senseObject.cleanUp();
     this.props.actions.viewport.resetViewPort();
     this.props.actions.senseObject.loadMaps();
-    this.props.actions.senseObject.loadObjects(this.props.id);
+    // tslint:disable-next-line:no-any
+    const p = this.props.actions.senseObject.loadObjects(this.props.id) as any;
     this.props.actions.senseObject.loadCards(this.props.id);
     this.props.actions.senseObject.loadBoxes(this.props.id);
     this.props.actions.senseObject.loadEdges(this.props.id);
+
+    type ObjectAction = {
+      payload: {
+        objects: ObjectMap<ObjectData>,
+      },
+    };
+    const promisedObjects =
+      (p as Promise<ObjectAction>).then(({ payload: { objects } }) => objects);
+    this.setState({ promisedObjects });
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -49,12 +72,12 @@ class Map extends React.Component<Props> {
       && CS.doesBoxExist(this.props.senseObject, this.props.scope.box))
         ? CS.scopedToBox(this.props.senseObject, this.props.scope.box)
         : CS.scopedToMap(this.props.senseObject);
-    return <Comp {...this.props} inScope={inScope} />;
+    return <Comp {...this.props} inScope={inScope} promisedObjects={this.state.promisedObjects} />;
   }
 }
 
-export default connect<StateFromProps, ActionProps, OwnProps>(
-  (state: State) => ({
+export default withRouter(connect<StateFromProps, ActionProps, OwnProps>(
+  (state: State, props: OwnProps) => ({
     selection: state.selection,
     senseObject: state.senseObject,
     inScope: state.senseObject,
@@ -62,6 +85,8 @@ export default connect<StateFromProps, ActionProps, OwnProps>(
     input: state.input,
     stage: state.stage,
     level: state.viewport.level,
+    history: props.history,
+    promisedObjects: Promise.resolve({}),
   }),
   mapDispatch({ actions }),
-)(Map);
+)(Map));
