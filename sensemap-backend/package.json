@@ -8,7 +8,6 @@
   },
   "scripts": {
     "knex": "knex",
-    "migrate": "node migrate.js",
     "build": "rimraf dist && tsc",
     "prestart": "yarn build",
     "start": "node dist",
@@ -18,6 +17,7 @@
     "test:watch": "yarn test --watch",
     "test:coverage": "yarn test --coverage",
     "dbms:verify": "node verify_db_connection.js",
+    "db:migrate": "node bin/migrate.js",
     "db:create": "node create_database.js"
   },
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
