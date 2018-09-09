@@ -5,6 +5,7 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
+const RedisStore = require('connect-redis')(session);
 import * as cors from 'cors';
 import flash = require('connect-flash');
 import * as passport from 'passport';
@@ -25,9 +26,19 @@ app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'xeepe3uuT1Gieh2ig0Aoyoongie1vooTeloo0Oongieb5mear4pix4aSh2loiCei',
-}));
+if (!!process.env.REDIS_HOST && !!process.env.REDIS_PORT) {
+  app.use(session({
+    store: new RedisStore({
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+    }),
+    secret: process.env.SESSION_SECRET || 'xeepe3uuT1Gieh2ig0Aoyoongie1vooTeloo0Oongieb5mear4pix4aSh2loiCei',
+  }));
+} else {
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'xeepe3uuT1Gieh2ig0Aoyoongie1vooTeloo0Oongieb5mear4pix4aSh2loiCei',
+  }));
+}
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
