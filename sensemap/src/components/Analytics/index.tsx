@@ -4,7 +4,7 @@ import { Location } from 'history';
 import { RouteComponentProps } from 'react-router-dom';
 
 interface OwnProps {
-  trackingId: string;
+  trackingId?: string;
 }
 
 type Props = OwnProps & RouteComponentProps<{}>;
@@ -19,12 +19,14 @@ class Analytics extends React.Component<Props> {
     super(props);
 
     const { trackingId } = this.props;
+    if (!trackingId) { return; }
 
     ReactGA.initialize(trackingId, { debug: process.env.NODE_ENV !== 'production' });
     this.sendPageview(props.location);
   }
 
   componentWillReceiveProps(nextProps: Props) {
+    if (!this.props.trackingId) { return; }
     if (
       this.props.location.pathname !== nextProps.location.pathname ||
       this.props.location.search !== nextProps.location.search

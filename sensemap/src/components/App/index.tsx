@@ -40,7 +40,14 @@ export class App extends React.Component<Props> {
       <Router basename={process.env.PUBLIC_URL}>
       { this.props.checked &&
           <div className="App">
-            <Route render={(props) => <Analytics {...props} trackingId="UA-112380022-4" />} />
+            <Route
+              render={(props) =>
+                <Analytics
+                  {...props}
+                  trackingId={process.env.REACT_APP_TRACKING_ID}
+                />
+              }
+            />
             <Header />
             <Switch>
               <Route exact path={R.index} component={DashboardPage} />
