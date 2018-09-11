@@ -8,6 +8,7 @@
   },
   "scripts": {
     "knex": "knex",
+    "migrate": "yarn db:migrate",
     "build": "rimraf dist && tsc",
     "prestart": "yarn build",
     "start": "node dist",
