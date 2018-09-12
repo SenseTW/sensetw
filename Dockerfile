@@ -3,7 +3,7 @@ ARG ENV=stage
 ARG BRANCH_NAME
 ARG COMMIT_SHA
 RUN mkdir /workspace
-ADD builder/sensemap/scripts/build.sh /opt/front-builder.sh
+ADD builder/sensemap/build.sh /opt/front-builder.sh
 COPY sensemap/. /workspace
 WORKDIR /workspace
 RUN /opt/front-builder.sh $ENV $BRANCH_NAME $COMMIT_SHA
