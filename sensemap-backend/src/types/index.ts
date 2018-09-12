@@ -30,6 +30,7 @@ export const typeDefs = gql`
 
   type Mutation {
     createBox(
+      boxType: BoxType,
       summary: String,
       tags: String,
       title: String,
@@ -89,6 +90,7 @@ export const typeDefs = gql`
     ): Map
     updateBox(
       id: ID!,
+      boxType: BoxType,
       summary: String,
       tags: String,
       title: String,
@@ -190,6 +192,18 @@ export const typeDefs = gql`
     QUESTION
     ANSWER
     NOTE
+    PROBLEM
+    SOLUTION
+    DEFINITION
+    INFO
+  }
+
+  enum BoxType {
+    NOTE
+    PROBLEM
+    SOLUTION
+    DEFINITION
+    INFO
   }
 
   type Object @model {
@@ -246,6 +260,7 @@ export const typeDefs = gql`
 
   type Box @model {
     id: ID! @isUnique
+    boxType: BoxType
     createdAt: DateTime!
     updatedAt: DateTime!
     title: String
