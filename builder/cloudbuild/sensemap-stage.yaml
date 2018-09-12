@@ -1,20 +1,24 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build',
-         '-t', 'gcr.io/$PROJECT_ID/sensemap-backend:$BRANCH_NAME',
-         '-t', 'gcr.io/$PROJECT_ID/sensemap-backend:$COMMIT_SHA',
-         '-f', './sensemap-backend/Dockerfile', './sensemap-backend/.']
+         '-t', 'gcr.io/$PROJECT_ID/sensemap:$BRANCH_NAME',
+         '-t', 'gcr.io/$PROJECT_ID/sensemap:$COMMIT_SHA',
+         '--build-arg', 'ENV=stage',
+         '--build-arg', 'COMMIT_SHA=$COMMIT_SHA',
+         '--build-arg', 'BRANCH_NAME=$BRANCH_NAME',
+         '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap-backend:$BRANCH_NAME']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap-backend:$COMMIT_SHA']
-- name: gcr.io/cloud-builders/docker
-  args: ['run', '-v', '/workspace/sensemap-backend:/workspace', 'gcr.io/$PROJECT_ID/api-builder', "$BRANCH_NAME", '$COMMIT_SHA', '${_DB_ACCOUNT}', '${_DB_PASSWORD}', '${_SESSION_SECRET}', '${_MAILGUN_HOST}', '${_MAILGUN_PORT}', '${_MAILGUN_USER}', '${_MAILGUN_PASS}', '${_MAILGUN_NAME}']
+//---
+- name: 'ubuntu'
+  args: ['bash', './builder/cloudbuild/config/gen.sh', "$BRANCH_NAME", '$COMMIT_SHA', '${_DB_ACCOUNT}', '${_DB_PASSWORD}', '${_SESSION_SECRET}', '${_MAILGUN_HOST}', '${_MAILGUN_PORT}', '${_MAILGUN_USER}', '${_MAILGUN_PASS}', '${_MAILGUN_NAME}']
 - name: 'gcr.io/cloud-builders/kubectl'
   args:
   - 'apply'
   - '-f'
-  - '/workspace/sensemap-backend/env.yaml'
+  - '/workspace/env.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
@@ -22,7 +26,7 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - '/workspace/sensemap-backend/sensemap-backend.yaml'
+  - '/workspace/sensemap-backend.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
@@ -30,7 +34,7 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - '/workspace/sensemap-backend/sensemap-backend_service.yaml'
+  - '/workspace/sensemap-backend_service.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'

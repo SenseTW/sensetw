@@ -1,0 +1,87 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sensemap-${BRANCH_NAME}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: sensemap-${BRANCH_NAME}
+    spec:
+      containers:
+        - image: nginx
+          name: sensemap-web
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
+          volumeMounts:
+            - name: "nginx-proxy-conf"
+              mountPath: "/etc/nginx/conf.d"
+            - name: front-static
+              mountPath: /var/front
+          ports:
+            - containerPort: 6000
+              name: sensemap-tcp
+        - image: gcr.io/ggv-notetool/sensemap:${COMMIT_SHA}
+          imagePullPolicy: Always
+          name: sensemap
+          args: ["${BRANCH_NAME}"]
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "cp -r /static/* /shared-static/"]
+          ports:
+          - containerPort: 8000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+          envFrom:
+            - configMapRef:
+                name: sensemap-${BRANCH_NAME}-env
+          volumeMounts:
+            - name: front-static
+              mountPath: /shared-static
+        - image: b.gcr.io/cloudsql-docker/gce-proxy:1.11
+          name: cloudsql-proxy
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                    "-instances=ggv-notetool:asia-east1:hypothsis=tcp:5432",
+                    "-credential_file=/secrets/cloudsql/credentials.json"]
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+            - name: ssl-certs
+              mountPath: /etc/ssl/certs
+            - name: cloudsql
+              mountPath: /cloudsql
+      volumes:
+        - name: nginx-proxy-conf
+          configMap:
+            name: sensemap-${BRANCH_NAME}-web-config
+            items:
+              - key: "nginx.conf"
+                path: "nginx.conf"
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+        - name: ssl-certs
+          hostPath:
+            path: /etc/ssl/certs
+        - name: cloudsql
+          emptyDir:
+        - name: sensemap-${BRANCH_NAME}-env
+          configMap:
+            name: sensemap-${BRANCH_NAME}-env
+        - name: front-static
+          emptyDir:
