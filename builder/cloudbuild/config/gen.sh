@@ -54,6 +54,8 @@ sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap_service.yaml
 sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap_service.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" nginx.yaml
+sed -i "s/\${API_SERVERNAME}/$API_SERVERNAME/g" nginx.yaml
+sed -i "s/\${FRONT_SERVERNAME}/$FRONT_SERVERNAME/g" nginx.yaml
 
 if [ "$1" = "release" ]; then
   cat <<EOT >> env.yaml
