@@ -6,6 +6,7 @@ steps:
          '--build-arg', 'ENV=stage',
          '--build-arg', 'COMMIT_SHA=$COMMIT_SHA',
          '--build-arg', 'BRANCH_NAME=$BRANCH_NAME',
+         '--build-arg', 'GA_ID=${_GA_ID}',
          '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap:$BRANCH_NAME']
