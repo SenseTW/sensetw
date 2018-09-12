@@ -25,6 +25,14 @@ steps:
   args:
   - 'apply'
   - '-f'
+  - '/workspace/nginx.yaml'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
   - '/workspace/sensemap.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
