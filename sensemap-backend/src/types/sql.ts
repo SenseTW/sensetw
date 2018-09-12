@@ -76,7 +76,7 @@ export const objectFields = (db) => [
   db.column('belongsToId').as('belongsTo'),
 ];
 
-export type CardType = 'NORMAL' | 'QUESTION' | 'ANSWER' | 'NOTE';
+export type CardType = 'NORMAL' | 'QUESTION' | 'ANSWER' | 'NOTE' | 'PROBLEM' | 'SOLUTION' | 'DEFINITION' | 'INFO';
 
 export type Card = HasID & HasTimestamps & {
   cardType: CardType,
@@ -107,14 +107,17 @@ export const cardWithTargetFields = (db) => [
   db.raw('? as target', db.select('target').from('annotation').whereRaw('"cardId" = "card"."id"')),
 ];
 
+export type BoxType = 'NOTE' | 'PROBLEM' | 'SOLUTION' | 'DEFINITION' | 'INFO';
+
 export type Box = HasID & HasTimestamps & {
+  boxType: BoxType,
   title: string,
   summary: string,
   tags: string,
   mapId: ID,
 }
 
-export const boxDataFields = [ 'title', 'summary', 'tags', 'mapId' ];
+export const boxDataFields = [ 'boxType', 'title', 'summary', 'tags', 'mapId' ];
 
 export const boxFields = (db) => [
   ...hasTimestampFields,

@@ -14,7 +14,7 @@ test('getBox', async () => {
 });
 
 test('create/update/delete Box', async () => {
-  const box = await B.createBox(db, { mapId: maps[0].id });
+  const box = await B.createBox(db, { boxType: 'NOTE', mapId: maps[0].id });
   const b1 = await B.getBox(db, box.id);
   expect(b1).toEqual(box);
 
@@ -33,6 +33,7 @@ test('create/update/delete Box', async () => {
 
 test('addToContainCards', async () => {
   const box = await B.createBox(db, {
+    boxType: 'NOTE',
     mapId: maps[0].id,
   });
   const obj = await O.createObject(db, {

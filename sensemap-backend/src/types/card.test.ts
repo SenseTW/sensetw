@@ -18,7 +18,7 @@ describe('GraphQL Mutation', () => {
   test('createCard result fields', async () => {
     const mapId = maps[0].id;
     const c0 = await C.resolvers.Mutation.createCard(null, {
-      cardType: 'NORMAL',
+      cardType: 'NOTE',
       mapId,
     }, { db });
     expect(c0.id).toBeTruthy();
@@ -37,7 +37,7 @@ describe('GraphQL Mutation', () => {
     );
     const mapId = maps[0].id;
     const c0 = await C.resolvers.Mutation.createCard(null, {
-      cardType: 'NORMAL',
+      cardType: 'NOTE',
       mapId,
       description,
     }, { db });

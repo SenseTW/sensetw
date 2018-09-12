@@ -1,4 +1,4 @@
-import { ID, Box, boxFields, objectFields, boxDataFields, SenseObject } from './sql';
+import { ID, Box, BoxType, boxFields, objectFields, boxDataFields, SenseObject } from './sql';
 import { getBoxesInMap, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
@@ -96,6 +96,7 @@ export const resolvers = {
     id:        async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.id        : o,
     createdAt: async (o, _, { db }, info): Promise<Date>   => typeof(o) !== 'string' ? o.createdAt : (await getBox(db, o)).createdAt,
     updatedAt: async (o, _, { db }, info): Promise<Date>   => typeof(o) !== 'string' ? o.updatedAt : (await getBox(db, o)).updatedAt,
+    boxType:   async (o, _, { db }, info): Promise<BoxType> => typeof(o) !== 'string' ? o.boxType : (await getBox(db, o)).boxType,
     title:     async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.title     : (await getBox(db, o)).title,
     summary:   async (o, _, { db }, info): Promise<string> => typeof(o) !== 'string' ? o.summary   : (await getBox(db, o)).summary,
     tags:      async (o, _, { db }, info): Promise<string> => typeof(o) !== 'string' ? o.tags      : (await getBox(db, o)).tags,
