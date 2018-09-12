@@ -7,6 +7,14 @@ import * as moment from 'moment';
 
 export type BoxID = string;
 
+export enum BoxType {
+  NOTE = 'NOTE',
+  PROBLEM = 'PROBLEM',
+  SOLUTION = 'SOLUTION',
+  DEFINITION = 'DEFINITION',
+  INFO = 'INFO',
+}
+
 /**
  * The default width of a box on the sense map.
  *
@@ -33,6 +41,7 @@ export interface BoxData extends HasID<BoxID> {
   summary: string;
   tags: string;
   contains: { [key: string]: { id: ObjectID } };
+  boxType: BoxType;
 }
 
 /**
@@ -45,6 +54,7 @@ interface PartialBoxData {
   title?: string;
   summary?: string;
   tags?: string;
+  boxType?: BoxType;
 }
 
 /**
@@ -62,7 +72,8 @@ export const emptyBoxData: BoxData = {
   title: '',
   summary: '',
   tags: '',
-  contains: {}
+  contains: {},
+  boxType: BoxType.NOTE,
 };
 
 /**
@@ -83,6 +94,13 @@ export const boxData = (partial: PartialBoxData = {}): BoxData => {
 };
 
 export const isEmpty = (box: BoxData): boolean => equals(emptyBoxData, box);
+
+const UPDATE_BOX_TYPE = 'UPDATE_BOX_TYPE';
+export const updateBoxType =
+  (boxType: BoxType) => ({
+    type: UPDATE_BOX_TYPE as typeof UPDATE_BOX_TYPE,
+    payload: { boxType }
+  });
 
 const UPDATE_BOX_TITLE = 'UPDATE_BOX_TITLE';
 /**
@@ -124,6 +142,7 @@ export const updateTags =
  * Box action types.
  */
 export const types = {
+  UPDATE_BOX_TYPE,
   UPDATE_BOX_TITLE,
   UPDATE_BOX_SUMMARY,
   UPDATE_BOX_TAGS,
@@ -133,6 +152,7 @@ export const types = {
  * The data constructors of box actions
  */
 export const actions = {
+  updateBoxType,
   updateTitle,
   updateSummary,
   updateTags,
@@ -148,6 +168,14 @@ export type Action = ActionUnion<typeof actions>;
  */
 export const reducer = (state: BoxData = emptyBoxData, action: Action = emptyAction): BoxData => {
   switch (action.type) {
+    case UPDATE_BOX_TYPE: {
+      const { boxType } = action.payload;
+
+      return {
+        ...state,
+        boxType,
+      };
+    }
     case UPDATE_BOX_TITLE: {
       const { title } = action.payload;
 

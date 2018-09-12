@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Header, Form, TextArea, Input } from 'semantic-ui-react';
+import BoxTypeSelector from './BoxTypeSelector';
 import * as B from '../../types/sense/box';
 import * as U from '../../types/utils';
 import * as moment from 'moment';
@@ -19,7 +20,7 @@ class BoxContent extends React.PureComponent<Props> {
 
   render() {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
-    const { title, summary, tags, updatedAt } = data;
+    const { title, summary, tags, boxType, updatedAt } = data;
     const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
     return (
@@ -28,6 +29,13 @@ class BoxContent extends React.PureComponent<Props> {
           <h3>BOX INSPECTOR</h3>
           <h4>last updated on {updateTime}</h4>
         </Header>
+        <Form.Field className="box-content__box-type">
+          <BoxTypeSelector
+            disabled={disabled}
+            boxType={boxType}
+            onChange={type => onChange && onChange(B.updateBoxType(type))}
+          />
+        </Form.Field>
         <Form.Field className="box-content__title">
           <label>Title</label>
           <Input

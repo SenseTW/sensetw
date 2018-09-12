@@ -1,8 +1,6 @@
 import * as React from 'react';
-import { Form, Checkbox } from 'semantic-ui-react';
+import TypeSelector from '../../TypeSelector';
 import { CardType } from '../../../types';
-import { noop } from '../../../types/utils';
-import './index.css';
 
 interface Props {
   disabled?: boolean;
@@ -10,42 +8,24 @@ interface Props {
   onChange? (type: CardType): void;
 }
 
-const groupName = 'card-type-selector';
-
-const capitalize = (str: string): string => {
-  if (str.length === 0) {
-    return str;
-  }
-  return str[0] + str.slice(1).toLowerCase();
-};
-
-const legacyCardTypes = [
-  CardType.NORMAL,
-  CardType.QUESTION,
-  CardType.ANSWER,
+const cardTypes = [
   CardType.NOTE,
+  CardType.PROBLEM,
+  CardType.SOLUTION,
+  CardType.DEFINITION,
+  CardType.INFO,
 ];
 
 function CardTypeSelector(props: Props) {
-  const { disabled = false, cardType, onChange = noop } = props;
+  const { disabled, cardType, onChange } = props;
 
   return (
-    <div className="card-type-selector">{
-      legacyCardTypes.map(ty => (
-        <Form.Field key={ty}>
-          <Checkbox
-            disabled={disabled}
-            radio
-            className={`card-type-selector__${ty.toLowerCase()}`}
-            label={capitalize(ty)}
-            name={groupName}
-            value={ty}
-            checked={cardType === ty}
-            onChange={() => onChange(ty as CardType)}
-          />
-        </Form.Field>
-      ))
-    }</div>
+    <TypeSelector
+      disabled={disabled}
+      types={cardTypes}
+      type={cardType}
+      onChange={onChange}
+    />
   );
 }
 

@@ -33,6 +33,13 @@ class CardContent extends React.PureComponent<Props> {
           <h4>created by {data.owner.username}</h4>
           <h4>last updated on {updateTime}</h4>
         </Header>
+        <Form.Field className="card-content__card-type">
+          <CardTypeSelector
+            disabled={disabled}
+            cardType={cardType}
+            onChange={type => onChange && onChange(C.updateCardType(type))}
+          />
+        </Form.Field>
         <Form.Field className="card-content__summary">
           <label>Summary</label>
           <TextArea
@@ -104,14 +111,6 @@ class CardContent extends React.PureComponent<Props> {
               content="The card description should be less than or equal to 255 characters."
             />
           }
-        </Form.Field>
-        <Form.Field className="card-content__card-type">
-          <label>Card Type</label>
-          <CardTypeSelector
-            disabled={disabled}
-            cardType={cardType}
-            onChange={type => onChange && onChange(C.updateCardType(type))}
-          />
         </Form.Field>
         <Form.Field className="card-content__said-by" inline>
           <label>Said By</label>

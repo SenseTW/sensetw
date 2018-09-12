@@ -1,0 +1,109 @@
+.ui.form .type-selector .field {
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.type-selector .ui.radio.checkbox {
+  width: 62px;
+}
+
+.type-selector .ui.radio.checkbox label {
+  line-height: 32px;
+  padding-left: 0;
+  padding-top: 32px;
+  text-align: center;
+  color: #b4b4b4;
+}
+
+.type-selector .ui.radio.checkbox input~label:before {
+  width: 32px;
+  height: 32px;
+  left: 15px; /* (62px - 32px) / 2 */
+}
+
+.type-selector .ui.radio.checkbox input~label:after {
+  opacity: 1;
+  width: 32px;
+  height: 32px;
+  left: 15px;
+  -webkit-transform: scale(0.75);
+  transform: sacle(0.75);
+}
+
+/* the default card type style */
+.type-selector .ui.radio.checkbox input~label:after {
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}
+
+.type-selector .ui.radio.checkbox input:checked~label:after {
+  border: 1px solid #000000;
+  background-color: #ffffff;
+}
+
+/* legacy card types */
+.type-selector .ui.radio.checkbox.type-selector__normal input:checked~label:after {
+  border: 1px solid #979797;
+  background-color: #ffffff;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__question input:checked~label:after {
+  border: 1px solid #ff9999;
+  background-color: #ff9999;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__answer input:checked~label:after {
+  border: 1px solid #a7ccf2;
+  background-color: #a7ccf2;
+}
+
+/* card types */
+.type-selector .ui.radio.checkbox.type-selector__note input~label:after {
+  border: 1px solid #ffffef;
+  background-color: #ffffef;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__note input:checked~label:after {
+  border: 1px solid #ffdc64;
+  background-color: #ffdc64;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__problem input~label:after {
+  border: 1px solid #ffecef;
+  background-color: #ffecef;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__problem input:checked~label:after {
+  border: 1px solid #ffb2be;
+  background-color: #ffb2be;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__solution input~label:after {
+  border: 1px solid #effaff;
+  background-color: #effaff;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__solution input:checked~label:after {
+  border: 1px solid #9ae0ff;
+  background-color: #9ae0ff;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__definition input~label:after {
+  border: 1px solid #defff5;
+  background-color: #defff5;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__definition input:checked~label:after {
+  border: 1px solid #93f8da;
+  background-color: #93f8da;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__info input~label:after {
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}
+
+.type-selector .ui.radio.checkbox.type-selector__info input:checked~label:after {
+  border: 1px solid #979797;
+  background-color: #ffffff;
+}
