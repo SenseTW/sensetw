@@ -11,7 +11,6 @@ steps:
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap-backend:$BRANCH_NAME']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap-backend:$COMMIT_SHA']
-//---
 - name: 'ubuntu'
   args: ['bash', './builder/cloudbuild/config/gen.sh', "$BRANCH_NAME", '$COMMIT_SHA', '${_DB_ACCOUNT}', '${_DB_PASSWORD}', '${_SESSION_SECRET}', '${_MAILGUN_HOST}', '${_MAILGUN_PORT}', '${_MAILGUN_USER}', '${_MAILGUN_PASS}', '${_MAILGUN_NAME}']
 - name: 'gcr.io/cloud-builders/kubectl'
