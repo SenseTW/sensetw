@@ -11,23 +11,24 @@ else
     exit 1
 fi
 
-if [ "$1" = "release" ]; then
-    commit="$2"
-else
-    branch="$2"
-    commit="$3"
-    URL=${branch}.staging.sense.tw
-    API_URL=${branch}.staging.api.sense.tw
+GA_ID="$3"
+COMMIT_SHA="$2"
+BRANCH="$1"
 
-    if [ "$2" = "master" ]; then
-        URL=staging.sense.tw
-        API_URL=staging.api.sense.tw
-    fi
+if [ "$1" != "release" ]; then
+    URL=${BRANCH}.staging.sense.tw
+    API_URL=${BRANCH}.staging.api.sense.tw
+fi
+
+if [ "$1" = "master" ]; then
+    URL=staging.sense.tw
+    API_URL=staging.api.sense.tw
 fi
 
 echo "${URL}" >> ./gcs-build/build-url
 export REACT_APP_SENSEMAP_API_ROOT=https://${API_URL}
 export REACT_APP_SENSEMAP_GRAPHQL_ROOT=https://${API_URL}/graphql
+export REACT_APP_TRACKING_ID=${GA_ID}
 
 yarn
 PUBLIC_URL="" yarn run build
