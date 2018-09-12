@@ -25,7 +25,7 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - '/workspace/sensemap-backend.yaml'
+  - '/workspace/sensemap.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
@@ -33,7 +33,7 @@ steps:
   args:
   - 'apply'
   - '-f'
-  - '/workspace/sensemap-backend_service.yaml'
+  - '/workspace/sensemap_service.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
