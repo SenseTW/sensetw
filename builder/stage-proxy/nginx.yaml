@@ -14,7 +14,7 @@ data:
         listen 6060;
         access_log /var/log/nginx/access.log h_upstream;
 
-        server_name staging.api.sense.tw;
+        server_name staging.api.sense.tw stage.sense.tw;
         server_tokens off;
 
         root /var/www;
@@ -48,7 +48,7 @@ data:
         listen 6060;
         access_log /var/log/nginx/access.log h_upstream;
 
-        server_name ~^(?<subdomain>\w+)\.staging\.api\.sense\.tw$;
+        server_name ~^(?<subdomain>\w+)\.staging\.api\.sense\.tw$ ~^(?<subdomain>\w+)\.staging\.sense\.tw$;
         server_tokens off;
 
         root /var/www;
