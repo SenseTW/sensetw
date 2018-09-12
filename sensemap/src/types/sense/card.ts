@@ -38,7 +38,6 @@ export const typeToString = (type: CardType) => {
     case CardType.QUESTION:
     case CardType.ANSWER:
     case CardType.NOTE:
-    case CardType.STATEMENT:
     case CardType.DEFINITION:
     case CardType.PROBLEM:
     case CardType.SOLUTION:
