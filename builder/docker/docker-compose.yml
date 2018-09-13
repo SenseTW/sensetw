@@ -1,0 +1,37 @@
+version: '3'
+volumes:
+  shared_static:
+services:
+  db:
+    image: "postgres:9.6"
+    restart: always
+    env_file:
+     - ./env/pg.env
+    ports:
+     - "5432"
+  nginx:
+    image: "nginx"
+    depends_on:
+     - sensemap
+    volumes:
+     - shared_static:/var/front
+     - ./env/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+     - 8888:80
+     - 9999:90
+  sensemap:
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+      args:
+        ENV: stage
+        COMMIT_SHA: localhost:8888
+        BRANCH_NAME: _docker_test
+        GA_ID: localhost:9999
+    image: "sensemap"
+    env_file:
+     - ./env/sensemap.env
+    ports:
+     - "8000:8000"
+    volumes:
+     - shared_static:/static

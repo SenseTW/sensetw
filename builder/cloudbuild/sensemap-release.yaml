@@ -1,0 +1,48 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build',
+         '-t', 'gcr.io/$PROJECT_ID/sensemap:release',
+         '-t', 'gcr.io/$PROJECT_ID/sensemap:$COMMIT_SHA',
+         '--build-arg', 'ENV=production',
+         '--build-arg', 'COMMIT_SHA=$COMMIT_SHA',
+         '--build-arg', 'BRANCH_NAME=release',
+         '--build-arg', 'GA_ID=${_GA_ID}',
+         '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", 'gcr.io/$PROJECT_ID/sensemap:release']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", 'gcr.io/$PROJECT_ID/sensemap:$COMMIT_SHA']
+- name: 'ubuntu'
+  args: ['bash', './builder/cloudbuild/config/gen.sh', "release", '$COMMIT_SHA', '${_DB_ACCOUNT}', '${_DB_PASSWORD}', '${_SESSION_SECRET}', '${_MAILGUN_HOST}', '${_MAILGUN_PORT}', '${_MAILGUN_USER}', '${_MAILGUN_PASS}', '${_MAILGUN_NAME}']
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - '/workspace/env.yaml'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - '/workspace/nginx.yaml'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - '/workspace/sensemap.yaml'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - '/workspace/sensemap_service.yaml'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
