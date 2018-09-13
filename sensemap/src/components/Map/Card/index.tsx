@@ -18,14 +18,20 @@ interface State {
 }
 
 const color = {
+  // legacy card types
   [T.CardType.NORMAL]: 'rgba(255, 255, 255, 1)',
-  [T.CardType.NOTE]: 'rgba(255, 227, 132, 1)',
   [T.CardType.QUESTION]: 'rgba(255, 236, 239, 1)',
-  [T.CardType.ANSWER]: 'rgba(222, 255, 245, 1)'
+  [T.CardType.ANSWER]: 'rgba(222, 255, 245, 1)',
+  // card types
+  [T.CardType.NOTE]: '#ffffef',
+  [T.CardType.PROBLEM]: '#ffecef',
+  [T.CardType.SOLUTION]: '#effaff',
+  [T.CardType.DEFINITION]: '#defff5',
+  [T.CardType.INFO]: '#ffffff',
 };
 
 const colorFromType = (cardType: T.CardType): string =>
-  color[cardType] || 'rgba(255, 255, 255, 1)';
+  color[cardType] || '#ffffff';
 
 const summaryLimit = Infinity;
 const descriptionLimit = Infinity;
