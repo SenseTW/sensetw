@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { Header, Form, TextArea, Input, Message } from 'semantic-ui-react';
+import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import * as C from '../../types/sense/card';
-import { isURL, isLength } from 'validator';
+import { isURL } from 'validator';
 import * as moment from 'moment';
 import * as U from '../../types/utils';
+import { placeholders } from './placeholders';
 import './index.css';
 
 interface Props {
@@ -23,11 +24,10 @@ class CardContent extends React.PureComponent<Props> {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
     const { title, summary, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
     const isURLValid = isURL(url, { require_protocol: true });
-    const isDescriptionInvalid = !isLength(description, { max: 5000});
     const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
     return (
-      <Form className="card-content" error={isDescriptionInvalid}>
+      <Form className="card-content">
         <Header color="grey">
           <h3>CARD INSPECTOR</h3>
           <h4>created by {data.owner.username}</h4>
@@ -44,7 +44,7 @@ class CardContent extends React.PureComponent<Props> {
           <label>Summary</label>
           <TextArea
             disabled={disabled}
-            placeholder="說重點"
+            placeholder={placeholders[cardType].summary}
             value={summary}
             onChange={e => onChange && onChange(C.updateSummary(e.currentTarget.value))}
           />
@@ -53,7 +53,7 @@ class CardContent extends React.PureComponent<Props> {
           <label>Tag</label>
           <Input
             disabled={disabled}
-            placeholder="tag1, tag2, tag3"
+            placeholder={placeholders[cardType].tags}
             value={tags}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(C.updateTags(e.currentTarget.value))}
@@ -63,7 +63,7 @@ class CardContent extends React.PureComponent<Props> {
           <label>Source Title</label>
           <TextArea
             disabled={disabled}
-            placeholder="資料來源，e.g. 【AI全面啟動Ⅱ：台灣企業行不行？關鍵在老闆｜天下雜誌】"
+            placeholder={placeholders[cardType].sourceTitle}
             value={title}
             onChange={e => onChange && onChange(C.updateTitle(e.currentTarget.value))}
           />
@@ -72,7 +72,7 @@ class CardContent extends React.PureComponent<Props> {
           <label>Source Link</label>
           <Input
             disabled={disabled}
-            placeholder="https://o.sense.tw/abcd"
+            placeholder={placeholders[cardType].sourceLink}
             value={url}
             action={{
               icon: 'share square',
@@ -99,24 +99,16 @@ class CardContent extends React.PureComponent<Props> {
           <label>Description</label>
           <TextArea
             disabled={disabled}
-            placeholder="資料原文摘錄與補充資訊"
+            placeholder={placeholders[cardType].description}
             value={description}
             onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
           />
-          {
-            isDescriptionInvalid &&
-            <Message
-              error
-              header="Description is too Long"
-              content="The card description should be less than or equal to 255 characters."
-            />
-          }
         </Form.Field>
         <Form.Field className="card-content__said-by" inline>
           <label>Said By</label>
           <Input
             disabled={disabled}
-            placeholder="誰提出的意見？ e.g. XX 大學校長 XXX"
+            placeholder={placeholders[cardType].saidBy}
             value={saidBy}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(C.updateSaidBy(e.currentTarget.value))}
@@ -126,7 +118,7 @@ class CardContent extends React.PureComponent<Props> {
           <label>Stakeholders</label>
           <Input
             disabled={disabled}
-            placeholder="誰會被影響？（用逗號隔開）e.g. 經濟部, 半導體廠商, 大學"
+            placeholder={placeholders[cardType].stakeholders}
             value={stakeholder}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(C.updateStakeholder(e.currentTarget.value))}
