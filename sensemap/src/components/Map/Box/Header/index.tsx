@@ -12,6 +12,8 @@ interface OwnProps {
   x?: number;
   y?: number;
   width?: number;
+  backgroundColor: string;
+  color: string;
 }
 
 type Props = OwnProps & LayoutForProps & TransformerForProps;
@@ -32,16 +34,8 @@ class Header extends React.PureComponent<Props, State> {
       left: 20,
     },
     textGap: 10,
-    background: {
-      color: '#ffffff',
-    },
     cornerRadius: 4,
-    border: {
-      color: '#e5e5e5',
-      width: 1
-    },
     contents: {
-      color: '#000000',
       font: {
         family: 'sans-serif',
         size: 20,
@@ -70,7 +64,7 @@ class Header extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { transform, inverseTransform, box, x = 0, y = 0, width = 0 } = this.props;
+    const { transform, inverseTransform, box, x = 0, y = 0, width = 0, backgroundColor, color } = this.props;
     const style = transformObject(transform, Header.style) as typeof Header.style;
     const { height: innerHeight } = this.state;
     const innerWidth = width - style.padding.left - style.padding.right;
@@ -80,11 +74,9 @@ class Header extends React.PureComponent<Props, State> {
     return (
       <Group x={x} y={y}>
         <Rect
-          fill={style.background.color}
+          fill={backgroundColor}
           width={width}
           height={height}
-          stroke={style.border.color}
-          strokeWidth={style.border.width}
           cornerRadius={style.cornerRadius}
         />
         <Layout
@@ -95,7 +87,7 @@ class Header extends React.PureComponent<Props, State> {
         >
           <Text
             width={innerWidth}
-            fill={style.contents.color}
+            fill={color}
             fontFamily={style.contents.font.family}
             fontSize={style.contents.font.size}
             lineHeight={style.contents.lineHeight}

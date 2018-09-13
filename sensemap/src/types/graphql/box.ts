@@ -32,7 +32,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     title:     b.title,
     summary:   b.summary,
     tags:      b.tags || '',
-    boxType:   (b.boxType || 'NOTE') as BoxType,
+    boxType:   (b.boxType || 'INFO') as BoxType,
     objects:   H.toIDMap(b.objects),
     contains:  H.toIDMap(b.contains),
   });

@@ -38,6 +38,17 @@ interface State {
   height: number;
 }
 
+const colors = {
+  [T.BoxType.NOTE]: { backgroundColor: '#ffdc64', color: '#000000', toggleColor: '#ffffef' },
+  [T.BoxType.PROBLEM]: { backgroundColor: '#ffb2be', color: '#000000', toggleColor: '#ffecff' },
+  [T.BoxType.SOLUTION]: { backgroundColor: '#9ae0ff', color: '#000000', toggleColor: '#effaff' },
+  [T.BoxType.DEFINITION]: { backgroundColor: '#93f8da', color: '#000000', toggleColor: '#defff5' },
+  [T.BoxType.INFO]: { backgroundColor: '#484848', color: '#ffffff', toggleColor: '#d1d1d1' },
+};
+
+const colorFromType = (boxType: T.BoxType): { backgroundColor: string, color: string, toggleColor: string } =>
+  colors[boxType] || { backgroundColor: '#484848', color: '#ffffff', toggleColor: '#d1d1d1' };
+
 function boxCards(
   transform: G.Transform, inverseTransform: G.Transform,
   { width }: { width: number },
@@ -107,6 +118,7 @@ class Box extends React.PureComponent<Props, State> {
 
   render() {
     const { transform, inverseTransform, object, data, isDirty = false } = this.props;
+    const { backgroundColor, color, toggleColor } = colorFromType(data.boxType);
     const { height } = this.state;
     const style = transformObject(transform, Box.style) as typeof Box.style;
     let transformed = transform(object);
@@ -180,6 +192,8 @@ class Box extends React.PureComponent<Props, State> {
             inverseTransform={inverseTransform}
             box={data}
             width={width}
+            backgroundColor={backgroundColor}
+            color={color}
             onResize={this.handleResize}
           />
           {
@@ -191,7 +205,7 @@ class Box extends React.PureComponent<Props, State> {
               fill={style.dirty.color}
             />
           }
-          <Layout y={height} direction="column">
+          <Layout y={height + 1} direction="column">
             {
               this.state.listDisplay === ListDisplay.COLLAPSED
                 ? <Nothing />
@@ -203,6 +217,8 @@ class Box extends React.PureComponent<Props, State> {
               inverseTransform={inverseTransform}
               width={width}
               show={this.state.listDisplay === ListDisplay.EXPANDED}
+              backgroundColor={backgroundColor}
+              color={toggleColor}
               action={this.handleToggleListDisplay}
             />
           </Layout>

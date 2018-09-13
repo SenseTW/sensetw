@@ -12,6 +12,8 @@ interface OwnProps {
   height?: number;
   disabled?: boolean;
   show: boolean;
+  backgroundColor: string;
+  color: string;
   action: () => void;
 }
 
@@ -40,13 +42,6 @@ class Toggle extends React.PureComponent<Props, State> {
 
   static style = {
     height: 20,
-    background: {
-      color: '#f5f5f5',
-    },
-    border: {
-      color: '#e5e5e5',
-      width: 1,
-    },
     cornerRadius: 4,
     triangle: {
       base: 10,
@@ -54,8 +49,6 @@ class Toggle extends React.PureComponent<Props, State> {
       x: -5,
       yUp: 8.5,
       yDown: 6.5,
-      color: '#4a4a4a',
-      disabledColor: '#999',
     },
   };
 
@@ -66,7 +59,7 @@ class Toggle extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { transform, x = 0, y = 0, width = 0, disabled = false } = this.props;
+    const { transform, x = 0, y = 0, width = 0, disabled = false, backgroundColor, color } = this.props;
     const style = transformObject(transform, Toggle.style) as typeof Toggle.style;
 
     return (
@@ -77,9 +70,7 @@ class Toggle extends React.PureComponent<Props, State> {
           y={0}
           width={width}
           height={style.height}
-          fill={style.background.color}
-          stroke={style.border.color}
-          strokeWidth={style.border.width}
+          fill={backgroundColor}
           cornerRadius={style.cornerRadius}
         />
         {this.props.show
@@ -89,8 +80,8 @@ class Toggle extends React.PureComponent<Props, State> {
             style.triangle.base,
             style.triangle.height,
             disabled
-              ? style.triangle.disabledColor
-              : style.triangle.color,
+              ? backgroundColor
+              : color,
           )
           : TriangleDown(
             width / 2 + style.triangle.x,
@@ -98,8 +89,8 @@ class Toggle extends React.PureComponent<Props, State> {
             style.triangle.base,
             style.triangle.height,
             disabled
-              ? style.triangle.disabledColor
-              : style.triangle.color,
+              ? backgroundColor
+              : color,
           )}
       </Group>
     );
