@@ -4,6 +4,7 @@ import BoxTypeSelector from './BoxTypeSelector';
 import * as B from '../../types/sense/box';
 import * as U from '../../types/utils';
 import * as moment from 'moment';
+import { placeholders } from './placeholders';
 import './index.css';
 
 interface Props {
@@ -40,7 +41,7 @@ class BoxContent extends React.PureComponent<Props> {
           <label>Title</label>
           <Input
             disabled={disabled}
-            placeholder="one concept or one argument"
+            placeholder={placeholders[boxType].title}
             value={title}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(B.updateTitle(e.currentTarget.value))}
@@ -50,7 +51,7 @@ class BoxContent extends React.PureComponent<Props> {
           <label>Summary</label>
           <TextArea
             disabled={disabled}
-            placeholder="文化部提供的議題分析表"
+            placeholder={placeholders[boxType].summary}
             value={summary}
             onChange={e => onChange && onChange(B.updateSummary(e.currentTarget.value))}
           />
@@ -59,7 +60,7 @@ class BoxContent extends React.PureComponent<Props> {
           <label>Tag</label>
           <Input
             disabled={disabled}
-            placeholder="tag1, tag2, tag3"
+            placeholder={placeholders[boxType].tags}
             value={tags}
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(B.updateTags(e.currentTarget.value))}
