@@ -8,7 +8,7 @@ const client = new Client({
 });
 
 const dbName = client.database;
-var sql = `CREATE DATABASE ${client.database}`;
+var sql = `CREATE DATABASE "${client.database}"`;
 client.database = "";
 client.connectionParameters.database = "";
 
