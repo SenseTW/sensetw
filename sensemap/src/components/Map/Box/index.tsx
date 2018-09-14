@@ -79,6 +79,9 @@ class Box extends React.PureComponent<Props, State> {
       bottom: 10,
       left: 10,
     },
+    margin: {
+      bottom: 1,
+    },
     dirty: {
       radius: 5,
       color: '#3ad8fa',
@@ -205,7 +208,7 @@ class Box extends React.PureComponent<Props, State> {
               fill={style.dirty.color}
             />
           }
-          <Layout y={height + 1} direction="column">
+          <Layout y={height + style.margin.bottom} direction="column">
             {
               this.state.listDisplay === ListDisplay.COLLAPSED
                 ? <Nothing />

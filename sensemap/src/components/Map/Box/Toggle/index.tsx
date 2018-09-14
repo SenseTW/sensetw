@@ -66,12 +66,15 @@ class Toggle extends React.PureComponent<Props, State> {
       <Group x={x} y={y} onClick={disabled ? undefined : this.props.action}>
         <Nothing onResize={this.handleResize} />
         <Rect
-          x={0}
-          y={0}
           width={width}
           height={style.height}
           fill={backgroundColor}
           cornerRadius={style.cornerRadius}
+        />
+        <Rect
+          width={width}
+          height={style.cornerRadius}
+          fill={backgroundColor}
         />
         {this.props.show
           ? TriangleUp(

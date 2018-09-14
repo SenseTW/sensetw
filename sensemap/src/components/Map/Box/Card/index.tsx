@@ -33,7 +33,6 @@ class Card extends React.PureComponent<Props, State> {
     background: {
       color: '#ffffff',
     },
-    cornerRadius: 4,
     border: {
       color: '#dddddd',
       width: 1,
@@ -80,7 +79,6 @@ class Card extends React.PureComponent<Props, State> {
           fill={style.background.color}
           stroke={style.border.color}
           strokeWidth={style.border.width}
-          cornerRadius={style.cornerRadius}
         />
         <Text
           x={style.padding.left}

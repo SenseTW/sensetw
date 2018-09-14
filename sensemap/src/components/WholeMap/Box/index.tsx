@@ -3,18 +3,27 @@ import { Group, Rect, Text } from 'react-konva';
 import { MapObjectForProps } from '../../Map/props';
 import Selectable from '../../Layout/Selectable';
 import { rectFromBox } from '../../../graphics/drawing';
-import { BoxData } from '../../../types';
+import { BoxType, BoxData } from '../../../types';
 import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
 import { Event as KonvaEvent } from '../../../types/konva';
 
 type Props = MapObjectForProps<BoxData>;
 
+const colors = {
+  [BoxType.NOTE]: { backgroundColor: '#ffe384', color: '#4a4a4a' },
+  [BoxType.PROBLEM]: { backgroundColor: '#ffb2be', color: '#4a4a4a' },
+  [BoxType.SOLUTION]: { backgroundColor: '#9ae0ff', color: '#4a4a4a' },
+  [BoxType.DEFINITION]: { backgroundColor: '#defff5', color: '#4a4a4a' },
+  [BoxType.INFO]: { backgroundColor: '#484848', color: '#ffffff' },
+};
+
+const colorFromType = (cardType: BoxType): { backgroundColor: string, color: string } =>
+  colors[cardType] || colors[BoxType.INFO];
+
 class Box extends React.PureComponent<Props> {
   static style = {
-    backgroundColor: '#4d4d4d',
     borderRadius: 18,
-    color: '#fff',
     fontSize: 36,
     width: 216,
     height: 96,
@@ -32,22 +41,7 @@ class Box extends React.PureComponent<Props> {
         y: -18,
       },
       strokeWidth: 9,
-    },
-    hover: {
-      backgroundColor: '#b3e5fc',
-      borderRadius: 18,
-      color: '#000',
-      width: 630,
-      height: 750,
-      margin: {
-        left: 36,
-      }
     }
-  };
-
-  state = {
-    newlySelected: false,
-    hover: false,
   };
 
   render() {
@@ -65,6 +59,7 @@ class Box extends React.PureComponent<Props> {
       onDragEnd = noop,
       onOpen = noop,
     } = this.props;
+    const { backgroundColor, color } = colorFromType(data.boxType);
     const transformed = transform(object);
     const { width, height } = transformed;
     const { left: x, top: y } = rectFromBox(transformed);
@@ -118,7 +113,7 @@ class Box extends React.PureComponent<Props> {
             width={width}
             height={height}
             cornerRadius={style.borderRadius}
-            fill={style.backgroundColor}
+            fill={backgroundColor}
           />
           <Text
             x={style.padding.left}
@@ -126,7 +121,7 @@ class Box extends React.PureComponent<Props> {
             width={textWidth}
             height={textHeight}
             fontSize={style.fontSize}
-            fill={style.color}
+            fill={color}
             text={data.title}
           />
         </Group>
