@@ -11,14 +11,18 @@ import { Event as KonvaEvent } from '../../../types/konva';
 type Props = MapObjectForProps<CardData>;
 
 const colors = {
-  [CardType.ANSWER]: '#c0e2d8',
-  [CardType.NORMAL]: '#d8d8d8',
-  [CardType.NOTE]: '#ffe384',
-  [CardType.QUESTION]: '#e5ced1',
+  [CardType.ANSWER]: { backgroundColor: '#c0e2d8' },
+  [CardType.NORMAL]: { backgroundColor: '#d8d8d8' },
+  [CardType.QUESTION]: { backgroundColor: '#e5ced1' },
+  [CardType.NOTE]: { backgroundColor: '#eeedd1' },
+  [CardType.PROBLEM]: { backgroundColor: '#e5ced1' },
+  [CardType.SOLUTION]: { backgroundColor: '#cedde5' },
+  [CardType.DEFINITION]: { backgroundColor: '#c0e2d8' },
+  [CardType.INFO]: { backgroundColor: '#d8d8d8' },
 };
 
-const colorFromType = (cardType: CardType): string =>
-  colors[cardType] || '#ffffff';
+const colorFromType = (cardType: CardType): { backgroundColor: string } =>
+  colors[cardType] || colors[CardType.INFO];
 
 class Card extends React.PureComponent<Props> {
   static style = {
@@ -42,10 +46,6 @@ class Card extends React.PureComponent<Props> {
     }
   };
 
-  state = {
-    newlySelected: false,
-  };
-
   render() {
     const {
       transform,
@@ -61,6 +61,7 @@ class Card extends React.PureComponent<Props> {
       onDragEnd = noop,
       onOpen = noop,
     } = this.props;
+    const { backgroundColor } = colorFromType(data.cardType);
     // TODO: should I use the object dimension or the style dimension?
     const transformed = transform(object);
     const { width, height } = transformed;
@@ -112,7 +113,7 @@ class Card extends React.PureComponent<Props> {
             width={width}
             height={height}
             cornerRadius={style.borderRadius}
-            fill={colorFromType(data.cardType)}
+            fill={backgroundColor}
           />
         </Group>
       </Selectable>

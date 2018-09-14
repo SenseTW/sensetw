@@ -79,6 +79,12 @@ class Header extends React.PureComponent<Props, State> {
           height={height}
           cornerRadius={style.cornerRadius}
         />
+        <Rect
+          y={height - style.cornerRadius}
+          fill={backgroundColor}
+          width={width}
+          height={style.cornerRadius}
+        />
         <Layout
           direction="column"
           x={style.padding.left}
