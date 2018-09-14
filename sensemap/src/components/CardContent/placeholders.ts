@@ -38,12 +38,14 @@ const problemPlaceholders: Placeholders = {
 const solutionPlaceholders: Placeholders = {
   ...notePlaceholders,
   summary: '簡短回答，針對別人提出的問題和疑慮，有什麼解法？',
+  sourceTitle: '資料來源名稱，e.g. 數位國家行動方案',
   description: '這裏可以更詳細解釋解決方案的細節補充資訊和支持證據。資料原文摘錄重點可以使用畫面右上角 Annotation 功能。',
 };
 
 const definitionPlaceholders: Placeholders = {
   ...notePlaceholders,
   summary: '釐清專有名詞定義，例如定義什麼是 AI 人才、自由軟體、網路中立性，幫助大家討論有共同基礎。',
+  sourceTitle: '資料來源名稱，e.g. 維基百科',
   description: '建議引用外部資料作為名詞定義來源。資料原文摘錄重點可以使用畫面右上角 Annotation 功能。也開放大家共編讓定義更完備。',
 };
 
