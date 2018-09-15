@@ -4,7 +4,8 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
-import Analytics from '../Analytics';
+import GoogleAnalytics from '../GoogleAnalytics';
+import GoogleTagManager from '../GoogleTagManager';
 import Header from '../Header';
 import MapPage from '../MapPage';
 import Sources from '../Sources';
@@ -42,10 +43,13 @@ export class App extends React.Component<Props> {
           <div className="App">
             <Route
               render={(props) =>
-                <Analytics
-                  {...props}
-                  trackingId={process.env.REACT_APP_TRACKING_ID}
-                />
+                <React.Fragment>
+                  <GoogleAnalytics
+                    {...props}
+                    trackingId={process.env.REACT_APP_TRACKING_ID}
+                  />
+                  <GoogleTagManager gtmId={process.env.REACT_APP_GTM_ID} />
+                </React.Fragment>
               }
             />
             <Header />
