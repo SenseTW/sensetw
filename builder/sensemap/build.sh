@@ -11,6 +11,7 @@ else
     exit 1
 fi
 
+GTM_ID="$4"
 GA_ID="$3"
 COMMIT_SHA="$2"
 BRANCH="$1"
@@ -28,14 +29,17 @@ fi
 export REACT_APP_SENSEMAP_API_ROOT=https://${API_URL}
 export REACT_APP_SENSEMAP_GRAPHQL_ROOT=https://${API_URL}/graphql
 export REACT_APP_TRACKING_ID=${GA_ID}
+export REACT_APP_GTM_ID=${GTM_ID}
 
 if [ "$1" = "_docker_test" ]; then
     URL="$2"
     API_URL="$3"
     GA_ID=""
+    GTM_ID=""
     export REACT_APP_SENSEMAP_API_ROOT=http://${API_URL}
     export REACT_APP_SENSEMAP_GRAPHQL_ROOT=http://${API_URL}/graphql
     export REACT_APP_TRACKING_ID=${GA_ID}
+    export REACT_APP_GTM_ID=${GTM_ID}
 fi
 
 yarn
