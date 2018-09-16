@@ -2,6 +2,7 @@ import { ID, User, UserData, userFields, Map } from './sql';
 import * as Knex from 'knex';
 import { pick } from 'ramda';
 import { mapsQuery } from './map';
+import * as A from './oauth';
 
 export function usersQuery(db: Knex) {
   return db.select(userFields(db)).from('user');
@@ -42,10 +43,19 @@ export async function authenticate(db: Knex, claim: IdentityClaim): Promise<User
   return u === undefined ? null : u;
 }
 
+async function verifyUserPassword(db: Knex, id: ID, password: string): Promise<User | null> {
+  const q = db.select(userFields(db)).from('user')
+    .where('salthash', db.raw(`crypt(?, ??)`, [ password, 'salthash' ]))
+    .andWhere('id', id);
+  const u: User | undefined = await q.first();
+  return u === undefined ? null : u;
+}
+
 export async function updateUserPassword(db: Knex, id: ID, password: string): Promise<User | null> {
-  return db('user').where('id', id).update({
+  const rows: User[] = await db('user').where('id', id).update({
     salthash: db.raw(`crypt(?, gen_salt('bf', 8))`, [ password ]),
-  });
+  }).returning(userFields(db));
+  return rows.length > 0 ? rows[0] : null;
 }
 
 export async function createUser(db: Knex, args: UserData, password: string): Promise<User> {
@@ -146,6 +156,22 @@ export const resolvers = {
   Query: {
     User: async (_, args, { db }, info): Promise<User | null> => {
       return getUser(db, args.id);
+    },
+    verifyPassword: async (_, { password }, { db, authorization }, info): Promise<User | null> => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      if (!u) {
+        return null;
+      }
+      return await verifyUserPassword(db, u.id, password);
+    },
+  },
+  Mutation: {
+    changePassword: async (_, { password }, { db, authorization }, info): Promise<User | null> => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      if (!u) {
+        return null;
+      }
+      return await updateUserPassword(db, u.id, password);
     },
   },
   User: {
