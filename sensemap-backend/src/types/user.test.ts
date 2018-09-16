@@ -93,7 +93,7 @@ describe('Reset password token', () => {
   test('findUserByResetPasswordToken', async () => {
     const u0 = await U.createUser(db, { username: 'foo', email: 'foo@example.com' }, 'mysecret');
     const t0 = await U.createResetPasswordToken(db, u0.id);
-    const u1 = await U.findUserByResetPasswordToken(db, t0);
+    const u1 = await U.findUserByResetPasswordToken(db, t0.token);
     expect(u1.id).toBe(u0.id);
   });
 });

@@ -6,7 +6,6 @@ import * as C from './card';
 import * as B from './box';
 import * as O from './object';
 import * as E from './edge';
-import * as P from './profile';
 
 
 export const typeDefs = gql`
@@ -19,13 +18,13 @@ export const typeDefs = gql`
     allEdges(filter: EdgeFilter): [Edge!]!
     allMaps(filter: MapFilter): [Map!]!
     allObjects(filter: ObjectFilter): [Object!]!
-    Profile: User
     User(id: ID): User
     Box(id: ID): Box
     Card(id: ID): Card
     Edge(id: ID): Edge
     Map(id: ID): Map
     Object(id: ID): Object
+    verifyPassword(password: String): User
   }
 
   type Mutation {
@@ -155,6 +154,9 @@ export const typeDefs = gql`
       belongsToBoxId: ID!,
       containsObjectId: ID!
     ): RemoveFromContainCardsPayload
+    changePassword(
+      password: String
+    ): User
   }
 
   type User @model {
@@ -319,6 +321,5 @@ export const resolvers =
       O.resolvers,
       E.resolvers,
       U.resolvers,
-      P.resolvers,
     ]
   ) as IResolvers<any, any>;
