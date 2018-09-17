@@ -4,7 +4,6 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
-import GoogleAnalytics from '../GoogleAnalytics';
 import GoogleTagManager from '../GoogleTagManager';
 import Header from '../Header';
 import MapPage from '../MapPage';
@@ -41,17 +40,7 @@ export class App extends React.Component<Props> {
       <Router basename={process.env.PUBLIC_URL}>
       { this.props.checked &&
           <div className="App">
-            <Route
-              render={(props) =>
-                <React.Fragment>
-                  <GoogleAnalytics
-                    {...props}
-                    trackingId={process.env.REACT_APP_TRACKING_ID}
-                  />
-                  <GoogleTagManager gtmId={process.env.REACT_APP_GTM_ID} />
-                </React.Fragment>
-              }
-            />
+            <Route render={(props) => <GoogleTagManager gtmId={process.env.REACT_APP_GTM_ID} />} />
             <Header />
             <Switch>
               <Route exact path={R.index} component={DashboardPage} />
