@@ -7,6 +7,8 @@ export type TimeStamp = number;
 
 export const TIME_FORMAT = 'YYYY-M-DD HH:mm';
 
+export const MAP_TIME_FORMAT = 'YYYY.MM.DD';
+
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
  */

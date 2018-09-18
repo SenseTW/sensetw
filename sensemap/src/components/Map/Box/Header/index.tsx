@@ -3,12 +3,14 @@ import { Group, Rect } from 'react-konva';
 import TagList from '../../TagList';
 import { TransformerForProps, LayoutForProps } from '../../../Layout';
 import Layout from '../../../Layout';
+import Creator from '../../Creator';
 import Text from '../../../Layout/Text';
+import { BoxData } from '../../../../types';
 import { transformObject } from '../../../../types/viewport';
 import { toTags, noop } from '../../../../types/utils';
 
 interface OwnProps {
-  box: { title: string, tags: string };
+  box: BoxData;
   x?: number;
   y?: number;
   width?: number;
@@ -28,12 +30,12 @@ class Header extends React.PureComponent<Props, State> {
   static style = {
     width: 320,
     padding: {
-      top: 18,
-      right: 20,
-      bottom: 18,
-      left: 20,
+      top: 8,
+      right: 10,
+      bottom: 8,
+      left: 10,
     },
-    textGap: 10,
+    textGap: 5,
     cornerRadius: 4,
     contents: {
       font: {
@@ -89,8 +91,15 @@ class Header extends React.PureComponent<Props, State> {
           direction="column"
           x={style.padding.left}
           y={style.padding.top}
+          margin={style.textGap}
           onResize={this.handleResize}
         >
+          <Creator
+            transform={transform}
+            inverseTransform={inverseTransform}
+            width={innerWidth}
+            time={box.createdAt}
+          />
           <Text
             width={innerWidth}
             fill={color}
