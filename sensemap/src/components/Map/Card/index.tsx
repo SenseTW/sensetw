@@ -3,6 +3,7 @@ import { Group, Rect, Circle } from 'react-konva';
 import Layout from '../../Layout';
 import { MapObjectForProps } from '../props';
 import Text from '../../Layout/Text';
+import Creator from '../Creator';
 import Selectable from '../../Layout/Selectable';
 import TagList from '../TagList';
 import * as D from '../../../graphics/drawing';
@@ -187,6 +188,13 @@ class Card extends React.PureComponent<Props, State> {
             margin={style.textGap}
             onResize={this.handleContainerResize}
           >
+            <Creator
+              transform={transform}
+              inverseTransform={inverseTransform}
+              width={textWidth}
+              name={data.owner.username}
+              time={data.createdAt}
+            />
             {
               sanitizedSummary.length === 0
                 ? null

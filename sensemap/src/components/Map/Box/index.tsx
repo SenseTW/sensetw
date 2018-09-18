@@ -87,10 +87,10 @@ class Box extends React.PureComponent<Props, State> {
       color: '#3ad8fa',
     },
     selected: {
-      offset: { x: -8, y: -8 },
-      borderRadius: 10,
+      offset: { x: -4, y: -4 },
+      borderRadius: 6,
       color: '#3ad8fa',
-      strokeWidth: 2,
+      strokeWidth: 3,
     },
   };
 
