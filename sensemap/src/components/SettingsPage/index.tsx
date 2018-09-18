@@ -14,17 +14,17 @@ interface StateFromProps {
   oldPassword: string;
   newPassword: string;
   confirmPassword: string;
+  passwordStatus: S.PasswordStatus;
 }
 
 type Props = StateFromProps & ActionProps;
 
 class SettingsPage extends React.PureComponent<Props> {
   render() {
-    const { actions: acts, oldPassword, newPassword, confirmPassword } = this.props;
-    const isOldPasswordInRange = isInRange(oldPassword);
+    const { actions: acts, oldPassword, newPassword, confirmPassword, passwordStatus } = this.props;
     const isNewPasswordInRange = isInRange(newPassword);
     const isNewPasswordMatched = equals(newPassword, confirmPassword);
-    const isValid = isOldPasswordInRange && isNewPasswordInRange && isNewPasswordMatched;
+    const isValid = isNewPasswordInRange && isNewPasswordMatched;
 
     return (
       <div className="settings-page">
@@ -36,12 +36,12 @@ class SettingsPage extends React.PureComponent<Props> {
               <Input
                 type="password"
                 value={oldPassword}
-                error={oldPassword.length !== 0 && !isOldPasswordInRange}
+                error={passwordStatus === S.PasswordStatus.OLD_PASSWORD_WRONG}
                 onChange={e => acts.settings.updateOldPassword(e.currentTarget.value)}
               />
               {
-                oldPassword.length !== 0 && !isOldPasswordInRange &&
-                <span className="settings-page__error">Password must be between 8 and 16 characters.</span>
+                passwordStatus === S.PasswordStatus.OLD_PASSWORD_WRONG &&
+                <span className="settings-page__error">Wrong password.</span>
               }
               <span className="settings-page__hint">
                 Forget password?&nbsp;
@@ -53,13 +53,20 @@ class SettingsPage extends React.PureComponent<Props> {
               <Input
                 type="password"
                 value={newPassword}
-                error={newPassword.length !== 0 && !isNewPasswordInRange}
+                error={
+                  (newPassword.length !== 0 && !isNewPasswordInRange) ||
+                    passwordStatus === S.PasswordStatus.NEW_PASSWORD_INVALID
+                }
                 onChange={e => acts.settings.updateNewPassword(e.currentTarget.value)}
               />
               {
                 newPassword.length === 0 || isNewPasswordInRange
                   ? <span className="settings-page__hint">Password must be between 8 and 16 characters.</span>
                   : <span className="settings-page__error">Password must be between 8 and 16 characters.</span>
+              }
+              {
+                passwordStatus === S.PasswordStatus.NEW_PASSWORD_INVALID &&
+                <span className="settings-page__error">Password was invalid.</span>
               }
             </Form.Field>
             <Form.Field>
@@ -75,11 +82,16 @@ class SettingsPage extends React.PureComponent<Props> {
                 <span className="settings-page__error">These values are not the same.</span>
               }
             </Form.Field>
+            {
+              passwordStatus === S.PasswordStatus.SUCCESS &&
+              <span>Password successfully changed.</span>
+            }
             <Button
               fluid
               disabled={!isValid}
               color="black"
               className="settings-page__submit"
+              onClick={acts.settings.submitNewPassword}
             >
               Update Password
             </Button>
@@ -96,11 +108,13 @@ export default connect<StateFromProps, ActionProps>(
     const oldPassword = S.getOldPassword(settings);
     const newPassword = S.getNewPassword(settings);
     const confirmPassword = S.getConfirmPassword(settings);
+    const passwordStatus = S.getPasswordStatus(settings);
 
     return {
       oldPassword,
       newPassword,
       confirmPassword,
+      passwordStatus,
     };
   },
   mapDispatch({ actions })
