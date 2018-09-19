@@ -91,7 +91,7 @@ export type Card = HasID & HasTimestamps & {
   ownerId: ID,
 }
 
-export const cardDataFields = [ 'cardType', 'description', 'saidBy', 'stakeholder', 'summary', 'tags', 'title', 'url', 'mapId', 'ownerId' ];
+export const cardDataFields = [ 'cardType', 'description', 'saidBy', 'stakeholder', 'summary', 'quote', 'tags', 'title', 'url', 'mapId', 'ownerId' ];
 
 export const cardFields = (db) => [
   ...hasTimestampFields,

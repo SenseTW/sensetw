@@ -44,6 +44,7 @@ export const typeDefs = gql`
       saidBy: String,
       stakeholder: String,
       summary: String,
+      quote: String,
       tags: String,
       title: String,
       url: String,
@@ -105,6 +106,7 @@ export const typeDefs = gql`
       saidBy: String,
       stakeholder: String,
       summary: String,
+      quote: String,
       tags: String,
       title: String,
       url: String,
@@ -246,6 +248,7 @@ export const typeDefs = gql`
     updatedAt: DateTime!
     title: String
     summary: String
+    quote: String,
     description: String
     tags: String
     saidBy: String
