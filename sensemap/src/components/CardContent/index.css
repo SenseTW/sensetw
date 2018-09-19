@@ -2,3 +2,7 @@
 .card-content .ui.header h4 {
   margin: 0;
 }
+
+.card-content .accordion {
+  margin-top: 2em;
+}
