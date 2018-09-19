@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
+import Accordion from './Accordion';
 import * as C from '../../types/sense/card';
 import { isURL } from 'validator';
 import * as moment from 'moment';
@@ -59,15 +60,6 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateTags(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field className="card-content__title">
-          <label>Source Title</label>
-          <TextArea
-            disabled={disabled}
-            placeholder={placeholders[cardType].sourceTitle}
-            value={title}
-            onChange={e => onChange && onChange(C.updateTitle(e.currentTarget.value))}
-          />
-        </Form.Field>
         <Form.Field className="card-content__url">
           <label>Source Link</label>
           <Input
@@ -104,26 +96,37 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field className="card-content__said-by" inline>
-          <label>Said By</label>
-          <Input
-            disabled={disabled}
-            placeholder={placeholders[cardType].saidBy}
-            value={saidBy}
-            onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(C.updateSaidBy(e.currentTarget.value))}
-          />
-        </Form.Field>
-        <Form.Field className="card-content__stakeholder" inline>
-          <label>Stakeholders</label>
-          <Input
-            disabled={disabled}
-            placeholder={placeholders[cardType].stakeholders}
-            value={stakeholder}
-            onKeyUp={onKeyUp}
-            onChange={e => onChange && onChange(C.updateStakeholder(e.currentTarget.value))}
-          />
-        </Form.Field>
+        <Accordion title="Advance">
+          <Form.Field className="card-content__title">
+            <label>Source Title</label>
+            <TextArea
+              disabled={disabled}
+              placeholder={placeholders[cardType].sourceTitle}
+              value={title}
+              onChange={e => onChange && onChange(C.updateTitle(e.currentTarget.value))}
+            />
+          </Form.Field>
+          <Form.Field className="card-content__said-by">
+            <label>Said By</label>
+            <Input
+              disabled={disabled}
+              placeholder={placeholders[cardType].saidBy}
+              value={saidBy}
+              onKeyUp={onKeyUp}
+              onChange={e => onChange && onChange(C.updateSaidBy(e.currentTarget.value))}
+            />
+          </Form.Field>
+          <Form.Field className="card-content__stakeholder">
+            <label>Stakeholders</label>
+            <Input
+              disabled={disabled}
+              placeholder={placeholders[cardType].stakeholders}
+              value={stakeholder}
+              onKeyUp={onKeyUp}
+              onChange={e => onChange && onChange(C.updateStakeholder(e.currentTarget.value))}
+            />
+          </Form.Field>
+        </Accordion>
         {children}
       </Form>
     );

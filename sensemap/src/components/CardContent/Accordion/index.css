@@ -1,0 +1,27 @@
+.accordion > .accordion__handler {
+  position: relative;
+  font-size: .92857143em;
+  line-height: 2em;
+  margin-bottom: 1em;
+}
+
+.accordion > .accordion__handler:after,
+.accordion > .accordion__handler > label:after {
+  content: '';
+  position: absolute;
+  top: 45%;
+  border-bottom: 2px solid #d8d8d8;
+  width: 50%;
+}
+
+.accordion > .accordion__handler:after {
+  right: 2em;
+}
+
+.accordion > .accordion__handler > label:after {
+  margin-left: 1em;
+}
+
+.accordion > .accordion__handler > i.icon {
+  float: right;
+}
