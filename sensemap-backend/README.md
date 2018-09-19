@@ -1,7 +1,7 @@
 # Avaliable Scripts
 - yarn run start :: run development server.
 
-# Tech Architecture 
+# Tech Architecture
 - Yarn :: Fast, reliable, and secure dependency management for JavaScript.
 - TypeScript :: A programming language designed for large-scale JavaScript application with optional static type-checking along with the latest ECMAScript features.
 - React :: A JavaScript library for building user interfaces.
@@ -29,4 +29,10 @@ Development
 ```
 # creates `migrations/<timestamp>_My-Awesome-Migration.ts`
 $ yarn run migrate create My Awesome Migration -j ts
+```
+
+## Debug SQL
+
+```
+$ DEBUG=knex:* yarn test
 ```
