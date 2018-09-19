@@ -134,6 +134,7 @@ export const resolvers = {
     saidBy:      async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.saidBy      : (await getCard(db, o)).saidBy,
     stakeholder: async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.stakeholder : (await getCard(db, o)).stakeholder,
     summary:     async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.summary     : (await getCard(db, o)).summary,
+    quote:       async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.quote       : (await getCard(db, o)).quote,
     tags:        async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.tags        : (await getCard(db, o)).tags,
     title:       async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.title       : (await getCard(db, o)).title,
     url:         async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.url         : (await getCard(db, o)).url,
