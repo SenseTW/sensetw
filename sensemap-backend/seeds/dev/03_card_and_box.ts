@@ -8,6 +8,7 @@ exports.seed = function (knex: Knex): Promise<any> {
         cardType: 'NORMAL',
         url: 'http://example.com',
         mapId: 'b2f73daf-e767-4d8d-9506-52589d4fd039',
+        ownerId: 'dd776858-52f4-48b4-b40c-2b9330409513',
       },
       {
         id: '61cfcfc1-1336-4f55-93ba-446bb8eedd4f',
@@ -29,6 +30,7 @@ exports.seed = function (knex: Knex): Promise<any> {
         id: '10330ced-04b4-46d3-91a6-1d294bb12da3',
         title: 'woot',
         mapId: 'b2f73daf-e767-4d8d-9506-52589d4fd039',
+        ownerId: 'dd776858-52f4-48b4-b40c-2b9330409513',
       },
       {
         id: '45f2ce6e-603a-4c97-90a5-1965709ef0c1',
