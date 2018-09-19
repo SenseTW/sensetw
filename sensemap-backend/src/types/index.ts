@@ -270,6 +270,7 @@ export const typeDefs = gql`
     contains: [Object!]! @relation(name: "ContainCards")
     mapId: ID
     map: Map @relation(name: "MapBoxes")
+    owner: User
   }
 
   type AddToContainCardsPayload {

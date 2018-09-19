@@ -117,12 +117,13 @@ export type Box = HasID & HasTimestamps & {
   mapId: ID,
 }
 
-export const boxDataFields = [ 'boxType', 'title', 'summary', 'tags', 'mapId' ];
+export const boxDataFields = [ 'boxType', 'title', 'summary', 'tags', 'mapId', 'ownerId' ];
 
 export const boxFields = (db) => [
   ...hasTimestampFields,
   ...boxDataFields,
   db.column('mapId').as('map'),
+  db.column('ownerId').as('owner'),
   db.raw('array(?) as objects', db.select('id').from('object').whereRaw('"object"."boxId" = "box"."id"')),
   db.raw('array(?) as contains', db.select('id').from('object').whereRaw('"object"."belongsToId" = "box"."id"')),
 ];

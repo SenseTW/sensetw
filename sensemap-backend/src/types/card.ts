@@ -138,8 +138,8 @@ export const resolvers = {
     title:       async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.title       : (await getCard(db, o)).title,
     url:         async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.url         : (await getCard(db, o)).url,
     mapId:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.mapId       : (await getCard(db, o)).mapId,
-    map:         async (o, _, { db }, info): Promise<Map>      => typeof(o) !== 'string' ? o.map         : (await getCard(db, o)).mapId,
+    map:         async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.map         : (await getCard(db, o)).mapId,
     objects:     async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects : getObjectsForCard(db, o),
-    owner:       async (o, _, { db }, info): Promise<Map>      => typeof(o) !== 'string' ? o.owner       : (await getCard(db, o)).ownerId,
+    owner:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.owner       : (await getCard(db, o)).ownerId,
   },
 };

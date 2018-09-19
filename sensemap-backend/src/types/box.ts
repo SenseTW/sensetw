@@ -2,6 +2,7 @@ import { ID, Box, BoxType, boxFields, objectFields, boxDataFields, SenseObject }
 import { getBoxesInMap, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import { pick } from 'ramda';
+import * as A from './oauth';
 
 export function boxesQuery(db) {
   return db.select(boxFields(db)).from('box');
@@ -76,7 +77,9 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createBox: async (_, args, { db }, info) => {
+    createBox: async (_, args, { db, authorization }, info) => {
+      const u = await A.getUserFromAuthorization(db, authorization);
+      args.ownerId = !!u ? u.id : null;
       return createBox(db, args);
     },
     deleteBox: async (_, { id }, { db }, info) => {
@@ -104,5 +107,6 @@ export const resolvers = {
     map:       async (o, _, { db }, info): Promise<ID>     => typeof(o) !== 'string' ? o.map       : (await getBox(db, o)).mapId,
     objects:   async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects  : getObjectsForBox(db, o),
     contains:  async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.contains : getObjectsInBox(db, o),
+    owner:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.owner       : (await getBox(db, o)).ownerId,
   },
 };
