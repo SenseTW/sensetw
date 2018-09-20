@@ -5,8 +5,17 @@ var i = process.env.DATABASE_URL.lastIndexOf('/');
 var connection = process.env.DATABASE_URL.substr(0, i) + '/postgres';
 var database_name = process.env.DATABASE_URL.substr(i + 1);
 
-if (!process.env.DO_NOT_PROTECT_MY_FROM_MYSELF) {
-  console.log(`This script will purge all data in the database '${database_name}' on server ${connection}.  If you really want to do this, please make sure you have access to the 'postgres' database, and  run 'DO_NOT_PROTECT_MY_FROM_MYSELF=1 purge-db.js'.`);
+if (!process.env.DO_NOT_PROTECT_ME_FROM_MYSELF) {
+  console.log(`
+Running this script will purge all data in:
+
+  - Database: ${database_name}
+  - Server: ${connection}
+
+If you really want to do this, make sure you can access the 'postgres' database, and run:
+
+  DO_NOT_PROTECT_ME_FROM_MYSELF=1 purge-db.js
+`);
   process.exit(-1);
 }
 
