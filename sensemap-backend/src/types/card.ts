@@ -1,4 +1,4 @@
-import { ID, Map, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
+import { ID, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
 import { MapFilter, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
 import * as R from 'ramda';

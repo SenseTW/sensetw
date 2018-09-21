@@ -84,6 +84,7 @@ export type Card = HasID & HasTimestamps & {
   saidBy: string,
   stakeholder: string,
   summary: string,
+  quote: string,
   tags: string,
   title: string,
   url: string,
@@ -115,6 +116,7 @@ export type Box = HasID & HasTimestamps & {
   summary: string,
   tags: string,
   mapId: ID,
+  ownerId: ID,
 }
 
 export const boxDataFields = [ 'boxType', 'title', 'summary', 'tags', 'mapId', 'ownerId' ];
