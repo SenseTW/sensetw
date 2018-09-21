@@ -26,11 +26,6 @@
   border-bottom: 2px solid #303030;
 }
 
-.inbox__action.ui.basic.button {
-  margin: 0;
-  height: 36px;
-}
-
 .inbox__action.ui.basic.button:focus {
   background-color: transparent !important;
   box-shadow: 0 0 0 1px #909090 inset;
@@ -44,6 +39,8 @@
 }
 
 .inbox__action.ui.basic.button {
+  margin: 0;
+  height: 36px;
   box-shadow: 0 0 0 1px #909090 inset;
   color: #909090 !important;
 }
@@ -67,4 +64,39 @@
   text-align: center;
   background-color: #000;
   padding: 1em 0;
+}
+
+.inbox__pagination > .ui.menu.pagination,
+.inbox__pagination > .ui.menu.pagination > .item {
+  border-color: #909090;
+}
+
+.inbox__pagination > .ui.menu.pagination > .item:before {
+  background-color: #909090;
+}
+
+.inbox__pagination > .ui.menu.pagination {
+  background-color: transparent;
+}
+
+.inbox__pagination > .ui.menu.pagination > .item:focus {
+  color: #00ffd7;
+  outline: none;
+}
+
+.inbox__pagination > .ui.menu.pagination > .item:hover {
+  color: #00ffd7;
+}
+
+.inbox__pagination > .ui.menu.pagination > .item.active {
+  color: #fff;
+  background-color: #00b5af;
+}
+
+.inbox__pagination > .ui.menu.pagination > .item.disabled {
+  color: #606060 !important;
+}
+
+.inbox__pagination > .ui.menu.pagination > .item {
+  color: #909090;
 }
