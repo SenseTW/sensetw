@@ -14,6 +14,7 @@
     "start": "node dist",
     "dev": "nodemon --watch src --ext 'ts tsx' --exec ts-node src",
     "debug": "nodemon --inspect-brk --watch src --ext ts --exec ts-node src",
+    "pretest": "yarn build",
     "test": "jest --runInBand",
     "test:watch": "yarn test --watch",
     "test:coverage": "yarn test --coverage",
