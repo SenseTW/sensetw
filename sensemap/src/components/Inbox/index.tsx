@@ -51,7 +51,7 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
           </Modal.Content>
         </Modal>
       </div>
-      <Pager data={cards} pageSize={9} currentPage={senseMap.activateInboxPage} >
+      <Pager data={cards} pageSize={10} currentPage={senseMap.activateInboxPage} >
         {({ data, totalPages, currentPage, handlePageChange }) => {
           return (
             <React.Fragment>
