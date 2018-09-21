@@ -6,42 +6,25 @@ const { db } = context();
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
-describe('GraphQL Query', () => {
-  test('Card result fields', async () => {
-    const id = maps[0].cards[0].id;
-    const c = await C.resolvers.Query.Card(null, { id }, { db }, null);
-    expect(c.objects.length).toBeGreaterThanOrEqual(0);
-  });
-});
-
-describe('GraphQL Mutation', () => {
-  test('createCard result fields', async () => {
+describe('create/update/deleteCard', () => {
+  test('Card quote is writable at operation level', async () => {
     const mapId = maps[0].id;
-    const c0 = await C.resolvers.Mutation.createCard(null, {
+    const c0 = await C.createCard(db, {
       cardType: 'NOTE',
+      quote: 'mono no aware',
       mapId,
-    }, { db });
+    });
     expect(c0.id).toBeTruthy();
     expect(c0.objects).toEqual([]);
+    expect(c0.quote).toBe('mono no aware');
     expect(c0.map).toBe(mapId);
 
-    const c1 = await C.resolvers.Mutation.deleteCard(null, { id: c0.id }, { db });
-    expect(c1.id).toBe(c0.id);
-  });
-
-  test('card description length', async () => {
-    const description = String.fromCharCode(
-      ...Array(512)
-        .fill(0)
-        .map(() => parseInt(97 + Math.random() * 26))
-    );
-    const mapId = maps[0].id;
-    const c0 = await C.resolvers.Mutation.createCard(null, {
-      cardType: 'NOTE',
-      mapId,
-      description,
-    }, { db });
-    expect(c0.description).toBe(description);
+    const c1 = await C.updateCard(db, c0.id, {
+      summary: 'sweet variety peas',
+      quote: 'always adopt never buy',
+    })
+    expect(c1.summary).toBe('sweet variety peas');
+    expect(c1.quote).toBe('always adopt never buy');
   });
 });
 
@@ -70,5 +53,52 @@ describe('getAllCards', () => {
     const cs = await C.getAllCards(db, { skip: 1, limit: 1, orderBy: ['updatedAt', 'asc'] });
     expect(cs.length).toBe(1);
     expect(cs[0].id).toBe('61cfcfc1-1336-4f55-93ba-446bb8eedd4f');
+  });
+});
+
+describe('GraphQL', () => {
+  test('Card query', async () => {
+    const id = maps[0].cards[0].id;
+    const c = await C.resolvers.Query.Card(null, { id }, { db }, null);
+    expect(c.objects.length).toBeGreaterThanOrEqual(0);
+  });
+
+  test('create/update/deleteCard', async () => {
+    const mapId = maps[0].id;
+    const c0 = await C.resolvers.Mutation.createCard(null, {
+      cardType: 'NOTE',
+      quote: 'mono no aware',
+      mapId,
+    }, { db });
+    expect(c0.id).toBeTruthy();
+    expect(c0.objects).toEqual([]);
+    expect(c0.quote).toBe('');
+    expect(c0.map).toBe(mapId);
+
+    const c1 = await C.resolvers.Mutation.updateCard(null, {
+      id: c0.id,
+      summary: 'sweet variety peas',
+      quote: 'mono no aware',
+    }, { db })
+    expect(c1.summary).toBe('sweet variety peas');
+    expect(c1.quote).toBe('');
+
+    const c2 = await C.resolvers.Mutation.deleteCard(null, { id: c0.id }, { db });
+    expect(c2.id).toBe(c0.id);
+  });
+
+  test('card description length', async () => {
+    const description = String.fromCharCode(
+      ...Array(512)
+        .fill(0)
+        .map(() => parseInt(97 + Math.random() * 26))
+    );
+    const mapId = maps[0].id;
+    const c0 = await C.resolvers.Mutation.createCard(null, {
+      cardType: 'NOTE',
+      mapId,
+      description,
+    }, { db });
+    expect(c0.description).toBe(description);
   });
 });
