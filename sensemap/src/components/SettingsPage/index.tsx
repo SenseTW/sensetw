@@ -82,19 +82,21 @@ class SettingsPage extends React.PureComponent<Props> {
                 <span className="settings-page__error">These values are not the same.</span>
               }
             </Form.Field>
-            {
-              passwordStatus === S.PasswordStatus.SUCCESS &&
-              <span>Password successfully changed.</span>
-            }
-            <Button
-              fluid
-              disabled={!isValid}
-              color="black"
-              className="settings-page__submit"
-              onClick={acts.settings.submitNewPassword}
-            >
-              Update Password
-            </Button>
+            <div className="settings-page__submit">
+              {
+                passwordStatus === S.PasswordStatus.SUCCESS &&
+                <span className="settings-page__message">Password successfully changed.</span>
+              }
+              <Button
+                fluid
+                disabled={!isValid}
+                color="black"
+                className="settings-page__submit"
+                onClick={acts.settings.submitNewPassword}
+              >
+                Update Password
+              </Button>
+            </div>
           </Form>
         </Container>
       </div>
