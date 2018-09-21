@@ -1,10 +1,13 @@
 import * as React from 'react';
 import './index.css';
 import * as T from '../../../types';
+import { MAP_TIME_FORMAT } from '../../../types/utils';
 import { Reveal } from 'semantic-ui-react';
 import CardAction from '../CardActions';
+import * as moment from 'moment';
 
 const summaryLimit = 39;
+const descriptionLimit = 50;
 
 interface Props {
   card: T.CardData;
@@ -27,6 +30,7 @@ export default function Card(props: Props) {
   const card = {
     ...props.card,
     summary: props.card.summary.substr(0, summaryLimit),
+    description: props.card.description.substr(0, descriptionLimit),
   };
   const className = [
     'inbox-card',
@@ -42,8 +46,14 @@ export default function Card(props: Props) {
         {/* XXX a hack */}
         <Reveal.Content visible style={{ pointerEvents: 'none' }}>
           <div className="card__body">
+            <div className="card__creator">
+              {moment(card.createdAt).format(MAP_TIME_FORMAT)} {`Created by ${card.owner.username}`}
+            </div>
             <div className="card__summary">
-              {card.summary} <br />
+              {card.summary}
+            </div>
+            <div className="card__description">
+              {card.description}
             </div>
             {renderCardTags({ tags: card.tags })}
           </div>
