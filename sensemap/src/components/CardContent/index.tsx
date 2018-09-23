@@ -96,7 +96,7 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
           />
         </Form.Field>
-        <Accordion title="Advance">
+        <Accordion title="Advanced">
           <Form.Field className="card-content__title">
             <label>Source Title</label>
             <TextArea
