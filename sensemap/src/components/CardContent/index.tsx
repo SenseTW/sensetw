@@ -23,7 +23,8 @@ class CardContent extends React.PureComponent<Props> {
 
   render() {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
-    const { title, summary, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
+    const { title, summary, quote, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
+    const isAnnotation = quote.length !== 0;
     const isURLValid = isURL(url, { require_protocol: true });
     const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
@@ -87,15 +88,25 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateUrl(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field className="card-content__description">
-          <label>Description</label>
-          <TextArea
-            disabled={disabled}
-            placeholder={placeholders[cardType].description}
-            value={description}
-            onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
-          />
-        </Form.Field>
+        {
+          isAnnotation
+            ? <Form.Field className="card-content__quote">
+                <label>Quote</label>
+                <TextArea
+                  disabled
+                  value={quote}
+                />
+              </Form.Field>
+            : <Form.Field className="card-content__description">
+                <label>Description</label>
+                <TextArea
+                  disabled={disabled}
+                  placeholder={placeholders[cardType].description}
+                  value={description}
+                  onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
+                />
+              </Form.Field>
+        }
         <Accordion title="Advanced">
           <Form.Field className="card-content__title">
             <label>Source Title</label>

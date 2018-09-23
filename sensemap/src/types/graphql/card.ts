@@ -12,7 +12,7 @@ export const graphQLCardFieldsFragment = `
   fragment cardFields on Card {
     id,
     createdAt, updatedAt,
-    title, summary, description, tags, saidBy, stakeholder, url, cardType,
+    title, summary, quote, description, tags, saidBy, stakeholder, url, cardType,
     objects { id }, map { id }, owner { id, email, username }
   }`;
 
@@ -22,6 +22,7 @@ interface GraphQLCardFields {
   updatedAt:   string;
   title:       string;
   summary:     string;
+  quote:       string;
   description: string;
   tags:        string;
   saidBy:      string;
@@ -40,6 +41,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     updatedAt:   +moment(c.updatedAt),
     title:       c.title,
     summary:     c.summary,
+    quote:       c.quote || '',
     description: c.description || '',
     tags:        c.tags || '',
     saidBy:      c.saidBy,
@@ -55,7 +57,7 @@ export const loadCards =
     const query = `
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
-          id, createdAt, updatedAt, title, summary, description, tags, saidBy, stakeholder,
+          id, createdAt, updatedAt, title, summary, quote, description, tags, saidBy, stakeholder,
           url, cardType, objects { id }, owner { id, email, username }
         }
       }
