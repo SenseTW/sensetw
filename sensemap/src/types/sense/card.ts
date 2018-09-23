@@ -62,6 +62,7 @@ export interface CardData extends HasID<CardID> {
   objects: { [key: string]: { id: ObjectID } };
   title: string;
   summary: string;
+  quote: string;
   description: string;
   tags: string;
   saidBy: string;
@@ -80,6 +81,7 @@ interface PartialCardData {
   updatedAt?: TimeStamp;
   title?: string;
   summary?: string;
+  quote?: string;
   description?: string;
   tags?: string;
   saidBy?: string;
@@ -100,6 +102,7 @@ export const emptyCardData: CardData = {
   objects: {},
   title: '',
   summary: '',
+  quote: '',
   description: '',
   tags: '',
   saidBy: '',
