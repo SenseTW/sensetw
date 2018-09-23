@@ -3,12 +3,14 @@ import { ObjectID } from '../sense/object';
 import { MapID } from '../sense/map';
 import { BoxID, BoxData, BoxType } from '../sense/box';
 import { client } from './client';
+import * as U from './user';
 import * as moment from 'moment';
+import { anonymousUserData } from '../sense/user';
 
 const graphQLBoxFieldsFragment = `
   fragment boxFields on Box {
     id, createdAt, updatedAt, title, summary, tags, boxType,
-    objects { id }, contains { id }, map { id }
+    objects { id }, contains { id }, map { id }, owner { id, email, username }
   }`;
 
 interface GraphQLBoxFields {
@@ -22,6 +24,7 @@ interface GraphQLBoxFields {
   objects:   H.HasID<ObjectID>[];
   contains:  H.HasID<ObjectID>[];
   map?:      H.HasID<MapID>;
+  owner:     U.GraphQLUserFields;
 }
 
 const toBoxData: (b: GraphQLBoxFields) => BoxData =
@@ -35,6 +38,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     boxType:   (b.boxType || 'INFO') as BoxType,
     objects:   H.toIDMap(b.objects),
     contains:  H.toIDMap(b.contains),
+    owner:     U.toUserData(b.owner) || anonymousUserData,
   });
 
 export const loadBoxes =

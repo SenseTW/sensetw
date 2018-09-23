@@ -98,6 +98,7 @@ class Header extends React.PureComponent<Props, State> {
             transform={transform}
             inverseTransform={inverseTransform}
             width={innerWidth}
+            name={box.owner.username}
             time={box.createdAt}
           />
           <Text
