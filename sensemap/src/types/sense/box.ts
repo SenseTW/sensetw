@@ -1,5 +1,6 @@
 import { HasID } from './has-id';
 import { ObjectID } from './object';
+import { UserData, anonymousUserData } from './user';
 import { TimeStamp } from '../utils';
 import { ActionUnion, emptyAction } from '../action';
 import { equals } from 'ramda';
@@ -42,6 +43,7 @@ export interface BoxData extends HasID<BoxID> {
   tags: string;
   contains: { [key: string]: { id: ObjectID } };
   boxType: BoxType;
+  owner: UserData;
 }
 
 /**
@@ -74,6 +76,7 @@ export const emptyBoxData: BoxData = {
   tags: '',
   contains: {},
   boxType: BoxType.NOTE,
+  owner: anonymousUserData,
 };
 
 /**
