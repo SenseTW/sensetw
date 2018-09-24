@@ -2,8 +2,32 @@
   position: relative;
 }
 
-.map-page .sidebar {
+.map-page .ui.wide.left.sidebar,
+.map-page .ui.wide.right.sidebar {
   background-color: #f5f5f5;
+  width: 128px;
+}
+
+@media screen and (min-width: 641px) {
+  .map-page .ui.wide.left.sidebar,
+  .map-page .ui.wide.right.sidebar {
+    width: 160px;
+  }
+}
+
+@media screen and (min-width: 801px) {
+  .map-page .ui.wide.left.sidebar,
+  .map-page .ui.wide.right.sidebar {
+    width: 204px;
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  .map-page .ui.wide.left.sidebar,
+  .map-page .ui.wide.right.sidebar {
+    /* the default Semantic UI sidebar width */
+    width: 350px;
+  }
 }
 
 .map-page .sidebar .inspector-empty {

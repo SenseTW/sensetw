@@ -1,7 +1,27 @@
 body {
   margin: 0;
   padding: 0;
+  font-size: 7pt;
   font-family: sans-serif;
+}
+
+@media screen and (min-width: 641px) {
+  body {
+    font-size: 8pt;
+  }
+}
+
+@media screen and (min-width: 801px) {
+  body {
+    font-size: 9pt;
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  body {
+    /* the Semantic UI default font-size */
+    font-size: 14px;
+  }
 }
 
 #root {
