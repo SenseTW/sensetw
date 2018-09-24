@@ -50,11 +50,6 @@ const definitionPlaceholders: Placeholders = {
 };
 
 export const placeholders = {
-  // legacy card types
-  [CardType.NORMAL]: notePlaceholders,
-  [CardType.QUESTION]: notePlaceholders,
-  [CardType.ANSWER]: notePlaceholders,
-  // card types
   [CardType.NOTE]: notePlaceholders,
   [CardType.PROBLEM]: problemPlaceholders,
   [CardType.SOLUTION]: solutionPlaceholders,

@@ -9,9 +9,6 @@ import * as moment from 'moment';
 export type CardID = string;
 
 export enum CardType {
-  NORMAL = 'NORMAL',
-  QUESTION = 'QUESTION',
-  ANSWER = 'ANSWER',
   NOTE = 'NOTE',
   PROBLEM = 'PROBLEM',
   SOLUTION = 'SOLUTION',
@@ -34,9 +31,6 @@ export const DEFAULT_HEIGHT = 160;
 
 export const typeToString = (type: CardType) => {
   switch (type) {
-    case CardType.NORMAL:
-    case CardType.QUESTION:
-    case CardType.ANSWER:
     case CardType.NOTE:
     case CardType.PROBLEM:
     case CardType.SOLUTION:
@@ -108,7 +102,7 @@ export const emptyCardData: CardData = {
   saidBy: '',
   stakeholder: '',
   url: '',
-  cardType: CardType.NORMAL,
+  cardType: CardType.INFO,
   owner: anonymousUserData,
 };
 

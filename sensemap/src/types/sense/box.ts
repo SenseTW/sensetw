@@ -75,7 +75,7 @@ export const emptyBoxData: BoxData = {
   summary: '',
   tags: '',
   contains: {},
-  boxType: BoxType.NOTE,
+  boxType: BoxType.INFO,
   owner: anonymousUserData,
 };
 
