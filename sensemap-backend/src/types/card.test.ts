@@ -10,7 +10,7 @@ describe('create/update/deleteCard', () => {
   test('Card quote is writable at operation level', async () => {
     const mapId = maps[0].id;
     const c0 = await C.createCard(db, {
-      cardType: 'NOTE',
+      cardType: 'INFO',
       quote: 'mono no aware',
       mapId,
     });
@@ -66,7 +66,7 @@ describe('GraphQL', () => {
   test('create/update/deleteCard', async () => {
     const mapId = maps[0].id;
     const c0 = await C.resolvers.Mutation.createCard(null, {
-      cardType: 'NOTE',
+      cardType: 'INFO',
       quote: 'mono no aware',
       mapId,
     }, { db });
@@ -95,7 +95,7 @@ describe('GraphQL', () => {
     );
     const mapId = maps[0].id;
     const c0 = await C.resolvers.Mutation.createCard(null, {
-      cardType: 'NOTE',
+      cardType: 'INFO',
       mapId,
       description,
     }, { db });

@@ -192,9 +192,6 @@ export const typeDefs = gql`
   }
 
   enum CardType {
-    NORMAL
-    QUESTION
-    ANSWER
     NOTE
     PROBLEM
     SOLUTION
@@ -256,7 +253,7 @@ export const typeDefs = gql`
     saidBy: String
     stakeholder: String
     url: String
-    cardType: CardType @migrationValue(value: NORMAL)
+    cardType: CardType @migrationValue(value: INFO)
     objects: [Object!]! @relation(name: "ObjectCard")
     mapId: ID
     map: Map @relation(name: "MapCards")

@@ -76,7 +76,7 @@ export const objectFields = (db) => [
   db.column('belongsToId').as('belongsTo'),
 ];
 
-export type CardType = 'NORMAL' | 'QUESTION' | 'ANSWER' | 'NOTE' | 'PROBLEM' | 'SOLUTION' | 'DEFINITION' | 'INFO';
+export type CardType = 'NOTE' | 'PROBLEM' | 'SOLUTION' | 'DEFINITION' | 'INFO';
 
 export type Card = HasID & HasTimestamps & {
   cardType: CardType,
