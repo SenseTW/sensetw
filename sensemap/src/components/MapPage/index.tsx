@@ -25,6 +25,7 @@ import * as OE from '../../types/object-editor';
 import * as SM from '../../types/sense-map';
 import * as SO from '../../types/sense-object';
 import * as CS from '../../types/cached-storage';
+import * as V from '../../types/viewport';
 import * as B from '../../types/sense/box';
 import { Action as BoxAction } from '../../types/sense/box';
 import * as C from '../../types/sense/card';
@@ -41,6 +42,7 @@ interface StateFromProps {
   senseObject: SO.State;
   editor: OE.State;
   scope: typeof SM.initial.scope;
+  viewport: V.State;
   isAuthenticated: Boolean;
 }
 
@@ -92,10 +94,20 @@ class MapPage extends React.Component<Props> {
       senseMap,
       senseObject,
       isAuthenticated,
+      viewport,
     } = this.props;
     const { status, focus } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
     const isInspectorOpen = editor.status === OE.StatusType.SHOW;
+
+    let sidebarWidth = 350;
+    if (viewport.width <= 640) {
+      sidebarWidth = 128;
+    } else if (viewport.width <= 800) {
+      sidebarWidth = 160;
+    } else if (viewport.width <= 1024) {
+      sidebarWidth = 204;
+    }
 
     let data: BoxData | CardData | null = null;
     let isDirty: boolean = false;
@@ -236,7 +248,7 @@ class MapPage extends React.Component<Props> {
                 ? (
                   <SidebarToggler
                     className="inbox__btn"
-                    style={{ left: isInboxVisible ? 350 : 0 }}
+                    style={{ left: isInboxVisible ? sidebarWidth : 0 }}
                     open={isInboxVisible}
                     onToggle={open =>
                       open
@@ -258,7 +270,7 @@ class MapPage extends React.Component<Props> {
             <SidebarToggler
               right
               className="inspector__btn"
-              style={{ right: isInspectorOpen ? 350 : 0 }}
+              style={{ right: isInspectorOpen ? sidebarWidth : 0 }}
               open={isInspectorOpen}
               onToggle={open =>
                 open
@@ -279,7 +291,7 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
     const senseObject = state.senseObject;
     const scope = state.senseMap.scope;
     const session = state.session;
-    const { editor } = state;
+    const { editor, viewport } = state;
     const { mid } = router.match.params;
     const isAuthenticated = session.authenticated;
 
@@ -289,6 +301,7 @@ export default withRouter(connect<StateFromProps, ActionProps, RouteProps>(
       senseObject,
       scope,
       editor,
+      viewport,
       isAuthenticated,
     };
   },
