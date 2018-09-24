@@ -11,9 +11,6 @@ import { Event as KonvaEvent } from '../../../types/konva';
 type Props = MapObjectForProps<CardData>;
 
 const colors = {
-  [CardType.ANSWER]: { backgroundColor: '#c0e2d8' },
-  [CardType.NORMAL]: { backgroundColor: '#d8d8d8' },
-  [CardType.QUESTION]: { backgroundColor: '#e5ced1' },
   [CardType.NOTE]: { backgroundColor: '#eeedd1' },
   [CardType.PROBLEM]: { backgroundColor: '#e5ced1' },
   [CardType.SOLUTION]: { backgroundColor: '#cedde5' },

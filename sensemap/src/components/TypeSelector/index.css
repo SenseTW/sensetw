@@ -41,22 +41,6 @@
   background-color: #ffffff;
 }
 
-/* legacy card types */
-.type-selector .ui.radio.checkbox.type-selector__normal input:checked~label:after {
-  border: 1px solid #979797;
-  background-color: #ffffff;
-}
-
-.type-selector .ui.radio.checkbox.type-selector__question input:checked~label:after {
-  border: 1px solid #ff9999;
-  background-color: #ff9999;
-}
-
-.type-selector .ui.radio.checkbox.type-selector__answer input:checked~label:after {
-  border: 1px solid #a7ccf2;
-  background-color: #a7ccf2;
-}
-
 /* card types */
 .type-selector .ui.radio.checkbox.type-selector__note input~label:after {
   border: 1px solid #ffffef;
