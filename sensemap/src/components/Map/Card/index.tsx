@@ -97,9 +97,9 @@ class Card extends React.PureComponent<Props, State> {
     transformed.width = width;
     transformed.height = height;
     const { left: x, top: y } = D.rectFromBox(transformed);
-    const {summary, description, cardType, tags} = data;
+    const {summary, quote, description, cardType, tags} = data;
     const sanitizedSummary = summary.substr(0, summaryLimit);
-    const sanitizedDescription   = description.substr(0, descriptionLimit);
+    const sanitizedDescription   = (quote || description).substr(0, descriptionLimit);
     const selectedWidth = width - style.selected.offset.x * 2;
     const selectedHeight = height - style.selected.offset.y * 2;
 
