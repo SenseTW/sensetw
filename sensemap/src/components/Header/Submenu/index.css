@@ -1,31 +1,46 @@
-.sense-header__submenu > .ui.menu {
+.ui.menu.sense-submenu {
   margin-top: 12px;
 }
 
-.sense-header__submenu > .ui.right.menu {
+.ui.right.menu.sense-submenu {
   margin-left: auto;
 }
 
-.sense-header__submenu > .ui.right.menu > .item {
+.ui.right.menu.sense-submenu > .item {
   margin-right: 16px;
   font-size: 1.142857rem;
   color: #9b9da9;
 }
 
-.sense-header__submenu > .ui.right.menu > .active.item {
+.ui.right.menu.sense-submenu > .active.item {
   color: #4a4a4a;
 }
 
-.sense-header__submenu > .ui.menu > .item.sense-header__submenu__annotation:hover {
+.ui.menu.sense-submenu > .item.sense-submenu__annotation:hover {
   background-color: #000;
   color: #fff;
 }
 
-.sense-header__submenu > .ui.menu > .item.sense-header__submenu__annotation {
+.ui.menu.sense-submenu > .item.sense-submenu__annotation {
   margin-right: 16px;
   background-color: #000;
   color: #fff;
   border-radius: 0.285714rem;
   height: 36px;
   font-size: 1rem;
+}
+
+.ui.menu.sense-submenu > .ui.dropdown {
+  width: 40px;
+  line-height: 40px;
+  margin-right: 3px;
+}
+
+.ui.menu.sense-submenu > .ui.dropdown > i.icon {
+  margin-right: 0;
+}
+
+.ui.menu.sense-submenu > .ui.dropdown > .left.menu {
+  display: none;
+  margin-top: 3px;
 }
