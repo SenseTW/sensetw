@@ -25,6 +25,7 @@
 
 .ui.card.map-card > .content.map-card__content > .header:not(.ui) {
   font-size: 1.142857rem;
+  color: rgba(0, 0, 0, .85);
 }
 
 .ui.card.map-card > .content.map-card__content > .header+.description {

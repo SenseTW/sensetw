@@ -84,11 +84,11 @@ class MapCard extends React.Component<Props, State> {
             Owned by <span className="map-card__username">{data.owner.username}</span>
           </Card.Header>
         </Card.Content>
-        <Image src={data.image || 'https://picsum.photos/360/200'} />
+        <Image as={Link} to={mapUrl} src={data.image || 'https://picsum.photos/360/200'} />
         <Card.Content extra className="map-card__content">
           {
             data.name &&
-            <Card.Header title={timeHint}>{data.name}</Card.Header>
+            <Card.Header title={timeHint} as={Link} to={mapUrl}>{data.name}</Card.Header>
           }
           {
             data.description &&
