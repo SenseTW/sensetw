@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Switch, Route, withRouter, RouteComponentProps } from 'react-router-dom';
-import { Menu } from 'semantic-ui-react';
+import { Menu, Dropdown } from 'semantic-ui-react';
 import * as R from '../../../types/routes';
 import './index.css';
 
@@ -10,7 +10,7 @@ type Props = {} & MyRouteProps;
 
 class Submenu extends React.PureComponent<Props> {
   render() {
-    const className = 'sense-header__submenu';
+    const className = 'sense-submenu';
 
     return (
       <Menu tabular className={`${className} right`}>
@@ -28,6 +28,15 @@ class Submenu extends React.PureComponent<Props> {
             {() => <Menu.Item active>Map</Menu.Item>}
           </Route>
         </Switch>
+        <Dropdown
+          direction="left"
+          icon="ellipsis horizontal"
+        >
+          <Dropdown.Menu>
+            <Dropdown.Item disabled>MAP Detail</Dropdown.Item>
+            <Dropdown.Item disabled>MEMBER</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </Menu>
     );
   }
