@@ -87,7 +87,7 @@ class Card extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { transform, inverseTransform, object, data, isDirty = false } = this.props;
+    const { transform, inverseTransform, draggable, object, data, isDirty = false } = this.props;
     const { containerHeight } = this.state;
     const style = transformObject(transform, Card.style) as typeof Card.style;
     let transformed = this.props.transform(object);
@@ -142,7 +142,7 @@ class Card extends React.PureComponent<Props, State> {
         <Group
           x={x}
           y={y}
-          draggable={true}
+          draggable={draggable}
           onDblClick={(e) => {
             onSelect(e, object);
             onOpen(e, data.id);

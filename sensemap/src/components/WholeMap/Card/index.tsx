@@ -46,6 +46,7 @@ class Card extends React.PureComponent<Props> {
   render() {
     const {
       transform,
+      draggable,
       object,
       data,
       selected = false,
@@ -92,7 +93,7 @@ class Card extends React.PureComponent<Props> {
         }}
       >
         <Group
-          draggable
+          draggable={draggable}
           x={x}
           y={y}
           onDblClick={(e: KonvaEvent.Mouse) => {
