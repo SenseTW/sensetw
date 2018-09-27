@@ -47,6 +47,7 @@ class Box extends React.PureComponent<Props> {
   render() {
     const {
       transform,
+      draggable,
       object,
       data,
       selected = false,
@@ -95,7 +96,7 @@ class Box extends React.PureComponent<Props> {
         }}
       >
         <Group
-          draggable
+          draggable={draggable}
           x={x}
           y={y}
           onMouseOver={(e: KonvaEvent.Mouse) => onMouseOver(e, object)}

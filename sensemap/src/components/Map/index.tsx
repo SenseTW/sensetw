@@ -31,6 +31,7 @@ export interface StateFromProps {
   level:       number;
   history:     History;
   promisedObjects: Promise<ObjectMap<ObjectData>>;
+  isAuthenticated: boolean;
 }
 
 type ViewportState = State['viewport'];
@@ -330,8 +331,22 @@ export class Map extends React.Component<Props, MapState> {
 
   renderObject(o: ObjectData) {
     const acts = this.props.actions;
+    const isAuthenticated = this.props.isAuthenticated;
     const isSelected = SL.contains(this.props.selection, o.id);
     const useAltLayout = this.isAltLayout();
+    const draggingProps = isAuthenticated
+      ? {
+        draggable: true,
+        onDragStart: this.handleObjectDragStart,
+        onDragMove: this.handleObjectDragMove,
+        onDragEnd: this.handleObjectDragEnd,
+        onTouchStart: this.handleObjectTouchStart,
+        onTouchMove: this.handleObjectTouchMove,
+        onTouchEnd: this.handleObjectTouchEnd,
+      }
+      : {
+        draggable: false,
+      };
 
     switch (o.objectType) {
       case ObjectType.NONE: {
@@ -349,14 +364,9 @@ export class Map extends React.Component<Props, MapState> {
           data: CS.getCard(this.props.senseObject, o.data),
           isDirty: CS.isCardDirty(this.props.senseObject, o.data),
           selected: isSelected,
+          ...draggingProps,
           onSelect: this.handleObjectSelect,
           onDeselect: this.handleObjectDeselect,
-          onDragStart: this.handleObjectDragStart,
-          onDragMove: this.handleObjectDragMove,
-          onDragEnd: this.handleObjectDragEnd,
-          onTouchStart: this.handleObjectTouchStart,
-          onTouchMove: this.handleObjectTouchMove,
-          onTouchEnd: this.handleObjectTouchEnd,
           onMouseOver: this.handleMouseOver,
           onMouseOut: this.handleMouseOut,
           onOpen: () => acts.editor.changeStatus(OE.StatusType.SHOW),
@@ -387,12 +397,7 @@ export class Map extends React.Component<Props, MapState> {
           selected: isSelected,
           onSelect: this.handleObjectSelect,
           onDeselect: this.handleObjectDeselect,
-          onDragStart: this.handleObjectDragStart,
-          onDragMove: this.handleObjectDragMove,
-          onDragEnd: this.handleObjectDragEnd,
-          onTouchStart: this.handleObjectTouchStart,
-          onTouchMove: this.handleObjectTouchMove,
-          onTouchEnd: this.handleObjectTouchEnd,
+          ...draggingProps,
           onMouseOver: this.handleMouseOver,
           onMouseOut: this.handleMouseOut,
           onOpen: () => acts.editor.changeStatus(OE.StatusType.SHOW),

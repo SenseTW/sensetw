@@ -9,6 +9,7 @@ import { ObjectData, BoxID, CardID } from '../../types';
  * @template T A `BoxData` or a `CardData`.
  */
 export interface MapObjectForProps<T extends HasID<BoxID | CardID>> extends TransformerForProps {
+  draggable: boolean;
   object: ObjectData;
   data: T;
   isDirty?: boolean;

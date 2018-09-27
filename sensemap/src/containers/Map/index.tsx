@@ -87,6 +87,7 @@ export default withRouter(connect<StateFromProps, ActionProps, OwnProps>(
     level: state.viewport.level,
     history: props.history,
     promisedObjects: Promise.resolve({}),
+    isAuthenticated: state.session.authenticated,
   }),
   mapDispatch({ actions }),
 )(Map));

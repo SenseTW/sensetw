@@ -120,7 +120,7 @@ class Box extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { transform, inverseTransform, object, data, isDirty = false } = this.props;
+    const { transform, inverseTransform, draggable, object, data, isDirty = false } = this.props;
     const { backgroundColor, color, toggleColor } = colorFromType(data.boxType);
     const { height } = this.state;
     const style = transformObject(transform, Box.style) as typeof Box.style;
@@ -173,7 +173,7 @@ class Box extends React.PureComponent<Props, State> {
         <Group
           x={x}
           y={y}
-          draggable={true}
+          draggable={draggable}
           onDblClick={(e) => {
             onSelect(e, object);
             onOpen(e, data.id);
