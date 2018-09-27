@@ -4,7 +4,6 @@ import { Prompt, Link, matchPath } from 'react-router-dom';
 import { State, ActionProps, actions, mapDispatch, MapID } from '../../types';
 import MapCard from './MapCard';
 import FloatingActionButton from './FloatingActionButton';
-import MapContent from './MapContent';
 import { Container, Card, Modal, Header, Button } from 'semantic-ui-react';
 import * as SM from '../../types/sense/map';
 import * as CS from '../../types/cached-storage';
@@ -110,7 +109,6 @@ class DashboardPage extends React.Component<Props, OwnState> {
               <Button primary as={Link} to={R.toMapPath({ mid })}>繼續</Button>
             </Modal.Actions>
           </Modal>
-          <MapContent />
         </Container>
       </div>
     );

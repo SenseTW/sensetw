@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { State, actions, ActionProps, MapID, MapData, mapDispatch } from '../../../types';
+import { State, actions, ActionProps, MapID, MapData, mapDispatch } from '../../types';
 import { Modal, Header, Button, Form, TextArea, Input, Radio } from 'semantic-ui-react';
-import * as SM from '../../../types/sense/map';
-import * as CS from '../../../types/cached-storage';
+import * as SM from '../../types/sense/map';
+import * as CS from '../../types/cached-storage';
 import './index.css';
 
 interface StateFromProps {

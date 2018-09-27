@@ -14,6 +14,7 @@ import SignUpPage from '../SignupPage';
 import SettingsPage from '../SettingsPage';
 import TermsOfServicePage from '../TermsOfServicePage';
 import LoginPage from '../LoginPage';
+import MapContent from '../MapContent';
 import { User } from '../../types';
 import * as R from '../../types/routes';
 import './index.css';
@@ -54,6 +55,7 @@ export class App extends React.Component<Props> {
               <Route path={R.login} component={LoginPage} />
               <Route path={R.termsOfService} component={TermsOfServicePage} />
             </Switch>
+            <MapContent />
           </div>
       }
       </Router>

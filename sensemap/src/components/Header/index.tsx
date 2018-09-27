@@ -5,13 +5,17 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 import { Menu, Icon } from 'semantic-ui-react';
 import Breadcrumb from './Breadcrumb';
 import Submenu from './Submenu';
+import { State } from '../../types';
+import * as SM from '../../types/sense/map';
 import * as R from '../../types/routes';
+import * as CS from '../../types/cached-storage';
 import './index.css';
 import { actions, ActionProps, mapDispatch } from '../../types';
 import AccountMenuItem from './AccountMenuItem';
 const logo = require('./logo.png');
 
 type StateFromProps = {
+  map: SM.MapData,
 };
 
 // tslint:disable:no-any
@@ -25,6 +29,8 @@ type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
  */
 class Header extends React.Component<Props> {
   render() {
+    const { actions: acts } = this.props;
+
     return (
       <div className="sense-header">
         <Menu inverted>
@@ -59,7 +65,10 @@ class Header extends React.Component<Props> {
         </Menu>
         <div className="sense-header__submenu">
           <Breadcrumb />
-          <Submenu />
+          <Submenu
+            map={this.props.map}
+            onEditMap={(m: SM.MapData) => acts.editor.focusMap(m.id)}
+          />
         </div>
       </div>
     );
@@ -67,6 +76,9 @@ class Header extends React.Component<Props> {
 }
 
 export default connect<StateFromProps, ActionProps>(
-  (state: Props) => state,
+  (state: State) => {
+    const { senseMap, senseObject } = state;
+    return { map: CS.getMap(senseObject, senseMap.map) };
+  },
   mapDispatch({actions})
 )(withRouter(Header));

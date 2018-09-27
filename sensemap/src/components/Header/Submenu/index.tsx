@@ -1,15 +1,20 @@
 import * as React from 'react';
 import { Switch, Route, withRouter, RouteComponentProps } from 'react-router-dom';
 import { Menu, Dropdown } from 'semantic-ui-react';
+import * as SM from '../../../types/sense/map';
 import * as R from '../../../types/routes';
 import './index.css';
 
 type MyRouteProps = RouteComponentProps<{}>;
 
-type Props = {} & MyRouteProps;
+type Props = {
+  map: SM.MapData,
+  onEditMap?(map: SM.MapData): void,
+} & MyRouteProps;
 
 class Submenu extends React.PureComponent<Props> {
   render() {
+    const { map, onEditMap } = this.props;
     const className = 'sense-submenu';
 
     return (
@@ -33,7 +38,11 @@ class Submenu extends React.PureComponent<Props> {
           icon="ellipsis horizontal"
         >
           <Dropdown.Menu>
-            <Dropdown.Item disabled>MAP Detail</Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => onEditMap && onEditMap(map)}
+            >
+              MAP Detail
+            </Dropdown.Item>
             <Dropdown.Item disabled>MEMBER</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
@@ -42,4 +51,4 @@ class Submenu extends React.PureComponent<Props> {
   }
 }
 
-export default withRouter<MyRouteProps>(Submenu);
+export default withRouter<Props>(Submenu);
