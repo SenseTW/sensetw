@@ -268,6 +268,13 @@ class ObjectMenu extends React.PureComponent<Props> {
     }
   }
 
+  canZoom(): boolean {
+    const { viewport: { level } } = this.props;
+    if (level === Infinity || level === -Infinity) { return false; }
+    if (isNaN(level)) { return false; }
+    return true;
+  }
+
   canReset(): boolean {
     const { viewport } = this.props;
     return Math.abs(viewport.level - 1.0) >= Number.EPSILON;
@@ -277,6 +284,18 @@ class ObjectMenu extends React.PureComponent<Props> {
     const { actions: acts, viewport } = this.props;
     const center = V.getCenter(viewport);
     acts.viewport.zoomViewport(1.0, center);
+  }
+
+  showZoomLevel(): string {
+    const { viewport } = this.props;
+    switch (viewport.level) {
+      case Infinity:
+      case -Infinity:
+        return '---%';
+      default:
+        if (isNaN(viewport.level)) { return '---%'; }
+        return Math.floor(viewport.level * 100) + '%';
+    }
   }
 
   render() {
@@ -427,7 +446,10 @@ class ObjectMenu extends React.PureComponent<Props> {
         }
         {
           <Menu compact inverted icon>
-            <Menu.Item onClick={() => this.handleZoom(0.9)}>
+            <Menu.Item
+              disabled={!this.canZoom()}
+              onClick={() => this.handleZoom(0.9)}
+            >
               <Icon name="zoom out" />
             </Menu.Item>
             <Menu.Item
@@ -436,7 +458,10 @@ class ObjectMenu extends React.PureComponent<Props> {
             >
               <Icon name="crosshairs" />
             </Menu.Item>
-            <Menu.Item onClick={() => this.handleZoom(1.1)}>
+            <Menu.Item
+              disabled={!this.canZoom()}
+              onClick={() => this.handleZoom(1.1)}
+            >
               <Icon name="zoom in" />
             </Menu.Item>
             <Menu.Item
@@ -444,6 +469,9 @@ class ObjectMenu extends React.PureComponent<Props> {
               onClick={() => this.handleModeChange()}
             >
               <Icon name="globe" />
+            </Menu.Item>
+            <Menu.Item className="sense-object-menu__zoom-level">
+              {this.showZoomLevel()}
             </Menu.Item>
           </Menu>
         }

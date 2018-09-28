@@ -27,3 +27,9 @@
 .ui.inverted.popup {
   padding: 0.428571em 0.714285em;
 }
+
+.sense-object-menu .sense-object-menu__zoom-level {
+  flex-direction: row-reverse;
+  min-width: 3.5em;
+  font-family: monospace;
+}
