@@ -13,10 +13,10 @@ spec:
         - image: asia.gcr.io/ggv-notetool/db-backup:latest
           imagePullPolicy: Always
           name: restore-worker
-          restartPolicy: Never
           args:
             - restore
             - sensemap
+            - keep-alive
           envFrom:
             - configMapRef:
                 name: db-restore-sensemap-${BRANCH_NAME}-env
@@ -28,8 +28,8 @@ spec:
               name: tmp-pod
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "10m"
+              memory: "8Mi"
+              cpu: "1m"
         - image: nginx
           name: sensemap-web
           resources:
