@@ -14,6 +14,7 @@ MAILGUN_PASS=$9
 MAILGUN_NAME=${10}
 REDIS_HOST=${11}
 REDIS_PORT=${12}
+GS_BACKUP_PATH=${13}
 
 API_SERVERNAME=api.sense.tw
 FRONT_SERVERNAME=sense.tw
@@ -38,6 +39,12 @@ if [ -z "$SESSION_SECRET" ]; then
   SESSION_SECRET="TEST"
 fi
 
+
+sed -i "s/\${DB_NAME}/$DB_NAME/g" restore_env.yaml
+sed -i "s/\${DB_ACCOUNT}/$DB_ACCOUNT/g" restore_env.yaml
+sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" restore_env.yaml
+sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" restore_env.yaml
+sed -i "s/\${GS_BACKUP_PATH}/$GS_BACKUP_PATH/g" restore_env.yaml
 sed -i "s/\${DB_NAME}/$DB_NAME/g" env.yaml
 sed -i "s/\${DB_ACCOUNT}/$DB_ACCOUNT/g" env.yaml
 sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" env.yaml
@@ -51,6 +58,8 @@ sed -i "s/\${MAILGUN_PASS}/$MAILGUN_PASS/g" env.yaml
 sed -i "s/\${MAILGUN_NAME}/$MAILGUN_NAME/g" env.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap.yaml
 sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap.yaml
+sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap-staging.yaml
+sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap-staging.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap_service.yaml
 sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap_service.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" nginx.yaml

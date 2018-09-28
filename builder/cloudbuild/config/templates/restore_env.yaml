@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-restore-sensemap-${BRANCH_NAME}-env
+  namespace: default
+data:
+  PGDATABASE: ${DB_NAME}
+  PGHOST: localhost
+  PGPORT: "5432"
+  PGUSER: ${DB_ACCOUNT}
+  PGPASSWORD: ${DB_PASSWORD}
+  GS_BUCKET_PATH: ${GS_BACKUP_PATH}
+  GCLOUD_CREDENTIALS: /secrets/gcloud/credentials.json
