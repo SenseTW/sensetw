@@ -39,6 +39,7 @@ class Submenu extends React.PureComponent<Props> {
         >
           <Dropdown.Menu>
             <Dropdown.Item
+              disabled={SM.isEmpty(map)}
               onClick={() => onEditMap && onEditMap(map)}
             >
               MAP Detail

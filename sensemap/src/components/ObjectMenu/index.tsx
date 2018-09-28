@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { State, actions, ActionProps, mapDispatch } from '../../types';
 import { Menu, Popup, Icon } from 'semantic-ui-react';
 import Card from '../SVGIcon/Card';
@@ -20,6 +21,7 @@ import * as OE from '../../types/object-editor';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
 import * as F from '../../types/sense/focus';
+import * as R from '../../types/routes';
 // TODO: use UUID v4
 import * as U from '../../types/utils';
 import { cardData } from '../../types/sense/card';
@@ -213,12 +215,9 @@ class ObjectMenu extends React.PureComponent<Props> {
     return boxes.length === 1;
   }
 
-  handleOpenBox(): void {
-    const { actions: acts, selection, senseObject } = this.props;
-    const objectId = SL.get(selection, 0);
-    const obj = CS.getObject(senseObject, objectId);
+  handleOpenBox = (): void => {
+    const { actions: acts } = this.props;
     acts.selection.clearSelection();
-    acts.senseMap.openBox(obj.data);
   }
 
   canRemoveCard(): boolean {
@@ -281,7 +280,11 @@ class ObjectMenu extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions: acts, editor } = this.props;
+    const { actions: acts, editor, senseObject, senseMap, selection } = this.props;
+    const mid = senseMap.map;
+    const oid = SL.get(selection, 0);
+    const obj = CS.getObject(senseObject, oid);
+    const bid = obj.data;
     const canCreateCard = this.canCreateCard();
     const canCreateBox = this.canCreateBox();
     const isInspectorOpen = editor.status === OE.StatusType.SHOW;
@@ -400,7 +403,15 @@ class ObjectMenu extends React.PureComponent<Props> {
               canOpenBox &&
               <Popup
                 {...popupProps}
-                trigger={<Menu.Item onClick={() => this.handleOpenBox()}><OpenBox /></Menu.Item>}
+                trigger={
+                  <Menu.Item
+                    as={Link}
+                    to={R.toSubmapPath({ mid, bid })}
+                    onClick={this.handleOpenBox}
+                  >
+                    <OpenBox />
+                  </Menu.Item>
+                }
                 content="Open Box"
               />
             }

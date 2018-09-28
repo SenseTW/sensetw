@@ -23,11 +23,8 @@ type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
 
 /**
  * The header contains a main menu with a submenu.
- *
- * It extends the normal React component instead of the pure component so the
- * breadcrumb component will rerender properly after updates.
  */
-class Header extends React.Component<Props> {
+class Header extends React.PureComponent<Props> {
   render() {
     const { actions: acts } = this.props;
 
@@ -75,10 +72,10 @@ class Header extends React.Component<Props> {
   }
 }
 
-export default connect<StateFromProps, ActionProps>(
+export default withRouter(connect<StateFromProps, ActionProps>(
   (state: State) => {
     const { senseMap, senseObject } = state;
     return { map: CS.getMap(senseObject, senseMap.map) };
   },
   mapDispatch({actions})
-)(withRouter(Header));
+)(Header));
