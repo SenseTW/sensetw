@@ -18,7 +18,7 @@
     "test": "jest --runInBand",
     "test:watch": "yarn test --watch",
     "test:coverage": "yarn test --coverage",
-    "db:migrate": "node bin/migrate.js",
+    "db:migrate": "node bin/migrate.js"
   },
   "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
   "license": "MIT",

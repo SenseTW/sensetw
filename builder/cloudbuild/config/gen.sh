@@ -22,6 +22,7 @@ PUBLIC_URL=https\\:\\/\\/api.sense.tw\\/
 DB_NAME=sensemap
 
 if [ "$1" != "release" ]; then
+  DB_NAME="sensemap_${BRANCH_NAME}"
   MAILGUN_NAME="${BRANCH_NAME}.${MAILGUN_NAME}"
   API_SERVERNAME=staging.api.sense.tw
   FRONT_SERVERNAME=staging.sense.tw
@@ -29,7 +30,6 @@ if [ "$1" != "release" ]; then
 fi
 
 if [ "$1" != "release" ] && [ "$1" != "master" ]; then
-  DB_NAME="sensemap_${BRANCH_NAME}"
   PUBLIC_URL="https\\:\\/\\/${BRANCH_NAME}.staging.api.sense.tw\\/"
   API_SERVERNAME="${BRANCH_NAME}.staging.api.sense.tw"
   FRONT_SERVERNAME="${BRANCH_NAME}.staging.sense.tw"
