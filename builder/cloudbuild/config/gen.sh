@@ -14,7 +14,7 @@ MAILGUN_PASS=$9
 MAILGUN_NAME=${10}
 REDIS_HOST=${11}
 REDIS_PORT=${12}
-GS_BACKUP_PATH=${11}
+GS_BACKUP_BUCKET=${11}
 
 API_SERVERNAME=api.sense.tw
 FRONT_SERVERNAME=sense.tw
@@ -44,7 +44,7 @@ sed -i "s/\${DB_NAME}/$DB_NAME/g" restore_env.yaml
 sed -i "s/\${DB_ACCOUNT}/$DB_ACCOUNT/g" restore_env.yaml
 sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" restore_env.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" restore_env.yaml
-sed -i "s/\${GS_BACKUP_PATH}/$GS_BACKUP_PATH/g" restore_env.yaml
+sed -i "s/\${GS_BACKUP_BUCKET}/$GS_BACKUP_BUCKET/g" restore_env.yaml
 sed -i "s/\${DB_NAME}/$DB_NAME/g" env.yaml
 sed -i "s/\${DB_ACCOUNT}/$DB_ACCOUNT/g" env.yaml
 sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" env.yaml

@@ -9,5 +9,5 @@ data:
   PGPORT: "5432"
   PGUSER: ${DB_ACCOUNT}
   PGPASSWORD: ${DB_PASSWORD}
-  GS_BUCKET_PATH: ${GS_BACKUP_PATH}
+  GS_BUCKET_PATH: gs://${GS_BACKUP_BUCKET}
   GCLOUD_CREDENTIALS: /secrets/gcloud/credentials.json

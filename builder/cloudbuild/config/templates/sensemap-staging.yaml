@@ -9,9 +9,9 @@ spec:
       labels:
         service: sensemap-${BRANCH_NAME}
     spec:
-      init-containers:
+      initContainers:
         - image: b.gcr.io/cloudsql-docker/gce-proxy:1.12
-          name: cloudsql-proxy
+          name: cloudsql-proxy-temp
           resources:
             requests:
               memory: "64Mi"
@@ -19,7 +19,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             - |
-              /cloud_sql_proxy --dir=/cloudsql -instances=ggv-notetool:asia-east1:hypothsis-replica=tcp:5432 -credential_file=/secrets/cloudsql/credentials.json &
+              /cloud_sql_proxy --dir=/cloudsql -instances=ggv-notetool:asia-east1:hypothsis=tcp:5432 -credential_file=/secrets/cloudsql/credentials.json &
               CHILD_PID=$!
               (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
               wait $CHILD_PID
@@ -37,7 +37,7 @@ spec:
               readOnly: true
         - image: asia.gcr.io/ggv-notetool/db-backup:latest
           imagePullPolicy: Always
-          name: backup-worker
+          name: restore-worker
           args:
             - restore
             - sensemap
@@ -93,7 +93,7 @@ spec:
           volumeMounts:
             - name: front-static
               mountPath: /shared-static
-        - image: b.gcr.io/cloudsql-docker/gce-proxy:1.11
+        - image: b.gcr.io/cloudsql-docker/gce-proxy:1.12
           name: cloudsql-proxy
           resources:
             requests:
