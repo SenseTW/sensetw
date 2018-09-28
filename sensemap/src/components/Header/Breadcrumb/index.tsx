@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { History } from 'history';
 import { Switch, Route, Link, withRouter, RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Breadcrumb as SBreadcrumb } from 'semantic-ui-react';
@@ -17,30 +16,11 @@ type MyRouteProps = RouteComponentProps<any>;
 interface StateFromProps {
   senseObject: CS.CachedStorage;
   scope: MapScope;
-  history: History;
 }
 
 type Props = StateFromProps & ActionProps;
 
 class MapSections extends React.PureComponent<Props & { map: T.MapData }> {
-  componentWillMount() {
-    const { actions: { senseMap }, map } = this.props;
-
-    // sync the route to the scope
-    senseMap.setMap(map.id);
-    senseMap.setScopeToFullmap();
-  }
-
-  componentDidUpdate() {
-    const { history, scope, map } = this.props;
-
-    // sync the scope to the route
-    if (scope.type !== T.MapScopeType.FULL_MAP) {
-      // XXX: can I get the router basename here?
-      history.push(`${process.env.PUBLIC_URL}${R.toSubmapPath({ mid: map.id, bid: scope.box })}`);
-    }
-  }
-
   render() {
     const { map } = this.props;
 
@@ -61,23 +41,6 @@ class MapSections extends React.PureComponent<Props & { map: T.MapData }> {
 }
 
 class MapBoxSections extends React.PureComponent<Props & { map: T.MapData, box: T.BoxData }> {
-  componentWillMount() {
-    const { actions: { senseMap }, map, box } = this.props;
-
-    // sync the route to the scope
-    senseMap.setMap(map.id);
-    senseMap.setScopeToBox(box.id);
-  }
-
-  componentDidUpdate() {
-    const { history, scope, map } = this.props;
-
-    // sync the scope to the route
-    if (scope.type === T.MapScopeType.FULL_MAP) {
-      history.push(`${process.env.PUBLIC_URL}${R.toMapPath({ mid: map.id })}`);
-    }
-  }
-
   render() {
     const { actions: { senseMap, selection }, map, box } = this.props;
 
@@ -150,7 +113,8 @@ class Breadcrumb extends React.PureComponent<Props> {
             )}
           </Route>
           <Route exact path={R.map}>
-            {({ match: { params: { mid }} }) => <MapSections {...this.props} map={getMap(mid)} />}
+            {({ match: { params: { mid }} }) =>
+                <MapSections {...this.props} map={getMap(mid)} />}
           </Route>
           <Route path={R.submap}>
             {({ match: { params: { mid, bid }} }) =>
@@ -163,13 +127,11 @@ class Breadcrumb extends React.PureComponent<Props> {
 }
 
 export default withRouter(connect<StateFromProps, ActionProps, MyRouteProps>(
-  (state: T.State, router: MyRouteProps) => {
+  (state: T.State) => {
     const { senseObject } = state;
     const { scope } = state.senseMap;
-    const { history } = router;
 
-    // pass router to trigger rerender when the url changed
-    return { senseObject, scope, history };
+    return { senseObject, scope };
   },
   mapDispatch({ actions })
 )(Breadcrumb));

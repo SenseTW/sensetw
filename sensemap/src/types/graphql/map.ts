@@ -26,7 +26,7 @@ interface GraphQLMapFields {
 const toMapData: (m: GraphQLMapFields) => MapData =
   m => ({
     id:          m.id,
-    type:        MapType[m.type],
+    type:        MapType[m.type] || MapType.PUBLIC,
     createdAt:   +moment(m.createdAt),
     updatedAt:   +moment(m.updatedAt),
     name:        m.name || '',
