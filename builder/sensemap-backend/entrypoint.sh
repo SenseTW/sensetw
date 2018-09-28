@@ -8,6 +8,7 @@ if [ "$CMD" = "cloudbuild-staging" ]; then
     echo "Waiting for Database prepare process"
     while true; do
         if [[ -f "/tmp/pod/main-terminated" ]]; then
+	    rm /tmp/pod/main-terminated
 	    break
         fi;
 	sleep 1;

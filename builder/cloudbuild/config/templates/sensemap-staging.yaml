@@ -13,6 +13,7 @@ spec:
         - image: asia.gcr.io/ggv-notetool/db-backup:latest
           imagePullPolicy: Always
           name: restore-worker
+          restartPolicy: Never
           args:
             - restore
             - sensemap
