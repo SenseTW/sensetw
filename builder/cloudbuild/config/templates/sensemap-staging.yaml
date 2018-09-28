@@ -18,7 +18,7 @@ spec:
             - sensemap
           envFrom:
             - configMapRef:
-                name: db-restore-sensemap-env
+                name: db-restore-sensemap-${BRANCH_NAME}-env
           volumeMounts:
             - name: gcloud-credentials
               mountPath: /secrets/gcloud
@@ -50,7 +50,7 @@ spec:
         - image: gcr.io/ggv-notetool/sensemap:${COMMIT_SHA}
           imagePullPolicy: Always
           name: sensemap
-          args: ["${BRANCH_NAME}"]
+          args: ["cloudbuild-staging"]
           lifecycle:
             postStart:
               exec:
@@ -109,7 +109,7 @@ spec:
             name: sensemap-${BRANCH_NAME}-env
         - name: front-static
           emptyDir:
-        - name: db-restore-sensemap-env
+        - name: db-restore-sensemap-${BRANCH_NAME}-env
           configMap:
             name: db-restore-sensemap-${BRANCH_NAME}-env
         - name: tmp-pod

@@ -31,7 +31,6 @@ spec:
         - image: gcr.io/ggv-notetool/sensemap:${COMMIT_SHA}
           imagePullPolicy: Always
           name: sensemap
-          args: ["${BRANCH_NAME}"]
           lifecycle:
             postStart:
               exec:
