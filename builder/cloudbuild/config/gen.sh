@@ -2,26 +2,30 @@
 BASH_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cp $BASH_DIR/templates/* ./
 
-BRANCH_NAME=$1
-COMMIT_SHA=$2
-DB_ACCOUNT=$3
-DB_PASSWORD=$4
-SESSION_SECRET=$5
-MAILGUN_HOST=$6
-MAILGUN_PORT=$7
-MAILGUN_USER=$8
-MAILGUN_PASS=$9
-MAILGUN_NAME=${10}
-REDIS_HOST=${11}
-REDIS_PORT=${12}
-GS_BACKUP_BUCKET=${11}
+BRANCH_NAME=$BRANCH_NAME
+COMMIT_SHA=$COMMIT_SHA
+DB_ACCOUNT=$_DB_ACCOUNT
+DB_PASSWORD=$_DB_PASSWORD
+SESSION_SECRET=$_SESSION_SECRET
+MAILGUN_HOST=$_MAILGUN_HOST
+MAILGUN_PORT=$_MAILGUN_PORT
+MAILGUN_USER=$_MAILGUN_USER
+MAILGUN_PASS=$_MAILGUN_PASS
+MAILGUN_NAME=$_MAILGUN_NAME
+REDIS_HOST=$_REDIS_HOST
+REDIS_PORT=$_REDIS_PORT
+GS_BACKUP_BUCKET=$_GS_BACKUP_BUCKET
+
+if [ "$1" = "release" ]; then
+  BRANCH_NAME="$1"
+fi
 
 API_SERVERNAME=api.sense.tw
 FRONT_SERVERNAME=sense.tw
 PUBLIC_URL=https\\:\\/\\/api.sense.tw\\/
 DB_NAME=sensemap
 
-if [ "$1" != "release" ]; then
+if [ "$BRANCH_NAME" != "release" ]; then
   DB_NAME="sensemap_${BRANCH_NAME}"
   MAILGUN_NAME="${BRANCH_NAME}.${MAILGUN_NAME}"
   API_SERVERNAME=staging.api.sense.tw
@@ -29,7 +33,7 @@ if [ "$1" != "release" ]; then
   PUBLIC_URL=https\\:\\/\\/staging.api.sense.tw\\/
 fi
 
-if [ "$1" != "release" ] && [ "$1" != "master" ]; then
+if [ "$BRANCH_NAME" != "release" ] && [ "$BRANCH_NAME" != "master" ]; then
   PUBLIC_URL="https\\:\\/\\/${BRANCH_NAME}.staging.api.sense.tw\\/"
   API_SERVERNAME="${BRANCH_NAME}.staging.api.sense.tw"
   FRONT_SERVERNAME="${BRANCH_NAME}.staging.sense.tw"
