@@ -14,7 +14,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap:$COMMIT_SHA']
 - name: 'ubuntu'
-  args: ['bash', './builder/cloudbuild/config/gen.sh', "release", '$COMMIT_SHA', '${_DB_ACCOUNT}', '${_DB_PASSWORD}', '${_SESSION_SECRET}', '${_MAILGUN_HOST}', '${_MAILGUN_PORT}', '${_MAILGUN_USER}', '${_MAILGUN_PASS}', '${_MAILGUN_NAME}', '${_REDIS_HOST}', '${_REDIS_PORT}']
+  args: ['bash', './builder/cloudbuild/config/gen.sh', "release"]
 - name: 'gcr.io/cloud-builders/kubectl'
   args:
   - 'apply'
