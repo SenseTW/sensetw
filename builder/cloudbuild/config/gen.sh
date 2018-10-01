@@ -16,7 +16,7 @@ REDIS_HOST=$_REDIS_HOST
 REDIS_PORT=$_REDIS_PORT
 GS_BACKUP_BUCKET=$_GS_BACKUP_BUCKET
 
-if [ "$1" != "release" ]; then
+if [ "$1" = "release" ]; then
   BRANCH_NAME="release"
 fi
 
