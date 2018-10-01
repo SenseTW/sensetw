@@ -17,7 +17,7 @@ REDIS_PORT=$_REDIS_PORT
 GS_BACKUP_BUCKET=$_GS_BACKUP_BUCKET
 
 if [ "$1" = "release" ]; then
-  BRANCH_NAME="release"
+  BRANCH_NAME="$1"
 fi
 
 API_SERVERNAME=api.sense.tw
