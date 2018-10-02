@@ -1,0 +1,7 @@
+.box-delete-modal p {
+  font-weight: bold;
+}
+
+.box-delete-modal .box-delete-modal__note {
+  font-weight: normal;
+}
