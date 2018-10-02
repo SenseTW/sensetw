@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { State, actions, ActionProps, mapDispatch } from '../../types';
 import { Menu, Popup, Icon } from 'semantic-ui-react';
+import DeleteConfirmation from './DeleteConfirmation';
 import Card from '../SVGIcon/Card';
 import Box from '../SVGIcon/Box';
 import Inspector from '../SVGIcon/Inspector';
@@ -41,6 +42,10 @@ interface OwnProps {}
 
 type Props = StateFromProps & OwnProps & ActionProps;
 
+interface OwnState {
+  open: boolean;
+}
+
 const selectedCardsAndBoxes:
   (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
   props => props.selection.objects.reduce(
@@ -60,7 +65,11 @@ const selectedCardsAndBoxes:
     { cards: [], boxes: [] }
   );
 
-class ObjectMenu extends React.PureComponent<Props> {
+class ObjectMenu extends React.PureComponent<Props, OwnState> {
+  state = {
+    open: false,
+  };
+
   canCreateCard(): boolean {
     const { isAuthenticated } = this.props;
     return isAuthenticated;
@@ -155,23 +164,52 @@ class ObjectMenu extends React.PureComponent<Props> {
     return cards.length > 0 || boxes.length > 0;
   }
 
-  async handleDeleteCard() {
-    const { actions: acts, senseObject } = this.props;
+  async handleDelete() {
+    const { actions: acts } = this.props;
     const { cards, boxes } = selectedCardsAndBoxes(this.props);
     try {
-      if (cards.length > 0) {
+      if (boxes.length > 0) {
+        this.setState({ open: true });
+      } else if (cards.length > 0) {
         // remove card container objects
         // we don't remove cards and leave them in the inbox
-        await acts.senseObject.removeObjects(cards);
+        acts.senseObject.removeObjects(cards);
+        acts.editor.focusObject(F.focusNothing());
       }
-      if (boxes.length > 0) {
-        const boxIDList =
-          boxes.map(objID => CS.getObject(senseObject, objID).data as T.BoxID);
-        // remove box container objects
-        await acts.senseObject.removeObjects(boxes);
-        // remove boxes
-        await acts.senseObject.removeBoxes(boxIDList);
+    } catch (err) {
+      // tslint:disable-next-line:no-console
+      console.error(err);
+    }
+  }
+
+  getBoxedCardCount(): number {
+    const { senseObject } = this.props;
+    const { boxes } = selectedCardsAndBoxes(this.props);
+    return boxes.reduce(
+      (acc, objID) => {
+        const obj = CS.getObject(senseObject, objID);
+        const box = CS.getBox(senseObject, obj.data as T.BoxID);
+        return acc + Object.keys(box.contains).length;
+      },
+      0
+    );
+  }
+
+  async doDelete() {
+    const { actions: acts, senseObject } = this.props;
+    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    const boxIDList =
+      boxes.map(objID => CS.getObject(senseObject, objID).data as T.BoxID);
+    try {
+      if (cards.length > 0) {
+        // remove card container objects and cards remain in the inbox
+        acts.senseObject.removeObjects(cards);
+        acts.editor.focusObject(F.focusNothing());
       }
+      // remove box container objects
+      await acts.senseObject.removeObjects(boxes);
+      // remove boxes
+      await acts.senseObject.removeBoxes(boxIDList);
     } catch (err) {
       // tslint:disable-next-line:no-console
       console.error(err);
@@ -300,6 +338,7 @@ class ObjectMenu extends React.PureComponent<Props> {
 
   render() {
     const { actions: acts, editor, senseObject, senseMap, selection } = this.props;
+    const { open } = this.state;
     const mid = senseMap.map;
     const oid = SL.get(selection, 0);
     const obj = CS.getObject(senseObject, oid);
@@ -404,10 +443,21 @@ class ObjectMenu extends React.PureComponent<Props> {
             }
             {
               canDeleteCard &&
-              <Popup
-                {...popupProps}
-                trigger={<Menu.Item onClick={() => this.handleDeleteCard()}><Delete /></Menu.Item>}
-                content="Delete"
+              <DeleteConfirmation
+                trigger={
+                  <Popup
+                    {...popupProps}
+                    trigger={<Menu.Item onClick={() => this.handleDelete()}><Delete /></Menu.Item>}
+                    content="Delete"
+                  />
+                }
+                open={open}
+                cardCount={this.getBoxedCardCount()}
+                onClose={() => this.setState({ open: false })}
+                onSubmit={() => {
+                  this.doDelete();
+                  this.setState({ open: false });
+                }}
               />
             }
             {
