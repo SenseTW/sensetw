@@ -253,7 +253,7 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   isAltLayout(): boolean {
-    return this.props.level < 0.33;
+    return this.props.level < 0.65;
   }
 
   render() {
