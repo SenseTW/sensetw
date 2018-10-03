@@ -6,7 +6,7 @@ import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
 import Toolbar from '../Toolbar';
-import ObjectContent from '../ObjectContent';
+import Inspector from '../Inspector';
 import Inbox from '../../containers/Inbox';
 import SidebarToggler from '../SidebarToggler';
 import {
@@ -146,7 +146,7 @@ class MapPage extends React.Component<Props> {
           >{
             data
               ? (
-                <ObjectContent
+                <Inspector
                   disabled={!isAuthenticated}
                   objectType={focus.objectType}
                   data={data}
