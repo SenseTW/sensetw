@@ -70,23 +70,6 @@ spec:
               mountPath: /shared-static
             - name: tmp-pod
               mountPath: /tmp/pod
-        - image: b.gcr.io/cloudsql-docker/gce-proxy:1.12
-          name: cloudsql-proxy
-          resources:
-            requests:
-              memory: "64Mi"
-              cpu: "10m"
-          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
-                    "-instances=ggv-notetool:asia-east1:hypothsis=tcp:5432",
-                    "-credential_file=/secrets/cloudsql/credentials.json"]
-          volumeMounts:
-            - name: cloudsql-instance-credentials
-              mountPath: /secrets/cloudsql
-              readOnly: true
-            - name: ssl-certs
-              mountPath: /etc/ssl/certs
-            - name: cloudsql
-              mountPath: /cloudsql
       volumes:
         - name: nginx-proxy-conf
           configMap:
@@ -94,17 +77,9 @@ spec:
             items:
               - key: "nginx.conf"
                 path: "nginx.conf"
-        - name: cloudsql-instance-credentials
-          secret:
-            secretName: cloudsql-instance-credentials
         - name: gcloud-credentials
           secret:
             secretName: db-backup-credentials
-        - name: ssl-certs
-          hostPath:
-            path: /etc/ssl/certs
-        - name: cloudsql
-          emptyDir:
         - name: sensemap-${BRANCH_NAME}-env
           configMap:
             name: sensemap-${BRANCH_NAME}-env

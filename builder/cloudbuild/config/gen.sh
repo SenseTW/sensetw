@@ -6,6 +6,7 @@ BRANCH_NAME=$BRANCH_NAME
 COMMIT_SHA=$COMMIT_SHA
 DB_ACCOUNT=$_DB_ACCOUNT
 DB_PASSWORD=$_DB_PASSWORD
+DB_HOST=$_DB_HOST
 SESSION_SECRET=$_SESSION_SECRET
 MAILGUN_HOST=$_MAILGUN_HOST
 MAILGUN_PORT=$_MAILGUN_PORT
@@ -43,12 +44,13 @@ if [ -z "$SESSION_SECRET" ]; then
   SESSION_SECRET="TEST"
 fi
 
-
+sed -i "s/\${DB_HOST}/$DB_HOST/g" restore_env.yaml
 sed -i "s/\${DB_NAME}/$DB_NAME/g" restore_env.yaml
 sed -i "s/\${DB_ACCOUNT}/$DB_ACCOUNT/g" restore_env.yaml
 sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" restore_env.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" restore_env.yaml
 sed -i "s/\${GS_BACKUP_BUCKET}/$GS_BACKUP_BUCKET/g" restore_env.yaml
+sed -i "s/\${DB_HOST}/$DB_HOST/g" env.yaml
 sed -i "s/\${DB_NAME}/$DB_NAME/g" env.yaml
 sed -i "s/\${DB_ACCOUNT}/$DB_ACCOUNT/g" env.yaml
 sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" env.yaml

@@ -5,7 +5,7 @@ metadata:
   namespace: default
 data:
   PGDATABASE: ${DB_NAME}
-  PGHOST: localhost
+  PGHOST: ${DB_HOST}
   PGPORT: "5432"
   PGUSER: ${DB_ACCOUNT}
   PGPASSWORD: ${DB_PASSWORD}
