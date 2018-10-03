@@ -26,7 +26,7 @@ interface Props {
   onCancel? (): void;
 }
 
-class ObjectContent extends React.PureComponent<Props> {
+class Inspector extends React.PureComponent<Props> {
   handleKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const { data, onSubmit = noop, onCancel = noop } = this.props;
 
@@ -82,16 +82,17 @@ class ObjectContent extends React.PureComponent<Props> {
     }
 
     return (
-      <div className="object-content">
-        <div className="object-content__content">
+      <div className="inspector">
+        <div className="inspector__content">
           {content}
         </div>
         {!disabled && <Divider />}
         {
           !disabled &&
-          <div className="object-content__actions">
+          <div className="inspector__actions">
             <Button.Group>
               <Button
+                id="inspcetor__cancel-btn"
                 disabled={cancelDisabled}
                 onClick={() => onCancel()}
               >
@@ -100,6 +101,7 @@ class ObjectContent extends React.PureComponent<Props> {
               <Button.Or />
               <Button
                 positive
+                id="inspector__submit-btn"
                 disabled={submitDisabled || !isContentValid}
                 onClick={() => onSubmit(data)}
               >
@@ -113,4 +115,4 @@ class ObjectContent extends React.PureComponent<Props> {
   }
 }
 
-export default ObjectContent;
+export default Inspector;

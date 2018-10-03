@@ -1,4 +1,4 @@
-.object-content {
+.inspector {
   position: relative;
   color: #4a4a4a;
   height: 100%;
@@ -7,31 +7,31 @@
   overflow: hidden;
 }
 
-.object-content .ui.form .field>label {
+.inspector .ui.form .field>label {
   color: #2d323a;
   font-weight: normal;
 }
 
-.object-content .ui.form .ui.input input,
-.object-content .ui.form textarea {
+.inspector .ui.form .ui.input input,
+.inspector .ui.form textarea {
   border-radius: 10px;
   border: solid 1px #d6dee9;
   background-color: #fff;
 }
 
-.object-content .object-content__content {
+.inspector .inspector__content {
   height: 100%;
   max-height: 100%;
   padding: 1em;
   overflow-y: scroll;
 }
 
-.object-content .object-content__content::-webkit-scrollbar {
+.inspector .inspector__content::-webkit-scrollbar {
   width: 0;
   background-color: transparent;
 }
 
-.object-content .object-content__actions {
+.inspector .inspector__actions {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -40,28 +40,28 @@
   background-color: #f5f5f5;
 }
 
-.object-content .object-content__actions .ui.buttons {
+.inspector .inspector__actions .ui.buttons {
   float: right;
 }
 
-.object-content .ui.form textarea {
+.inspector .ui.form textarea {
   height: 38px; /* 75px * 0.5 */
 }
 
 @media screen and (min-width: 641px) {
-  .object-content .ui.form textarea {
+  .inspector .ui.form textarea {
     height: 38px;
   }
 }
 
 @media screen and (min-width: 801px) {
-  .object-content .ui.form textarea {
+  .inspector .ui.form textarea {
     height: 45px; /* 75px * 0.6 */
   }
 }
 
 @media screen and (min-width: 1025px) {
-  .object-content .ui.form textarea {
+  .inspector .ui.form textarea {
     height: 75px;
   }
 }
