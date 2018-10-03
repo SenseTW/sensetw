@@ -1,3 +1,4 @@
+import { gql } from 'apollo-server';
 import { ID, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
 import { MapFilter, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
@@ -97,6 +98,82 @@ export async function updateCard(db, id: ID, args): Promise<Card | null> {
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
+
+export const typeDefs = [
+  gql`
+    input CardFilter {
+      map: MapFilter
+      url: String
+      tags: String
+    }
+
+    extend type Query {
+      allCards(filter: CardFilter): [Card!]!
+      Card(id: ID): Card
+    }
+
+    extend type Mutation {
+      createCard(
+        cardType: CardType,
+        description: String,
+        saidBy: String,
+        stakeholder: String,
+        summary: String,
+        quote: String,
+        tags: String,
+        title: String,
+        url: String,
+        mapId: ID,
+        objectsIds: [ID!]
+      ): Card
+      updateCard(
+        id: ID!,
+        cardType: CardType,
+        description: String,
+        saidBy: String,
+        stakeholder: String,
+        summary: String,
+        quote: String,
+        tags: String,
+        title: String,
+        url: String,
+        mapId: ID,
+        objectsIds: [ID!]
+      ): Card
+      deleteCard(
+        id: ID!
+      ): Card
+    }
+
+    enum CardType {
+      NOTE
+      PROBLEM
+      SOLUTION
+      DEFINITION
+      INFO
+    }
+
+    type Card @model {
+      id: ID! @isUnique
+      createdAt: DateTime!
+      updatedAt: DateTime!
+      title: String
+      summary: String
+      quote: String,
+      description: String
+      tags: String
+      saidBy: String
+      stakeholder: String
+      url: String
+      cardType: CardType @migrationValue(value: INFO)
+      objects: [Object!]! @relation(name: "ObjectCard")
+      mapId: ID
+      map: Map @relation(name: "MapCards")
+      owner: User
+    }
+  `,
+
+];
 
 export const resolvers = {
   Query: {

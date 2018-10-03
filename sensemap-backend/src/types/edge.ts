@@ -1,3 +1,4 @@
+import { gql } from 'apollo-server';
 import { ID, Map, SenseObject, Edge, edgeFields, edgeDataFields } from './sql';
 import { getEdgesInMap, updateMapUpdatedAt } from './map';
 import { pick } from 'ramda';
@@ -35,6 +36,47 @@ export async function deleteEdge(db, id: ID): Promise<Edge | null> {
   return rows[0];
 }
 
+export const typeDefs = [
+  gql`
+    input EdgeFilter {
+      map: MapFilter
+    }
+
+    extend type Query {
+      allEdges(filter: EdgeFilter): [Edge!]!
+      Edge(id: ID): Edge
+    }
+
+    extend type Mutation {
+      createEdge(
+        fromId: ID,
+        mapId: ID,
+        toId: ID,
+      ): Edge
+      updateEdge(
+        id: ID!,
+        fromId: ID,
+        mapId: ID,
+        toId: ID,
+      ): Edge
+      deleteEdge(
+        id: ID!
+      ): Edge
+    }
+
+    type Edge @model {
+      id: ID! @isUnique
+      createdAt: DateTime!
+      updatedAt: DateTime!
+      mapId: ID
+      map: Map! @relation(name: "MapEdges")
+      fromId: ID
+      from: Object! @relation(name: "EdgeFrom")
+      toId: ID
+      to: Object! @relation(name: "EdgeTo")
+    }
+  `,
+];
 
 export const resolvers = {
   Query: {

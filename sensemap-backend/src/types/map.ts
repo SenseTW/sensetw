@@ -1,10 +1,11 @@
-import { pick } from 'ramda';
+import { gql } from 'apollo-server';
 import { ID, Map, mapFields, mapDataFields, SenseObject, Card, Box, Edge } from './sql';
 import { objectsQuery } from './object';
 import { boxesQuery } from './box';
 import { cardsQuery } from './card';
 import { edgesQuery } from './edge';
-import * as A from './oauth';
+import { getUserFromAuthorization } from './oauth';
+import { pick } from 'ramda';
 
 export type MapFilter = {
   id?: ID;
@@ -68,6 +69,61 @@ export async function getBoxesInMap(db, mapId: ID): Promise<Box[]> {
   return boxesQuery(db).where('mapId', mapId);
 }
 
+export const typeDefs = [
+  gql`
+    input MapFilter {
+      id: ID!
+    }
+
+    extend type Query {
+      allMaps(filter: MapFilter): [Map!]!
+      Map(id: ID): Map
+    }
+
+    extend type Mutation {
+      createMap(
+        name: String,
+        description: String,
+        tags: String,
+        image: String,
+        type: String,
+        boxesIds: [ID!],
+        cardsIds: [ID!],
+        edgesIds: [ID!],
+        objectsIds: [ID!]
+      ): Map
+      updateMap(
+        id: ID!,
+        name: String,
+        description: String,
+        tags: String,
+        image: String,
+        type: String,
+      ): Map
+      deleteMap(
+        id: ID!
+      ): Map
+    }
+
+    type Map @model {
+      id: ID! @isUnique
+      createdAt: DateTime!
+      updatedAt: DateTime!
+      owner: User @relation(name: "MapOwners")
+      name: String
+      description: String
+      tags: String
+      image: String
+      type: String
+      objects: [Object!]! @relation(name: "MapObjects")
+      edges: [Edge!]! @relation(name: "MapEdges")
+      cards: [Card!]! @relation(name: "MapCards")
+      boxes: [Box!]! @relation(name: "MapBoxes")
+    }
+  `,
+
+];
+
 export const resolvers = {
   Query: {
     allMaps: async (_, args: AllMapsArgs, { db }, info): Promise<Map[]> => {
@@ -86,7 +142,7 @@ export const resolvers = {
 
   Mutation: {
     createMap: async (_, args, { db, authorization }, info): Promise<Map> => {
-      const u = await A.getUserFromAuthorization(db, authorization);
+      const u = await getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       return createMap(db, args);
     },
