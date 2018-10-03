@@ -1,3 +1,4 @@
+import { gql } from 'apollo-server';
 import { ID, Box, BoxType, boxFields, objectFields, boxDataFields, SenseObject } from './sql';
 import { getBoxesInMap, updateMapUpdatedAt } from './map';
 import { objectsQuery } from './object';
@@ -62,6 +63,86 @@ export async function removeObjectFromBox(db, obj: ID, box: ID) {
     belongsToBox: box,
   };
 }
+
+export const typeDefs = [
+  gql`
+    input BoxFilter {
+      map: MapFilter
+    }
+
+    extend type Query {
+      allBoxes(filter: BoxFilter): [Box!]!
+      Box(id: ID): Box
+    }
+
+    type AddToContainCardsPayload {
+      containsObject: Object!
+      belongsToBox: Box!
+    }
+
+    type RemoveFromContainCardsPayload {
+      containsObject: Object!
+      belongsToBox: Box!
+    }
+
+    extend type Mutation {
+      createBox(
+        boxType: BoxType,
+        summary: String,
+        tags: String,
+        title: String,
+        mapId: ID,
+        containsIds: [ID!],
+        objectsIds: [ID!]
+      ): Box
+      updateBox(
+        id: ID!,
+        boxType: BoxType,
+        summary: String,
+        tags: String,
+        title: String,
+        mapId: ID,
+        containsIds: [ID!],
+        objectsIds: [ID!]
+      ): Box
+      deleteBox(
+        id: ID!
+      ): Box
+      addToContainCards(
+        belongsToBoxId: ID!,
+        containsObjectId: ID!
+      ): AddToContainCardsPayload
+      removeFromContainCards(
+        belongsToBoxId: ID!,
+        containsObjectId: ID!
+      ): RemoveFromContainCardsPayload
+    }
+
+    enum BoxType {
+      NOTE
+      PROBLEM
+      SOLUTION
+      DEFINITION
+      INFO
+    }
+
+    type Box @model {
+      id: ID! @isUnique
+      boxType: BoxType
+      createdAt: DateTime!
+      updatedAt: DateTime!
+      title: String
+      summary: String
+      tags: String
+      objects: [Object!]! @relation(name: "ObjectBox")
+      contains: [Object!]! @relation(name: "ContainCards")
+      mapId: ID
+      map: Map @relation(name: "MapBoxes")
+      owner: User
+    }
+  `,
+
+];
 
 export const resolvers = {
   Query: {

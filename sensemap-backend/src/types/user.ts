@@ -1,3 +1,4 @@
+import { gql } from 'apollo-server';
 import { ID, User, UserData, userFields, Map } from './sql';
 import * as Knex from 'knex';
 import { pick } from 'ramda';
@@ -151,6 +152,30 @@ export async function findUserByResetPasswordToken(db: Knex, token: string): Pro
   }
   return getUser(db, t.userId);
 }
+
+export const typeDefs = [
+  gql`
+    extend type Query {
+      User(id: ID): User
+      verifyPassword(password: String): User
+    }
+
+    extend type Mutation {
+      changePassword(
+        password: String
+      ): User
+    }
+
+    type User @model {
+      id: ID! @isUnique
+      createdAt: DateTime!
+      updatedAt: DateTime!
+      username: String!
+      email: String
+      maps: [Map!]! @relation(name: "MapOwners")
+    }
+  `,
+];
 
 export const resolvers = {
   Query: {

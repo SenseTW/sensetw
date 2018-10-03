@@ -1,3 +1,4 @@
+import { gql } from 'apollo-server';
 import { ID, SenseObject, objectFields, objectDataFields } from './sql';
 import { getObjectsInMap, updateMapUpdatedAt } from './map';
 import { pick } from 'ramda';
@@ -34,6 +35,81 @@ export async function deleteObject(db, id: ID): Promise<SenseObject | null> {
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
+
+export const typeDefs = [
+  gql`
+    input ObjectFilter {
+      map: MapFilter
+    }
+
+    extend type Query {
+      allObjects(filter: ObjectFilter): [Object!]!
+      Object(id: ID): Object
+    }
+
+    extend type Mutation {
+      createObject(
+        objectType: ObjectType!,
+        x: Float!,
+        y: Float!,
+        width: Float!,
+        height: Float!,
+        zIndex: Float!,
+        belongsToId: ID,
+        boxId: ID,
+        cardId: ID,
+        mapId: ID
+        incomingIds: [ID!],
+        outgoingIds: [ID!]
+      ): Object
+      updateObject(
+        id: ID!,
+        objectType: ObjectType,
+        x: Float,
+        y: Float,
+        width: Float,
+        height: Float,
+        zIndex: Float,
+        belongsToId: ID,
+        boxId: ID,
+        cardId: ID,
+        mapId: ID
+        incomingIds: [ID!],
+        outgoingIds: [ID!]
+      ): Object
+      deleteObject(
+        id: ID!
+      ): Object
+    }
+
+    enum ObjectType {
+      CARD
+      BOX
+    }
+
+    type Object {
+      id: ID! @isUnique
+      createdAt: DateTime!
+      updatedAt: DateTime!
+      x: Float!
+      y: Float!
+      width: Float!,
+      height: Float!,
+      zIndex: Float!
+      mapId: ID,
+      map: Map @relation(name: "MapObjects")
+      objectType: ObjectType! @migrationValue(value: CARD)
+      cardId: ID,
+      card: Card @relation(name: "ObjectCard")
+      boxId: ID,
+      box: Box @relation(name: "ObjectBox")
+      belongsToId: ID,
+      belongsTo: Box @relation(name: "ContainCards")
+      outgoing: [Edge!]! @relation(name: "EdgeFrom")
+      incoming: [Edge!]! @relation(name: "EdgeTo")
+    }
+  `,
+];
 
 export const resolvers = {
   Query: {
