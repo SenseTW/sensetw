@@ -5,7 +5,7 @@ import { Sidebar, Segment } from 'semantic-ui-react';
 import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
-import ObjectMenu from '../ObjectMenu';
+import Toolbar from '../Toolbar';
 import ObjectContent from '../ObjectContent';
 import Inbox from '../../containers/Inbox';
 import SidebarToggler from '../SidebarToggler';
@@ -240,8 +240,8 @@ class MapPage extends React.Component<Props> {
             <Viewport>
               {(props) => <Map id={mid} {...props} />}
             </Viewport>
-            <div className="map-page__menu">
-              <ObjectMenu />
+            <div className="map-page__toolbar">
+              <Toolbar />
             </div>
             {
               isAuthenticated

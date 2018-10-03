@@ -65,7 +65,7 @@ const selectedCardsAndBoxes:
     { cards: [], boxes: [] }
   );
 
-class ObjectMenu extends React.PureComponent<Props, OwnState> {
+class Toolbar extends React.PureComponent<Props, OwnState> {
   state = {
     open: false,
   };
@@ -359,12 +359,13 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
     const popupProps = { inverted: true, position: 'bottom center' as 'bottom center' };
 
     return (
-      <div className="sense-object-menu">
+      <div className="sense-toolbar">
         <Menu compact inverted icon>
           <Popup
             {...popupProps}
             trigger={
               <Menu.Item
+                id="sense-toolbar__new-card-btn"
                 disabled={!canCreateCard}
                 onClick={() => this.handleCreateCard()}
               >
@@ -376,6 +377,7 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
             {...popupProps}
             trigger={
               <Menu.Item
+                id="sense-toolbar__new-box-btn"
                 disabled={!canCreateBox}
                 onClick={() => this.handleBox()}
               >
@@ -392,6 +394,7 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
             {...popupProps}
             trigger={
               <Menu.Item
+                id="sense-toolbar__inspector-btn"
                 active={isInspectorOpen}
                 onClick={() =>
                   acts.editor.changeStatus(
@@ -410,6 +413,7 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
             {...popupProps}
             trigger={
               <Menu.Item
+                id="sense-toolbar__remove-edge-btn"
                 disabled={!canRemoveEdge && !canCreateEdge}
                 onClick={() =>
                   canRemoveEdge
@@ -437,7 +441,15 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
               canCopy &&
               <Popup
                 {...popupProps}
-                trigger={<Menu.Item disabled onClick={U.noop}><Copy /></Menu.Item>}
+                trigger={
+                  <Menu.Item
+                    id="sense-toolbar__copy-btn"
+                    disabled
+                    onClick={U.noop}
+                  >
+                    <Copy />
+                  </Menu.Item>
+                }
                 content="Copy"
               />
             }
@@ -447,7 +459,14 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
                 trigger={
                   <Popup
                     {...popupProps}
-                    trigger={<Menu.Item onClick={() => this.handleDelete()}><Delete /></Menu.Item>}
+                    trigger={
+                      <Menu.Item
+                        id="sense-toolbar__delete-btn"
+                        onClick={() => this.handleDelete()}
+                      >
+                        <Delete />
+                      </Menu.Item>
+                    }
                     content="Delete"
                   />
                 }
@@ -464,7 +483,14 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
               canAddCard &&
               <Popup
                 {...popupProps}
-                trigger={<Menu.Item onClick={() => this.handleAddCard()}><BoxCard /></Menu.Item>}
+                trigger={
+                  <Menu.Item
+                    id="sense-toolbar__add-to-box-btn"
+                    onClick={() => this.handleAddCard()}
+                  >
+                    <BoxCard />
+                  </Menu.Item>
+                }
                 content="Add to Box"
               />
             }
@@ -474,6 +500,7 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
                 {...popupProps}
                 trigger={
                   <Menu.Item
+                    id="sense-toolbar__open-box-btn"
                     as={Link}
                     to={R.toSubmapPath({ mid, bid })}
                     onClick={this.handleOpenBox}
@@ -488,7 +515,14 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
               canRemoveCard &&
               <Popup
                 {...popupProps}
-                trigger={<Menu.Item onClick={() => this.handleRemoveCard()}><Eject /></Menu.Item>}
+                trigger={
+                  <Menu.Item
+                    id="sense-toolbar__eject-btn"
+                    onClick={() => this.handleRemoveCard()}
+                  >
+                    <Eject />
+                  </Menu.Item>
+                }
                 content="Eject"
               />
             }
@@ -497,30 +531,34 @@ class ObjectMenu extends React.PureComponent<Props, OwnState> {
         {
           <Menu compact inverted icon>
             <Menu.Item
+              id="sense-toolbar__zoom-out-btn"
               disabled={!this.canZoom()}
               onClick={() => this.handleZoom(0.9)}
             >
               <Icon name="zoom out" />
             </Menu.Item>
             <Menu.Item
+              id="sense-toolbar__zoom-reset-btn"
               disabled={!this.canReset()}
               onClick={() => this.resetZoomLevel()}
             >
               <Icon name="crosshairs" />
             </Menu.Item>
             <Menu.Item
+              id="sense-toolbar__zoom-in-btn"
               disabled={!this.canZoom()}
               onClick={() => this.handleZoom(1.1)}
             >
               <Icon name="zoom in" />
             </Menu.Item>
             <Menu.Item
+              id="sense-toolbar__whole-picture-btn"
               active={this.isWholePicture()}
               onClick={() => this.handleModeChange()}
             >
               <Icon name="globe" />
             </Menu.Item>
-            <Menu.Item className="sense-object-menu__zoom-level">
+            <Menu.Item className="sense-toolbar__zoom-level">
               {this.showZoomLevel()}
             </Menu.Item>
           </Menu>
@@ -544,4 +582,4 @@ export default connect<StateFromProps, ActionProps>(
     };
   },
   mapDispatch({ actions }),
-)(ObjectMenu);
+)(Toolbar);
