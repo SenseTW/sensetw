@@ -34,6 +34,8 @@ steps:
   - '_GS_BACKUP_BUCKET=${_GS_BACKUP_BUCKET}'
   - '_REDIS_HOST=${_REDIS_HOST}'
   - '_REDIS_PORT=${_REDIS_PORT}'
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
 - name: 'gcr.io/cloud-builders/kubectl'
   args:
   - 'apply'
