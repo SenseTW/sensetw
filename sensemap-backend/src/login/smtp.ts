@@ -1,17 +1,16 @@
+const debug = require("debug")("sensemap-backend:smtp");
+import { context } from "../context";
+import * as nodemailer from "nodemailer";
 
-const debug = require('debug')('sensemap-backend:smtp');
-import { context } from '../context';
-import * as nodemailer from 'nodemailer';
-
-type EmailAddress = string | { name: string, address: string };
+type EmailAddress = string | { name: string; address: string };
 type MessageBody = string;
 type Message = {
-  from?: EmailAddress,
-  to: EmailAddress,
-  subject: string,
-  text: MessageBody,
-  html?: MessageBody,
-}
+  from?: EmailAddress;
+  to: EmailAddress;
+  subject: string;
+  text: MessageBody;
+  html?: MessageBody;
+};
 
 const { env } = context();
 
@@ -20,22 +19,22 @@ const transporterOptions = {
   port: env.MAILGUN_PORT,
   name: env.MAILGUN_NAME,
   secure: true,
-  authMethod: 'PLAIN',
+  authMethod: "PLAIN",
   auth: {
-    type: 'login',
+    type: "login",
     user: env.MAILGUN_USER,
-    pass: env.MAILGUN_PASS,
+    pass: env.MAILGUN_PASS
   },
-  debug: env.NODE_ENV === 'development',
+  debug: env.NODE_ENV === "development"
 };
 
 export const sendEmail = (message: Message) => {
   if (!message.from) {
-    message.from = { name: 'Sense.tw', address: 'no-reply@sense.tw' };
+    message.from = { name: "Sense.tw", address: "no-reply@sense.tw" };
   }
 
   if (!env.MAILGUN_USER || !env.MAILGUN_PASS) {
-    debug('skipped email without credential settings');
+    debug("skipped email without credential settings");
     return Promise.resolve();
   }
 
@@ -46,21 +45,19 @@ export const sendEmail = (message: Message) => {
   return new Promise((resolve, reject) => {
     transporter.verify((error, success) => {
       if (error) {
-        debug('SMTP server connection error');
+        debug("SMTP server connection error");
         return reject(error);
       }
 
       debug(`login as ${env.MAILGUN_USER}`);
 
-      transporter.sendMail(
-        message,
-        (error, info) => {
-          if (error) {
-            debug('error sending mail');
-            return reject(error);
-          }
-          resolve(info);
-        });
+      transporter.sendMail(message, (error, info) => {
+        if (error) {
+          debug("error sending mail");
+          return reject(error);
+        }
+        resolve(info);
+      });
     });
   });
 };

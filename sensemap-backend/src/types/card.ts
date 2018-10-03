@@ -1,9 +1,17 @@
-import { gql } from 'apollo-server';
-import { ID, Card, CardType, cardFields, cardDataFields, cardWithTargetFields, SenseObject } from './sql';
-import { MapFilter, updateMapUpdatedAt } from './map';
-import { objectsQuery } from './object';
-import * as R from 'ramda';
-import * as A from './oauth';
+import { gql } from "apollo-server";
+import {
+  ID,
+  Card,
+  CardType,
+  cardFields,
+  cardDataFields,
+  cardWithTargetFields,
+  SenseObject
+} from "./sql";
+import { MapFilter, updateMapUpdatedAt } from "./map";
+import { objectsQuery } from "./object";
+import * as R from "ramda";
+import * as A from "./oauth";
 
 export type CardFilter = {
   id?: ID;
@@ -17,7 +25,6 @@ export type CardFilter = {
   title?: string;
   url?: string;
   map?: MapFilter;
-
 };
 
 export type AllCardsArgs = {
@@ -31,33 +38,39 @@ export type AllCardsArgs = {
   //last?: number;
 };
 
-const writableFields = R.filter((name) => name !== 'quote', cardDataFields);
+const writableFields = R.filter(name => name !== "quote", cardDataFields);
 
 export function cardsQuery(db) {
-  return db.select(cardFields(db)).from('card');
+  return db.select(cardFields(db)).from("card");
 }
 
 export function cardsWithTargetQuery(db) {
-  return db.select(cardWithTargetFields(db)).from('card');
+  return db.select(cardWithTargetFields(db)).from("card");
 }
 
 export async function getCard(db, id: ID): Promise<Card | null> {
-  const c = await cardsQuery(db).where('id', id).first();
+  const c = await cardsQuery(db)
+    .where("id", id)
+    .first();
   return !!c ? c : null;
 }
 
-export async function getAllCards(db, args: AllCardsArgs = {}, query = cardsQuery): Promise<Card[]> {
+export async function getAllCards(
+  db,
+  args: AllCardsArgs = {},
+  query = cardsQuery
+): Promise<Card[]> {
   let q = query(db);
   if (args.filter) {
     const { map, tags, url } = args.filter;
     if (map) {
-      q = q.andWhere('mapId', map.id);
+      q = q.andWhere("mapId", map.id);
     }
     if (tags) {
       q = q.andWhereRaw('"tags" @@ ?', tags);
     }
     if (url) {
-      q = q.andWhere('url', url);
+      q = q.andWhere("url", url);
     }
   }
 
@@ -67,34 +80,42 @@ export async function getAllCards(db, args: AllCardsArgs = {}, query = cardsQuer
   if (args.skip) {
     q = q.offset(args.skip);
   }
-  if (typeof args.orderBy === 'string') {
-    q = q.orderBy(args.orderBy, 'desc')
+  if (typeof args.orderBy === "string") {
+    q = q.orderBy(args.orderBy, "desc");
   } else if (args.orderBy) {
-    q = q.orderBy(args.orderBy[0], args.orderBy[1])
+    q = q.orderBy(args.orderBy[0], args.orderBy[1]);
   }
   return q;
 }
 
 export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
-  return objectsQuery(db).where('cardId', id);
+  return objectsQuery(db).where("cardId", id);
 }
 
 export async function createCard(db, args): Promise<Card> {
   const fields = R.pick(cardDataFields, args);
-  const rows = await db('card').insert(fields).returning(cardFields(db));
+  const rows = await db("card")
+    .insert(fields)
+    .returning(cardFields(db));
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function deleteCard(db, id: ID): Promise<Card | null> {
-  const rows = await db('card').where('id', id).delete().returning(cardFields(db));
+  const rows = await db("card")
+    .where("id", id)
+    .delete()
+    .returning(cardFields(db));
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
 
 export async function updateCard(db, id: ID, args): Promise<Card | null> {
   const fields = R.pick(cardDataFields, args);
-  const rows = await db('card').where('id', id).update(fields).returning(cardFields(db));
+  const rows = await db("card")
+    .where("id", id)
+    .update(fields)
+    .returning(cardFields(db));
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -114,35 +135,33 @@ export const typeDefs = [
 
     extend type Mutation {
       createCard(
-        cardType: CardType,
-        description: String,
-        saidBy: String,
-        stakeholder: String,
-        summary: String,
-        quote: String,
-        tags: String,
-        title: String,
-        url: String,
-        mapId: ID,
+        cardType: CardType
+        description: String
+        saidBy: String
+        stakeholder: String
+        summary: String
+        quote: String
+        tags: String
+        title: String
+        url: String
+        mapId: ID
         objectsIds: [ID!]
       ): Card
       updateCard(
-        id: ID!,
-        cardType: CardType,
-        description: String,
-        saidBy: String,
-        stakeholder: String,
-        summary: String,
-        quote: String,
-        tags: String,
-        title: String,
-        url: String,
-        mapId: ID,
+        id: ID!
+        cardType: CardType
+        description: String
+        saidBy: String
+        stakeholder: String
+        summary: String
+        quote: String
+        tags: String
+        title: String
+        url: String
+        mapId: ID
         objectsIds: [ID!]
       ): Card
-      deleteCard(
-        id: ID!
-      ): Card
+      deleteCard(id: ID!): Card
     }
 
     enum CardType {
@@ -159,7 +178,7 @@ export const typeDefs = [
       updatedAt: DateTime!
       title: String
       summary: String
-      quote: String,
+      quote: String
       description: String
       tags: String
       saidBy: String
@@ -171,8 +190,7 @@ export const typeDefs = [
       map: Map @relation(name: "MapCards")
       owner: User
     }
-  `,
-
+  `
 ];
 
 export const resolvers = {
@@ -205,21 +223,41 @@ export const resolvers = {
     }
   },
   Card: {
-    id:          async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.id          : o,
-    createdAt:   async (o, _, { db }, info): Promise<Date>     => typeof(o) !== 'string' ? o.createdAt   : (await getCard(db, o)).createdAt,
-    updatedAt:   async (o, _, { db }, info): Promise<Date>     => typeof(o) !== 'string' ? o.updatedAt   : (await getCard(db, o)).updatedAt,
-    cardType:    async (o, _, { db }, info): Promise<CardType> => typeof(o) !== 'string' ? o.cardType    : (await getCard(db, o)).cardType,
-    description: async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.description : (await getCard(db, o)).description,
-    saidBy:      async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.saidBy      : (await getCard(db, o)).saidBy,
-    stakeholder: async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.stakeholder : (await getCard(db, o)).stakeholder,
-    summary:     async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.summary     : (await getCard(db, o)).summary,
-    quote:       async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.quote       : (await getCard(db, o)).quote,
-    tags:        async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.tags        : (await getCard(db, o)).tags,
-    title:       async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.title       : (await getCard(db, o)).title,
-    url:         async (o, _, { db }, info): Promise<string>   => typeof(o) !== 'string' ? o.url         : (await getCard(db, o)).url,
-    mapId:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.mapId       : (await getCard(db, o)).mapId,
-    map:         async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.map         : (await getCard(db, o)).mapId,
-    objects:     async (o, _, { db }, info): Promise<SenseObject[]> => typeof(o) !== 'string' ? o.objects : getObjectsForCard(db, o),
-    owner:       async (o, _, { db }, info): Promise<ID>       => typeof(o) !== 'string' ? o.owner       : (await getCard(db, o)).ownerId,
-  },
+    id: async (o, _, { db }, info): Promise<ID> =>
+      typeof o !== "string" ? o.id : o,
+    createdAt: async (o, _, { db }, info): Promise<Date> =>
+      typeof o !== "string" ? o.createdAt : (await getCard(db, o)).createdAt,
+    updatedAt: async (o, _, { db }, info): Promise<Date> =>
+      typeof o !== "string" ? o.updatedAt : (await getCard(db, o)).updatedAt,
+    cardType: async (o, _, { db }, info): Promise<CardType> =>
+      typeof o !== "string" ? o.cardType : (await getCard(db, o)).cardType,
+    description: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string"
+        ? o.description
+        : (await getCard(db, o)).description,
+    saidBy: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string" ? o.saidBy : (await getCard(db, o)).saidBy,
+    stakeholder: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string"
+        ? o.stakeholder
+        : (await getCard(db, o)).stakeholder,
+    summary: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string" ? o.summary : (await getCard(db, o)).summary,
+    quote: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string" ? o.quote : (await getCard(db, o)).quote,
+    tags: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string" ? o.tags : (await getCard(db, o)).tags,
+    title: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string" ? o.title : (await getCard(db, o)).title,
+    url: async (o, _, { db }, info): Promise<string> =>
+      typeof o !== "string" ? o.url : (await getCard(db, o)).url,
+    mapId: async (o, _, { db }, info): Promise<ID> =>
+      typeof o !== "string" ? o.mapId : (await getCard(db, o)).mapId,
+    map: async (o, _, { db }, info): Promise<ID> =>
+      typeof o !== "string" ? o.map : (await getCard(db, o)).mapId,
+    objects: async (o, _, { db }, info): Promise<SenseObject[]> =>
+      typeof o !== "string" ? o.objects : getObjectsForCard(db, o),
+    owner: async (o, _, { db }, info): Promise<ID> =>
+      typeof o !== "string" ? o.owner : (await getCard(db, o)).ownerId
+  }
 };
