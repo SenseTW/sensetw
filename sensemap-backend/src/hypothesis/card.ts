@@ -1,4 +1,3 @@
-
 export const translateAnnotation = env => card => {
   return {
     id: card.annotationID,
@@ -6,7 +5,7 @@ export const translateAnnotation = env => card => {
     target: card.target,
     links: {
       json: `${env.HYPOTHESIS_API_ROOT}/annotations/${card.annotationID}`,
-      incontext: `${env.HYPOTHESIS_API_ROOT}/annotations/${card.annotationID}`,
+      incontext: `${env.HYPOTHESIS_API_ROOT}/annotations/${card.annotationID}`
     },
     tags: card.tags.split(/,\s*/).filter(t => !!t),
     text: card.summary,
@@ -14,12 +13,12 @@ export const translateAnnotation = env => card => {
     uri: card.url,
     flagged: false,
     user_info: {
-      display_name: null,
+      display_name: null
     },
-    user: '',
+    user: "",
     hidden: false,
     permissions: {
-      read: [ 'group:__world__' ],
-    },
+      read: ["group:__world__"]
+    }
   };
-}
+};
