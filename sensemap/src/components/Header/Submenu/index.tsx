@@ -20,6 +20,7 @@ class Submenu extends React.PureComponent<Props> {
     return (
       <Menu tabular className={`${className} right`}>
         <Menu.Item
+          id={`${className}__annotation-btn`}
           className={`${className}__annotation`}
           as="a"
           href="https://via.sense.tw/"
@@ -39,12 +40,18 @@ class Submenu extends React.PureComponent<Props> {
         >
           <Dropdown.Menu>
             <Dropdown.Item
+              id={`${className}__map-detail-btn`}
               disabled={SM.isEmpty(map)}
               onClick={() => onEditMap && onEditMap(map)}
             >
               MAP Detail
             </Dropdown.Item>
-            <Dropdown.Item disabled>MEMBER</Dropdown.Item>
+            <Dropdown.Item
+              id={`${className}__map-member-btn`}
+              disabled
+            >
+              MEMBER
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </Menu>
