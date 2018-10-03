@@ -15,11 +15,6 @@ steps:
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap:$COMMIT_SHA']
 - name: 'ubuntu'
   args: ['bash', './builder/cloudbuild/config/gen.sh', "release"]
-- name: 'gcr.io/cloud-builders/kubectl'
-  args:
-  - 'apply'
-  - '-f'
-  - '/workspace/env.yaml'
   env:
   - 'BRANCH_NAME=${BRANCH_NAME}'
   - 'COMMIT_SHA=${COMMIT_SHA}'
@@ -34,6 +29,12 @@ steps:
   - '_GS_BACKUP_BUCKET=${_GS_BACKUP_BUCKET}'
   - '_REDIS_HOST=${_REDIS_HOST}'
   - '_REDIS_PORT=${_REDIS_PORT}'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - '/workspace/env.yaml'
+  env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
 - name: 'gcr.io/cloud-builders/kubectl'
