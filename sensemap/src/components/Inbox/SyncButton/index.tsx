@@ -3,6 +3,7 @@ import { Button } from 'semantic-ui-react';
 import { ActionProps } from '../../../types';
 
 interface StateFromProps {
+  id?: string;
   className?: string;
   mapId: string;
 }
@@ -11,8 +12,9 @@ type Props = StateFromProps & ActionProps;
 
 type ClickEvent = React.SyntheticEvent<HTMLElement>;
 
-const SyncButton = ({ className = '', mapId, actions: act }: Props) => (
+const SyncButton = ({ id, className = '', mapId, actions: act }: Props) => (
   <Button
+    id={id}
     basic
     icon="refresh"
     className={`inbox__sync-btn ${className}`}
