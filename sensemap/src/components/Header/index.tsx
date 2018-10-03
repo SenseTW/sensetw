@@ -31,10 +31,15 @@ class Header extends React.PureComponent<Props> {
     return (
       <div className="sense-header">
         <Menu inverted>
-          <Menu.Item as={Link} to={R.index}>
+          <Menu.Item
+            id="sense-header__home-btn"
+            as={Link}
+            to={R.index}
+          >
             <img src={logo} />
           </Menu.Item>
           <Menu.Item
+            id="sense-header__about-btn"
             as="a"
             href="https://about.sense.tw/"
             target="_blank"
@@ -43,6 +48,7 @@ class Header extends React.PureComponent<Props> {
             About
           </Menu.Item>
           <Menu.Item
+            id="sense-header__dashboard-btn"
             as={Link}
             to={R.mapList}
           >
@@ -50,6 +56,7 @@ class Header extends React.PureComponent<Props> {
           </Menu.Item>
           <Menu.Menu position="right">
             <Menu.Item
+              id="sense-header__help-btn"
               as="a"
               href="https://help.sense.tw/"
               target="_blank"

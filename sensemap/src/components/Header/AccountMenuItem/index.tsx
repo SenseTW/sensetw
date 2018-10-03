@@ -46,12 +46,14 @@ class AccountMenuItem extends React.Component<Props> {
             >
                 <Dropdown.Menu>
                     <Dropdown.Item
+                        id="sense-header__settings-btn"
                         as={Link}
                         to={R.settings}
                     >
                         Settings
                     </Dropdown.Item>
                     <Dropdown.Item
+                        id="sense-header__logout-btn"
                         onClick={e => acts.account.logoutRequest()}
                     >
                         Logout
