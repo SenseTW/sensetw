@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Line } from 'react-konva';
+import { Group, Line } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
 import * as G from '../../../graphics/point';
@@ -21,41 +21,61 @@ export interface Props extends TransformerForProps {
   // tslint:enable
 }
 
-export function Edge(props: Props) {
-  const from = G.toTuple(props.transform(props.from));
-  const to = G.toTuple(props.transform(props.to));
-  const data        = props.data;
-  const selected    = !!props.selected;
-  const onSelect    = props.onSelect    || noop;
-  const onDeselect  = props.onDeselect  || noop;
-  const onMouseOver = props.onMouseOver || noop;
-  const onMouseOut  = props.onMouseOut  || noop;
-  const onOpen      = props.onOpen      || noop;
+class Edge extends React.PureComponent<Props> {
+  static style = {
+    color: '#000000',
+    touchWidth: 24,
+    hover: {
+      color: '#0277bd',
+    },
+    selected: {
+      color: '#3ad8fa',
+    },
+  };
 
-  return (
-    <Selectable
-      selected={selected}
-      onSelect={(e) => {
-        e.cancelBubble = true;
-        onSelect(e, data);
-      }}
-      onDeselect={(e) => {
-        e.cancelBubble = true;
-        onDeselect(e, data);
-      }}
-    >
-      <Line
-        points={[...from, ...to]}
-        stroke="black"
-        onDblClick={(e) => {
+  render () {
+    const { transform, data, selected } = this.props;
+    const style = Edge.style;
+    const from = G.toTuple(transform(this.props.from));
+    const to = G.toTuple(transform(this.props.to));
+    const onSelect    = this.props.onSelect    || noop;
+    const onDeselect  = this.props.onDeselect  || noop;
+    const onMouseOver = this.props.onMouseOver || noop;
+    const onMouseOut  = this.props.onMouseOut  || noop;
+    const onOpen      = this.props.onOpen      || noop;
+
+    return (
+      <Selectable
+        selected={selected}
+        onSelect={(e) => {
+          e.cancelBubble = true;
           onSelect(e, data);
-          onOpen(e, data);
         }}
-        onMouseOver={(e) => onMouseOver(e, data)}
-        onMouseOut={(e) => onMouseOut(e, data)}
-      />
-    </Selectable>
-  );
+        onDeselect={(e) => {
+          e.cancelBubble = true;
+          onDeselect(e, data);
+        }}
+      >
+        <Group>
+          <Line
+            points={[...from, ...to]}
+            stroke={selected ? style.selected.color : style.color}
+          />
+          <Line
+            points={[...from, ...to]}
+            stroke="transparent"
+            strokeWidth={style.touchWidth}
+            onDblClick={(e) => {
+              onSelect(e, data);
+              onOpen(e, data);
+            }}
+            onMouseOver={(e) => onMouseOver(e, data)}
+            onMouseOut={(e) => onMouseOut(e, data)}
+          />
+        </Group>
+      </Selectable>
+    );
+  }
 }
 
 export default Edge;
