@@ -63,6 +63,10 @@ data:
             return 200;
         }
 
+        location = / {
+          rewrite / /index.html ;
+        }
+
         location = /index.html {
           add_header 'Cache-Control' 'no-cache, no-store, max-age=0';
           expires off;
@@ -71,14 +75,56 @@ data:
         location = /service-worker.js {
           add_header 'Cache-Control' 'no-cache, no-store, max-age=0';
           expires off;
+          break;
+        }
+
+        location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff2)$ {
+          add_header 'Cache-Control' 'public, max-age=604800';
         }
 
         location / {
           if ($http_x_forwarded_proto != "https") {
               rewrite ^(.*)$ https://$host$1 permanent;
           }
-          add_header 'Cache-Control' 'public, max-age=604800';
-          try_files $uri /index.html;
+          try_files $uri @prerender;
+        }
+
+        location @prerender {
+          set $prerender 0;
+          if ($http_user_agent ~* "googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator") {
+            set $prerender 1;
+          }
+          if ($args ~ "_escaped_fragment_") {
+            set $prerender 1;
+          }
+          if ($http_user_agent ~ "Prerender") {
+            set $prerender 0;
+          }
+          if ($uri ~* "\.(js|css|xml|less|png|jpg|jpeg|gif|pdf|doc|txt|ico|rss|zip|mp3|rar|exe|wmv|doc|avi|ppt|mpg|mpeg|tif|wav|mov|psd|ai|xls|mp4|m4a|swf|dat|dmg|iso|flv|m4v|torrent|ttf|woff|svg|eot)") {
+            set $prerender 0;
+          }
+
+          proxy_buffer_size 512k;
+          proxy_buffers 8 512k;
+          proxy_busy_buffers_size 512k;
+          proxy_temp_file_write_size 512k;
+          proxy_http_version 1.1;
+          proxy_connect_timeout 30s;
+          proxy_send_timeout 30s;
+          proxy_read_timeout 30s;
+          proxy_redirect off;
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-Server $http_host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Request-Start "t=${msec}";
+
+          if ($prerender = 1) {
+            proxy_pass http://web;
+          }
+          if ($prerender = 0) {
+            add_header 'Cache-Control' 'no-cache, no-store, max-age=0';
+            rewrite .* /index.html break;
+          }
         }
       }
 
