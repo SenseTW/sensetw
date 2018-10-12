@@ -21,6 +21,7 @@ import * as S from '../../types/stage';
 import * as G from '../../graphics/point';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
 import * as qs from 'qs';
+import { findIndex, equals } from 'ramda';
 
 export interface StateFromProps {
   selection:   State['selection'];
@@ -228,12 +229,32 @@ export class Map extends React.Component<Props, MapState> {
 
     if (isMultiSelectable) {
       acts.editor.focusObject(F.focusNothing());
+      // TODO: remove the deprecated action
       acts.selection.addObjectToSelection(o.id);
+      switch (o.objectType) {
+        case ObjectType.BOX:
+          acts.selection.selectMapBox(o.id, o.data);
+          break;
+        case ObjectType.CARD:
+          acts.selection.selectMapCard(o.id, o.data);
+          break;
+        default:
+      }
       history.replace('?');
     } else {
       acts.selection.clearSelection();
       acts.editor.focusObject(O.toFocus(o));
+      // TODO: remove the deprecated action
       acts.selection.addObjectToSelection(o.id);
+      switch (o.objectType) {
+        case ObjectType.BOX:
+          acts.selection.selectMapBox(o.id, o.data);
+          break;
+        case ObjectType.CARD:
+          acts.selection.selectMapCard(o.id, o.data);
+          break;
+        default:
+      }
       history.replace(`?object=${o.id}`);
     }
   }
@@ -243,13 +264,41 @@ export class Map extends React.Component<Props, MapState> {
     const acts = this.props.actions;
     const selection = this.props.selection;
 
+    // TODO: remove the deprecated action
     acts.selection.removeObjectFromSelection(o.id);
+    switch (o.objectType) {
+      case ObjectType.BOX:
+        acts.selection.unselectMapBox(o.id, o.data);
+        break;
+      case ObjectType.CARD:
+        acts.selection.unselectMapCard(o.id, o.data);
+        break;
+      default:
+    }
     history.replace('?');
     if (SL.count(selection) === 1) {
       acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
     } else {
       acts.editor.focusObject(F.focusNothing());
     }
+  }
+
+  handleEdgeSelect = (e: KonvaEvent.Mouse, edge: EdgeData) => {
+    const acts = this.props.actions;
+    const isMultiSelectable = I.isMultiSelectable(this.props.input);
+
+    if (isMultiSelectable) {
+      acts.selection.selectMapEdge(edge.id);
+    } else {
+      acts.selection.clearSelection();
+      acts.selection.selectMapEdge(edge.id);
+    }
+  }
+
+  handleEdgeDeselect = (e: KonvaEvent.Mouse, edge: EdgeData) => {
+    const acts = this.props.actions;
+
+    acts.selection.unselectMapEdge(edge.id);
   }
 
   isAltLayout(): boolean {
@@ -428,14 +477,24 @@ export class Map extends React.Component<Props, MapState> {
     }
   }
 
-  renderEdge(e: EdgeData) {
-    const edgeProps = {
-      from: CS.getObject(this.props.inScope, e.from),
-      to: CS.getObject(this.props.inScope, e.to),
-      transform: this.state.transform,
-      inverseTransform: this.state.inverseTransform,
-    };
-    return <Edge key={e.id} {...edgeProps} />;
+  renderEdge(edge: EdgeData) {
+    const { selection } = this.props;
+    const i = findIndex(equals(edge.id), selection.mapEdges);
+    const selected = i !== -1;
+
+    return (
+      <Edge
+        key={edge.id}
+        transform={this.state.transform}
+        inverseTransform={this.state.inverseTransform}
+        from={CS.getObject(this.props.inScope, edge.from)}
+        to={CS.getObject(this.props.inScope, edge.to)}
+        data={edge}
+        selected={selected}
+        onSelect={this.handleEdgeSelect}
+        onDeselect={this.handleEdgeDeselect}
+      />
+    );
   }
 }
 
