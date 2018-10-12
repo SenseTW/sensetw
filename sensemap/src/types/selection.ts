@@ -174,6 +174,22 @@ export const get = (selection: State, index: number): ObjectID =>
 export const count = (selection: State): number =>
   selection.objects.length;
 
+export const isMapObjectSelected = (selection: State, objectId: ObjectID): boolean =>
+  findIndex((s) => s.objectId === objectId, selection.mapBoxes) !== -1 ||
+  findIndex((s) => s.objectId === objectId, selection.mapCards) !== -1;
+
+export const isMapBoxSelected = (selection: State, boxId: BoxID): boolean =>
+  findIndex((s) => s.boxId === boxId, selection.mapBoxes) !== -1;
+
+export const isMapCardSelected = (selection: State, cardId: CardID): boolean =>
+  findIndex((s) => s.cardId === cardId, selection.mapCards) !== -1;
+
+export const isMapEdgeSelected = (selection: State, edgeId: EdgeID): boolean =>
+  findIndex((eid) => eid === edgeId, selection.mapEdges) !== -1;
+
+export const isInboxCardSelected = (selection: State, cardId: CardID): boolean =>
+  findIndex((cid) => cid === cardId, selection.inboxCards) !== -1;
+
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
     case ADD_OBJECT_TO_SELECTION: {
