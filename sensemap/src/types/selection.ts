@@ -283,6 +283,10 @@ export const reducer = (state: State = initial, action: Action): State => {
       return {
         ...state,
         objects: [],
+        mapBoxes: [],
+        mapCards: [],
+        mapEdges: [],
+        inboxCards: [],
       };
     }
     default: {
