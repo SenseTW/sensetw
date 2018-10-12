@@ -41,7 +41,13 @@ class CardActions extends React.PureComponent<Props, OwnState> {
     );
 
     return (
-      <div className="card-actions">
+      <div
+        className="card-actions"
+        onClick={() => {
+          acts.selection.clearSelection();
+          acts.selection.selectInboxCard(card.id);
+        }}
+      >
         <Button
           icon="edit"
           onClick={() => {
