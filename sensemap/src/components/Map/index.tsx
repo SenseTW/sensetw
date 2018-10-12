@@ -21,7 +21,6 @@ import * as S from '../../types/stage';
 import * as G from '../../graphics/point';
 import { NodeType, Event as KonvaEvent } from '../../types/konva';
 import * as qs from 'qs';
-import { findIndex, equals } from 'ramda';
 
 export interface StateFromProps {
   selection:   State['selection'];
@@ -479,8 +478,6 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(edge: EdgeData) {
     const { selection } = this.props;
-    const i = findIndex(equals(edge.id), selection.mapEdges);
-    const selected = i !== -1;
 
     return (
       <Edge
@@ -490,7 +487,7 @@ export class Map extends React.Component<Props, MapState> {
         from={CS.getObject(this.props.inScope, edge.from)}
         to={CS.getObject(this.props.inScope, edge.to)}
         data={edge}
-        selected={selected}
+        selected={SL.isMapEdgeSelected(selection, edge.id)}
         onSelect={this.handleEdgeSelect}
         onDeselect={this.handleEdgeDeselect}
       />
