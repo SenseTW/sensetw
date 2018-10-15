@@ -6,7 +6,7 @@ exports.seed = function(knex: Knex): Promise<any> {
       {
         id: "09f3bf62-7658-4b3e-aec0-559b55c033a6",
         title: "foo",
-        cardType: "NORMAL",
+        cardType: "INFO",
         url: "http://example.com",
         mapId: "b2f73daf-e767-4d8d-9506-52589d4fd039",
         ownerId: "dd776858-52f4-48b4-b40c-2b9330409513"
@@ -14,14 +14,14 @@ exports.seed = function(knex: Knex): Promise<any> {
       {
         id: "61cfcfc1-1336-4f55-93ba-446bb8eedd4f",
         title: "bar",
-        cardType: "QUESTION",
+        cardType: "PROBLEM",
         mapId: "b2f73daf-e767-4d8d-9506-52589d4fd039",
         tags: "foo,bar,baz"
       },
       {
         id: "056dc833-7845-4415-bd32-3abee8705527",
         title: "baz",
-        cardType: "ANSWER",
+        cardType: "SOLUTION",
         url: "http://example.com",
         mapId: "63a544b6-36cf-4344-b370-32d451a35b70"
       }
