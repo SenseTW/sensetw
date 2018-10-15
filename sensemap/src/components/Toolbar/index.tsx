@@ -46,25 +46,6 @@ interface OwnState {
   open: boolean;
 }
 
-const selectedCardsAndBoxes:
-  (props: Props) => { cards: T.ObjectID[], boxes: T.ObjectID[] } =
-  props => props.selection.objects.reduce(
-    (acc, id) => {
-      switch (CS.getObject(props.senseObject, id).objectType) {
-        case T.ObjectType.CARD: {
-          return { ...acc, cards: [ ...acc.cards, id ] };
-        }
-        case T.ObjectType.BOX: {
-          return { ...acc, boxes: [ ...acc.boxes, id ] };
-        }
-        default: {
-          return acc;
-        }
-      }
-    },
-    { cards: [], boxes: [] }
-  );
-
 class Toolbar extends React.PureComponent<Props, OwnState> {
   state = {
     open: false,
@@ -108,11 +89,12 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
 
   canCreateEdge(): boolean {
     const { selection, isAuthenticated } = this.props;
+    const ids = SL.selectedObjects(selection);
 
     return (
       isAuthenticated
-      && SL.count(selection) === 2
-      && this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) === null
+      && ids.length === 2
+      && this.findEdgeID(ids[0], ids[1]) === null
     );
   }
 
@@ -122,25 +104,28 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     }
     const map  = this.props.senseMap.map;
     const selection = this.props.selection;
-    const from = SL.get(selection, 0);
-    const to   = SL.get(selection, 1);
+    const ids = SL.selectedObjects(selection);
+    const from = ids[0];
+    const to   = ids[1];
     this.props.actions.senseObject.createEdge(map, from, to);
   }
 
   canRemoveEdge(): boolean {
     const { selection, isAuthenticated } = this.props;
+    const ids = SL.selectedObjects(selection);
 
     if (!isAuthenticated) { return false; }
-    if (SL.count(selection) !== 2) { return false; }
+    if (ids.length !== 2) { return false; }
 
-    return this.findEdgeID(SL.get(selection, 0), SL.get(selection, 1)) !== null;
+    return this.findEdgeID(ids[0], ids[1]) !== null;
   }
 
   handleRemoveEdge(): void {
     const map  = this.props.senseMap.map;
     const selection = this.props.selection;
-    const from = SL.get(selection, 0);
-    const to   = SL.get(selection, 1);
+    const ids = SL.selectedObjects(selection);
+    const from = ids[0];
+    const to   = ids[1];
     const r    = this.findEdgeID(from, to);
     if (r === null) {
       return;
@@ -149,31 +134,31 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
   }
 
   canCopy(): boolean {
-    const { isAuthenticated } = this.props;
+    const { isAuthenticated, selection } = this.props;
     if (!isAuthenticated) { return false; }
 
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    return cards.length + boxes.length === 1;
+    const { mapBoxes, mapCards } = selection;
+    return mapBoxes.length + mapCards.length === 1;
   }
 
   canDeleteCard(): boolean {
-    const { isAuthenticated } = this.props;
+    const { isAuthenticated, selection } = this.props;
     if (!isAuthenticated) { return false; }
 
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    return cards.length > 0 || boxes.length > 0;
+    const { mapBoxes, mapCards } = selection;
+    return mapBoxes.length > 0 || mapCards.length > 0;
   }
 
   async handleDelete() {
-    const { actions: acts } = this.props;
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
+    const { actions: acts, selection } = this.props;
+    const { mapBoxes, mapCards } = selection;
     try {
-      if (boxes.length > 0) {
+      if (mapBoxes.length > 0) {
         this.setState({ open: true });
-      } else if (cards.length > 0) {
+      } else if (mapCards.length > 0) {
         // remove card container objects
         // we don't remove cards and leave them in the inbox
-        acts.senseObject.removeObjects(cards);
+        acts.senseObject.removeObjects(mapCards.map(SL.getObjectId));
         acts.editor.focusObject(F.focusNothing());
       }
     } catch (err) {
@@ -183,11 +168,11 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
   }
 
   getBoxedCardCount(): number {
-    const { senseObject } = this.props;
-    const { boxes } = selectedCardsAndBoxes(this.props);
-    return boxes.reduce(
-      (acc, objID) => {
-        const obj = CS.getObject(senseObject, objID);
+    const { senseObject, selection } = this.props;
+    const { mapBoxes } = selection;
+    return mapBoxes.reduce(
+      (acc, { objectId }) => {
+        const obj = CS.getObject(senseObject, objectId);
         const box = CS.getBox(senseObject, obj.data as T.BoxID);
         return acc + Object.keys(box.contains).length;
       },
@@ -196,18 +181,17 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
   }
 
   async doDelete() {
-    const { actions: acts, senseObject } = this.props;
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    const boxIDList =
-      boxes.map(objID => CS.getObject(senseObject, objID).data as T.BoxID);
+    const { actions: acts, selection } = this.props;
+    const { mapBoxes, mapCards } = selection;
+    const boxIDList = mapBoxes.map(SL.getBoxId);
     try {
-      if (cards.length > 0) {
+      if (mapCards.length > 0) {
         // remove card container objects and cards remain in the inbox
-        acts.senseObject.removeObjects(cards);
+        acts.senseObject.removeObjects(mapCards.map(SL.getObjectId));
         acts.editor.focusObject(F.focusNothing());
       }
       // remove box container objects
-      await acts.senseObject.removeObjects(boxes);
+      await acts.senseObject.removeObjects(mapBoxes.map(SL.getObjectId));
       // remove boxes
       await acts.senseObject.removeBoxes(boxIDList);
     } catch (err) {
@@ -218,15 +202,15 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
   }
 
   canBatchTag(): boolean {
-    const { isAuthenticated } = this.props;
+    const { isAuthenticated, selection } = this.props;
     if (!isAuthenticated) { return false; }
 
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    return cards.length + boxes.length > 1;
+    const ids = SL.selectedObjects(selection);
+    return ids.length > 1;
   }
 
   canAddCard(): boolean {
-    const { isAuthenticated } = this.props;
+    const { isAuthenticated, selection } = this.props;
 
     if (!isAuthenticated) { return false; }
 
@@ -234,23 +218,24 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
       return false;
     }
 
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    return cards.length >= 1 && boxes.length === 1;
+    const { mapBoxes, mapCards } = selection;
+    return mapCards.length >= 1 && mapBoxes.length === 1;
   }
 
   handleAddCard(): void {
     if (!this.canAddCard()) {
       return;
     }
-    const { cards, boxes } = selectedCardsAndBoxes(this.props);
-    const object = CS.getObject(this.props.senseObject, boxes[0]);
-    this.props.actions.senseObject.addCardsToBox(cards, object.data);
+    const { mapBoxes, mapCards } = this.props.selection;
+    const object = CS.getObject(this.props.senseObject, mapBoxes[0].objectId);
+    const cardIds = mapCards.map(SL.getObjectId);
+    this.props.actions.senseObject.addCardsToBox(cardIds, object.data);
     return;
   }
 
   canOpenBox(): boolean {
-    const { boxes } = selectedCardsAndBoxes(this.props);
-    return boxes.length === 1;
+    const { mapBoxes } = this.props.selection;
+    return mapBoxes.length === 1;
   }
 
   handleOpenBox = (): void => {
@@ -259,10 +244,11 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
   }
 
   canRemoveCard(): boolean {
+    const ids = SL.selectedObjects(this.props.selection);
     return (
       this.props.isAuthenticated
       && this.props.senseMap.scope.type === T.MapScopeType.BOX
-      && SL.count(this.props.selection) >= 1
+      && ids.length >= 1
     );
   }
 
@@ -272,7 +258,7 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     }
     switch (this.props.senseMap.scope.type) {
       case T.MapScopeType.BOX: {
-        const cards = this.props.selection.objects;
+        const cards = this.props.selection.mapCards.map(SL.getObjectId);
         const box   = this.props.senseMap.scope.box;
         if (!box) {
           throw Error('This cannot happen: map scope has type BOX with null box ID.');
@@ -340,7 +326,7 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     const { actions: acts, editor, senseObject, senseMap, selection } = this.props;
     const { open } = this.state;
     const mid = senseMap.map;
-    const oid = SL.get(selection, 0);
+    const oid = SL.selectedObjects(selection)[0];
     const obj = CS.getObject(senseObject, oid);
     const bid = obj.data;
     const canCreateCard = this.canCreateCard();

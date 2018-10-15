@@ -36,25 +36,6 @@ const remove
       : [...xs.slice(0, i), ...xs.slice(i + 1)];
   };
 
-// old actions
-const ADD_OBJECT_TO_SELECTION = 'ADD_OBJECT_TO_SELECTION';
-const addObjectToSelection = (id: ObjectID) => ({
-  type: ADD_OBJECT_TO_SELECTION as typeof ADD_OBJECT_TO_SELECTION,
-  payload: id,
-});
-
-const REMOVE_OBJECT_FROM_SELECTION = 'REMOVE_OBJECT_FROM_SELECTION';
-const removeObjectFromSelection = (id: ObjectID) => ({
-  type: REMOVE_OBJECT_FROM_SELECTION as typeof REMOVE_OBJECT_FROM_SELECTION,
-  payload: id,
-});
-
-const TOGGLE_OBJECT_SELECTION = 'TOGGLE_OBJECT_SELECTION';
-const toggleObjectSelection = (id: ObjectID) => ({
-  type: TOGGLE_OBJECT_SELECTION as typeof TOGGLE_OBJECT_SELECTION,
-  payload: id,
-});
-
 // Selectable items in this application:
 //   * map objects:
 //     * boxes
@@ -124,11 +105,6 @@ const clearSelection = () => ({
 });
 
 export const actions = {
-  // old actions
-  addObjectToSelection,
-  removeObjectFromSelection,
-  toggleObjectSelection,
-  // new actions
   selectMapBox,
   unselectMapBox,
   selectMapCard,
@@ -144,9 +120,6 @@ export const actions = {
 export type Action = ActionUnion<typeof actions>;
 
 export type State = {
-  // old selections
-  objects: ObjectID[],
-  // new selections
   mapBoxes: { objectId: ObjectID, boxId: BoxID }[],
   mapCards: { objectId: ObjectID, cardId: CardID }[],
   mapEdges: EdgeID[],
@@ -155,9 +128,6 @@ export type State = {
 };
 
 export const initial: State = {
-  // old selections
-  objects: [],
-  // new selections
   mapBoxes: [],
   mapCards: [],
   mapEdges: [],
@@ -165,14 +135,12 @@ export const initial: State = {
   boundingBox: emptyBoundingBox,
 };
 
-export const contains = (selection: State, id: ObjectID): boolean =>
-  selection.objects.indexOf(id) >= 0;
+export const getObjectId = ({ objectId }: { objectId: ObjectID }) => objectId;
 
-export const get = (selection: State, index: number): ObjectID =>
-  selection.objects[index];
+export const getBoxId = ({ boxId }: { boxId: BoxID }) => boxId;
 
-export const count = (selection: State): number =>
-  selection.objects.length;
+export const selectedObjects = (selection: State): ObjectID[] =>
+  [...selection.mapBoxes, ...selection.mapCards].map(getObjectId);
 
 export const isMapObjectSelected = (selection: State, objectId: ObjectID): boolean =>
   findIndex((s) => s.objectId === objectId, selection.mapBoxes) !== -1 ||
@@ -192,41 +160,6 @@ export const isInboxCardSelected = (selection: State, cardId: CardID): boolean =
 
 export const reducer = (state: State = initial, action: Action): State => {
   switch (action.type) {
-    case ADD_OBJECT_TO_SELECTION: {
-      const id = action.payload;
-      if (state.objects.indexOf(id) >= 0) {
-        return state;
-      } else {
-        return { ...state, objects: [...state.objects, id] };
-      }
-    }
-    case REMOVE_OBJECT_FROM_SELECTION: {
-      const id = action.payload;
-      const i = state.objects.indexOf(id);
-      if (i >= 0) {
-        return {
-          ...state,
-          objects: [...state.objects.slice(0, i), ...state.objects.slice(i + 1)],
-        };
-      } else {
-        return state;
-      }
-    }
-    case TOGGLE_OBJECT_SELECTION: {
-      const id = action.payload;
-      const i = state.objects.indexOf(id);
-      if (i >= 0) {
-        return {
-          ...state,
-          objects: [...state.objects.slice(0, i), ...state.objects.slice(i + 1)],
-        };
-      } else {
-        return {
-          ...state,
-          objects: [...state.objects, id],
-        };
-      }
-    }
     case SELECT_MAP_BOX: {
       return {
         ...state,
@@ -282,7 +215,6 @@ export const reducer = (state: State = initial, action: Action): State => {
     case CLEAR_SELECTION: {
       return {
         ...state,
-        objects: [],
         mapBoxes: [],
         mapCards: [],
         mapEdges: [],
