@@ -155,10 +155,11 @@ const toNormalMode =
     // recover the old viewport
     const state = getState();
     const { selection, senseObject, viewport } = state;
+    const ids = SL.selectedObjects(selection);
     dispatch(V.actions.load());
-    if (SL.count(selection) !== 0) {
+    if (ids.length !== 0) {
       // get the selected objects
-      const objects = selection.objects.map(id => CS.getObject(senseObject, id));
+      const objects = ids.map((id) => CS.getObject(senseObject, id));
       // caculate the bounding box
       const box = D.flatten(objects, D.AnchorType.CENTER);
       // set the new viewport
