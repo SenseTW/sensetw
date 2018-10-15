@@ -72,15 +72,24 @@ export class Map extends React.Component<Props, MapState> {
 
   // center to the queried object
   async componentDidMount() {
-    const { actions: acts, promisedObjects } = this.props;
+    const { actions: acts, promisedObjects, senseObject } = this.props;
     const query = location.search.substr(1);
     type Query = { object: string };
     const { object: oid } = qs.parse(query) as Query;
+    const object = CS.getObject(senseObject, oid);
 
     if (oid) {
       await promisedObjects;
       acts.viewport.panToObject(oid);
-      acts.selection.toggleObjectSelection(oid);
+      switch (object.objectType) {
+        case ObjectType.BOX:
+          acts.selection.selectMapBox(object.id, object.data);
+          break;
+        case ObjectType.CARD:
+          acts.selection.selectMapCard(object.id, object.data);
+          break;
+        default:
+      }
     }
   }
 
@@ -159,7 +168,8 @@ export class Map extends React.Component<Props, MapState> {
     const prevDragPoint = this.state.inverseTransform({ x, y });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
     const dy = prevDragPoint.y - this.state.prevDragPoint.y;
-    const objects = this.props.selection.objects.map(id => {
+    const ids = SL.selectedObjects(this.props.selection);
+    const objects = ids.map(id => {
       const o = CS.getObject(this.props.senseObject, id);
       return { ...o, x: o.x + dx, y: o.y + dy };
     }).reduce((a, o) => { a[o.id] = o; return a; }, {});
@@ -171,7 +181,8 @@ export class Map extends React.Component<Props, MapState> {
     const prevDragPoint = this.state.inverseTransform({ x, y });
     const dx = prevDragPoint.x - this.state.prevDragPoint.x;
     const dy = prevDragPoint.y - this.state.prevDragPoint.y;
-    this.props.selection.objects.forEach(id => {
+    const ids = SL.selectedObjects(this.props.selection);
+    ids.forEach(id => {
       const o = CS.getObject(this.props.senseObject, id);
       this.props.actions.senseObject.moveObject(id, o.x + dx, o.y + dy);
     });
@@ -228,8 +239,6 @@ export class Map extends React.Component<Props, MapState> {
 
     if (isMultiSelectable) {
       acts.editor.focusObject(F.focusNothing());
-      // TODO: remove the deprecated action
-      acts.selection.addObjectToSelection(o.id);
       switch (o.objectType) {
         case ObjectType.BOX:
           acts.selection.selectMapBox(o.id, o.data);
@@ -243,8 +252,6 @@ export class Map extends React.Component<Props, MapState> {
     } else {
       acts.selection.clearSelection();
       acts.editor.focusObject(O.toFocus(o));
-      // TODO: remove the deprecated action
-      acts.selection.addObjectToSelection(o.id);
       switch (o.objectType) {
         case ObjectType.BOX:
           acts.selection.selectMapBox(o.id, o.data);
@@ -263,8 +270,6 @@ export class Map extends React.Component<Props, MapState> {
     const acts = this.props.actions;
     const selection = this.props.selection;
 
-    // TODO: remove the deprecated action
-    acts.selection.removeObjectFromSelection(o.id);
     switch (o.objectType) {
       case ObjectType.BOX:
         acts.selection.unselectMapBox(o.id, o.data);
@@ -275,8 +280,9 @@ export class Map extends React.Component<Props, MapState> {
       default:
     }
     history.replace('?');
-    if (SL.count(selection) === 1) {
-      acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, SL.get(selection, 0))));
+    const ids = SL.selectedObjects(selection);
+    if (ids.length === 1) {
+      acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, ids[0])));
     } else {
       acts.editor.focusObject(F.focusNothing());
     }
@@ -380,7 +386,7 @@ export class Map extends React.Component<Props, MapState> {
   renderObject(o: ObjectData) {
     const acts = this.props.actions;
     const isAuthenticated = this.props.isAuthenticated;
-    const isSelected = SL.contains(this.props.selection, o.id);
+    const isSelected = SL.isMapObjectSelected(this.props.selection, o.id);
     const useAltLayout = this.isAltLayout();
     const draggingProps = isAuthenticated
       ? {
