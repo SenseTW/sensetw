@@ -63,7 +63,7 @@ test("create/update/delete annotation /w card", async () => {
     target: [],
     card: {
       title: "foo",
-      cardType: "NORMAL",
+      cardType: "INFO",
       url: "http://example.com",
       mapId: maps[0].id
     }
