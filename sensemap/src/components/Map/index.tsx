@@ -13,8 +13,6 @@ import { Edge as EdgeData, ObjectType, ObjectData, CardData, State, ActionProps 
 import { ObjectMap } from '../../types/sense/has-id';
 import * as I from '../../types/input';
 import * as OE from '../../types/object-editor';
-import * as O from '../../types/sense/object';
-import * as F from '../../types/sense/focus';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
 import * as S from '../../types/stage';
@@ -238,7 +236,6 @@ export class Map extends React.Component<Props, MapState> {
     const isMultiSelectable = I.isMultiSelectable(this.props.input);
 
     if (isMultiSelectable) {
-      acts.editor.focusObject(F.focusNothing());
       switch (o.objectType) {
         case ObjectType.BOX:
           acts.selection.selectMapBox(o.id, o.data);
@@ -251,7 +248,6 @@ export class Map extends React.Component<Props, MapState> {
       history.replace('?');
     } else {
       acts.selection.clearSelection();
-      acts.editor.focusObject(O.toFocus(o));
       switch (o.objectType) {
         case ObjectType.BOX:
           acts.selection.selectMapBox(o.id, o.data);
@@ -268,7 +264,6 @@ export class Map extends React.Component<Props, MapState> {
   handleObjectDeselect = (e: KonvaEvent.Mouse, o: ObjectData) => {
     const history = this.props.history;
     const acts = this.props.actions;
-    const selection = this.props.selection;
 
     switch (o.objectType) {
       case ObjectType.BOX:
@@ -280,12 +275,6 @@ export class Map extends React.Component<Props, MapState> {
       default:
     }
     history.replace('?');
-    const ids = SL.selectedObjects(selection);
-    if (ids.length === 1) {
-      acts.editor.focusObject(O.toFocus(CS.getObject(this.props.senseObject, ids[0])));
-    } else {
-      acts.editor.focusObject(F.focusNothing());
-    }
   }
 
   handleEdgeSelect = (e: KonvaEvent.Mouse, edge: EdgeData) => {

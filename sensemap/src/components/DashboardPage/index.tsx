@@ -59,7 +59,10 @@ class DashboardPage extends React.Component<Props, OwnState> {
                   disabled={!isAuthenticated}
                   data={m}
                   onShare={copy}
-                  onEdit={() => acts.editor.focusMap(m.id)}
+                  onEdit={() => {
+                    acts.senseMap.setMap(m.id);
+                    acts.senseMap.toggleEditor(true);
+                  }}
                 />
             )}
           </Card.Group>
@@ -69,7 +72,8 @@ class DashboardPage extends React.Component<Props, OwnState> {
               onClick={() => {
                 const newMap = SM.mapData({ id: U.objectId() });
                 acts.senseObject.updateMap(newMap);
-                acts.editor.focusMap(newMap.id);
+                acts.senseMap.setMap(newMap.id);
+                acts.senseMap.toggleEditor(true);
               }}
             />
           }

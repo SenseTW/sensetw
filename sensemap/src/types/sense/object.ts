@@ -5,7 +5,6 @@ import { ObjectType } from './object-type';
 import { TimeStamp } from '../utils';
 import { CardID } from './card';
 import { BoxID } from './box';
-import * as F from './focus';
 import * as moment from 'moment';
 
 export { ObjectType } from './object-type';
@@ -77,20 +76,6 @@ export const objectData = (partial: PartialObjectData = {}): ObjectData => {
     createdAt: now,
     updatedAt: now,
   };
-};
-
-/**
- * It creates a focus from the given object data. The focus is also a partial
- * object data.
- *
- * @param {ObjectData} object The input object data.
- */
-export const toFocus = (object: ObjectData): F.Focus => {
-  switch (object.objectType) {
-    case ObjectType.BOX:  return F.focusBox(object.data);
-    case ObjectType.CARD: return F.focusCard(object.data);
-    default:              return F.focusNothing();
-  }
 };
 
 const UPDATE_POSITION = 'UPDATE_POSITION';

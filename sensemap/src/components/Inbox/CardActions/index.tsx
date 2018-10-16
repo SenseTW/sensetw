@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { CardData, MapScopeType, State, actions, ActionProps, mapDispatch } from '../../../types';
-import * as F from '../../../types/sense/focus';
 import * as OE from '../../../types/object-editor';
 import { Button } from 'semantic-ui-react';
 import DeleteConfirmation from '../DeleteConfirmation';
@@ -51,7 +50,8 @@ class CardActions extends React.PureComponent<Props, OwnState> {
         <Button
           icon="edit"
           onClick={() => {
-            acts.editor.focusObject(F.focusCard(card.id));
+            acts.selection.clearSelection();
+            acts.selection.selectInboxCard(card.id);
             acts.editor.changeStatus(OE.StatusType.SHOW);
           }}
         />
