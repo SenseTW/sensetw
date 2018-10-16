@@ -62,7 +62,7 @@ const setScopeToFullmap =
 
 const SET_MAP = 'SET_MAP';
 const setMap =
-  (map: MapID) => ({
+  (map: MapID = '') => ({
     type: SET_MAP as typeof SET_MAP,
     payload: { map },
   });
@@ -93,6 +93,13 @@ const CLOSE_INBOX = 'CLOSE_INBOX';
 const closeInbox =
   () => ({
     type: CLOSE_INBOX as typeof CLOSE_INBOX,
+  });
+
+const TOGGLE_MAP_EDITOR = 'TOGGLE_MAP_EDITOR';
+const toggleEditor =
+  (isEditing: boolean) => ({
+    type: TOGGLE_MAP_EDITOR as typeof TOGGLE_MAP_EDITOR,
+    payload: { isEditing },
   });
 
 const openBox =
@@ -181,6 +188,7 @@ const syncActions = {
   openInbox,
   activateInboxPage,
   closeInbox,
+  toggleEditor,
 };
 
 export const actions = {
@@ -198,7 +206,8 @@ export type State = {
   map: MapID,
   scope: MapScope,
   inbox: InboxVisibility,
-  activateInboxPage: number
+  activateInboxPage: number,
+  isEditing: boolean,
 };
 
 export const initial: State = {
@@ -207,7 +216,8 @@ export const initial: State = {
     type: MapScopeType.FULL_MAP,
   },
   inbox: InboxVisibility.HIDDEN,
-  activateInboxPage: 1
+  activateInboxPage: 1,
+  isEditing: false,
 };
 
 /**
@@ -235,6 +245,9 @@ export const reducer = (state: State = initial, action: Action = emptyAction): S
     }
     case CLOSE_INBOX: {
       return { ...state, inbox: InboxVisibility.HIDDEN };
+    }
+    case TOGGLE_MAP_EDITOR: {
+      return { ...state, isEditing: action.payload.isEditing };
     }
     default:
       return state;

@@ -46,7 +46,7 @@ class SignUpPage extends React.PureComponent<Props> {
                   username.length === 0 || !isUsernameInRange &&
                   <span className="signup-page__error">Username must be more than 2 characters.</span>
                 }
-               {
+                {
                   username.length === 0 || !isValidUsername &&
                   <span className="signup-page__error">Please use only letters, numbers and periods.</span>
                 }

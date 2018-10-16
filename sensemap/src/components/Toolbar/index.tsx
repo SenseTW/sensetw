@@ -21,7 +21,6 @@ import * as SO from '../../types/sense-object';
 import * as OE from '../../types/object-editor';
 import * as V from '../../types/viewport';
 import * as CS from '../../types/cached-storage';
-import * as F from '../../types/sense/focus';
 import * as R from '../../types/routes';
 // TODO: use UUID v4
 import * as U from '../../types/utils';
@@ -60,7 +59,6 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     const { actions: acts } = this.props;
     const data = cardData({ id: U.objectId() });
     acts.senseObject.updateCard(data);
-    acts.editor.focusObject(F.focusCard(data.id));
     acts.editor.changeStatus(OE.StatusType.SHOW);
   }
 
@@ -76,7 +74,6 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     const { actions: acts } = this.props;
     const data = boxData({ id: U.objectId() });
     acts.senseObject.updateBox(data);
-    acts.editor.focusObject(F.focusBox(data.id));
     acts.editor.changeStatus(OE.StatusType.SHOW);
   }
 
@@ -159,7 +156,6 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
         // remove card container objects
         // we don't remove cards and leave them in the inbox
         acts.senseObject.removeObjects(mapCards.map(SL.getObjectId));
-        acts.editor.focusObject(F.focusNothing());
       }
     } catch (err) {
       // tslint:disable-next-line:no-console
@@ -188,7 +184,6 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
       if (mapCards.length > 0) {
         // remove card container objects and cards remain in the inbox
         acts.senseObject.removeObjects(mapCards.map(SL.getObjectId));
-        acts.editor.focusObject(F.focusNothing());
       }
       // remove box container objects
       await acts.senseObject.removeObjects(mapBoxes.map(SL.getObjectId));
@@ -198,7 +193,6 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
       // tslint:disable-next-line:no-console
       console.error(err);
     }
-    acts.editor.focusObject(F.focusNothing());
   }
 
   canBatchTag(): boolean {

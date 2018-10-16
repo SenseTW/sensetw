@@ -71,7 +71,7 @@ class Header extends React.PureComponent<Props> {
           <Breadcrumb />
           <Submenu
             map={this.props.map}
-            onEditMap={(m: SM.MapData) => acts.editor.focusMap(m.id)}
+            onEditMap={(m: SM.MapData) => acts.senseMap.toggleEditor(true)}
           />
         </div>
       </div>

@@ -1,28 +1,22 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { State, actions, ActionProps, MapID, MapData, mapDispatch } from '../../types';
+import { State, actions, ActionProps, MapData, mapDispatch } from '../../types';
 import { Modal, Header, Button, Form, TextArea, Input, Radio } from 'semantic-ui-react';
 import * as SM from '../../types/sense/map';
 import * as CS from '../../types/cached-storage';
 import './index.css';
 
 interface StateFromProps {
-  mid?: MapID;
-  map?: MapData;
-  isNew?: boolean;
-  isDirty?: boolean;
+  map: MapData;
+  isNew: boolean;
+  isDirty: boolean;
+  isEditing: boolean;
 }
 
 type Props = StateFromProps & ActionProps;
 
 class MapContent extends React.PureComponent<Props> {
   handleMapChange = (action: SM.Action) => {
-    const { mid } = this.props;
-
-    if (mid === undefined) {
-      return;
-    }
-
     const { actions: acts } = this.props;
     const oldMap = this.props.map as MapData;
     const map = SM.reducer(oldMap, action);
@@ -31,19 +25,13 @@ class MapContent extends React.PureComponent<Props> {
   }
 
   render() {
-    const { mid } = this.props;
-
-    if (mid === undefined) {
-      return false;
-    }
-
-    const { actions: acts, map, isNew, isDirty } = this.props;
+    const { actions: acts, map, isNew, isDirty, isEditing } = this.props;
     const disabled = !(isNew && map && map.name) && !isDirty;
 
     return (
       <Modal
         size="tiny"
-        open={!!mid}
+        open={isEditing}
       >
         <Header>{isNew ? 'Add Map' : 'Edit Map'}</Header>
         <Modal.Content>
@@ -100,7 +88,7 @@ class MapContent extends React.PureComponent<Props> {
                 if (map) {
                   acts.cachedStorage.removeMap(map);
                 }
-                acts.editor.focusMap();
+                acts.senseMap.toggleEditor(false);
               }}
             >
               Cancel
@@ -117,7 +105,7 @@ class MapContent extends React.PureComponent<Props> {
                     await acts.senseObject.saveMap(map);
                   }
                 }
-                acts.editor.focusMap();
+                acts.senseMap.toggleEditor(false);
               }}
             >
               {isNew ? 'Save' : 'Update'}
@@ -131,15 +119,13 @@ class MapContent extends React.PureComponent<Props> {
 
 export default connect<StateFromProps, ActionProps>(
   (state: State) => {
-    const { map: mid } = state.editor;
-    if (mid === undefined) { return {}; }
-
     const { senseObject } = state;
+    const { map: mid, isEditing } = state.senseMap;
     const map = CS.getMap(senseObject, mid);
     const isNew = CS.isMapNew(senseObject, mid);
     const isDirty = CS.isMapDirty(senseObject, mid);
 
-    return { mid, map, isNew, isDirty };
+    return { map, isNew, isDirty, isEditing };
   },
   mapDispatch({ actions })
 )(MapContent);
