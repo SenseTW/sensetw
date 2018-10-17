@@ -5,6 +5,7 @@ export { BoxID, BoxType, BoxData } from './sense/box';
 export { CardID, CardType, CardData } from './sense/card';
 export { EdgeID, Edge } from './sense/edge';
 export { User } from './session';
+export { SelectionType } from './selection';
 
 // application types
 export { MapScopeType } from './sense-map';

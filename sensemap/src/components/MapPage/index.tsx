@@ -15,7 +15,7 @@ import {
   CardData,
   BoxID,
   BoxData,
-  ObjectType,
+  SelectionType,
   State,
   actions,
   ActionProps,
@@ -30,6 +30,7 @@ import * as B from '../../types/sense/box';
 import * as SL from '../../types/selection';
 import { Action as BoxAction } from '../../types/sense/box';
 import * as C from '../../types/sense/card';
+import * as E from '../../types/sense/edge';
 import { Action as CardAction } from '../../types/sense/card';
 import './index.css';
 const background = require('./background-map.png');
@@ -102,7 +103,7 @@ class MapPage extends React.Component<Props> {
     return data && (
       <Inspector
         disabled={!isAuthenticated}
-        objectType={ObjectType.BOX}
+        selectionType={SelectionType.MAP_BOX}
         data={data}
         submitText={isNew ? 'Submit' : 'Update'}
         submitDisabled={!isDirty && !isNew}
@@ -157,7 +158,7 @@ class MapPage extends React.Component<Props> {
     return data && (
       <Inspector
         disabled={!isAuthenticated}
-        objectType={ObjectType.CARD}
+        selectionType={isCardSelected ? SelectionType.MAP_CARD : SelectionType.INBOX_CARD}
         data={data}
         submitText={isNew ? 'Submit' : 'Update'}
         submitDisabled={!isDirty && !isNew}
@@ -189,6 +190,25 @@ class MapPage extends React.Component<Props> {
     );
   }
 
+  renderEdgeInspector() {
+    const { senseObject, selection } = this.props;
+    const edgeId = selection.mapEdges[0] || '';
+    const data = CS.getEdge(senseObject, edgeId);
+    const isEmpty = E.isEmpty(data);
+    const isNew = CS.isEdgeNew(senseObject, edgeId);
+    const isDirty = CS.isEdgeDirty(senseObject, edgeId);
+
+    return !isEmpty && (
+      <Inspector
+        selectionType={SelectionType.MAP_EDGE}
+        data={data}
+        submitText={isNew ? 'Submit' : 'Update'}
+        submitDisabled={!isDirty && !isNew}
+        cancelDisabled={!isDirty && !isNew}
+      />
+    );
+  }
+
   render() {
     const {
       actions: acts,
@@ -211,8 +231,9 @@ class MapPage extends React.Component<Props> {
       sidebarWidth = 204;
     }
 
-    let boxInspector = this.renderBoxInspector();
-    let cardInspector = this.renderCardInspector();
+    const boxInspector = this.renderBoxInspector();
+    const cardInspector = this.renderCardInspector();
+    const edgeInpsector = this.renderEdgeInspector();
     const emptyInspector = (
       <div className="inspector-empty">
         <div>請選擇單一卡片或 Box</div>
@@ -237,7 +258,7 @@ class MapPage extends React.Component<Props> {
             width="wide"
             direction="right"
           >
-            {boxInspector || cardInspector || emptyInspector}
+            {boxInspector || cardInspector || edgeInpsector || emptyInspector}
           </Sidebar>
           <Sidebar.Pusher>
             <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
