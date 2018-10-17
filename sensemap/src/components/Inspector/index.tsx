@@ -3,6 +3,7 @@ import { Key } from 'ts-keycode-enum';
 import { Divider, Button } from 'semantic-ui-react';
 import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
+import EdgeContent from '../EdgeContent';
 import * as T from '../../types';
 import * as C from '../../types/sense/card';
 import * as B from '../../types/sense/box';
@@ -12,11 +13,12 @@ import './index.css';
 
 type Data
   = T.CardData
-  | T.BoxData;
+  | T.BoxData
+  | T.Edge;
 
 interface Props {
   disabled?: boolean;
-  objectType: T.ObjectType;
+  selectionType: T.SelectionType;
   data: Data;
   submitText?: string;
   submitDisabled?: boolean;
@@ -44,7 +46,7 @@ class Inspector extends React.PureComponent<Props> {
   render() {
     const {
       disabled = false,
-      objectType,
+      selectionType,
       submitText,
       submitDisabled = false,
       cancelDisabled = false,
@@ -56,8 +58,9 @@ class Inspector extends React.PureComponent<Props> {
 
     let content;
     let isContentValid = true;
-    switch (objectType) {
-      case T.ObjectType.CARD:
+    switch (selectionType) {
+      case T.SelectionType.MAP_CARD:
+      case T.SelectionType.INBOX_CARD:
         isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 5000 });
         content = (
           <CardContent
@@ -68,13 +71,20 @@ class Inspector extends React.PureComponent<Props> {
           />
         );
         break;
-      case T.ObjectType.BOX:
+      case T.SelectionType.MAP_BOX:
         content = (
           <BoxContent
             disabled={disabled}
             data={data as T.BoxData}
             onKeyUp={this.handleKey}
             onChange={onUpdate}
+          />
+        );
+        break;
+      case T.SelectionType.MAP_EDGE:
+        content = (
+          <EdgeContent
+            data={data as T.Edge}
           />
         );
         break;

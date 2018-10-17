@@ -45,6 +45,13 @@ const remove
 //
 // The new selection structure should hold all of them.
 // And map objects should be serialized to the query string.
+export enum SelectionType {
+  MAP_BOX = 'MAP_BOX',
+  MAP_CARD = 'MAP_CARD',
+  MAP_EDGE = 'MAP_EDGE',
+  INBOX_CARD = 'INBOX_CARD',
+}
+
 const SELECT_MAP_BOX = 'SELECT_MAP_BOX';
 const selectMapBox = (objectId: ObjectID, boxId: BoxID) => ({
   type: SELECT_MAP_BOX as typeof SELECT_MAP_BOX,
