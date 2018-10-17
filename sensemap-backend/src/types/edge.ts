@@ -1,7 +1,7 @@
 import { gql } from "apollo-server";
-import { ID, Map, SenseObject, Edge, edgeFields, edgeDataFields } from "./sql";
-import { getEdgesInMap, updateMapUpdatedAt } from "./map";
-import { pick } from "ramda";
+import { ID, Map, SenseObject, Edge, edgeFields } from "./sql";
+import { getEdgesInMap } from "./map";
+import * as T from "./transactions";
 
 export function edgesQuery(db) {
   return db.select(edgeFields).from("edge");
@@ -16,34 +16,6 @@ export async function getEdge(db, id: ID): Promise<Edge | null> {
     .where("id", id)
     .first();
   return !!e ? e : null;
-}
-
-export async function createEdge(db, args): Promise<Edge> {
-  const fields = pick(edgeDataFields, args);
-  const rows = await db("edge")
-    .insert(fields)
-    .returning(edgeFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function updateEdge(db, id: ID, args): Promise<Edge | null> {
-  const fields = pick(edgeDataFields, args);
-  const rows = await db("edge")
-    .where("id", id)
-    .update(fields)
-    .returning(edgeFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function deleteEdge(db, id: ID): Promise<Edge | null> {
-  const rows = await db("edge")
-    .where("id", id)
-    .delete()
-    .returning(edgeFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
 }
 
 export const typeDefs = [
@@ -92,13 +64,19 @@ export const resolvers = {
   },
   Mutation: {
     createEdge: async (_, args, { db }, info): Promise<Edge> => {
-      return createEdge(db, args);
+      const trx = T.createEdge(args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     updateEdge: async (_, args, { db }, info): Promise<Edge | null> => {
-      return updateEdge(db, args.id, args);
+      const trx = T.updateEdge(args.id, args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     deleteEdge: async (_, { id }, { db }, info): Promise<Edge | null> => {
-      return deleteEdge(db, id);
+      const trx = T.deleteEdge(id);
+      const r = await T.run(db, trx);
+      return r.data;
     }
   },
   Edge: {

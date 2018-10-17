@@ -1,4 +1,5 @@
 import * as C from "./card";
+import * as T from "./transactions";
 import { context } from "../context";
 import { maps } from "../../seeds/dev";
 
@@ -7,22 +8,26 @@ beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
 describe("create/update/deleteCard", () => {
-  test("Card quote is writable at operation level", async () => {
+  test("Card quote is writable at transaction layer", async () => {
     const mapId = maps[0].id;
-    const c0 = await C.createCard(db, {
+    const trx = T.createCard({
       cardType: "INFO",
       quote: "mono no aware",
       mapId
     });
+    const r = await T.run(db, trx);
+    const c0 = r.data;
     expect(c0.id).toBeTruthy();
     expect(c0.objects).toEqual([]);
     expect(c0.quote).toBe("mono no aware");
     expect(c0.map).toBe(mapId);
 
-    const c1 = await C.updateCard(db, c0.id, {
+    const trx1 = T.updateCard(c0.id, {
       summary: "sweet variety peas",
       quote: "always adopt never buy"
     });
+    const r1 = await T.run(db, trx1);
+    const c1 = r1.data;
     expect(c1.summary).toBe("sweet variety peas");
     expect(c1.quote).toBe("always adopt never buy");
   });

@@ -14,17 +14,25 @@ test("getBox", async () => {
 });
 
 test("create/update/delete Box", async () => {
-  const box = await B.createBox(db, { boxType: "INFO", mapId: maps[0].id });
+  const box = await B.resolvers.Mutation.createBox(
+    null,
+    { boxType: "INFO", mapId: maps[0].id },
+    { db }
+  );
   const b1 = await B.getBox(db, box.id);
   expect(b1).toEqual(box);
 
-  const b2 = await B.updateBox(db, box.id, { title: "foobar" });
+  const b2 = await B.resolvers.Mutation.updateBox(
+    null,
+    { id: box.id, title: "foobar" },
+    { db }
+  );
   expect(b2.title).toBe("foobar");
 
   const b3 = await B.getBox(db, box.id);
   expect(b3.title).toBe("foobar");
 
-  const b4 = await B.deleteBox(db, box.id);
+  const b4 = await B.resolvers.Mutation.deleteBox(null, { id: box.id }, { db });
   expect(b4).toEqual(b3);
 
   const b5 = await B.getBox(db, box.id);
@@ -32,14 +40,22 @@ test("create/update/delete Box", async () => {
 });
 
 test("addToContainCards", async () => {
-  const box = await B.createBox(db, {
-    boxType: "INFO",
-    mapId: maps[0].id
-  });
-  const obj = await O.createObject(db, {
-    mapId: maps[0].id,
-    objectType: "CARD"
-  });
+  const box = await B.resolvers.Mutation.createBox(
+    null,
+    {
+      boxType: "INFO",
+      mapId: maps[0].id
+    },
+    { db }
+  );
+  const obj = await O.resolvers.Mutation.createObject(
+    null,
+    {
+      mapId: maps[0].id,
+      objectType: "CARD"
+    },
+    { db }
+  );
   expect(box.contains).toEqual([]);
 
   const r1 = await B.resolvers.Mutation.addToContainCards(

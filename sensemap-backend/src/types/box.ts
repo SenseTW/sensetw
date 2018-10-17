@@ -1,16 +1,8 @@
 import { gql } from "apollo-server";
-import {
-  ID,
-  Box,
-  BoxType,
-  boxFields,
-  objectFields,
-  boxDataFields,
-  SenseObject
-} from "./sql";
-import { getBoxesInMap, updateMapUpdatedAt } from "./map";
+import { ID, Box, BoxType, boxFields, SenseObject } from "./sql";
+import { getBoxesInMap } from "./map";
 import { objectsQuery } from "./object";
-import { pick } from "ramda";
+import * as T from "./transactions";
 import * as A from "./oauth";
 
 export function boxesQuery(db) {
@@ -34,58 +26,6 @@ export async function getObjectsForBox(db, id: ID): Promise<SenseObject[]> {
 
 export async function getObjectsInBox(db, id: ID): Promise<SenseObject[]> {
   return objectsQuery(db).where("belongsTo", id);
-}
-
-export async function createBox(db, args): Promise<Box> {
-  const fields = pick(boxDataFields, args);
-  const rows = await db("box")
-    .insert(fields)
-    .returning(boxFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function deleteBox(db, id: ID): Promise<Box> {
-  const rows = await db("box")
-    .where("id", id)
-    .delete()
-    .returning(boxFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function updateBox(db, id: ID, args): Promise<Box | null> {
-  const fields = pick(boxDataFields, args);
-  const rows = await db("box")
-    .where("id", id)
-    .update(fields)
-    .returning(boxFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function addObjectToBox(db, obj: ID, box: ID) {
-  const rows = await db("object")
-    .where("id", obj)
-    .update({ belongsToId: box })
-    .returning(objectFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return {
-    containsObject: obj,
-    belongsToBox: box
-  };
-}
-
-export async function removeObjectFromBox(db, obj: ID, box: ID) {
-  const rows = await db("object")
-    .where("id", obj)
-    .update({ belongsToId: db.raw("NULL") })
-    .returning(objectFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return {
-    containsObject: obj,
-    belongsToBox: box
-  };
 }
 
 export const typeDefs = [
@@ -182,13 +122,19 @@ export const resolvers = {
     createBox: async (_, args, { db, authorization }, info) => {
       const u = await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
-      return createBox(db, args);
+      const trx = T.createBox(args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     deleteBox: async (_, { id }, { db }, info) => {
-      return deleteBox(db, id);
+      const trx = T.deleteBox(id);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     updateBox: async (_, args, { db }, info) => {
-      return updateBox(db, args.id, args);
+      const trx = T.updateBox(args.id, args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     addToContainCards: async (
       _,
@@ -196,7 +142,9 @@ export const resolvers = {
       { db },
       info
     ) => {
-      return addObjectToBox(db, containsObjectId, belongsToBoxId);
+      const trx = T.addObjectToBox(containsObjectId, belongsToBoxId);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     removeFromContainCards: async (
       _,
@@ -204,7 +152,9 @@ export const resolvers = {
       { db },
       info
     ) => {
-      return removeObjectFromBox(db, containsObjectId, belongsToBoxId);
+      const trx = T.removeObjectFromBox(containsObjectId, belongsToBoxId);
+      const r = await T.run(db, trx);
+      return r.data;
     }
   },
   Box: {

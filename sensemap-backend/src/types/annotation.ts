@@ -1,5 +1,6 @@
 import { ID, Annotation, annotationDataFields, annotationFields } from "./sql";
 import * as C from "./card";
+import * as T from "./transactions";
 import * as Knex from "knex";
 import { assoc, pick, filter, isEmpty } from "ramda";
 
@@ -38,8 +39,10 @@ export async function createAnnotation(
 
   let cardData;
   if (args.card) {
-    cardData = await C.createCard(db, { ...args.card, mapId: args.mapId });
-    a.cardId = cardData.id;
+    const trx = T.createCard({ ...args.card, mapId: args.mapId });
+    const r = await T.run(db, trx);
+    cardData = r.data;
+    a.cardId = r.data.id;
   }
 
   const rows = await db("annotation")
@@ -70,7 +73,8 @@ export async function updateAnnotation(
   }
 
   if (args.card && !isEmpty(args.card)) {
-    await C.updateCard(db, data.cardId, args.card);
+    const trx = T.updateCard(data.cardId, args.card);
+    await T.run(db, trx);
   }
 
   return getAnnotation(db, id);
@@ -84,7 +88,9 @@ export async function deleteAnnotation(db: Knex, id: ID): Promise<Annotation> {
   const data = rows[0];
 
   if (data.cardId) {
-    data.card = await C.deleteCard(db, data.cardId);
+    const trx = T.deleteCard(data.cardId);
+    const r = await T.run(db, trx);
+    data.card = r.data;
   }
 
   return data;

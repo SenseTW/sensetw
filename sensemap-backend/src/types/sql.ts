@@ -278,22 +278,6 @@ export const annotationFields = [
   ...annotationDataFields
 ] as string[];
 
-export type TransactionType =
-  | "MAP"
-  | "OBJECT"
-  | "EDGE"
-  | "CARD"
-  | "BOX"
-  | "BOXITEM";
-
-export const transactionDataFields = ["transactionType", "mapId", "data"];
-export type Transaction = HasID &
-  HasTimestamps & {
-    transactionType: TransactionType;
-    mapId: ID;
-    data: any;
-  };
-
 export type HistoryType = "MAP" | "OBJECT";
 
 export const historyDataFields = ["userId", "mapId", "objectId", "data"];
