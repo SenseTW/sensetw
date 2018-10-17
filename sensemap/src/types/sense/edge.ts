@@ -1,6 +1,7 @@
 import { ActionUnion, emptyAction } from '../action';
 import { HasID } from './has-id';
 import { ObjectID, ObjectData } from './object';
+import { equals } from 'ramda';
 
 export type EdgeID = string;
 
@@ -15,6 +16,8 @@ export const emptyEdge = {
   from:    '0',
   to:      '0',
 };
+
+export const isEmpty = (edge: Edge): boolean => equals(emptyEdge, edge);
 
 const EDGE_FROM = 'EDGE_FROM';
 const edgeFrom =
