@@ -1,7 +1,7 @@
 import { gql } from "apollo-server";
-import { ID, SenseObject, objectFields, objectDataFields } from "./sql";
-import { getObjectsInMap, updateMapUpdatedAt } from "./map";
-import { pick } from "ramda";
+import { ID, SenseObject, objectFields } from "./sql";
+import { getObjectsInMap } from "./map";
+import * as T from './transactions';
 
 export function objectsQuery(db) {
   return db.select(objectFields).from("object");
@@ -16,38 +16,6 @@ export async function getObject(db, id: ID): Promise<SenseObject> {
     .where("id", id)
     .first();
   return !!o ? o : null;
-}
-
-export async function createObject(db, args): Promise<SenseObject> {
-  const fields = pick(objectDataFields, args);
-  const rows = await db("object")
-    .insert(fields)
-    .returning(objectFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function updateObject(
-  db,
-  id: ID,
-  args
-): Promise<SenseObject | null> {
-  const fields = pick(objectDataFields, args);
-  const rows = await db("object")
-    .where("id", id)
-    .update(fields)
-    .returning(objectFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function deleteObject(db, id: ID): Promise<SenseObject | null> {
-  const rows = await db("object")
-    .where("id", id)
-    .del()
-    .returning(objectFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
 }
 
 export const typeDefs = [
@@ -138,13 +106,19 @@ export const resolvers = {
   },
   Mutation: {
     createObject: async (_, args, { db }, info) => {
-      return createObject(db, args);
+      const trx = T.createObject(args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     updateObject: async (_, args, { db }, info) => {
-      return updateObject(db, args.id, args);
+      const trx = T.updateObject(args.id, args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
     deleteObject: async (_, { id }, { db }, info) => {
-      return deleteObject(db, id);
+      const trx = T.deleteObject(id);
+      const r = await T.run(db, trx);
+      return r.data;
     }
   },
   Object: {

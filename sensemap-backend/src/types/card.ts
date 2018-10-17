@@ -8,10 +8,11 @@ import {
   cardWithTargetFields,
   SenseObject
 } from "./sql";
-import { MapFilter, updateMapUpdatedAt } from "./map";
+import { MapFilter } from "./map";
 import { objectsQuery } from "./object";
 import * as R from "ramda";
 import * as A from "./oauth";
+import * as T from "./transactions";
 
 export type CardFilter = {
   id?: ID;
@@ -90,34 +91,6 @@ export async function getAllCards(
 
 export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
   return objectsQuery(db).where("cardId", id);
-}
-
-export async function createCard(db, args): Promise<Card> {
-  const fields = R.pick(cardDataFields, args);
-  const rows = await db("card")
-    .insert(fields)
-    .returning(cardFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function deleteCard(db, id: ID): Promise<Card | null> {
-  const rows = await db("card")
-    .where("id", id)
-    .delete()
-    .returning(cardFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
-}
-
-export async function updateCard(db, id: ID, args): Promise<Card | null> {
-  const fields = R.pick(cardDataFields, args);
-  const rows = await db("card")
-    .where("id", id)
-    .update(fields)
-    .returning(cardFields);
-  await updateMapUpdatedAt(db, rows[0].mapId);
-  return rows[0];
 }
 
 export const typeDefs = [
@@ -211,15 +184,21 @@ export const resolvers = {
     createCard: async (_, args, { db, authorization }, info) => {
       const u = await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
-      return createCard(db, R.pick(writableFields, args));
+      const trx = T.createCard(R.pick(writableFields, args));
+      const r = await T.run(db, trx);
+      return r.data;
     },
 
     deleteCard: async (_, { id }, { db }, info) => {
-      return deleteCard(db, id);
+      const trx = T.deleteCard(id);
+      const r = await T.run(db, trx);
+      return r.data;
     },
 
     updateCard: async (_, args, { db }, info) => {
-      return updateCard(db, args.id, R.pick(writableFields, args));
+      const trx = T.updateCard(args.id, R.pick(writableFields, args));
+      const r = await T.run(db, trx);
+      return r.data;
     }
   },
   Card: {

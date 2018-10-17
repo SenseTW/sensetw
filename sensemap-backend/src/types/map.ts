@@ -3,18 +3,17 @@ import {
   ID,
   Map,
   mapFields,
-  mapDataFields,
   SenseObject,
   Card,
   Box,
   Edge
 } from "./sql";
+import * as T from "./transactions";
 import { objectsQuery } from "./object";
 import { boxesQuery } from "./box";
 import { cardsQuery } from "./card";
 import { edgesQuery } from "./edge";
 import { getUserFromAuthorization } from "./oauth";
-import { pick } from "ramda";
 
 export type MapFilter = {
   id?: ID;
@@ -37,40 +36,6 @@ export async function getMap(db, id: ID): Promise<Map | null> {
 
 export async function getAllMaps(db): Promise<Map[]> {
   return mapsQuery(db);
-}
-
-export async function createMap(db, args: Map): Promise<Map> {
-  const fields = pick(mapDataFields, args);
-  const rows = await db("map")
-    .insert(fields)
-    .returning(mapFields);
-  return rows[0];
-}
-
-export async function updateMap(db, id: ID, args): Promise<Map> {
-  const fields = pick(mapDataFields, args);
-  const rows = await db("map")
-    .where("id", id)
-    .update(fields)
-    .returning(mapFields);
-  await updateMapUpdatedAt(db, id);
-  return rows[0];
-}
-
-export async function updateMapUpdatedAt(db, id: ID): Promise<Map> {
-  const rows = await db("map")
-    .where("id", id)
-    .update({ updatedAt: new Date() })
-    .returning(mapFields);
-  return rows[0];
-}
-
-export async function deleteMap(db, id: ID): Promise<Map> {
-  const rows = await db("map")
-    .where("id", id)
-    .del()
-    .returning(mapFields);
-  return rows[0];
 }
 
 export async function getObjectsInMap(db, mapId: ID): Promise<SenseObject[]> {
@@ -161,15 +126,21 @@ export const resolvers = {
     createMap: async (_, args, { db, authorization }, info): Promise<Map> => {
       const u = await getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
-      return createMap(db, args);
+      const trx = T.createMap(args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
 
     updateMap: async (_, args, { db }, info): Promise<Map> => {
-      return updateMap(db, args.id, args);
+      const trx = T.updateMap(args.id, args);
+      const r = await T.run(db, trx);
+      return r.data;
     },
 
     deleteMap: async (_, args, { db }, info): Promise<Map> => {
-      return deleteMap(db, args.id);
+      const trx = T.deleteMap(args.id);
+      const r = await T.run(db, trx);
+      return r.data;
     }
   },
 
