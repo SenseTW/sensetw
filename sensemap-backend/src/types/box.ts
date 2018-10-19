@@ -14,7 +14,7 @@ import { pick } from "ramda";
 import * as A from "./oauth";
 
 export function boxesQuery(db) {
-  return db.select(boxFields(db)).from("box");
+  return db.select(boxFields).from("box");
 }
 
 export async function getAllBoxes(db): Promise<Box[]> {
@@ -40,7 +40,7 @@ export async function createBox(db, args): Promise<Box> {
   const fields = pick(boxDataFields, args);
   const rows = await db("box")
     .insert(fields)
-    .returning(boxFields(db));
+    .returning(boxFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -49,7 +49,7 @@ export async function deleteBox(db, id: ID): Promise<Box> {
   const rows = await db("box")
     .where("id", id)
     .delete()
-    .returning(boxFields(db));
+    .returning(boxFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -59,7 +59,7 @@ export async function updateBox(db, id: ID, args): Promise<Box | null> {
   const rows = await db("box")
     .where("id", id)
     .update(fields)
-    .returning(boxFields(db));
+    .returning(boxFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -68,7 +68,7 @@ export async function addObjectToBox(db, obj: ID, box: ID) {
   const rows = await db("object")
     .where("id", obj)
     .update({ belongsToId: box })
-    .returning(objectFields(db));
+    .returning(objectFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return {
     containsObject: obj,
@@ -80,7 +80,7 @@ export async function removeObjectFromBox(db, obj: ID, box: ID) {
   const rows = await db("object")
     .where("id", obj)
     .update({ belongsToId: db.raw("NULL") })
-    .returning(objectFields(db));
+    .returning(objectFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return {
     containsObject: obj,

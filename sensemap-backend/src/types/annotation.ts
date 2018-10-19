@@ -5,7 +5,7 @@ import { assoc, pick, filter, isEmpty } from "ramda";
 
 export async function getAnnotation(db: Knex, id: ID): Promise<Annotation> {
   const a = await db
-    .select(annotationFields(db))
+    .select(annotationFields)
     .from("annotation")
     .where("id", id)
     .first();
@@ -44,7 +44,7 @@ export async function createAnnotation(
 
   const rows = await db("annotation")
     .insert(a)
-    .returning(annotationFields(db));
+    .returning(annotationFields);
   const data = rows[0];
 
   if (cardData) {
@@ -66,7 +66,7 @@ export async function updateAnnotation(
     await db("annotation")
       .update(a)
       .where("id", id)
-      .returning(annotationFields(db));
+      .returning(annotationFields);
   }
 
   if (args.card && !isEmpty(args.card)) {
@@ -80,7 +80,7 @@ export async function deleteAnnotation(db: Knex, id: ID): Promise<Annotation> {
   const rows = await db("annotation")
     .where("id", id)
     .del()
-    .returning(annotationFields(db));
+    .returning(annotationFields);
   const data = rows[0];
 
   if (data.cardId) {

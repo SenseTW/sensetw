@@ -6,7 +6,7 @@ import { mapsQuery } from "./map";
 import * as A from "./oauth";
 
 export function usersQuery(db: Knex) {
-  return db.select(userFields(db)).from("user");
+  return db.select(userFields).from("user");
 }
 
 export async function getUser(db: Knex, id: ID): Promise<User | null> {
@@ -39,7 +39,7 @@ export async function authenticate(
   claim: IdentityClaim
 ): Promise<User | null> {
   let q = db
-    .select(userFields(db))
+    .select(userFields)
     .from("user")
     .where("salthash", db.raw(`crypt(?, ??)`, [claim.password, "salthash"]));
   if (claim.type === "username") {
@@ -57,7 +57,7 @@ async function verifyUserPassword(
   password: string
 ): Promise<User | null> {
   const q = db
-    .select(userFields(db))
+    .select(userFields)
     .from("user")
     .where("salthash", db.raw(`crypt(?, ??)`, [password, "salthash"]))
     .andWhere("id", id);
@@ -73,9 +73,9 @@ export async function updateUserPassword(
   const rows: User[] = await db("user")
     .where("id", id)
     .update({
-      salthash: db.raw(`crypt(?, gen_salt('bf', 8))`, [password])
+      salthash: db.raw(`crypt(?, gen_salt('bf', 8))`, [ password ])
     })
-    .returning(userFields(db));
+    .returning(userFields);
   return rows.length > 0 ? rows[0] : null;
 }
 
@@ -85,13 +85,13 @@ export async function createUser(
   password: string
 ): Promise<User> {
   return db.transaction(async trx => {
-    const fields: UserData = pick(userFields(db), args);
+    const fields: UserData = pick(userFields, args);
     const rows: User[] = await trx("user")
       .insert({
         ...fields,
         salthash: db.raw(`crypt(?, gen_salt('bf', 8))`, [password])
       })
-      .returning(userFields(db));
+      .returning(userFields);
     return rows[0];
   });
 }
@@ -101,7 +101,7 @@ export async function findUserByUsername(
   username: string
 ): Promise<User | null> {
   const rows = await db
-    .select(userFields(db))
+    .select(userFields)
     .from("user")
     .where("username", username);
   return rows.length > 0 ? rows[0] : null;
@@ -112,7 +112,7 @@ export async function findUserByEmail(
   email: string
 ): Promise<User | null> {
   const rows = await db
-    .select(userFields(db))
+    .select(userFields)
     .from("user")
     .where("email", email);
   return rows.length > 0 ? rows[0] : null;
@@ -122,7 +122,7 @@ export async function deleteUser(db: Knex, id: ID): Promise<User | null> {
   return db("user")
     .where("id", id)
     .delete()
-    .returning(userFields(db));
+    .returning(userFields);
 }
 
 export async function updateUser(
@@ -130,11 +130,11 @@ export async function updateUser(
   id: ID,
   args: User
 ): Promise<User | null> {
-  const fields: User = pick(userFields(db), args);
+  const fields: User = pick(userFields, args);
   return db("user")
     .where("id", id)
     .update(fields)
-    .returning(userFields(db));
+    .returning(userFields);
 }
 
 export type TokenPayload = {

@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config()
 
-import * as Knex from 'knex';
+import { db } from './types/sql';
 
 function noSlash(a: string): string {
   return a.replace(/\/+$/, '');
@@ -9,7 +9,7 @@ function noSlash(a: string): string {
 
 const env = {
   NODE_ENV: process.env.NODE_ENV,
-  DATABASE_URL: noSlash(process.env.DATABASE_URL),
+  DATABASE_URL: process.env.DATABASE_URL,
   SESSION_SECRET: process.env.SESSION_SECRET || 'Wush8je7kee0faileir3sohy0tai4Chee7ua5ahrah0LaG1mui6iepieg0looque',
   CLIENT_JS_URL: noSlash(process.env.CLIENT_URL || 'https://sense.tw/embed.js'),
   CLIENT_OAUTH_ID: noSlash(process.env.CLIENT_OAUTH_ID || '00e468bc-c948-11e7-9ada-33c411fb1c8a'),
@@ -24,15 +24,6 @@ const env = {
   MAILGUN_PASS: process.env.MAILGUN_PASS,
   MAILGUN_NAME: process.env.MAILGUN_NAME || 'sense.tw',
 };
-
-const db = Knex({
-  client: 'pg',
-  connection: env.DATABASE_URL,
-  //debug: env.NODE_ENV === 'development',
-  seeds: {
-    directory: './seeds/dev',
-  },
-});
 
 export const context = ({ req = null } = {}) => {
   const authorization = !!req ? req.headers.authorization : null;
