@@ -4,7 +4,6 @@ import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
 import * as G from '../../../graphics/point';
 import { Edge as EdgeData } from '../../../types';
-import { transformObject } from '../../../types/viewport';
 import { noop } from '../../../types/utils';
 
 const SQRT3 = 1.73205;
@@ -70,28 +69,22 @@ class Edge extends React.PureComponent<Props> {
     indicator: {
       radius: 6,
       color: '#ffffff',
-      distance: 100,
     }
   };
 
   render () {
     const { transform, data, selected } = this.props;
-    const style = transformObject(transform, Edge.style) as typeof Edge.style;
+    const style = Edge.style;
     const from = G.toTuple(transform(this.props.from));
     const to = G.toTuple(transform(this.props.to));
-    const centerX = (from[0] + to[0]) / 2;
-    const centerY = (from[1] + to[1]) / 2;
     const dX = (to[0] - from[0]);
     const dY = (to[1] - from[1]);
-    const showMoreIndicators = dX * dX + dY * dY > 4 * style.indicator.distance * style.indicator.distance;
-    const radius = Math.atan2(dY, dX);
-    const rotation = radius * 180 / Math.PI;
-    const x100 = Math.cos(radius) * style.indicator.distance;
-    const y100 = Math.sin(radius) * style.indicator.distance;
-    const prevX = centerX - x100;
-    const prevY = centerY - y100;
-    const nextX = centerX + x100;
-    const nextY = centerY + y100;
+    const points = [
+      { x: from[0] + dX / 3, y: from[1] + dY / 3 },
+      { x: from[0] + dX / 2, y: from[1] + dY / 2 },
+      { x: from[0] + dX / 3 * 2, y: from[1] + dY / 3 * 2 },
+    ];
+    const rotation = Math.atan2(dY, dX) * 180 / Math.PI;
     const onSelect    = this.props.onSelect    || noop;
     const onDeselect  = this.props.onDeselect  || noop;
     const onMouseOver = this.props.onMouseOver || noop;
@@ -127,34 +120,17 @@ class Edge extends React.PureComponent<Props> {
             onMouseOut={(e) => onMouseOut(e, data)}
           />
           {
-            showMoreIndicators &&
-            <Indicator
-              x={prevX}
-              y={prevY}
-              radius={style.indicator.radius}
-              rotation={rotation}
-              color={style.indicator.color}
-              backgroundColor={selected ? style.selected.color : style.color}
-            />
-          }
-          <Indicator
-            x={centerX}
-            y={centerY}
-            radius={style.indicator.radius}
-            rotation={rotation}
-            color={style.indicator.color}
-            backgroundColor={selected ? style.selected.color : style.color}
-          />
-          {
-            showMoreIndicators &&
-            <Indicator
-              x={nextX}
-              y={nextY}
-              radius={style.indicator.radius}
-              rotation={rotation}
-              color={style.indicator.color}
-              backgroundColor={selected ? style.selected.color : style.color}
-            />
+            points.map((p, i) =>
+              <Indicator
+                key={i}
+                x={p.x}
+                y={p.y}
+                radius={style.indicator.radius}
+                rotation={rotation}
+                color={style.indicator.color}
+                backgroundColor={selected ? style.selected.color : style.color}
+              />
+            )
           }
         </Group>
       </Selectable>
