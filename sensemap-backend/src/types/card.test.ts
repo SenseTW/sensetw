@@ -16,7 +16,7 @@ describe("create/update/deleteCard", () => {
       mapId
     });
     const r = await T.run(db, trx);
-    const c0 = r.data;
+    const c0 = r.transaction.data;
     expect(c0.id).toBeTruthy();
     expect(c0.objects).toEqual([]);
     expect(c0.quote).toBe("mono no aware");
@@ -27,7 +27,7 @@ describe("create/update/deleteCard", () => {
       quote: "always adopt never buy"
     });
     const r1 = await T.run(db, trx1);
-    const c1 = r1.data;
+    const c1 = r1.transaction.data;
     expect(c1.summary).toBe("sweet variety peas");
     expect(c1.quote).toBe("always adopt never buy");
   });

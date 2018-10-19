@@ -66,17 +66,17 @@ export const resolvers = {
     createEdge: async (_, args, { db }, info): Promise<Edge> => {
       const trx = T.createEdge(args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
     updateEdge: async (_, args, { db }, info): Promise<Edge | null> => {
       const trx = T.updateEdge(args.id, args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
     deleteEdge: async (_, { id }, { db }, info): Promise<Edge | null> => {
       const trx = T.deleteEdge(id);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     }
   },
   Edge: {

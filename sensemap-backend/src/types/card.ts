@@ -181,24 +181,24 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createCard: async (_, args, { db, authorization }, info) => {
+    createCard: async (_, args, { db, authorization }, info): Promise<Card> => {
       const u = await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createCard(R.pick(writableFields, args));
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
 
-    deleteCard: async (_, { id }, { db }, info) => {
+    deleteCard: async (_, { id }, { db }, info): Promise<Card> => {
       const trx = T.deleteCard(id);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
 
-    updateCard: async (_, args, { db }, info) => {
+    updateCard: async (_, args, { db }, info): Promise<Card> => {
       const trx = T.updateCard(args.id, R.pick(writableFields, args));
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     }
   },
   Card: {
