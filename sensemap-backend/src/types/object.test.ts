@@ -1,8 +1,9 @@
 import * as O from "./object";
 import { context } from "../context";
-import { maps } from "../../seeds/dev";
+import { users, maps } from "../../seeds/dev";
 
 const { db } = context();
+const user = users[0];
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
@@ -40,7 +41,7 @@ describe("GraphQL", () => {
         cardId,
         mapId
       },
-      { db },
+      { db, user },
       null
     );
     expect(o.map).toBe(mapId);
@@ -60,8 +61,7 @@ describe("GraphQL", () => {
         cardId,
         mapId
       },
-      { db },
-      null
+      { db, user },
     );
     expect(o.zIndex).toBe(0);
 
@@ -71,16 +71,14 @@ describe("GraphQL", () => {
         id: o.id,
         zIndex: 10
       },
-      { db },
-      null
+      { db, user },
     );
     expect(o1.zIndex).toBe(10);
 
     const o2 = await O.resolvers.Mutation.deleteObject(
       null,
       { id: o.id },
-      { db },
-      null
+      { db, user },
     );
     expect(o2.id).toBe(o.id);
 

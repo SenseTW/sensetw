@@ -8,12 +8,12 @@ import {
   Box,
   Edge
 } from "./sql";
-import * as T from "./transactions";
+import * as T from "./transaction";
 import { objectsQuery } from "./object";
 import { boxesQuery } from "./box";
 import { cardsQuery } from "./card";
 import { edgesQuery } from "./edge";
-import { getUserFromAuthorization } from "./oauth";
+import * as A from "./oauth";
 
 export type MapFilter = {
   id?: ID;
@@ -123,23 +123,25 @@ export const resolvers = {
   },
 
   Mutation: {
-    createMap: async (_, args, { db, authorization }, info): Promise<Map> => {
-      const u = await getUserFromAuthorization(db, authorization);
+    createMap: async (_, args, { db, user, authorization }, info): Promise<Map> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createMap(args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    updateMap: async (_, args, { db }, info): Promise<Map> => {
+    updateMap: async (_, args, { db, user, authorization }, info): Promise<Map> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateMap(args.id, args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    deleteMap: async (_, args, { db }, info): Promise<Map> => {
+    deleteMap: async (_, args, { db, user, authorization }, info): Promise<Map> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteMap(args.id);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },

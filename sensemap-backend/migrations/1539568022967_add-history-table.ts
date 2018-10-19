@@ -13,29 +13,34 @@ export const shorthands = {
   },
   userReference: {
     type: 'uuid',
-    notNull: true,
+    notNull: false,
     references: '"user"',
   },
   mapReference: {
     type: 'uuid',
     notNull: true,
     references: 'map',
+    onDelete: 'CASCADE',
   },
   objectReference: {
     type: 'uuid',
     references: 'object',
+    onDelete: 'CASCADE',
   },
   cardReference: {
     type: 'uuid',
     references: 'card',
+    onDelete: 'CASCADE',
   },
   boxReference: {
     type: 'uuid',
     references: 'box',
+    onDelete: 'CASCADE',
   },
   edgeReference: {
     type: 'uuid',
     references: 'edge',
+    onDelete: 'CASCADE',
   },
 };
 
@@ -44,6 +49,7 @@ export const up = (pgm: MigrationBuilder) => {
     id: 'id',
     createdAt: 'time',
     updatedAt: 'time',
+    userId: 'userReference',
     data: {
       type: 'jsonb',
       notNull: true,

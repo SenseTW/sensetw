@@ -1,9 +1,10 @@
 import * as E from "./edge";
 import * as O from "./object";
 import { context } from "../context";
-import { maps, objects } from "../../seeds/dev";
+import { users, maps, objects } from "../../seeds/dev";
 
 const { db } = context();
+const user = users[0];
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
@@ -16,7 +17,7 @@ describe("GraphQL Mutation", () => {
         toId: objects[1].id,
         mapId: maps[0].id
       },
-      { db }
+      { db, user }
     );
     expect(e0.from).toBe(objects[0].id);
 
@@ -25,7 +26,7 @@ describe("GraphQL Mutation", () => {
       {
         id: objects[0].id
       },
-      { db }
+      { db, user }
     );
 
     const e3 = await E.resolvers.Query.Edge(
@@ -33,7 +34,7 @@ describe("GraphQL Mutation", () => {
       {
         id: e0.id
       },
-      { db }
+      { db, user }
     );
     expect(e3).toBeNull();
   });

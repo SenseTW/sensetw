@@ -1,6 +1,6 @@
-import { ID, Annotation, annotationDataFields, annotationFields } from "./sql";
+import { ID, User, Annotation, annotationDataFields, annotationFields } from "./sql";
 import * as C from "./card";
-import * as T from "./transactions";
+import * as T from "./transaction";
 import * as Knex from "knex";
 import { assoc, pick, filter, isEmpty } from "ramda";
 
@@ -33,6 +33,7 @@ function toAnnotationField(args: Annotation) {
 
 export async function createAnnotation(
   db: Knex,
+  user: User,
   args: any
 ): Promise<Annotation> {
   const a = toAnnotationField(args);
@@ -40,7 +41,7 @@ export async function createAnnotation(
   let cardData;
   if (args.card) {
     const trx = T.createCard({ ...args.card, mapId: args.mapId });
-    const r = await T.run(db, trx);
+    const r = await T.run(db, user, trx);
     cardData = r.transaction.data;
     a.cardId = r.transaction.data.id;
   }
@@ -59,6 +60,7 @@ export async function createAnnotation(
 
 export async function updateAnnotation(
   db: Knex,
+  user: User,
   id: ID,
   args: any
 ): Promise<Annotation> {
@@ -74,13 +76,13 @@ export async function updateAnnotation(
 
   if (args.card && !isEmpty(args.card)) {
     const trx = T.updateCard(data.cardId, args.card);
-    await T.run(db, trx);
+    await T.run(db, user, trx);
   }
 
   return getAnnotation(db, id);
 }
 
-export async function deleteAnnotation(db: Knex, id: ID): Promise<Annotation> {
+export async function deleteAnnotation(db: Knex, user: User, id: ID): Promise<Annotation> {
   const rows = await db("annotation")
     .where("id", id)
     .del()
@@ -89,7 +91,7 @@ export async function deleteAnnotation(db: Knex, id: ID): Promise<Annotation> {
 
   if (data.cardId) {
     const trx = T.deleteCard(data.cardId);
-    const r = await T.run(db, trx);
+    const r = await T.run(db, user, trx);
     data.card = r.transaction.data;
   }
 

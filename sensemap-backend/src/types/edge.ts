@@ -1,7 +1,8 @@
 import { gql } from "apollo-server";
 import { ID, Map, SenseObject, Edge, edgeFields } from "./sql";
 import { getEdgesInMap } from "./map";
-import * as T from "./transactions";
+import * as T from "./transaction";
+import * as A from "./oauth";
 
 export function edgesQuery(db) {
   return db.select(edgeFields).from("edge");
@@ -63,19 +64,32 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createEdge: async (_, args, { db }, info): Promise<Edge> => {
+    createEdge: async (_, args, { db, user, authorization }, info): Promise<Edge> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.createEdge(args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    updateEdge: async (_, args, { db }, info): Promise<Edge | null> => {
+    updateEdge: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Edge | null> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateEdge(args.id, args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    deleteEdge: async (_, { id }, { db }, info): Promise<Edge | null> => {
+    deleteEdge: async (
+      _,
+      { id },
+      { db, user, authorization },
+      info
+    ): Promise<Edge | null> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteEdge(id);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },
