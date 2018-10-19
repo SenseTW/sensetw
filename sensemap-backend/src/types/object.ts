@@ -105,20 +105,20 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createObject: async (_, args, { db }, info) => {
+    createObject: async (_, args, { db }, info): Promise<Object> => {
       const trx = T.createObject(args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
-    updateObject: async (_, args, { db }, info) => {
+    updateObject: async (_, args, { db }, info): Promise<Object> => {
       const trx = T.updateObject(args.id, args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
-    deleteObject: async (_, { id }, { db }, info) => {
+    deleteObject: async (_, { id }, { db }, info): Promise<Object> => {
       const trx = T.deleteObject(id);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     }
   },
   Object: {

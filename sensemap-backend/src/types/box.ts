@@ -119,22 +119,22 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createBox: async (_, args, { db, authorization }, info) => {
+    createBox: async (_, args, { db, authorization }, info): Promise<Box> => {
       const u = await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createBox(args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
-    deleteBox: async (_, { id }, { db }, info) => {
+    deleteBox: async (_, { id }, { db }, info): Promise<Box> => {
       const trx = T.deleteBox(id);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
-    updateBox: async (_, args, { db }, info) => {
+    updateBox: async (_, args, { db }, info): Promise<Box> => {
       const trx = T.updateBox(args.id, args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
     addToContainCards: async (
       _,
@@ -144,7 +144,7 @@ export const resolvers = {
     ) => {
       const trx = T.addObjectToBox(containsObjectId, belongsToBoxId);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
     removeFromContainCards: async (
       _,
@@ -154,7 +154,7 @@ export const resolvers = {
     ) => {
       const trx = T.removeObjectFromBox(containsObjectId, belongsToBoxId);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     }
   },
   Box: {

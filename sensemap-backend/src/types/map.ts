@@ -128,19 +128,19 @@ export const resolvers = {
       args.ownerId = !!u ? u.id : null;
       const trx = T.createMap(args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
 
     updateMap: async (_, args, { db }, info): Promise<Map> => {
       const trx = T.updateMap(args.id, args);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     },
 
     deleteMap: async (_, args, { db }, info): Promise<Map> => {
       const trx = T.deleteMap(args.id);
       const r = await T.run(db, trx);
-      return r.data;
+      return r.transaction.data;
     }
   },
 

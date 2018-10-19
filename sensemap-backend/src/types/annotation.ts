@@ -41,8 +41,8 @@ export async function createAnnotation(
   if (args.card) {
     const trx = T.createCard({ ...args.card, mapId: args.mapId });
     const r = await T.run(db, trx);
-    cardData = r.data;
-    a.cardId = r.data.id;
+    cardData = r.transaction.data;
+    a.cardId = r.transaction.data.id;
   }
 
   const rows = await db("annotation")
@@ -90,7 +90,7 @@ export async function deleteAnnotation(db: Knex, id: ID): Promise<Annotation> {
   if (data.cardId) {
     const trx = T.deleteCard(data.cardId);
     const r = await T.run(db, trx);
-    data.card = r.data;
+    data.card = r.transaction.data;
   }
 
   return data;
