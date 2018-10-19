@@ -3,7 +3,7 @@ import * as Knex from "knex";
 exports.seed = function(knex: Knex): Promise<any> {
   return knex("edge")
     .del()
-    .then(() => knex("transaction").del())
+    //.then(() => knex("transaction").del())
     .then(() => knex("history").del())
     .then(() => knex("annotation").del())
     .then(() => knex("object").del())
