@@ -33,15 +33,25 @@ type Transaction = {
 
 type TransactionResult = {
   status: TransactionStatus;
+  transaction: Transaction;
+  mapId: ID;
   data: any;
 };
 
-function successResult(data: any): TransactionResult {
-  return { status: TransactionStatus.SUCCESS, data };
+function successResult(
+  mapId: ID,
+  transaction: Transaction,
+  data: any
+): TransactionResult {
+  return { status: TransactionStatus.SUCCESS, mapId, transaction, data };
 }
 
-function failedResult(data: any): TransactionResult {
-  return { status: TransactionStatus.FAILED, data };
+function failedResult(
+  mapId: ID,
+  transaction: Transaction,
+  data: any
+): TransactionResult {
+  return { status: TransactionStatus.FAILED, mapId, transaction, data };
 }
 
 export function createMap(args): Transaction {
@@ -56,12 +66,6 @@ export function updateMap(mapId: ID, args): Transaction {
 
 export function deleteMap(mapId: ID): Transaction {
   return { op: "DELETE_MAP", mapId };
-}
-
-async function updateMapUpdatedAt(db, id: ID) {
-  await db("map")
-    .where("id", id)
-    .update({ updatedAt: new Date() });
 }
 
 export function createObject(args): Transaction {
@@ -128,7 +132,30 @@ export function removeObjectFromBox(objectId: ID, boxId: ID): Transaction {
   return { op: "REMOVE_OBJECT_FROM_BOX", objectId, boxId };
 }
 
+async function updateMapUpdatedAt(db, id: ID) {
+  await db("map")
+    .where("id", id)
+    .update({ updatedAt: new Date() });
+}
+
+async function saveTransaction(db: Knex, trx: Transaction) {
+  await db("transaction")
+    .insert({ data: trx });
+}
+
 export async function run(
+  db: Knex,
+  trx: Transaction
+): Promise<TransactionResult> {
+  const result = await runTransaction(db, trx);
+  if (result.status == TransactionStatus.SUCCESS) {
+    await saveTransaction(db, result.transaction);
+    await updateMapUpdatedAt(db, result.mapId);
+  }
+  return result;
+}
+
+export async function runTransaction(
   db: Knex,
   trx: Transaction
 ): Promise<TransactionResult> {
@@ -137,122 +164,108 @@ export async function run(
       const rows = await db("map")
         .insert(trx.data)
         .returning(mapFields);
-      return successResult(rows[0]);
+      return successResult(rows[0].id, trx, rows[0]);
     }
     case "UPDATE_MAP": {
       const rows = await db("map")
         .where("id", trx.mapId)
         .update(trx.data)
         .returning(mapFields);
-      await updateMapUpdatedAt(db, trx.mapId);
-      return successResult(rows[0]);
+      return successResult(trx.mapId, trx, rows[0]);
     }
     case "DELETE_MAP": {
       const rows = await db("map")
         .where("id", trx.mapId)
         .del()
         .returning(mapFields);
-      return successResult(rows[0]);
+      return successResult(trx.mapId, trx, rows[0]);
     }
     case "CREATE_OBJECT": {
       const rows = await db("object")
         .insert(trx.data)
         .returning(objectFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "UPDATE_OBJECT": {
       const rows = await db("object")
         .where("id", trx.objectId)
         .update(trx.data)
         .returning(objectFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "DELETE_OBJECT": {
       const rows = await db("object")
         .where("id", trx.objectId)
         .del()
         .returning(objectFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "CREATE_EDGE": {
       const rows = await db("edge")
         .insert(trx.data)
         .returning(edgeFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "UPDATE_EDGE": {
       const rows = await db("edge")
         .where("id", trx.edgeId)
         .update(trx.data)
         .returning(edgeFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "DELETE_EDGE": {
       const rows = await db("edge")
         .where("id", trx.edgeId)
         .delete()
         .returning(edgeFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "CREATE_CARD": {
       const rows = await db("card")
         .insert(trx.data)
         .returning(cardFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "UPDATE_CARD": {
       const rows = await db("card")
         .where("id", trx.cardId)
         .update(trx.data)
         .returning(cardFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "DELETE_CARD": {
       const rows = await db("card")
         .where("id", trx.cardId)
         .delete()
         .returning(cardFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "CREATE_BOX": {
       const rows = await db("box")
         .insert(trx.data)
         .returning(boxFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "UPDATE_BOX": {
       const rows = await db("box")
         .where("id", trx.boxId)
         .update(trx.data)
         .returning(boxFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "DELETE_BOX": {
       const rows = await db("box")
         .where("id", trx.boxId)
         .delete()
         .returning(boxFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult(rows[0]);
+      return successResult(rows[0].mapId, trx, rows[0]);
     }
     case "ADD_OBJECT_TO_BOX": {
       const rows = await db("object")
         .where("id", trx.objectId)
         .update({ belongsToId: trx.boxId })
         .returning(objectFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult({
+      return successResult(rows[0].mapId, trx, {
         containsObject: trx.objectId,
         belongsToBox: trx.boxId
       });
@@ -262,14 +275,13 @@ export async function run(
         .where("id", trx.objectId)
         .update({ belongsToId: db.raw("NULL") })
         .returning(objectFields);
-      await updateMapUpdatedAt(db, rows[0].mapId);
-      return successResult({
+      return successResult(rows[0].mapId, trx, {
         containsObject: trx.objectId,
         belongsToBox: trx.boxId
       });
     }
     default: {
-      return failedResult(null);
+      return failedResult(trx.mapId, trx, null);
     }
   }
 }
