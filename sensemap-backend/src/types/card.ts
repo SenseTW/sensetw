@@ -41,11 +41,11 @@ export type AllCardsArgs = {
 const writableFields = R.filter(name => name !== "quote", cardDataFields);
 
 export function cardsQuery(db) {
-  return db.select(cardFields(db)).from("card");
+  return db.select(cardFields).from("card");
 }
 
 export function cardsWithTargetQuery(db) {
-  return db.select(cardWithTargetFields(db)).from("card");
+  return db.select(cardWithTargetFields).from("card");
 }
 
 export async function getCard(db, id: ID): Promise<Card | null> {
@@ -96,7 +96,7 @@ export async function createCard(db, args): Promise<Card> {
   const fields = R.pick(cardDataFields, args);
   const rows = await db("card")
     .insert(fields)
-    .returning(cardFields(db));
+    .returning(cardFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -105,7 +105,7 @@ export async function deleteCard(db, id: ID): Promise<Card | null> {
   const rows = await db("card")
     .where("id", id)
     .delete()
-    .returning(cardFields(db));
+    .returning(cardFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -115,7 +115,7 @@ export async function updateCard(db, id: ID, args): Promise<Card | null> {
   const rows = await db("card")
     .where("id", id)
     .update(fields)
-    .returning(cardFields(db));
+    .returning(cardFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }

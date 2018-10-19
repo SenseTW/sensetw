@@ -25,7 +25,7 @@ type AllMapsArgs = {
 };
 
 export function mapsQuery(db) {
-  return db.select(mapFields(db)).from("map");
+  return db.select(mapFields).from("map");
 }
 
 export async function getMap(db, id: ID): Promise<Map | null> {
@@ -43,7 +43,7 @@ export async function createMap(db, args: Map): Promise<Map> {
   const fields = pick(mapDataFields, args);
   const rows = await db("map")
     .insert(fields)
-    .returning(mapFields(db));
+    .returning(mapFields);
   return rows[0];
 }
 
@@ -52,7 +52,7 @@ export async function updateMap(db, id: ID, args): Promise<Map> {
   const rows = await db("map")
     .where("id", id)
     .update(fields)
-    .returning(mapFields(db));
+    .returning(mapFields);
   await updateMapUpdatedAt(db, id);
   return rows[0];
 }
@@ -61,7 +61,7 @@ export async function updateMapUpdatedAt(db, id: ID): Promise<Map> {
   const rows = await db("map")
     .where("id", id)
     .update({ updatedAt: new Date() })
-    .returning(mapFields(db));
+    .returning(mapFields);
   return rows[0];
 }
 
@@ -69,7 +69,7 @@ export async function deleteMap(db, id: ID): Promise<Map> {
   const rows = await db("map")
     .where("id", id)
     .del()
-    .returning(mapFields(db));
+    .returning(mapFields);
   return rows[0];
 }
 

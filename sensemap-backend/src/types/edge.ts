@@ -4,7 +4,7 @@ import { getEdgesInMap, updateMapUpdatedAt } from "./map";
 import { pick } from "ramda";
 
 export function edgesQuery(db) {
-  return db.select(edgeFields(db)).from("edge");
+  return db.select(edgeFields).from("edge");
 }
 
 export async function getAllEdges(db): Promise<Edge[]> {
@@ -22,7 +22,7 @@ export async function createEdge(db, args): Promise<Edge> {
   const fields = pick(edgeDataFields, args);
   const rows = await db("edge")
     .insert(fields)
-    .returning(edgeFields(db));
+    .returning(edgeFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -32,7 +32,7 @@ export async function updateEdge(db, id: ID, args): Promise<Edge | null> {
   const rows = await db("edge")
     .where("id", id)
     .update(fields)
-    .returning(edgeFields(db));
+    .returning(edgeFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -41,7 +41,7 @@ export async function deleteEdge(db, id: ID): Promise<Edge | null> {
   const rows = await db("edge")
     .where("id", id)
     .delete()
-    .returning(edgeFields(db));
+    .returning(edgeFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }

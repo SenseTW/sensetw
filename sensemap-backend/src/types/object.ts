@@ -4,7 +4,7 @@ import { getObjectsInMap, updateMapUpdatedAt } from "./map";
 import { pick } from "ramda";
 
 export function objectsQuery(db) {
-  return db.select(objectFields(db)).from("object");
+  return db.select(objectFields).from("object");
 }
 
 export async function getAllObjects(db): Promise<SenseObject[]> {
@@ -22,7 +22,7 @@ export async function createObject(db, args): Promise<SenseObject> {
   const fields = pick(objectDataFields, args);
   const rows = await db("object")
     .insert(fields)
-    .returning(objectFields(db));
+    .returning(objectFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -36,7 +36,7 @@ export async function updateObject(
   const rows = await db("object")
     .where("id", id)
     .update(fields)
-    .returning(objectFields(db));
+    .returning(objectFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }
@@ -45,7 +45,7 @@ export async function deleteObject(db, id: ID): Promise<SenseObject | null> {
   const rows = await db("object")
     .where("id", id)
     .del()
-    .returning(objectFields(db));
+    .returning(objectFields);
   await updateMapUpdatedAt(db, rows[0].mapId);
   return rows[0];
 }

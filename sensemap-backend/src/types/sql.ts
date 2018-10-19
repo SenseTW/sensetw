@@ -1,3 +1,17 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
+import * as Knex from "knex";
+
+export const db = Knex({
+  client: "pg",
+  connection: process.env.DATABASE_URL,
+  //debug: env.NODE_ENV === 'development',
+  seeds: {
+    directory: "./seeds/dev"
+  }
+});
+
 export type ID = string;
 
 export type HasID = {
@@ -18,7 +32,7 @@ export type UserData = {
 
 export type User = HasID & HasTimestamps & UserData;
 
-export const userFields = db => [
+export const userFields = [
   ...hasTimestampFields,
   "username",
   "email",
@@ -29,7 +43,7 @@ export const userFields = db => [
       .from("map")
       .whereRaw('"map"."ownerId" = "user"."id"')
   )
-];
+] as string[];
 
 export type Map = HasID &
   HasTimestamps & {
@@ -54,7 +68,7 @@ export const mapDataFields = [
   "ownerId"
 ];
 
-export const mapFields = db => [
+export const mapFields = [
   ...hasTimestampFields,
   ...mapDataFields,
   db.raw('"ownerId" as owner'),
@@ -86,7 +100,7 @@ export const mapFields = db => [
       .from("edge")
       .whereRaw('"edge"."mapId" = "map"."id"')
   )
-];
+] as string[];
 
 export type ObjectType = "CARD" | "BOX";
 
@@ -117,14 +131,14 @@ export const objectDataFields = [
   "belongsToId"
 ];
 
-export const objectFields = db => [
+export const objectFields = [
   ...hasTimestampFields,
   ...objectDataFields,
   db.column("mapId").as("map"),
   db.column("boxId").as("box"),
   db.column("cardId").as("card"),
   db.column("belongsToId").as("belongsTo")
-];
+] as string[];
 
 export type CardType = "NOTE" | "PROBLEM" | "SOLUTION" | "DEFINITION" | "INFO";
 
@@ -157,7 +171,7 @@ export const cardDataFields = [
   "ownerId"
 ];
 
-export const cardFields = db => [
+export const cardFields = [
   ...hasTimestampFields,
   ...cardDataFields,
   db.column("mapId").as("map"),
@@ -169,10 +183,10 @@ export const cardFields = db => [
       .from("object")
       .whereRaw('"cardId" = "card"."id"')
   )
-];
+] as string[];
 
-export const cardWithTargetFields = db => [
-  ...cardFields(db),
+export const cardWithTargetFields = [
+  ...cardFields,
   db.raw(
     '? as "annotationID"',
     db
@@ -187,7 +201,7 @@ export const cardWithTargetFields = db => [
       .from("annotation")
       .whereRaw('"cardId" = "card"."id"')
   )
-];
+] as string[];
 
 export type BoxType = "NOTE" | "PROBLEM" | "SOLUTION" | "DEFINITION" | "INFO";
 
@@ -210,7 +224,7 @@ export const boxDataFields = [
   "ownerId"
 ];
 
-export const boxFields = db => [
+export const boxFields = [
   ...hasTimestampFields,
   ...boxDataFields,
   db.column("mapId").as("map"),
@@ -229,7 +243,7 @@ export const boxFields = db => [
       .from("object")
       .whereRaw('"object"."belongsToId" = "box"."id"')
   )
-];
+] as string[];
 
 export type Edge = HasID &
   HasTimestamps & {
@@ -240,13 +254,13 @@ export type Edge = HasID &
 
 export const edgeDataFields = ["mapId", "fromId", "toId"];
 
-export const edgeFields = db => [
+export const edgeFields = [
   ...hasTimestampFields,
   ...edgeDataFields,
   db.column("mapId").as("map"),
   db.column("fromId").as("from"),
   db.column("toId").as("to")
-];
+] as string[];
 
 export type Annotation = HasID &
   HasTimestamps & {
@@ -259,7 +273,36 @@ export type Annotation = HasID &
 
 export const annotationDataFields = ["target", "document", "mapId", "cardId"];
 
-export const annotationFields = db => [
+export const annotationFields = [
   ...hasTimestampFields,
   ...annotationDataFields
-];
+] as string[];
+
+export type TransactionType =
+  | "MAP"
+  | "OBJECT"
+  | "EDGE"
+  | "CARD"
+  | "BOX"
+  | "BOXITEM";
+
+export const transactionDataFields = ["transactionType", "mapId", "data"];
+export type Transaction = HasID &
+  HasTimestamps & {
+    transactionType: TransactionType;
+    mapId: ID;
+    data: any;
+  };
+
+export type HistoryType = "MAP" | "OBJECT";
+
+export const historyDataFields = ["userId", "mapId", "objectId", "data"];
+
+export type History = HasID &
+  HasTimestamps & {
+    userId: ID;
+    historyType: HistoryType;
+    mapId: ID;
+    objectId: ID;
+    data: any;
+  };
