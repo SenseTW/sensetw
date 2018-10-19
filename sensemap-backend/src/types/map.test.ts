@@ -6,6 +6,7 @@ import { context } from "../context";
 const nonExistentID = "10330ced-04b4-46d3-91a6-1d294bb12da3";
 
 const { db } = context();
+const user = users[0];
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
@@ -36,22 +37,20 @@ describe("GraphQL", () => {
     const m0 = await M.resolvers.Mutation.createMap(
       null,
       {
-        ownerId: users[0].id
+        ownerId: user.id
       },
-      { db },
-      null
+      { db, user }
     );
     expect(m0.id).toBeTruthy();
     expect(m0.createdAt).toBeTruthy();
     expect(m0.updatedAt).toBeTruthy();
     expect(m0.name).toBeNull();
-    expect(m0.owner).toBeNull();
+    expect(m0.owner).toBe(user.id);
 
     const m1 = await M.resolvers.Mutation.updateMap(
       null,
       { id: m0.id, name: "baz", type: "someothertype" },
-      { db },
-      null
+      { db, user }
     );
 
     const m2 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);
@@ -64,8 +63,7 @@ describe("GraphQL", () => {
     const m3 = await M.resolvers.Mutation.deleteMap(
       null,
       { id: m0.id },
-      { db },
-      null
+      { db, user }
     );
     expect(m3.id).toBe(m0.id);
     const r3 = await M.resolvers.Query.Map(null, { id: m0.id }, { db }, null);

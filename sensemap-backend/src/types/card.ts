@@ -12,7 +12,7 @@ import { MapFilter } from "./map";
 import { objectsQuery } from "./object";
 import * as R from "ramda";
 import * as A from "./oauth";
-import * as T from "./transactions";
+import * as T from "./transaction";
 
 export type CardFilter = {
   id?: ID;
@@ -181,23 +181,25 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createCard: async (_, args, { db, authorization }, info): Promise<Card> => {
-      const u = await A.getUserFromAuthorization(db, authorization);
+    createCard: async (_, args, { db, user, authorization }, info): Promise<Card> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createCard(R.pick(writableFields, args));
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    deleteCard: async (_, { id }, { db }, info): Promise<Card> => {
+    deleteCard: async (_, { id }, { db, user, authorization }, info): Promise<Card> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteCard(id);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    updateCard: async (_, args, { db }, info): Promise<Card> => {
+    updateCard: async (_, args, { db, user, authorization }, info): Promise<Card> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateCard(args.id, R.pick(writableFields, args));
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },

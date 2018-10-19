@@ -147,3 +147,8 @@ User input --> validate -----+
             {who} added/ejected Card "{summary}" into / out of Box "{title}".
             {who} edited {description}, {tag} in Map Details
             {who} changed Map Name from {} to {}
+
+## TODO
+
+* userId in Transaction? in transaction?
+* denormalize card & box & map history

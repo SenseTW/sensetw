@@ -246,10 +246,10 @@ export const resolvers = {
     verifyPassword: async (
       _,
       { password },
-      { db, authorization },
+      { db, user, authorization },
       info
     ): Promise<User | null> => {
-      const u = await A.getUserFromAuthorization(db, authorization);
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       if (!u) {
         return null;
       }
@@ -260,10 +260,10 @@ export const resolvers = {
     changePassword: async (
       _,
       { password },
-      { db, authorization },
+      { db, user, authorization },
       info
     ): Promise<User | null> => {
-      const u = await A.getUserFromAuthorization(db, authorization);
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       if (!u) {
         return null;
       }

@@ -1,7 +1,8 @@
 import { gql } from "apollo-server";
 import { ID, SenseObject, objectFields } from "./sql";
 import { getObjectsInMap } from "./map";
-import * as T from './transactions';
+import * as T from './transaction';
+import * as A from "./oauth";
 
 export function objectsQuery(db) {
   return db.select(objectFields).from("object");
@@ -105,19 +106,22 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createObject: async (_, args, { db }, info): Promise<Object> => {
+    createObject: async (_, args, { db, user, authorization }, info): Promise<Object> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.createObject(args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    updateObject: async (_, args, { db }, info): Promise<Object> => {
+    updateObject: async (_, args, { db, user, authorization }, info): Promise<Object> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateObject(args.id, args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    deleteObject: async (_, { id }, { db }, info): Promise<Object> => {
+    deleteObject: async (_, { id }, { db, user, authorization }, info): Promise<Object> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteObject(id);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },

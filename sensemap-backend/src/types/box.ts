@@ -2,7 +2,7 @@ import { gql } from "apollo-server";
 import { ID, Box, BoxType, boxFields, SenseObject } from "./sql";
 import { getBoxesInMap } from "./map";
 import { objectsQuery } from "./object";
-import * as T from "./transactions";
+import * as T from "./transaction";
 import * as A from "./oauth";
 
 export function boxesQuery(db) {
@@ -119,41 +119,45 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createBox: async (_, args, { db, authorization }, info): Promise<Box> => {
-      const u = await A.getUserFromAuthorization(db, authorization);
+    createBox: async (_, args, { db, user, authorization }, info): Promise<Box> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createBox(args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    deleteBox: async (_, { id }, { db }, info): Promise<Box> => {
+    deleteBox: async (_, { id }, { db, user, authorization }, info): Promise<Box> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteBox(id);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    updateBox: async (_, args, { db }, info): Promise<Box> => {
+    updateBox: async (_, args, { db, user, authorization }, info): Promise<Box> => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateBox(args.id, args);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
     addToContainCards: async (
       _,
       { belongsToBoxId, containsObjectId },
-      { db },
+      { db, user, authorization },
       info
     ) => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.addObjectToBox(containsObjectId, belongsToBoxId);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
     removeFromContainCards: async (
       _,
       { belongsToBoxId, containsObjectId },
-      { db },
+      { db, user, authorization },
       info
     ) => {
+      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
       const trx = T.removeObjectFromBox(containsObjectId, belongsToBoxId);
-      const r = await T.run(db, trx);
+      const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },

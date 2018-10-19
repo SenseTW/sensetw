@@ -1,9 +1,10 @@
 import * as C from "./card";
-import * as T from "./transactions";
+import * as T from "./transaction";
 import { context } from "../context";
-import { maps } from "../../seeds/dev";
+import { users, maps } from "../../seeds/dev";
 
 const { db } = context();
+const user = users[0];
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
@@ -15,7 +16,7 @@ describe("create/update/deleteCard", () => {
       quote: "mono no aware",
       mapId
     });
-    const r = await T.run(db, trx);
+    const r = await T.run(db, user, trx);
     const c0 = r.transaction.data;
     expect(c0.id).toBeTruthy();
     expect(c0.objects).toEqual([]);
@@ -26,7 +27,7 @@ describe("create/update/deleteCard", () => {
       summary: "sweet variety peas",
       quote: "always adopt never buy"
     });
-    const r1 = await T.run(db, trx1);
+    const r1 = await T.run(db, user, trx1);
     const c1 = r1.transaction.data;
     expect(c1.summary).toBe("sweet variety peas");
     expect(c1.quote).toBe("always adopt never buy");
@@ -85,7 +86,7 @@ describe("GraphQL", () => {
         quote: "mono no aware",
         mapId
       },
-      { db }
+      { db, user }
     );
     expect(c0.id).toBeTruthy();
     expect(c0.objects).toEqual([]);
@@ -99,7 +100,7 @@ describe("GraphQL", () => {
         summary: "sweet variety peas",
         quote: "mono no aware"
       },
-      { db }
+      { db, user }
     );
     expect(c1.summary).toBe("sweet variety peas");
     expect(c1.quote).toBe("");
@@ -107,7 +108,7 @@ describe("GraphQL", () => {
     const c2 = await C.resolvers.Mutation.deleteCard(
       null,
       { id: c0.id },
-      { db }
+      { db, user }
     );
     expect(c2.id).toBe(c0.id);
   });
@@ -126,7 +127,7 @@ describe("GraphQL", () => {
         mapId,
         description
       },
-      { db }
+      { db, user }
     );
     expect(c0.description).toBe(description);
   });

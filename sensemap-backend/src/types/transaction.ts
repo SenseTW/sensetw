@@ -1,6 +1,7 @@
 import * as Knex from "knex";
 import {
   ID,
+  User,
   mapFields,
   mapDataFields,
   objectFields,
@@ -131,21 +132,8 @@ async function updateMapUpdatedAt(db, id: ID) {
     .update({ updatedAt: new Date() });
 }
 
-async function saveTransaction(db: Knex, trx: Transaction) {
+async function saveTransaction(db: Knex, user: User, trx: Transaction) {
   await db("transaction").insert({ data: trx });
-}
-
-export async function run(
-  db: Knex,
-  trx: Transaction
-): Promise<TransactionResult> {
-  const result = await runTransaction(db, trx);
-  if (result.status == TransactionStatus.SUCCESS) {
-    await saveTransaction(db, result.transaction);
-    await writeHistory(db, result.transaction);
-    await updateMapUpdatedAt(db, result.mapId);
-  }
-  return result;
 }
 
 export async function runTransaction(
@@ -334,4 +322,18 @@ export async function runTransaction(
       return failedResult(trx.mapId, trx);
     }
   }
+}
+
+export async function run(
+  db: Knex,
+  user: User,
+  trx: Transaction
+): Promise<TransactionResult> {
+  const result = await runTransaction(db, trx);
+  if (result.status == TransactionStatus.SUCCESS) {
+    await saveTransaction(db, user, result.transaction);
+    await writeHistory(db, result.transaction);
+    await updateMapUpdatedAt(db, result.mapId);
+  }
+  return result;
 }
