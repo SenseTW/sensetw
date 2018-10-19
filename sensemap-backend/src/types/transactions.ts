@@ -13,6 +13,7 @@ import {
   boxDataFields
 } from "./sql";
 import * as R from "ramda";
+import { writeHistory } from "./history";
 
 enum TransactionStatus {
   UNSAVED,
@@ -21,7 +22,7 @@ enum TransactionStatus {
   FAILED
 }
 
-type Transaction = {
+export type Transaction = {
   op: string;
   mapId?: ID;
   objectId?: ID;
@@ -141,6 +142,7 @@ export async function run(
   const result = await runTransaction(db, trx);
   if (result.status == TransactionStatus.SUCCESS) {
     await saveTransaction(db, result.transaction);
+    await writeHistory(db, result.transaction);
     await updateMapUpdatedAt(db, result.mapId);
   }
   return result;
