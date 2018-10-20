@@ -58,3 +58,6 @@ export function sanitizeURL(a?: string): string {
   }
   return a.replace(/\/+$/, '');
 }
+
+// tslint:disable-next-line:no-any
+export const delay = (t: number) => (v: any) => new Promise((resolve) => setTimeout(resolve, t, v));
