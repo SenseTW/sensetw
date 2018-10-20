@@ -50,7 +50,7 @@ export const up = (pgm: MigrationBuilder) => {
     },
   });
 
-  pgm.createType('historytype', ['MAP', 'OBJECT']);
+  pgm.createType('historytype', ['MAP', 'OBJECT', 'CARD']);
   pgm.createTable('history', {
     id: 'id',
     createdAt: 'time',
@@ -59,6 +59,7 @@ export const up = (pgm: MigrationBuilder) => {
     historyType: 'historytype',
     mapId: 'mapReference',
     objectId: 'objectReference',
+    cardId: 'cardReference',
     data: {
       type: 'jsonb',
       notNull: true,
