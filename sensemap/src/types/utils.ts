@@ -9,6 +9,8 @@ export const TIME_FORMAT = 'YYYY-M-DD HH:mm';
 
 export const MAP_TIME_FORMAT = 'YYYY.MM.DD';
 
+export const SQRT3 = 1.73205;
+
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
  */
