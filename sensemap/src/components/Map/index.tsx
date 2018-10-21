@@ -7,6 +7,7 @@ import Edge from './Edge';
 import AltBox from '../WholeMap/Box';
 import AltCard from '../WholeMap/Card';
 import CardList from '../WholeMap/CardList';
+import EdgeDescription from './EdgeDescription';
 import { Group } from 'react-konva';
 import * as SL from '../../types/selection';
 import { Edge as EdgeData, ObjectType, ObjectData, CardData, State, ActionProps } from '../../types';
@@ -45,6 +46,8 @@ interface MapState {
   transform: G.Transform;
   inverseTransform: G.Transform;
   hoverObject?: ObjectData;
+  hoverEdge?: EdgeData;
+  hoverPoint?: G.Point;
 }
 
 export class Map extends React.Component<Props, MapState> {
@@ -209,6 +212,20 @@ export class Map extends React.Component<Props, MapState> {
     this.setState({ hoverObject: undefined });
   }
 
+  handleEdgeMouseOver = (e: KonvaEvent.Mouse, hoverEdge: EdgeData) => {
+    const hoverPoint = { x: e.evt.layerX, y: e.evt.layerY };
+    this.setState({ hoverEdge, hoverPoint });
+  }
+
+  handleEdgeMouseMove = (e: KonvaEvent.Mouse) => {
+    const hoverPoint = { x: e.evt.layerX, y: e.evt.layerY };
+    this.setState({ hoverPoint });
+  }
+
+  handleEdgeMouseOut = () => {
+    this.setState({ hoverEdge: undefined, hoverPoint: undefined });
+  }
+
   handleObjectTouchStart = (e: KonvaEvent.Touch) => {
     if (e.evt.touches.length === 1) {
       const touch = e.evt.touches[0];
@@ -300,8 +317,9 @@ export class Map extends React.Component<Props, MapState> {
   }
 
   render() {
+    // const { senseObject } = this.props;
     const useAltLayout = this.isAltLayout();
-    const { transform, inverseTransform, hoverObject } = this.state;
+    const { transform, inverseTransform, hoverObject, hoverEdge, hoverPoint } = this.state;
     const storage = CS.toStorage(this.props.inScope);
     const objects = Object.values(storage.objects).map(o => this.renderObject(o));
     const edges =   Object.values(storage.edges).map(e => this.renderEdge(e));
@@ -351,6 +369,25 @@ export class Map extends React.Component<Props, MapState> {
         />
       );
 
+    let edgeDescription;
+    // let obj;
+    if (hoverEdge !== undefined && hoverPoint !== undefined) {
+      // obj = CS.getObject(senseObject, hoverEdge.from);
+      // const { x: fromX, y: fromY } = obj;
+      // obj = CS.getObject(senseObject, hoverEdge.to);
+      // const { x: toX, y: toY } = obj;
+      const { x, y } = inverseTransform(hoverPoint);
+      edgeDescription = (
+        <EdgeDescription
+          transform={transform}
+          inverseTransform={inverseTransform}
+          x={x}
+          y={y}
+          edge={hoverEdge}
+        />
+      );
+    }
+
     return (
       <Stage
         width={this.props.width}
@@ -367,6 +404,7 @@ export class Map extends React.Component<Props, MapState> {
           {edges}
           {objects}
           {cardList}
+          {edgeDescription}
         </Layer>
       </Stage>
     );
@@ -485,6 +523,9 @@ export class Map extends React.Component<Props, MapState> {
         selected={SL.isMapEdgeSelected(selection, edge.id)}
         onSelect={this.handleEdgeSelect}
         onDeselect={this.handleEdgeDeselect}
+        onMouseOver={this.handleEdgeMouseOver}
+        onMouseMove={this.handleEdgeMouseMove}
+        onMouseOut={this.handleEdgeMouseOut}
       />
     );
   }

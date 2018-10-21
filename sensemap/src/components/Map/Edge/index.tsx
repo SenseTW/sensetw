@@ -4,9 +4,7 @@ import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
 import * as G from '../../../graphics/point';
 import { Edge as EdgeData } from '../../../types';
-import { noop } from '../../../types/utils';
-
-const SQRT3 = 1.73205;
+import { SQRT3, noop } from '../../../types/utils';
 
 export interface Props extends TransformerForProps {
   from:      G.Point;
@@ -18,6 +16,7 @@ export interface Props extends TransformerForProps {
   onSelect?(e: any, edge: EdgeData): void;
   onDeselect?(e: any, edge: EdgeData): void;
   onMouseOver?(e: any, edge: EdgeData): void;
+  onMouseMove?(e: any, edge: EdgeData): void;
   onMouseOut?(e: any, edge: EdgeData): void;
   onOpen?(e: any, edge: EdgeData): void;
   // tslint:enable
@@ -88,6 +87,7 @@ class Edge extends React.PureComponent<Props> {
     const onSelect    = this.props.onSelect    || noop;
     const onDeselect  = this.props.onDeselect  || noop;
     const onMouseOver = this.props.onMouseOver || noop;
+    const onMouseMove = this.props.onMouseMove || noop;
     const onMouseOut  = this.props.onMouseOut  || noop;
     const onOpen      = this.props.onOpen      || noop;
 
@@ -108,17 +108,6 @@ class Edge extends React.PureComponent<Props> {
             points={[...from, ...to]}
             stroke={selected ? style.selected.color : style.color}
           />
-          <Line
-            points={[...from, ...to]}
-            stroke="transparent"
-            strokeWidth={style.touchWidth}
-            onDblClick={(e) => {
-              onSelect(e, data);
-              onOpen(e, data);
-            }}
-            onMouseOver={(e) => onMouseOver(e, data)}
-            onMouseOut={(e) => onMouseOut(e, data)}
-          />
           {
             points.map((p, i) =>
               <Indicator
@@ -132,6 +121,18 @@ class Edge extends React.PureComponent<Props> {
               />
             )
           }
+          <Line
+            points={[...from, ...to]}
+            stroke="transparent"
+            strokeWidth={style.touchWidth}
+            onDblClick={(e) => {
+              onSelect(e, data);
+              onOpen(e, data);
+            }}
+            onMouseOver={(e) => onMouseOver(e, data)}
+            onMouseMove={(e) => onMouseMove(e, data)}
+            onMouseOut={(e) => onMouseOut(e, data)}
+          />
         </Group>
       </Selectable>
     );
