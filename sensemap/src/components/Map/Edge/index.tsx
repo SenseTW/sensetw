@@ -12,6 +12,7 @@ export interface Props extends TransformerForProps {
   data:      EdgeData;
   isDirty?:  boolean;
   selected?: boolean;
+  hovered?:  boolean;
   // tslint:disable:no-any
   onSelect?(e: any, edge: EdgeData): void;
   onDeselect?(e: any, edge: EdgeData): void;
@@ -72,8 +73,14 @@ class Edge extends React.PureComponent<Props> {
   };
 
   render () {
-    const { transform, data, selected } = this.props;
+    const { transform, data, selected, hovered } = this.props;
     const style = Edge.style;
+    const color =
+      selected
+        ? style.selected.color
+        : hovered
+            ? style.hover.color
+            : style.color;
     const from = G.toTuple(transform(this.props.from));
     const to = G.toTuple(transform(this.props.to));
     const dX = (to[0] - from[0]);
@@ -106,7 +113,7 @@ class Edge extends React.PureComponent<Props> {
         <Group>
           <Line
             points={[...from, ...to]}
-            stroke={selected ? style.selected.color : style.color}
+            stroke={color}
           />
           {
             points.map((p, i) =>
@@ -117,7 +124,7 @@ class Edge extends React.PureComponent<Props> {
                 radius={style.indicator.radius}
                 rotation={rotation}
                 color={style.indicator.color}
-                backgroundColor={selected ? style.selected.color : style.color}
+                backgroundColor={color}
               />
             )
           }

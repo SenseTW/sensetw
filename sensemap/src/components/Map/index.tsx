@@ -511,6 +511,7 @@ export class Map extends React.Component<Props, MapState> {
 
   renderEdge(edge: EdgeData) {
     const { selection } = this.props;
+    const { hoverEdge } = this.state;
 
     return (
       <Edge
@@ -521,6 +522,7 @@ export class Map extends React.Component<Props, MapState> {
         to={CS.getObject(this.props.inScope, edge.to)}
         data={edge}
         selected={SL.isMapEdgeSelected(selection, edge.id)}
+        hovered={hoverEdge && hoverEdge.id === edge.id}
         onSelect={this.handleEdgeSelect}
         onDeselect={this.handleEdgeDeselect}
         onMouseOver={this.handleEdgeMouseOver}
