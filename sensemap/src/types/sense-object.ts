@@ -17,7 +17,6 @@ import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
 import * as SM from './sense-map';
-import { delay } from './utils';
 
 export type State = CachedStorage;
 
@@ -197,23 +196,6 @@ const loadEdges =
           ? CS.overwriteEdges(data, TargetType.PERMANENT)
           : CS.updateEdges(data, TargetType.PERMANENT)
       ));
-  };
-
-const reloadEverything =
-  (id: MapID) =>
-  // tslint:disable-next-line:no-any
-  (dispatch: Dispatch): Promise<any> => {
-    // tslint:disable-next-line:no-console
-    return Promise.all([
-      loadObjects(id)(dispatch),
-      loadCards(id)(dispatch),
-      loadBoxes(id)(dispatch),
-      loadEdges(id)(dispatch)
-    ])
-      // tslint:disable-next-line:no-console
-      .catch(err => console.error(err))
-      .then(delay(5000))
-      .then(() => reloadEverything(id)(dispatch));
   };
 
 const addCardToBox =
@@ -462,7 +444,6 @@ export const actions = {
   loadCards,
   loadBoxes,
   loadEdges,
-  reloadEverything,
   createCard,
   createBoxObject,
   createObjectForCard,

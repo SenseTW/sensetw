@@ -36,15 +36,11 @@ class Map extends React.Component<Props, OwnState> {
     this.props.actions.senseObject.cleanUp();
     this.props.actions.viewport.resetViewPort();
     this.props.actions.senseObject.loadMaps();
-    this.props.actions.senseObject.reloadEverything(this.props.id);
-
     // tslint:disable-next-line:no-any
     const p = this.props.actions.senseObject.loadObjects(this.props.id) as any;
-    /*
     this.props.actions.senseObject.loadCards(this.props.id);
     this.props.actions.senseObject.loadBoxes(this.props.id);
     this.props.actions.senseObject.loadEdges(this.props.id);
-    */
 
     type ObjectAction = {
       payload: {
@@ -61,13 +57,10 @@ class Map extends React.Component<Props, OwnState> {
       this.props.actions.senseObject.cleanUp();
       this.props.actions.viewport.resetViewPort();
       this.props.actions.senseObject.loadMaps();
-      this.props.actions.senseObject.reloadEverything(this.props.id);
-      /*
       this.props.actions.senseObject.loadObjects(this.props.id);
       this.props.actions.senseObject.loadCards(this.props.id);
       this.props.actions.senseObject.loadBoxes(this.props.id);
       this.props.actions.senseObject.loadEdges(this.props.id);
-      */
     }
   }
 
