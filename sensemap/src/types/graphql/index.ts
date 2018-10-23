@@ -4,9 +4,11 @@ import { BoxID } from '../sense/box';
 import { CardID } from '../sense/card';
 import * as GO from './object';
 import * as GC from './card';
+import * as SN from '../session';
+import { curry } from 'ramda';
 
 export const addCardToBox =
-  (cardObject: ObjectID, box: BoxID) => {
+  (user: SN.User, cardObject: ObjectID, box: BoxID) => {
     const query = `
       mutation AddCardToBox($cardObject: ID!, $box: ID!) {
         addToContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
@@ -15,11 +17,11 @@ export const addCardToBox =
       }
     `;
     const variables = { cardObject, box };
-    return client().request(query, variables);
+    return client(user).request(query, variables);
   };
 
 export const removeCardFromBox =
-  (cardObject: ObjectID, box: BoxID) => {
+  (user: SN.User, cardObject: ObjectID, box: BoxID) => {
     const query = `
       mutation RemoveCardFromBox($cardObject: ID!, $box: ID!) {
         removeFromContainCards(belongsToBoxId: $box, containsObjectId: $cardObject) {
@@ -28,11 +30,11 @@ export const removeCardFromBox =
       }
     `;
     const variables = { cardObject, box };
-    return client().request(query, variables);
+    return client(user).request(query, variables);
   };
 
 export const deleteObjectsByCard =
-  (cardID: CardID) => {
+  (user: SN.User, cardID: CardID) => {
     const query = `
       query GetCard($cardID: ID!) {
         Card(id: $cardID) { ...cardFields }
@@ -40,22 +42,22 @@ export const deleteObjectsByCard =
       ${GC.graphQLCardFieldsFragment}
     `;
     const variables = { cardID };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ Card }: { Card: { objects: { id: ObjectID }[] } }) =>
             Card.objects.map(({ id }) => id))
-      .then((ids) => Promise.all(ids.map(GO.remove)));
+      .then((ids) => Promise.all(ids.map(curry(GO.remove)(user))));
   };
 
 export const deleteObjectsByBox =
-  (boxID: BoxID) => {
+  (user: SN.User, boxID: BoxID) => {
     const query = `
       query GetBoxObjects($boxID: ID!) {
         Box(id: $boxID) { objects { id } }
       }
     `;
     const variables = { boxID };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
             Box.objects.map(({ id }) => id))
-      .then((ids) => Promise.all(ids.map(GO.remove)));
+      .then((ids) => Promise.all(ids.map(curry(GO.remove)(user))));
   };

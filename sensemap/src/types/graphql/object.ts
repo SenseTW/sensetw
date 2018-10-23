@@ -15,6 +15,7 @@ import {
   DEFAULT_HEIGHT as DEFAULT_BOX_HEIGHT,
 } from '../sense/box';
 import { client } from './client';
+import * as SN from '../session';
 import * as moment from 'moment';
 
 const graphQLObjectFieldsFragment = `
@@ -94,7 +95,7 @@ const toObjectData: (o: GraphQLObjectFields, isDeleted?: boolean) => ObjectData 
   });
 
 export const loadRawObjects =
-  (id: MapID): Promise<GraphQLObjectFields[]> => {
+  (user: SN.User, id: MapID): Promise<GraphQLObjectFields[]> => {
     const query = `
       query AllObjects($id: ID!) {
         allObjects(filter: { map: { id: $id } }) {
@@ -104,16 +105,16 @@ export const loadRawObjects =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ allObjects }) => allObjects);
   };
 
 export const loadObjects =
-  (id: MapID): Promise<ObjectData[]> =>
-    loadRawObjects(id).then(os => os.map(o => toObjectData(o)));
+  (user: SN.User, id: MapID): Promise<ObjectData[]> =>
+    loadRawObjects(user, id).then(os => os.map(o => toObjectData(o)));
 
 export const create =
-  (mapId: MapID, data: ObjectData) => {
+  (user: SN.User, mapId: MapID, data: ObjectData) => {
     const query = `
       mutation CreateObject(
         $x: Float!,
@@ -147,12 +148,12 @@ export const create =
       }
       ${graphQLObjectFieldsFragment}
     `;
-    return client().request(query, { ...data, mapId })
+    return client(user).request(query, { ...data, mapId })
       .then(({ createObject }) => toObjectData(createObject));
   };
 
 export const move =
-  (id: ObjectID, x: number, y: number) => {
+  (user: SN.User, id: ObjectID, x: number, y: number) => {
     const query = `
       mutation MoveObject($id: ID!, $x: Float!, $y: Float!) {
         updateObject(id: $id, x: $x, y: $y) {
@@ -162,12 +163,12 @@ export const move =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id, x, y };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ updateObject }) => toObjectData(updateObject));
   };
 
 export const updateObjectType =
-  (id: ObjectID, objectType: ObjectType) => {
+  (user: SN.User, id: ObjectID, objectType: ObjectType) => {
     const query = `
       mutation MoveObject($id: ID!, $objectType: ObjectType!) {
         updateObject(id: $id, objectType: $objectType) {
@@ -177,12 +178,12 @@ export const updateObjectType =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { id, objectType };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ updateObject }) => toObjectData(updateObject));
   };
 
 export const remove =
-  (objectID: ObjectID) => {
+  (user: SN.User, objectID: ObjectID) => {
     const query = `
       mutation DeleteObject($objectID: ID!) {
         deleteObject(id: $objectID) { ...objectFields }
@@ -190,7 +191,7 @@ export const remove =
       ${graphQLObjectFieldsFragment}
     `;
     const variables = { objectID };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ deleteObject }) => {
         // patch the object type, because Graphcool will not sync it with the
         // box/card field for us

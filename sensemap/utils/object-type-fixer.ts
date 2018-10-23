@@ -1,6 +1,7 @@
 #!/usr/bin/env ts-node
 import { MapID, ObjectType } from '../src/types';
 import * as GO from '../src/types/graphql/object';
+import { anonymousUser } from '../src/types/session';
 
 const mapId: MapID = 'cjgdo1yhj0si501559s0hgw2a';
 
@@ -22,7 +23,7 @@ const fixObjects =
 
 // main
 (async () => {
-  const objects = await GO.loadRawObjects(mapId);
+  const objects = await GO.loadRawObjects(anonymousUser, mapId);
   const fixed = fixObjects(objects);
 
   if (fixed.length === 0) {
@@ -33,7 +34,7 @@ const fixObjects =
 
   const ps =
     fixed.map(({ id, objectType }) =>
-      GO.updateObjectType(id, objectType as ObjectType));
+      GO.updateObjectType(anonymousUser, id, objectType as ObjectType));
   await Promise.all(ps);
 
   // tslint:disable-next-line:no-console

@@ -4,6 +4,7 @@ import { MapID } from '../sense/map';
 import { BoxID, BoxData, BoxType } from '../sense/box';
 import { client } from './client';
 import * as U from './user';
+import * as SN from '../session';
 import * as moment from 'moment';
 import { anonymousUserData } from '../sense/user';
 
@@ -42,7 +43,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
   });
 
 export const loadBoxes =
-  (id: MapID) => {
+  (user: SN.User, id: MapID) => {
     const query = `
       query AllBoxes($id: ID!) {
         allBoxes(filter: { map: { id: $id } }) {
@@ -52,12 +53,12 @@ export const loadBoxes =
       ${graphQLBoxFieldsFragment}
     `;
     const variables = { id };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ allBoxes }) => allBoxes.map(toBoxData));
   };
 
 export const create =
-  (mapId: MapID, box: BoxData) => {
+  (user: SN.User, mapId: MapID, box: BoxData) => {
     const query = `
       mutation CreateBox($title: String, $summary: String, $tags: String, $boxType: BoxType, $mapId: ID) {
         createBox(title: $title, summary: $summary, tags: $tags, boxType: $boxType, mapId: $mapId) {
@@ -66,12 +67,12 @@ export const create =
       }
       ${graphQLBoxFieldsFragment}
     `;
-    return client().request(query, { ...box, mapId })
+    return client(user).request(query, { ...box, mapId })
       .then(({ createBox }) => toBoxData(createBox));
   };
 
 export const update =
-  (box: BoxData) => {
+  (user: SN.User, box: BoxData) => {
     const query = `
       mutation UpdateBox($id: ID!, $title: String, $summary: String, $tags: String, $boxType: BoxType) {
         updateBox(id: $id, title: $title, summary: $summary, tags: $tags, boxType: $boxType) {
@@ -80,12 +81,12 @@ export const update =
       }
       ${graphQLBoxFieldsFragment}
     `;
-    return client().request(query, box)
+    return client(user).request(query, box)
       .then(({ updateBox }) => toBoxData(updateBox));
   };
 
 export const remove =
-  (boxID: BoxID) => {
+  (user: SN.User, boxID: BoxID) => {
     const query = `
       mutation DeleteBox($boxID: ID!) {
         deleteBox(id: $boxID) { ...boxFields }
@@ -93,6 +94,6 @@ export const remove =
       ${graphQLBoxFieldsFragment}
     `;
     const variables = { boxID };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ deleteBox }) => toBoxData(deleteBox));
   };

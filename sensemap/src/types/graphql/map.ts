@@ -37,7 +37,7 @@ const toMapData: (m: GraphQLMapFields) => MapData =
   });
 
 export const loadMaps =
-  () => {
+  (user: SN.User) => {
     const query = `
       query AllMaps {
         allMaps {
@@ -47,12 +47,12 @@ export const loadMaps =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client().request(query)
+    return client(user).request(query)
       .then(({ allMaps }) => allMaps.map(toMapData));
   };
 
 export const create =
-  (map: MapData, user: SN.User) => {
+  (user: SN.User, map: MapData) => {
     const query = `
       mutation CreateMap($type: String, $name: String, $description: String, $tags: String, $image: String) {
         createMap(type: $type, name: $name, description: $description, tags: $tags, image: $image) {
@@ -67,7 +67,7 @@ export const create =
   };
 
 export const update =
-  (map: MapData) => {
+  (user: SN.User, map: MapData) => {
     const query = `
       mutation UpdateMap($id: ID!, $type: String, $name: String, $description: String, $tags: String, $image: String) {
         updateMap(id: $id, type: $type, name: $name, description: $description, tags: $tags, image: $image) {
@@ -77,12 +77,12 @@ export const update =
       ${graphQLMapFieldsFragment}
       ${graphQLUserFieldsFragment}
     `;
-    return client().request(query, map)
+    return client(user).request(query, map)
       .then(({ updateMap }) => toMapData(updateMap));
   };
 
 export const remove =
-  (mapID: MapID) => {
+  (user: SN.User, mapID: MapID) => {
     const query = `
       mutation DeleteMap($mapID: ID!) {
         deleteMap(id: $mapID) { ...mapFields }
@@ -91,6 +91,6 @@ export const remove =
       ${graphQLUserFieldsFragment}
     `;
     const variables = { mapID };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ deleteMap }) => toMapData(deleteMap));
   };

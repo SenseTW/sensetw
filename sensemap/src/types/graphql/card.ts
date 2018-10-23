@@ -53,7 +53,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
   });
 
 export const loadCards =
-  (id: MapID) => {
+  (user: SN.User, id: MapID) => {
     const query = `
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
@@ -63,12 +63,12 @@ export const loadCards =
       }
     `;
     const variables = { id };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData));
   };
 
 export const create =
-  (mapId: MapID, card: CardData, user: SN.User) => {
+  (user: SN.User, mapId: MapID, card: CardData) => {
     const query = `
       mutation CreateCard(
         $title: String,
@@ -102,7 +102,7 @@ export const create =
   };
 
 export const update =
-  (card: CardData) => {
+  (user: SN.User, card: CardData) => {
     const query = `
       mutation UpdateCard(
         $id: ID!,
@@ -131,12 +131,12 @@ export const update =
       }
       ${graphQLCardFieldsFragment}
     `;
-    return client().request(query, card)
+    return client(user).request(query, card)
       .then(({ updateCard }) => toCardData(updateCard));
   };
 
 export const remove =
-  (cardID: CardID) => {
+  (user: SN.User, cardID: CardID) => {
     const query = `
       mutation DeleteCard($cardID: ID!) {
         deleteCard(id: $cardID) { ...cardFields }
@@ -144,6 +144,6 @@ export const remove =
       ${graphQLCardFieldsFragment}
     `;
     const variables = { cardID };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ deleteCard }) => toCardData(deleteCard));
   };

@@ -3,6 +3,7 @@ import { MapID } from '../sense/map';
 import { ObjectID } from '../sense/object';
 import { EdgeID, Edge } from '../sense/edge';
 import { client } from './client';
+import * as SN from '../session';
 
 const graphQLEdgeFieldsFragment = `
   fragment edgeFields on Edge {
@@ -25,7 +26,7 @@ const toEdge: (e: GraphQLEdgeFields) => Edge =
   });
 
 export const load =
-  (id: MapID) => {
+  (user: SN.User, id: MapID) => {
     const query = `
       query AllEdges($id: ID!) {
         allEdges(filter: { map: { id: $id } }) {
@@ -35,12 +36,12 @@ export const load =
       ${graphQLEdgeFieldsFragment}
     `;
     const variables = { id };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ allEdges }) => allEdges.map(toEdge));
   };
 
 export const create =
-  (map: MapID, from: ObjectID, to: ObjectID) => {
+  (user: SN.User, map: MapID, from: ObjectID, to: ObjectID) => {
     const query = `
       mutation CreateEdge(
         $map: ID,
@@ -54,12 +55,12 @@ export const create =
       ${graphQLEdgeFieldsFragment}
     `;
     const variables = { map, from, to };
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ createEdge }) => toEdge(createEdge));
   };
 
 export const remove =
-  (edge: EdgeID) => {
+  (user: SN.User, edge: EdgeID) => {
     const query = `
       mutation DeleteEdge($edge: ID!) {
         deleteEdge(id: $edge) {
@@ -68,6 +69,5 @@ export const remove =
       }
     `;
     const variables = { edge };
-    // XXX Graphcool return value lacks map, from, to?
-    return client().request(query, variables);
+    return client(user).request(query, variables);
   };

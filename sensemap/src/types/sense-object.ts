@@ -17,6 +17,7 @@ import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
 import * as SM from './sense-map';
+import { curry } from 'ramda';
 
 export type State = CachedStorage;
 
@@ -26,7 +27,7 @@ const createMap =
   (map: MapData) =>
   async (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
-    return GM.create(map, user)
+    return GM.create(user, map)
       .then((newMap) => {
         // add the new map
         dispatch(CS.updateMaps(
@@ -45,8 +46,9 @@ const updateMap =
 
 const saveMap =
   (map: MapData) =>
-  (dispatch: Dispatch) => {
-    return GM.update(map)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GM.update(user, map)
       .then((newMap) => {
         const mapMap = H.toIDMap<MapID, MapData>([newMap]);
         // update the map
@@ -60,7 +62,7 @@ const createCard =
   (mapId: MapID, card: CardData) =>
   async (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
-    return GC.create(mapId, card, user)
+    return GC.create(user, mapId, card)
       .then((newCard) => dispatch(
         CS.updateCards(
           H.toIDMap<CardID, CardData>([newCard]),
@@ -77,8 +79,9 @@ const updateCard =
 
 const saveCard =
   (card: CardData) =>
-  (dispatch: Dispatch) => {
-    return GC.update(card)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GC.update(user, card)
       .then((newCard) => {
         const cardMap = H.toIDMap<CardID, CardData>([newCard]);
         // update the card
@@ -90,8 +93,9 @@ const saveCard =
 
 const createBox =
   (mapId: MapID, box: BoxData) =>
-  async (dispatch: Dispatch) => {
-    return GB.create(mapId, box)
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GB.create(user, mapId, box)
       .then((newBox) => dispatch(
         CS.updateBoxes(
           H.toIDMap<BoxID, BoxData>([newBox]),
@@ -108,8 +112,9 @@ const updateBox =
 
 const saveBox =
   (box: BoxData) =>
-  (dispatch: Dispatch) => {
-    return GB.update(box)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GB.update(user, box)
       .then((newBox) => {
         const boxMap = H.toIDMap<BoxID, BoxData>([newBox]);
         // update the box
@@ -121,8 +126,9 @@ const saveBox =
 
 const loadMaps =
   (overwrite: Boolean = false) =>
-  (dispatch: Dispatch) => {
-    return GM.loadMaps()
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GM.loadMaps(user)
       .then(data => H.toIDMap<MapID, MapData>(data))
       .then(data => dispatch(
         overwrite
@@ -143,8 +149,9 @@ const cleanUp =
 
 const loadObjects =
   (id: MapID, overwrite: Boolean = false) =>
-  (dispatch: Dispatch) => {
-    return GO.loadObjects(id)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GO.loadObjects(user, id)
       .then(data => H.toIDMap<ObjectID, ObjectData>(data))
       .then(data => dispatch(
         overwrite
@@ -155,8 +162,9 @@ const loadObjects =
 
 const loadCards =
   (id: MapID, overwrite: Boolean = false) =>
-  (dispatch: Dispatch) => {
-    return GC.loadCards(id)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GC.loadCards(user, id)
       .then(data => H.toIDMap<CardID, CardData>(data))
       .then(data => dispatch(
         overwrite
@@ -167,8 +175,9 @@ const loadCards =
 
 const loadBoxes =
   (id: MapID, overwrite: Boolean = false) =>
-  (dispatch: Dispatch) => {
-    return GB.loadBoxes(id)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GB.loadBoxes(user, id)
       .then(data => H.toIDMap<BoxID, BoxData>(data))
       .then(data => dispatch(
         overwrite
@@ -179,8 +188,9 @@ const loadBoxes =
 
 const loadEdges =
   (id: MapID, overwrite: Boolean = false) =>
-  (dispatch: Dispatch) => {
-    return GE.load(id)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GE.load(user, id)
       .then(data => H.toIDMap<EdgeID, Edge>(data))
       .then(data => dispatch(
         overwrite
@@ -191,25 +201,27 @@ const loadEdges =
 
 const addCardToBox =
   (cardObject: ObjectID, box: BoxID) =>
-  (dispatch: Dispatch) => {
-    return G.addCardToBox(cardObject, box)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return G.addCardToBox(user, cardObject, box)
       .then(() => dispatch(CS.updateInBox(cardObject, box, TargetType.PERMANENT)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
 const addCardsToBox =
   (cardObjects: ObjectID[], box: BoxID) =>
-  async (dispatch: Dispatch) => {
+  async (dispatch: Dispatch, getState: GetState) => {
     await Promise.all(
-      cardObjects.map(id => addCardToBox(id, box)(dispatch))
+      cardObjects.map(id => addCardToBox(id, box)(dispatch, getState))
     );
     return dispatch(SL.actions.clearSelection());
   };
 
 const createObject =
   (mapId: MapID, data: ObjectData) =>
-  (dispatch: Dispatch) => {
-    return GO.create(mapId, data)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GO.create(user, mapId, data)
       .then((object) => dispatch(
         CS.updateObjects(
           H.toIDMap<ObjectID, ObjectData>([object]),
@@ -221,7 +233,7 @@ const createObject =
 const createBoxObject =
   (mapId: MapID, box: BoxData) =>
   async (dispatch: Dispatch, getState: GetState) => {
-    const action = await createBox(mapId, box)(dispatch);
+    const action = await createBox(mapId, box)(dispatch, getState);
     const { id = '' } = Object.values(action.payload.boxes)[0] || {};
     const { viewport: { width, height, top, left } } = getState();
     const x = left + (width - B.DEFAULT_WIDTH) / 2;
@@ -233,7 +245,7 @@ const createBoxObject =
         objectType: ObjectType.BOX,
         data: id,
       })
-    )(dispatch);
+    )(dispatch, getState);
   };
 
 const createObjectForCard =
@@ -249,10 +261,10 @@ const createObjectForCard =
         objectType: ObjectType.CARD,
         data: cardId,
       })
-    )(dispatch);
+    )(dispatch, getState);
     const { id = '' } = Object.values(action.payload.objects)[0] || {};
     if (box) {
-      addCardToBox(id, box)(dispatch);
+      addCardToBox(id, box)(dispatch, getState);
     }
     return action;
   };
@@ -267,9 +279,10 @@ const createCardObject =
 
 const moveObject =
   (id: ObjectID, x: number, y: number) =>
-  (dispatch: Dispatch) => {
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
     // update the remote object
-    return GO.move(id, x, y)
+    return GO.move(user, id, x, y)
       // sync the local object
       .then((object) => {
         const objectMap = H.toIDMap<ObjectID, ObjectData>([object]);
@@ -282,17 +295,19 @@ const moveObject =
 
 const removeCardFromBox =
   (cardObject: ObjectID, box: BoxID) =>
-  (dispatch: Dispatch) => {
-    return G.removeCardFromBox(cardObject, box)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return G.removeCardFromBox(user, cardObject, box)
       .then(() => dispatch(CS.updateNotInBox(cardObject, box, TargetType.PERMANENT)))
       .then(() => dispatch(SL.actions.clearSelection()));
   };
 
 const removeCardsFromBox =
   (cardObjects: ObjectID[], box: BoxID) =>
-  async (dispatch: Dispatch) => {
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
     await Promise.all(cardObjects.map(
-      id => G.removeCardFromBox(id, box)
+      id => G.removeCardFromBox(user, id, box)
         .then(() => dispatch(CS.updateNotInBox(id, box, TargetType.PERMANENT)))
     ));
     return dispatch(SL.actions.clearSelection());
@@ -300,85 +315,88 @@ const removeCardsFromBox =
 
 const removeMap =
   (mapID: MapID) =>
-  (dispatch: Dispatch) => {
-    return GM.remove(mapID)
-      .then(() => loadMaps(true)(dispatch));
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GM.remove(user, mapID)
+      .then(() => loadMaps(true)(dispatch, getState));
   };
 
 const removeObject =
   (objectID: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    return GO.remove(objectID)
+    const { senseMap: { map }, session: { user } } = getState();
+    return GO.remove(user, objectID)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => loadObjects(map, true)(dispatch))
-      .then(() => loadCards(map, true)(dispatch))
-      .then(() => loadBoxes(map, true)(dispatch));
+      .then(() => loadObjects(map, true)(dispatch, getState))
+      .then(() => loadCards(map, true)(dispatch, getState))
+      .then(() => loadBoxes(map, true)(dispatch, getState));
   };
 
 const removeObjects =
   (objectIDList: ObjectID[]) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    const ps = objectIDList.map(id => GO.remove(id));
+    const { senseMap: { map }, session: { user } } = getState();
+    const ps = objectIDList.map(id => curry(GO.remove)(user));
     return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => loadObjects(map, true)(dispatch))
-      .then(() => loadCards(map, true)(dispatch))
-      .then(() => loadBoxes(map, true)(dispatch));
+      .then(() => loadObjects(map, true)(dispatch, getState))
+      .then(() => loadCards(map, true)(dispatch, getState))
+      .then(() => loadBoxes(map, true)(dispatch, getState));
   };
 
 const removeCard =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map } } = getState();
-    return GC.remove(cardID)
+    const { senseMap: { map }, session: { user } } = getState();
+    return GC.remove(user, cardID)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => loadCards(map, true)(dispatch))
-      .then(() => loadObjects(map, true)(dispatch));
+      .then(() => loadCards(map, true)(dispatch, getState))
+      .then(() => loadObjects(map, true)(dispatch, getState));
   };
 
 const removeCardWithObject =
   (cardID: CardID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    return G.deleteObjectsByCard(cardID)
+    const { session: { user } } = getState();
+    return G.deleteObjectsByCard(user, cardID)
       .then(() => removeCard(cardID)(dispatch, getState));
   };
 
 const removeBox =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map }, senseObject } = getState();
+    const { senseMap: { map }, senseObject, session: { user } } = getState();
     const box = CS.getBox(senseObject, boxID);
     const objects = Object.keys(box.contains);
     return removeObjects(objects)(dispatch, getState)
-      .then(() => GB.remove(boxID))
+      .then(() => GB.remove(user, boxID))
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => loadBoxes(map, true)(dispatch))
-      .then(() => loadObjects(map, true)(dispatch));
+      .then(() => loadBoxes(map, true)(dispatch, getState))
+      .then(() => loadObjects(map, true)(dispatch, getState));
   };
 
 const removeBoxes =
   (boxIDList: BoxID[]) =>
   (dispatch: Dispatch, getState: GetState) => {
-    const { senseMap: { map }, senseObject } = getState();
+    const { senseMap: { map }, senseObject, session: { user } } = getState();
     const ps = boxIDList.map(boxID => {
       const box = CS.getBox(senseObject, boxID);
       // remove all objects from the box
       const objects = Object.keys(box.contains);
       return removeObjects(objects)(dispatch, getState)
-        .then(() => GB.remove(boxID));
+        .then(() => GB.remove(user, boxID));
     });
     return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
-      .then(() => loadBoxes(map, true)(dispatch))
-      .then(() => loadObjects(map, true)(dispatch));
+      .then(() => loadBoxes(map, true)(dispatch, getState))
+      .then(() => loadObjects(map, true)(dispatch, getState));
   };
 
 const removeBoxWithObject =
   (boxID: BoxID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    return G.deleteObjectsByBox(boxID)
+    const { session: { user } } = getState();
+    return G.deleteObjectsByBox(user, boxID)
       .then(() => removeBox(boxID)(dispatch, getState));
   };
 
@@ -392,7 +410,8 @@ const unboxCards =
 const createEdge =
   (map: MapID, from: ObjectID, to: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    return GE.create(map, from, to)
+    const { session: { user } } = getState();
+    return GE.create(user, map, from, to)
       .then((edge) => dispatch(
         CS.updateEdges(
           H.toIDMap<EdgeID, Edge>([ edge ]),
@@ -404,8 +423,9 @@ const createEdge =
 const removeEdge =
   (map: MapID, edge: EdgeID) =>
   (dispatch: Dispatch, getState: GetState) => {
-    return GE.remove(edge)
-      .then(() => loadEdges(map, true)(dispatch));
+    const { session: { user } } = getState();
+    return GE.remove(user, edge)
+      .then(() => loadEdges(map, true)(dispatch, getState));
   };
 
 export const actions = {
