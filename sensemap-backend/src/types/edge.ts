@@ -1,5 +1,5 @@
 import { gql } from "apollo-server";
-import { ID, Map, SenseObject, Edge, edgeFields } from "./sql";
+import { ID, Map, SenseObject, Edge, EdgeType, edgeFields } from "./sql";
 import { getEdgesInMap } from "./map";
 import * as T from "./transaction";
 import * as A from "./oauth";
@@ -31,9 +31,33 @@ export const typeDefs = [
     }
 
     extend type Mutation {
-      createEdge(fromId: ID, mapId: ID, toId: ID): Edge
-      updateEdge(id: ID!, fromId: ID, mapId: ID, toId: ID): Edge
+      createEdge(
+        fromId: ID,
+        mapId: ID,
+        toId: ID,
+        edgeType: EdgeType,
+        title: String,
+        tags: String,
+        summary: String
+      ): Edge
+      updateEdge(
+        id: ID!,
+        fromId: ID,
+        mapId: ID,
+        toId: ID,
+        edgeType: EdgeType,
+        title: String,
+        tags: String,
+        summary: String
+      ): Edge
       deleteEdge(id: ID!): Edge
+    }
+
+    enum EdgeType {
+      NONE
+      DIRECTED
+      REVERSED
+      BIDIRECTED
     }
 
     type Edge @model {
@@ -46,6 +70,10 @@ export const typeDefs = [
       from: Object! @relation(name: "EdgeFrom")
       toId: ID
       to: Object! @relation(name: "EdgeTo")
+      edgeType: EdgeType @migrationValue(value: NONE)
+      title: String
+      tags: String
+      summary: String
     }
   `
 ];
@@ -111,6 +139,14 @@ export const resolvers = {
     from: async (o, _, { db }, info): Promise<SenseObject> =>
       typeof o != "string" ? o.from : (await getEdge(db, o)).fromId,
     to: async (o, _, { db }, info): Promise<SenseObject> =>
-      typeof o != "string" ? o.to : (await getEdge(db, o)).toId
+      typeof o != "string" ? o.to : (await getEdge(db, o)).toId,
+    edgeType: async (o, _, { db }, info): Promise<EdgeType> =>
+      typeof o != "string" ? o.edgeType : (await getEdge(db, o)).edgeType,
+    title: async (o, _, { db }, info): Promise<string> =>
+      typeof o != "string" ? o.title : (await getEdge(db, o)).title,
+    tags: async (o, _, { db }, info): Promise<string> =>
+      typeof o != "string" ? o.tags : (await getEdge(db, o)).tags,
+    summary: async (o, _, { db }, info): Promise<string> =>
+      typeof o != "string" ? o.summary : (await getEdge(db, o)).summary
   }
 };
