@@ -406,6 +406,7 @@ const unboxCards =
       .then(() => dispatch(SM.actions.setScopeToFullmap()));
   };
 
+// TODO: should pass an edge
 const createEdge =
   (map: MapID, from: ObjectID, to: ObjectID) =>
   (dispatch: Dispatch, getState: GetState) => {
@@ -417,6 +418,25 @@ const createEdge =
           TargetType.PERMANENT,
         )
       ));
+  };
+
+const updateEdge =
+  (edge: Edge) =>
+  (dispatch: Dispatch) =>
+    // edit the edge cache
+    dispatch(CS.updateEdges(H.toIDMap<EdgeID, Edge>([edge])));
+
+const saveEdge =
+  (edge: Edge) =>
+  (dispatch: Dispatch) => {
+    return GE.update(edge)
+      .then((newEdge) => {
+        const edgeMap = H.toIDMap<EdgeID, Edge>([newEdge]);
+        // update the box
+        dispatch(CS.updateEdges(edgeMap, TargetType.PERMANENT));
+        // remove the box from the cache storage
+        dispatch(CS.removeEdges(edgeMap));
+      });
   };
 
 const removeEdge =
@@ -448,7 +468,6 @@ export const actions = {
   createBoxObject,
   createObjectForCard,
   createCardObject,
-  createEdge,
   moveObject,
   addCardToBox,
   addCardsToBox,
@@ -460,6 +479,9 @@ export const actions = {
   removeObjects,
   removeCardWithObject,
   removeBoxWithObject,
+  createEdge,
+  updateEdge,
+  saveEdge,
   removeEdge,
 };
 

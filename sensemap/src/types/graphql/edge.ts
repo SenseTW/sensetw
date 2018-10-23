@@ -68,9 +68,10 @@ export const create =
   };
 
 export const update =
-  (map: MapID, edge: Edge) => {
+  (edge: Edge) => {
     const query = `
-      mutation CreateEdge(
+      mutation UpdateEdge(
+        $id: ID!,
         $map: ID,
         $from: ID,
         $to: ID,
@@ -80,6 +81,7 @@ export const update =
         $summary: String
       ) {
         updateEdge(
+          id: $id,
           mapId: $map,
           fromId: $from,
           toId: $to,

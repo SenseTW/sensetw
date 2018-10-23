@@ -15,6 +15,7 @@ import {
   CardData,
   BoxID,
   BoxData,
+  Edge,
   SelectionType,
   State,
   actions,
@@ -27,11 +28,12 @@ import * as SO from '../../types/sense-object';
 import * as CS from '../../types/cached-storage';
 import * as V from '../../types/viewport';
 import * as B from '../../types/sense/box';
-import * as SL from '../../types/selection';
 import { Action as BoxAction } from '../../types/sense/box';
+import * as SL from '../../types/selection';
 import * as C from '../../types/sense/card';
-import * as E from '../../types/sense/edge';
 import { Action as CardAction } from '../../types/sense/card';
+import * as E from '../../types/sense/edge';
+import { Action as EdgeAction } from '../../types/sense/edge';
 import './index.css';
 const background = require('./background-map.png');
 
@@ -191,20 +193,32 @@ class MapPage extends React.Component<Props> {
   }
 
   renderEdgeInspector() {
-    const { senseObject, selection } = this.props;
+    const { actions: acts, senseObject, selection } = this.props;
     const edgeId = selection.mapEdges[0] || '';
     const data = CS.getEdge(senseObject, edgeId);
     const isEmpty = E.isEmpty(data);
-    const isNew = CS.isEdgeNew(senseObject, edgeId);
     const isDirty = CS.isEdgeDirty(senseObject, edgeId);
 
     return !isEmpty && (
       <Inspector
         selectionType={SelectionType.MAP_EDGE}
         data={data}
-        submitText={isNew ? 'Submit' : 'Update'}
-        submitDisabled={!isDirty && !isNew}
-        cancelDisabled={!isDirty && !isNew}
+        submitText="Update"
+        submitDisabled={!isDirty}
+        cancelDisabled={!isDirty}
+        onUpdate={action => {
+          if (!data) { return; }
+          const edge = E.reducer(data, action as EdgeAction);
+          acts.senseObject.updateEdge(edge);
+        }}
+        onSubmit={(newData) => {
+          if (!data) { return; }
+          acts.senseObject.saveEdge(newData as Edge);
+        }}
+        onCancel={() => {
+          if (!data) { return; }
+          acts.cachedStorage.removeEdge(data as Edge);
+        }}
       />
     );
   }

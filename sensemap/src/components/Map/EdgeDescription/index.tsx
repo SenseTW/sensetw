@@ -92,7 +92,7 @@ class EdgeDescription extends React.PureComponent<Props, OwnState> {
           width={textWidth}
           fontSize={fontSize}
           lineHeight={style.lineHeight}
-          text={edge.id}
+          text={edge.title || edge.summary}
           onResize={this.handleResize}
         />
       </Group>
