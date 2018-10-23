@@ -245,14 +245,20 @@ export const boxFields = [
   )
 ] as string[];
 
+export type EdgeType = "NONE" | "DIRECTED" | "REVERSED" | "BIDIRECTED";
+
 export type Edge = HasID &
   HasTimestamps & {
     mapId: ID;
     fromId: ID;
     toId: ID;
+    edgeType: EdgeType;
+    title: string;
+    tags: string;
+    summary: string;
   };
 
-export const edgeDataFields = ["mapId", "fromId", "toId"];
+export const edgeDataFields = ["mapId", "fromId", "toId", "edgeType", "title", "tags", "summary"];
 
 export const edgeFields = [
   ...hasTimestampFields,
