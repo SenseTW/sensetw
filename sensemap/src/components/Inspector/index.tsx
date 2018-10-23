@@ -7,6 +7,7 @@ import EdgeContent from '../EdgeContent';
 import * as T from '../../types';
 import * as C from '../../types/sense/card';
 import * as B from '../../types/sense/box';
+import * as E from '../../types/sense/edge';
 import { noop } from '../../types/utils';
 import { isLength } from 'validator';
 import './index.css';
@@ -23,7 +24,7 @@ interface Props {
   submitText?: string;
   submitDisabled?: boolean;
   cancelDisabled?: boolean;
-  onUpdate? (action: B.Action | C.Action): void;
+  onUpdate? (action: B.Action | C.Action | E.Action): void;
   onSubmit? (value: Data): void;
   onCancel? (): void;
 }
@@ -84,7 +85,9 @@ class Inspector extends React.PureComponent<Props> {
       case T.SelectionType.MAP_EDGE:
         content = (
           <EdgeContent
+            disabled={disabled}
             data={data as T.Edge}
+            onChange={onUpdate}
           />
         );
         break;

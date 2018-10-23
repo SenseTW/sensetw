@@ -371,7 +371,11 @@ export class Map extends React.Component<Props, MapState> {
 
     let edgeDescription;
     // let obj;
-    if (hoverEdge !== undefined && hoverPoint !== undefined) {
+    if (
+      hoverEdge !== undefined &&
+      hoverPoint !== undefined &&
+      (hoverEdge.title || hoverEdge.summary)
+    ) {
       // obj = CS.getObject(senseObject, hoverEdge.from);
       // const { x: fromX, y: fromY } = obj;
       // obj = CS.getObject(senseObject, hoverEdge.to);

@@ -49,28 +49,28 @@ const edgeTo =
   });
 
 const EDGE_TYPE = 'EDGE_TYPE';
-const edgeType =
+export const edgeType =
   (type: EdgeType) => ({
     type: EDGE_TYPE as typeof EDGE_TYPE,
     payload: { edgeType: type },
   });
 
 const EDGE_TITLE = 'EDGE_TITLE';
-const edgeTitle =
+export const edgeTitle =
   (title: string) => ({
     type: EDGE_TITLE as typeof EDGE_TITLE,
     payload: { title },
   });
 
 const EDGE_TAGS = 'EDGE_TAGS';
-const edgeTags =
+export const edgeTags =
   (tags: string) => ({
     type: EDGE_TAGS as typeof EDGE_TAGS,
     payload: { tags },
   });
 
 const EDGE_SUMMARY = 'EDGE_SUMMARY';
-const edgeSummary =
+export const edgeSummary =
   (summary: string) => ({
     type: EDGE_SUMMARY as typeof EDGE_SUMMARY,
     payload: { summary },
