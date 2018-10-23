@@ -1,17 +1,13 @@
 import { State, sessionReducer } from 'redux-react-session';
+import * as U from './sense/user';
 
-export type User = {
-  id: string,
-  email: string,
-  username: string,
-  access_token: string,
-  refresh_token: string,
-};
+export interface User extends U.UserData {
+  access_token: string;
+  refresh_token: string;
+}
 
 export const anonymousUser = {
-  id: '',
-  email: '',
-  username: '',
+  ...U.anonymousUserData,
   access_token: '',
   refresh_token: '',
 };

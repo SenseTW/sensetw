@@ -23,7 +23,6 @@ import './index.css';
 export interface StateFromProps {
   checked: boolean;
   authenticated: boolean;
-  // tslint:disable:no-any
   user?: User;
 }
 
