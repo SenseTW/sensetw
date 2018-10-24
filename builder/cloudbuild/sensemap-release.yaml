@@ -13,6 +13,16 @@ steps:
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap:release']
 - name: 'gcr.io/cloud-builders/docker'
   args: ["push", 'gcr.io/$PROJECT_ID/sensemap:$COMMIT_SHA']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build',
+         '-t', 'gcr.io/$PROJECT_ID/sensemap-smo:release',
+         '-t', 'gcr.io/$PROJECT_ID/sensemap-smo:$COMMIT_SHA',
+         '-f', './Dockerfile.smo',
+         '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", 'gcr.io/$PROJECT_ID/sensemap-smo:release']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ["push", 'gcr.io/$PROJECT_ID/sensemap-smo:$COMMIT_SHA']
 - name: 'ubuntu'
   args: ['bash', './builder/cloudbuild/config/gen.sh', "release"]
   env:
@@ -35,6 +45,14 @@ steps:
   - 'apply'
   - '-f'
   - '/workspace/env.yaml'
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'apply'
+  - '-f'
+  - '/workspace/smo_env.yaml'
   env:
   - 'CLOUDSDK_COMPUTE_ZONE=${_CLOUDSDK_COMPUTE_ZONE}'
   - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLOUDSDK_CONTAINER_CLUSTER}'
