@@ -1,11 +1,14 @@
 import * as React from 'react';
+import * as cx from 'classnames';
 import { Form, Checkbox } from 'semantic-ui-react';
 import { noop } from '../../types/utils';
 import './index.css';
 
 interface Props<T extends string> {
+  className?: string;
   disabled?: boolean;
   types: T[];
+  typeNames?: { [key: string]: string };
   type: T;
   onChange? (type: T): void;
 }
@@ -20,24 +23,28 @@ const capitalize = (str: string): string => {
 };
 
 function TypeSelector<T extends string>(props: Props<T>) {
-  const { disabled = false, types, type, onChange = noop } = props;
+  const { className = '', disabled = false, types, typeNames = {}, type, onChange = noop } = props;
+  const classes = cx(groupName, className);
 
   return (
-    <div className={groupName}>{
-      types.map(ty => (
-        <Form.Field key={ty}>
-          <Checkbox
-            disabled={disabled}
-            radio
-            className={`${groupName}__${ty.toLowerCase()}`}
-            label={capitalize(ty)}
-            name={groupName}
-            value={ty}
-            checked={type === ty}
-            onChange={() => onChange(ty)}
-          />
-        </Form.Field>
-      ))
+    <div className={classes}>{
+      types.map(ty => {
+        const typeName = typeNames[ty];
+        return (
+          <Form.Field key={ty}>
+            <Checkbox
+              disabled={disabled}
+              radio
+              className={`${groupName}__${ty.toLowerCase()}`}
+              label={typeName || capitalize(ty)}
+              name={groupName}
+              value={ty}
+              checked={type === ty}
+              onChange={() => onChange(ty)}
+            />
+          </Form.Field>
+        );
+      })
     }</div>
   );
 }

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Header, Form, Input } from 'semantic-ui-react';
+import EdgeTypeSelector from './EdgeTypeSelector';
 import { Edge } from '../../types';
 import * as E from '../../types/sense/edge';
 import { placeholders } from './placeholders';
@@ -34,6 +35,13 @@ class EdgeContent extends React.PureComponent<Props> {
         <Header color="grey">
           <h3>EDGE INSPECTOR</h3>
         </Header>
+        <Form.Field className="edge-content__edge-type">
+          <EdgeTypeSelector
+            disabled={disabled}
+            edgeType={edgeType}
+            onChange={type => onChange && onChange(E.edgeType(type))}
+          />
+        </Form.Field>
         <Form.Field className="edge-content__edge-title">
           <label>Title</label>
           <Input
