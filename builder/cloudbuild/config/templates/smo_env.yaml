@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: smo-${BRANCH_NAME}-env
+  name: sensemap-smo-${BRANCH_NAME}-env
   namespace: default
 data:
   SENSEMAP_GRAPHQL_ROOT: http://127.0.0.1:8000/graphql
