@@ -3,7 +3,7 @@ import { Group, Line, Circle } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
 import Selectable from '../../Layout/Selectable';
 import * as G from '../../../graphics/point';
-import { Edge as EdgeData } from '../../../types';
+import { EdgeType, Edge as EdgeData } from '../../../types';
 import { SQRT3, noop } from '../../../types/utils';
 
 export interface Props extends TransformerForProps {
@@ -24,6 +24,7 @@ export interface Props extends TransformerForProps {
 }
 
 interface IndicatorProps {
+  edgeType: EdgeType;
   x: number;
   y: number;
   radius: number;
@@ -33,27 +34,89 @@ interface IndicatorProps {
 }
 
 function Indicator(props: IndicatorProps) {
-  const { radius, rotation, x, y, color, backgroundColor } = props;
-  const innerRadius = radius * 0.75;
+  const {
+    edgeType,
+    radius,
+    rotation,
+    x,
+    y,
+    color,
+    backgroundColor
+  } = props;
+  const innerRadius = radius * 0.7;
 
-  return (
-    <Group x={x} y={y}>
-      <Circle
-        radius={radius}
-        fill={backgroundColor}
-      />
-      <Line
-        closed
-        points={[
-          -innerRadius / 2, -innerRadius / 2 * SQRT3,
-          innerRadius, 0,
-          -innerRadius / 2, innerRadius / 2 * SQRT3,
-        ]}
-        rotation={rotation}
-        fill={color}
-      />
-    </Group>
-  );
+  const circle = <Circle radius={radius} fill={backgroundColor} />;
+  let icon;
+  switch (edgeType) {
+    case EdgeType.DIRECTED: {
+      icon = (
+        <>
+          {circle}
+          <Line
+            closed
+            points={[
+              -innerRadius / 2, -innerRadius / 2 * SQRT3,
+              innerRadius, 0,
+              -innerRadius / 2, innerRadius / 2 * SQRT3,
+            ]}
+            rotation={rotation}
+            fill={color}
+          />
+        </>
+      );
+      break;
+    }
+    case EdgeType.REVERSED: {
+      icon = (
+        <>
+          {circle}
+          <Line
+            closed
+            points={[
+              innerRadius / 2, -innerRadius / 2 * SQRT3,
+              -innerRadius, 0,
+              innerRadius / 2, innerRadius / 2 * SQRT3,
+            ]}
+            rotation={rotation}
+            fill={color}
+          />
+        </>
+      );
+      break;
+    }
+    case EdgeType.BIDIRECTED: {
+      icon = (
+        <>
+          {circle}
+          <Line
+            closed
+            points={[
+              innerRadius / 4, -innerRadius / 3 * SQRT3,
+              innerRadius, 0,
+              innerRadius / 4, innerRadius / 3 * SQRT3,
+            ]}
+            rotation={rotation}
+            fill={color}
+          />
+          <Line
+            closed
+            points={[
+              -innerRadius / 4, -innerRadius / 3 * SQRT3,
+              -innerRadius, 0,
+              -innerRadius / 4, innerRadius / 3 * SQRT3,
+            ]}
+            rotation={rotation}
+            fill={color}
+          />
+        </>
+      );
+      break;
+    }
+    case EdgeType.NONE:
+    default:
+  }
+
+  return <Group x={x} y={y}>{icon}</Group>;
 }
 
 class Edge extends React.PureComponent<Props> {
@@ -86,9 +149,27 @@ class Edge extends React.PureComponent<Props> {
     const dX = (to[0] - from[0]);
     const dY = (to[1] - from[1]);
     const points = [
-      { x: from[0] + dX / 3, y: from[1] + dY / 3 },
-      { x: from[0] + dX / 2, y: from[1] + dY / 2 },
-      { x: from[0] + dX / 3 * 2, y: from[1] + dY / 3 * 2 },
+      {
+        x: from[0] + dX / 3,
+        y: from[1] + dY / 3,
+        edgeType: data.edgeType === EdgeType.BIDIRECTED
+          ? EdgeType.REVERSED
+          : data.edgeType
+      },
+      {
+        x: from[0] + dX / 2,
+        y: from[1] + dY / 2,
+        edgeType: data.edgeType === EdgeType.BIDIRECTED
+          ? EdgeType.BIDIRECTED
+          : data.edgeType
+      },
+      {
+        x: from[0] + dX / 3 * 2,
+        y: from[1] + dY / 3 * 2,
+        edgeType: data.edgeType === EdgeType.BIDIRECTED
+          ? EdgeType.DIRECTED
+          : data.edgeType
+      },
     ];
     const rotation = Math.atan2(dY, dX) * 180 / Math.PI;
     const onSelect    = this.props.onSelect    || noop;
@@ -119,6 +200,7 @@ class Edge extends React.PureComponent<Props> {
             points.map((p, i) =>
               <Indicator
                 key={i}
+                edgeType={p.edgeType}
                 x={p.x}
                 y={p.y}
                 radius={style.indicator.radius}
