@@ -17,8 +17,18 @@ services:
      - shared_static:/var/front
      - ./env/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
+     - 7777:70
      - 8888:80
      - 9999:90
+  smo:
+    build:
+      context: ../../
+      dockerfile: Dockerfile.smo
+    image: "sensemap-smo"
+    env_file:
+     - ./env/sensemap-smo.env
+    ports:
+     - "8080:8080"
   sensemap:
     build:
       context: ../../

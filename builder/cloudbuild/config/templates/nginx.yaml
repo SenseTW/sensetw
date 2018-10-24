@@ -1,7 +1,8 @@
 apiVersion: v1
 data:
   nginx.conf: |2+
-      upstream web { server 127.0.0.1:8000; }
+      upstream api { server 127.0.0.1:8000; }
+      upstream smo { server 127.0.0.1:8080; }
 
       set_real_ip_from 0.0.0.0/0;
       real_ip_header X-Forwarded-For;
@@ -31,7 +32,7 @@ data:
               rewrite ^(.*)$ https://$host$1 permanent;
           }
 
-          proxy_pass http://web;
+          proxy_pass http://api;
           proxy_buffer_size 512k;
           proxy_buffers 8 512k;
           proxy_busy_buffers_size 512k;
@@ -119,7 +120,7 @@ data:
           proxy_set_header X-Request-Start "t=${msec}";
 
           if ($prerender = 1) {
-            proxy_pass http://web;
+            proxy_pass http://smo;
           }
           if ($prerender = 0) {
             add_header 'Cache-Control' 'no-cache, no-store, max-age=0';

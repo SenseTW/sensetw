@@ -70,6 +70,18 @@ spec:
               mountPath: /shared-static
             - name: tmp-pod
               mountPath: /tmp/pod
+        - image: gcr.io/ggv-notetool/sensemap-smo:${COMMIT_SHA}
+          imagePullPolicy: Always
+          name: sensemap-smo
+          ports:
+          - containerPort: 8080
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+          envFrom:
+            - configMapRef:
+                name: sensemap-smo-${BRANCH_NAME}-env
       volumes:
         - name: nginx-proxy-conf
           configMap:
@@ -83,6 +95,9 @@ spec:
         - name: sensemap-${BRANCH_NAME}-env
           configMap:
             name: sensemap-${BRANCH_NAME}-env
+        - name: sensemap-smo-${BRANCH_NAME}-env
+          configMap:
+            name: sensemap-smo-${BRANCH_NAME}-env
         - name: front-static
           emptyDir:
         - name: db-restore-sensemap-${BRANCH_NAME}-env

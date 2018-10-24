@@ -68,6 +68,7 @@ sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap-staging.yaml
 sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap-staging.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" sensemap_service.yaml
 sed -i "s/\${COMMIT_SHA}/$COMMIT_SHA/g" sensemap_service.yaml
+sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" smo_env.yaml
 sed -i "s/\${BRANCH_NAME}/$BRANCH_NAME/g" nginx.yaml
 sed -i "s/\${API_SERVERNAME}/$API_SERVERNAME/g" nginx.yaml
 sed -i "s/\${FRONT_SERVERNAME}/$FRONT_SERVERNAME/g" nginx.yaml
