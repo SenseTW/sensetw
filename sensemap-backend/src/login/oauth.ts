@@ -7,7 +7,7 @@ const { db, env } = context();
 
 export const hypothesisClient = {
   id: env.CLIENT_OAUTH_ID,
-  grants: ["authorization_code"],
+  grants: ["authorization_code", "refresh_token"],
   name: "Hypothesis API",
   redirectUris: [`${env.PUBLIC_URL}/oauth/web_message`]
 };
