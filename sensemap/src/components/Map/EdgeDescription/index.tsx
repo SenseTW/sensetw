@@ -3,6 +3,8 @@ import { Group, Rect } from 'react-konva';
 import { TransformerForProps } from '../../Layout';
 import { Edge } from '../../../types';
 import Caret from '../../Layout/Caret';
+import Layout from '../../Layout';
+import Nothing from '../../Layout/Nothing';
 import Text from '../../Layout/Text';
 import { SQRT3 } from '../../../types/utils';
 
@@ -30,10 +32,20 @@ class EdgeDescription extends React.PureComponent<Props, OwnState> {
       height: 8,
       base: SQRT3 / 3 * 2 * 8,
     },
+    title: {
+      color: '#000',
+      fontSize: 24,
+      lineHeight: 1.2,
+    },
+    tags: {
+      color: '#333',
+      fontSize: 16,
+      lineHeight: 1.2,
+    },
     color: '#000',
     fontSize: 16,
     lineHeight: 1.2,
-    width: 200,
+    width: 136,
     margin: {
       left: 18,
     },
@@ -43,6 +55,7 @@ class EdgeDescription extends React.PureComponent<Props, OwnState> {
       bottom: 6,
       left: 6,
     },
+    textGap: 10,
   };
 
   state = {
@@ -63,7 +76,6 @@ class EdgeDescription extends React.PureComponent<Props, OwnState> {
       y: this.props.y,
     });
     const textWidth = style.width - style.padding.left - style.padding.right;
-    const fontSize = style.fontSize;
     const { height: innerHeight } = this.state;
     const height = style.padding.top + innerHeight + style.padding.bottom;
 
@@ -86,15 +98,53 @@ class EdgeDescription extends React.PureComponent<Props, OwnState> {
           cornerRadius={style.borderRadius}
           fill={style.backgroundColor}
         />
-        <Text
+        <Layout
+          direction="column"
           x={style.padding.left}
           y={style.padding.top}
-          width={textWidth}
-          fontSize={fontSize}
-          lineHeight={style.lineHeight}
-          text={edge.title || edge.summary}
+          margin={style.textGap}
           onResize={this.handleResize}
-        />
+        >
+        {
+          edge.title
+            ? (
+              <Text
+                width={textWidth}
+                fill={style.title.color}
+                fontSize={style.title.fontSize}
+                lineHeight={style.title.lineHeight}
+                text={edge.title}
+              />
+            )
+            : <Nothing />
+        }
+        {
+          edge.summary
+            ? (
+              <Text
+                width={textWidth}
+                fill={style.color}
+                fontSize={style.fontSize}
+                lineHeight={style.lineHeight}
+                text={edge.summary}
+              />
+            )
+            : <Nothing />
+        }
+        {
+          edge.tags
+            ? (
+              <Text
+                width={textWidth}
+                fill={style.tags.color}
+                fontSize={style.tags.fontSize}
+                lineHeight={style.tags.lineHeight}
+                text={edge.tags}
+              />
+            )
+            : <Nothing />
+        }
+        </Layout>
       </Group>
     );
   }
