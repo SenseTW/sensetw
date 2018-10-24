@@ -24,6 +24,28 @@ const getUser = async (id: string): Promise<User> => {
   return U.getUser(db, id);
 };
 
+const getRefreshToken = async (refreshToken: string): Promise<Token> => {
+  const rows = await db
+    .select([
+      "accessToken",
+      "accessTokenExpiresAt",
+      "refreshToken",
+      "refreshTokenExpiresAt",
+      "clientId",
+      "userId"
+    ])
+    .from("oauth_token")
+    .where("refreshToken", refreshToken);
+  if (rows.length === 0) {
+    return null;
+  }
+  return {
+    ...rows[0],
+    client: await getClient(rows[0].clientId),
+    user: await getUser(rows[0].userId)
+  }
+};
+
 export const getAccessToken = async (accessToken: string): Promise<Token> => {
   const rows = await db
     .select([
@@ -68,6 +90,13 @@ const saveToken = async (
     user: await getUser(user.id)
   };
   return t;
+};
+
+const revokeToken = async (token: Token): Promise<boolean> => {
+  await db("oauth_token")
+    .where("refreshToken", token)
+    .del();
+  return true;
 };
 
 const getAuthorizationCode = async (
@@ -135,11 +164,11 @@ const model = {
 
   getAccessToken,
   saveToken,
-
+  revokeToken,
   getAuthorizationCode,
   saveAuthorizationCode,
   revokeAuthorizationCode,
-
+  getRefreshToken,
   verifyScope
 };
 
