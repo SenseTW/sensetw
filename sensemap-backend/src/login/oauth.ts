@@ -145,7 +145,7 @@ const model = {
 
 const oauth = new OAuthServer({
   model,
-  requireClientAuthentication: { authorization_code: false }
+  requireClientAuthentication: { authorization_code: false, refresh_token: false }
 });
 
 export default oauth;
