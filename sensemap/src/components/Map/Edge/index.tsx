@@ -171,6 +171,11 @@ class Edge extends React.PureComponent<Props> {
           : data.edgeType
       },
     ];
+    const hasContent = data.title || data.tags || data.summary;
+    const contentPoints = [
+      { x: from[0] + dX / 12 * 5, y: from[1] + dY / 12 * 5 },
+      { x: from[0] + dX / 12 * 7, y: from[1] + dY / 12 * 7 },
+    ];
     const rotation = Math.atan2(dY, dX) * 180 / Math.PI;
     const onSelect    = this.props.onSelect    || noop;
     const onDeselect  = this.props.onDeselect  || noop;
@@ -209,6 +214,19 @@ class Edge extends React.PureComponent<Props> {
                 backgroundColor={color}
               />
             )
+          }
+          {
+            hasContent
+              ? contentPoints.map((p, i) =>
+                  <Circle
+                    key={i}
+                    x={p.x}
+                    y={p.y}
+                    radius={style.indicator.radius / 3 * 2}
+                    fill={color}
+                  />
+                )
+              : []
           }
           <Line
             points={[...from, ...to]}
