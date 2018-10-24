@@ -1,0 +1,39 @@
+.edge-type-selector .ui.radio.checkbox.type-selector__none input~label:after {
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__none input:checked~label:after {
+  border: 1px solid #979797;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__directed input~label:after {
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__directed input:checked~label:after {
+  border: 1px solid #979797;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__reversed input~label:after {
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__reversed input:checked~label:after {
+  border: 1px solid #979797;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input~label:after {
+  border: 1px solid #ffffff;
+  background-color: #ffffff;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input:checked~label:after {
+  border: 1px solid #979797;
+  background-color: #ffffff;
+}
