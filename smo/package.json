@@ -1,0 +1,33 @@
+{
+  "name": "smo",
+  "version": "0.0.1",
+  "description": "Sense.tw proxy for SMO",
+  "private": true,
+  "scripts": {
+    "doc": "typedoc --out doc",
+    "dev": "DEBUG=smo nodemon --watch src --ext ts --exec ts-node src",
+    "build": "rimraf dist && tsc",
+    "prestart": "yarn build",
+    "start": "node dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Pomin Wu <pomin5@gmail.com> (https://github.com/pm5)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/debug": "^0.0.31",
+    "@types/node": "^8.10.26",
+    "@types/request": "^2.47.1",
+    "nodemon": "^1.18.3",
+    "rimraf": "^2.5.4",
+    "ts-node": "^7.0.1",
+    "typedoc": "^0.12.0",
+    "typescript": "^3.0.1"
+  },
+  "dependencies": {
+    "@types/request-promise-native": "^1.0.15",
+    "debug": "^4.1.0",
+    "dotenv": "^6.1.0",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "outDir": "dist/",
+    "lib": ["esnext"],
+    "target": "es5",
+    "module": "commonjs",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": []
+}
