@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Header, Form, Input } from 'semantic-ui-react';
+import { Header, Form, Input, TextArea } from 'semantic-ui-react';
 import EdgeTypeSelector from './EdgeTypeSelector';
 import { Edge } from '../../types';
 import * as E from '../../types/sense/edge';
@@ -61,7 +61,7 @@ class EdgeContent extends React.PureComponent<Props> {
         </Form.Field>
         <Form.Field className="edge-content__edge-summary">
           <label>Summary</label>
-          <Input
+          <TextArea
             disabled={disabled}
             placeholder={placeholders[edgeType].summary}
             value={summary}
