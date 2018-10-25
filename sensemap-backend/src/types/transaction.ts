@@ -137,35 +137,33 @@ async function saveTransaction(db: Knex, user: User, trx: Transaction) {
 }
 
 export async function runTransaction(
-  db: Knex,
+  pgtrx: Knex,
   trx: Transaction
 ): Promise<TransactionResult> {
   switch (trx.op) {
     case "CREATE_MAP": {
-      const rows = await db("map")
+      const rows = await pgtrx("map")
         .insert(trx.data)
         .returning(mapFields);
       trx.data = rows[0];
       return successResult(rows[0].id, trx);
     }
     case "UPDATE_MAP": {
-      return db.transaction(async pgtrx => {
-        const before = await pgtrx
-          .select(mapFields)
-          .from("map")
-          .where("id", trx.mapId)
-          .first();
-        const rows = await pgtrx("map")
-          .where("id", trx.mapId)
-          .update(trx.data)
-          .returning(mapFields);
-        trx.data = rows[0];
-        trx.before = before;
-        return successResult(trx.mapId, trx);
-      });
+      const before = await pgtrx
+        .select(mapFields)
+        .from("map")
+        .where("id", trx.mapId)
+        .first();
+      const rows = await pgtrx("map")
+        .where("id", trx.mapId)
+        .update(trx.data)
+        .returning(mapFields);
+      trx.data = rows[0];
+      trx.before = before;
+      return successResult(trx.mapId, trx);
     }
     case "DELETE_MAP": {
-      const rows = await db("map")
+      const rows = await pgtrx("map")
         .where("id", trx.mapId)
         .del()
         .returning(mapFields);
@@ -173,30 +171,28 @@ export async function runTransaction(
       return successResult(trx.mapId, trx);
     }
     case "CREATE_OBJECT": {
-      const rows = await db("object")
+      const rows = await pgtrx("object")
         .insert(trx.data)
         .returning(objectFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
     }
     case "UPDATE_OBJECT": {
-      return db.transaction(async pgtrx => {
-        const before = await pgtrx
-          .select(objectFields)
-          .from("object")
-          .where("id", trx.objectId)
-          .first();
-        const rows = await pgtrx("object")
-          .where("id", trx.objectId)
-          .update(trx.data)
-          .returning(objectFields);
-        trx.data = rows[0];
-        trx.before = before;
-        return successResult(rows[0].mapId, trx);
-      });
+      const before = await pgtrx
+        .select(objectFields)
+        .from("object")
+        .where("id", trx.objectId)
+        .first();
+      const rows = await pgtrx("object")
+        .where("id", trx.objectId)
+        .update(trx.data)
+        .returning(objectFields);
+      trx.data = rows[0];
+      trx.before = before;
+      return successResult(rows[0].mapId, trx);
     }
     case "DELETE_OBJECT": {
-      const rows = await db("object")
+      const rows = await pgtrx("object")
         .where("id", trx.objectId)
         .del()
         .returning(objectFields);
@@ -204,30 +200,28 @@ export async function runTransaction(
       return successResult(rows[0].mapId, trx);
     }
     case "CREATE_EDGE": {
-      const rows = await db("edge")
+      const rows = await pgtrx("edge")
         .insert(trx.data)
         .returning(edgeFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
     }
     case "UPDATE_EDGE": {
-      return db.transaction(async pgtrx => {
-        const before = await pgtrx
-          .select(edgeFields)
-          .from("edge")
-          .where("id", trx.edgeId)
-          .first();
-        const rows = await pgtrx("edge")
-          .where("id", trx.edgeId)
-          .update(trx.data)
-          .returning(edgeFields);
-        trx.data = rows[0];
-        trx.before = before;
-        return successResult(rows[0].mapId, trx);
-      });
+      const before = await pgtrx
+        .select(edgeFields)
+        .from("edge")
+        .where("id", trx.edgeId)
+        .first();
+      const rows = await pgtrx("edge")
+        .where("id", trx.edgeId)
+        .update(trx.data)
+        .returning(edgeFields);
+      trx.data = rows[0];
+      trx.before = before;
+      return successResult(rows[0].mapId, trx);
     }
     case "DELETE_EDGE": {
-      const rows = await db("edge")
+      const rows = await pgtrx("edge")
         .where("id", trx.edgeId)
         .delete()
         .returning(edgeFields);
@@ -235,30 +229,28 @@ export async function runTransaction(
       return successResult(rows[0].mapId, trx);
     }
     case "CREATE_CARD": {
-      const rows = await db("card")
+      const rows = await pgtrx("card")
         .insert(trx.data)
         .returning(cardFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
     }
     case "UPDATE_CARD": {
-      return db.transaction(async pgtrx => {
-        const before = await pgtrx
-          .select(cardFields)
-          .from("card")
-          .where("id", trx.cardId)
-          .first();
-        const rows = await pgtrx("card")
-          .where("id", trx.cardId)
-          .update(trx.data)
-          .returning(cardFields);
-        trx.data = rows[0];
-        trx.before = before;
-        return successResult(rows[0].mapId, trx);
-      });
+      const before = await pgtrx
+        .select(cardFields)
+        .from("card")
+        .where("id", trx.cardId)
+        .first();
+      const rows = await pgtrx("card")
+        .where("id", trx.cardId)
+        .update(trx.data)
+        .returning(cardFields);
+      trx.data = rows[0];
+      trx.before = before;
+      return successResult(rows[0].mapId, trx);
     }
     case "DELETE_CARD": {
-      const rows = await db("card")
+      const rows = await pgtrx("card")
         .where("id", trx.cardId)
         .delete()
         .returning(cardFields);
@@ -266,30 +258,28 @@ export async function runTransaction(
       return successResult(rows[0].mapId, trx);
     }
     case "CREATE_BOX": {
-      const rows = await db("box")
+      const rows = await pgtrx("box")
         .insert(trx.data)
         .returning(boxFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
     }
     case "UPDATE_BOX": {
-      return db.transaction(async pgtrx => {
-        const before = await pgtrx
-          .select(boxFields)
-          .from("box")
-          .where("id", trx.boxId)
-          .first();
-        const rows = await pgtrx("box")
-          .where("id", trx.boxId)
-          .update(trx.data)
-          .returning(boxFields);
-        trx.data = rows[0];
-        trx.before = before;
-        return successResult(rows[0].mapId, trx);
-      });
+      const before = await pgtrx
+        .select(boxFields)
+        .from("box")
+        .where("id", trx.boxId)
+        .first();
+      const rows = await pgtrx("box")
+        .where("id", trx.boxId)
+        .update(trx.data)
+        .returning(boxFields);
+      trx.data = rows[0];
+      trx.before = before;
+      return successResult(rows[0].mapId, trx);
     }
     case "DELETE_BOX": {
-      const rows = await db("box")
+      const rows = await pgtrx("box")
         .where("id", trx.boxId)
         .delete()
         .returning(boxFields);
@@ -297,7 +287,7 @@ export async function runTransaction(
       return successResult(rows[0].mapId, trx);
     }
     case "ADD_OBJECT_TO_BOX": {
-      const rows = await db("object")
+      const rows = await pgtrx("object")
         .where("id", trx.objectId)
         .update({ belongsToId: trx.boxId })
         .returning(objectFields);
@@ -308,9 +298,9 @@ export async function runTransaction(
       return successResult(rows[0].mapId, trx);
     }
     case "REMOVE_OBJECT_FROM_BOX": {
-      const rows = await db("object")
+      const rows = await pgtrx("object")
         .where("id", trx.objectId)
-        .update({ belongsToId: db.raw("NULL") })
+        .update({ belongsToId: pgtrx.raw("NULL") })
         .returning(objectFields);
       trx.data = {
         containsObject: trx.objectId,
@@ -329,11 +319,13 @@ export async function run(
   user: User,
   trx: Transaction
 ): Promise<TransactionResult> {
-  const result = await runTransaction(db, trx);
-  if (result.status == TransactionStatus.SUCCESS) {
-    await saveTransaction(db, user, result.transaction);
-    await writeHistory(db, result.transaction);
-    await updateMapUpdatedAt(db, result.mapId);
-  }
-  return result;
+  return db.transaction(async pgtrx => {
+    const result = await runTransaction(pgtrx, trx);
+    if (result.status == TransactionStatus.SUCCESS) {
+      await saveTransaction(pgtrx, user, result.transaction);
+      await writeHistory(pgtrx, result.transaction);
+      await updateMapUpdatedAt(pgtrx, result.mapId);
+    }
+    return result;
+  });
 }
