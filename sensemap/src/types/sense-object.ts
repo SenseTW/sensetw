@@ -17,7 +17,6 @@ import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
 import * as SM from './sense-map';
-import { curry } from 'ramda';
 
 export type State = CachedStorage;
 
@@ -336,7 +335,7 @@ const removeObjects =
   (objectIDList: ObjectID[]) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { senseMap: { map }, session: { user } } = getState();
-    const ps = objectIDList.map(id => curry(GO.remove)(user));
+    const ps = objectIDList.map(id => GO.remove(user, id));
     return Promise.all(ps)
       .then(() => dispatch(SL.actions.clearSelection()))
       .then(() => loadObjects(map, true)(dispatch, getState))

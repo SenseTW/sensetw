@@ -5,7 +5,6 @@ import { CardID } from '../sense/card';
 import * as GO from './object';
 import * as GC from './card';
 import * as SN from '../session';
-import { curry } from 'ramda';
 
 export const addCardToBox =
   (user: SN.User, cardObject: ObjectID, box: BoxID) => {
@@ -45,7 +44,7 @@ export const deleteObjectsByCard =
     return client(user).request(query, variables)
       .then(({ Card }: { Card: { objects: { id: ObjectID }[] } }) =>
             Card.objects.map(({ id }) => id))
-      .then((ids) => Promise.all(ids.map(curry(GO.remove)(user))));
+      .then((ids) => Promise.all(ids.map(id => GO.remove(user, id))));
   };
 
 export const deleteObjectsByBox =
@@ -59,5 +58,5 @@ export const deleteObjectsByBox =
     return client(user).request(query, variables)
       .then(({ Box }: { Box: { objects: { id: ObjectID }[] } }) =>
             Box.objects.map(({ id }) => id))
-      .then((ids) => Promise.all(ids.map(curry(GO.remove)(user))));
+      .then((ids) => Promise.all(ids.map(id => GO.remove(user, id))));
   };
