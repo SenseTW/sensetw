@@ -9,6 +9,7 @@ interface Props<T extends string> {
   disabled?: boolean;
   types: T[];
   typeNames?: { [key: string]: string };
+  eachAs?: { [key: string]: React.ReactNode };
   type: T;
   onChange? (type: T): void;
 }
@@ -23,16 +24,26 @@ const capitalize = (str: string): string => {
 };
 
 function TypeSelector<T extends string>(props: Props<T>) {
-  const { className = '', disabled = false, types, typeNames = {}, type, onChange = noop } = props;
+  const {
+    className = '',
+    disabled = false,
+    types,
+    typeNames = {},
+    eachAs = {},
+    type,
+    onChange = noop
+  } = props;
   const classes = cx(groupName, className);
 
   return (
     <div className={classes}>{
       types.map(ty => {
         const typeName = typeNames[ty];
+        const wrapper = eachAs[ty];
         return (
           <Form.Field key={ty}>
             <Checkbox
+              as={wrapper}
               disabled={disabled}
               radio
               className={`${groupName}__${ty.toLowerCase()}`}

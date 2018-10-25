@@ -1,39 +1,48 @@
-.edge-type-selector .ui.radio.checkbox.type-selector__none input~label:after {
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox input~label:before,
+.edge-type-selector .ui.radio.checkbox input:checked~label:before,
+.edge-type-selector .ui.radio.checkbox input~label:after,
+.edge-type-selector .ui.radio.checkbox input:checked~label:after {
+  border: none;
+  background-color: transparent !important;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__none input:checked~label:after {
-  border: 1px solid #979797;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox input~label~svg {
+  position: absolute;
+  left: 15px;
+  top: 0;
+  margin: 0;
+  width: 32px;
+  height: 32px;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__directed input~label:after {
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox.type-selector__none input~label~svg {
+  color: #000000;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__directed input:checked~label:after {
-  border: 1px solid #979797;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox.type-selector__none input:checked~label~svg {
+  color: #3ad8fa;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__reversed input~label:after {
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox.type-selector__directed input~label~svg {
+  color: #000000;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__reversed input:checked~label:after {
-  border: 1px solid #979797;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox.type-selector__directed input:checked~label~svg {
+  color: #3ad8fa;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input~label:after {
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox.type-selector__reversed input~label~svg {
+  color: #000000;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input:checked~label:after {
-  border: 1px solid #979797;
-  background-color: #ffffff;
+.edge-type-selector .ui.radio.checkbox.type-selector__reversed input:checked~label~svg {
+  color: #3ad8fa;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input~label~svg {
+  color: #000000;
+}
+
+.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input:checked~label~svg {
+  color: #3ad8fa;
 }
