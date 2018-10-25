@@ -4,7 +4,6 @@ import EdgeTypeSelector from './EdgeTypeSelector';
 import { Edge } from '../../types';
 import * as E from '../../types/sense/edge';
 import { placeholders } from './placeholders';
-// import './index.css'
 
 interface Props {
   disabled?: boolean;

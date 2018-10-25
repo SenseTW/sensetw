@@ -2,8 +2,26 @@
 .edge-type-selector .ui.radio.checkbox input:checked~label:before,
 .edge-type-selector .ui.radio.checkbox input~label:after,
 .edge-type-selector .ui.radio.checkbox input:checked~label:after {
-  border: none;
-  background-color: transparent !important;
+  left: 26px;
+  top: 62px;
+  width: 10px;
+  height: 10px;
+}
+
+.edge-type-selector .ui.radio.checkbox input~label:before,
+.edge-type-selector .ui.radio.checkbox input:checked~label:before {
+  border-color: #d6dee9;
+}
+
+.edge-type-selector .ui.radio.checkbox input~label:after,
+.edge-type-selector .ui.radio.checkbox input:checked~label:after {
+  -webkit-transform: scale(0.5);
+  transform: scale(0.5);
+}
+
+.edge-type-selector .ui.radio.checkbox input:checked~label:after {
+  border-color: #9b9b9b;
+  background-color: #9b9b9b !important;
 }
 
 .edge-type-selector .ui.radio.checkbox input~label~svg {
@@ -13,36 +31,17 @@
   margin: 0;
   width: 32px;
   height: 32px;
+  pointer-events: none;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__none input~label~svg {
+.edge-type-selector .ui.radio.checkbox input~label~svg {
   color: #000000;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__none input:checked~label~svg {
-  color: #3ad8fa;
+.edge-type-selector .ui.radio.checkbox input~label:hover~svg {
+  color: #0277bd;
 }
 
-.edge-type-selector .ui.radio.checkbox.type-selector__directed input~label~svg {
-  color: #000000;
-}
-
-.edge-type-selector .ui.radio.checkbox.type-selector__directed input:checked~label~svg {
-  color: #3ad8fa;
-}
-
-.edge-type-selector .ui.radio.checkbox.type-selector__reversed input~label~svg {
-  color: #000000;
-}
-
-.edge-type-selector .ui.radio.checkbox.type-selector__reversed input:checked~label~svg {
-  color: #3ad8fa;
-}
-
-.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input~label~svg {
-  color: #000000;
-}
-
-.edge-type-selector .ui.radio.checkbox.type-selector__bidirected input:checked~label~svg {
+.edge-type-selector .ui.radio.checkbox input:checked~label~svg {
   color: #3ad8fa;
 }
