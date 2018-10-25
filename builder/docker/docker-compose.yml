@@ -20,6 +20,17 @@ services:
      - 7777:70
      - 8888:80
      - 9999:90
+  imageproxy:
+    build:
+      context: ../imageproxy/
+      dockerfile: Dockerfile.imageproxy
+    image: "imageproxy"
+    env_file:
+     - ./env/nginx.imageproxy.env
+    ports:
+     - 6600:60
+    volumes:
+     - ./env/nginx.imageproxy.conf:/etc/nginx/conf.d/default.conf
   smo:
     build:
       context: ../../

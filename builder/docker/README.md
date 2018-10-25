@@ -11,6 +11,7 @@ docker-compose up
 FRONT: http://localhost:8888
 API: http://localhost:9999
 SMO: http://localhost:7777
+IMAGE PROXY: http://localhost:6600
 ```
 # Cleanup
 ```

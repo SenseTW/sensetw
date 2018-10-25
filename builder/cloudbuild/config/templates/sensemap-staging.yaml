@@ -30,7 +30,7 @@ spec:
             requests:
               memory: "8Mi"
               cpu: "1m"
-        - image: nginx
+        - image: nginx:1.15-alpine-perl
           name: sensemap-web
           resources:
             requests:
@@ -40,9 +40,18 @@ spec:
             preStop:
               exec:
                 command: ["/usr/sbin/nginx","-s","quit"]
+          envFrom:
+            - configMapRef:
+                name: sensemap-${BRANCH_NAME}-web-env
           volumeMounts:
-            - name: "nginx-proxy-conf"
+            - name: "nginx-proxy-site-conf"
               mountPath: "/etc/nginx/conf.d"
+            - name: "nginx-proxy-conf"
+              mountPath: "/etc/nginx/nginx.conf"
+              subPath: "nginx.conf"
+            - name: "nginx-proxy-conf"
+              mountPath: "/etc/nginx/module.conf"
+              subPath: "module.conf"
             - name: front-static
               mountPath: /var/front
           ports:
@@ -83,15 +92,26 @@ spec:
             - configMapRef:
                 name: sensemap-smo-${BRANCH_NAME}-env
       volumes:
+        - name: nginx-proxy-site-conf
+          configMap:
+            name: sensemap-${BRANCH_NAME}-web-config
+            items:
+              - key: "default.conf"
+                path: "default.conf"
         - name: nginx-proxy-conf
           configMap:
             name: sensemap-${BRANCH_NAME}-web-config
             items:
               - key: "nginx.conf"
                 path: "nginx.conf"
+              - key: "module.conf"
+                path: "module.conf"
         - name: gcloud-credentials
           secret:
             secretName: db-backup-credentials
+        - name: sensemap-${BRANCH_NAME}-web-env
+          configMap:
+            name: sensemap-${BRANCH_NAME}-web-env
         - name: sensemap-${BRANCH_NAME}-env
           configMap:
             name: sensemap-${BRANCH_NAME}-env

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sensemap-${BRANCH_NAME}-web-env
+  namespace: default
+data:
+  GS_BUCKET: sense-image
