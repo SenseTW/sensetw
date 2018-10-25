@@ -1,12 +1,12 @@
 import * as dotenv from "dotenv";
 dotenv.load();
 import * as http from "http";
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 import * as request from "request-promise-native";
-import * as Debug from 'debug';
+import * as Debug from "debug";
 
-const debug = Debug('smo');
+const debug = Debug("smo");
 const port = process.env.PORT || "8001";
 const graphql_root =
   process.env.SENSEMAP_GRAPHQL_ROOT || "https://api.sense.tw/graphql";
@@ -45,7 +45,7 @@ function mapDataRequest(variables: MapRequestParam): GraphQLRequest {
         id, name, description, image
       }
     }`,
-    variables,
+    variables
   };
 }
 
@@ -70,17 +70,37 @@ type ResponseData = {
   name: string;
   description: string;
   image: string;
+  image_secure: string;
+  url: string;
 };
 
 const siteData: ResponseData = {
-  name: 'Sense.tw',
-  description: '議題釐清工具，社群協作讓政策 make sense 。用 Sense.tw 標注文件和網頁，收集、分類、萃取大量資訊中的重點，視覺化拉出多重議題架構，找出問題關鍵！',
-  image: 'http://sense.tw/tree.png',
+  name: "Sense.tw",
+  description:
+    "議題釐清工具，社群協作讓政策 make sense 。用 Sense.tw 標注文件和網頁，收集、分類、萃取大量資訊中的重點，視覺化拉出多重議題架構，找出問題關鍵！",
+  image: "http://sense.tw/tree.png",
+  image_secure: "https://sense.tw/tree.png",
+  url: "http://sense.tw/"
+};
+
+function mapDataToResponse(data: MapData): ResponseData {
+  return {
+    name: data.name,
+    description: data.description,
+    image: data.image || siteData.image,
+    image_secure: data.image.replace(/^http:/, 'https:') || siteData.image_secure,
+    url: `http://sense.tw/map/${data.id}`
+  };
 }
 
 function formatResponse(data: ResponseData): string {
-  const content = fs.readFileSync(path.join(__dirname, '../public/index.html')).toString();
-  return content.replace(new RegExp('\{(' + Object.keys(data).join('|') + ')\}', 'g'), (r, substr) => data[substr]);
+  const content = fs
+    .readFileSync(path.join(__dirname, "../public/index.html"))
+    .toString();
+  return content.replace(
+    new RegExp("{(" + Object.keys(data).join("|") + ")}", "g"),
+    (r, substr) => data[substr]
+  );
 }
 
 const server = http.createServer((req, res) => {
@@ -90,8 +110,7 @@ const server = http.createServer((req, res) => {
     return res.end(formatResponse(siteData));
   } else {
     return requestGraphQL(param)
-      .then(formatResponse)
-      .then(res.end.bind(res))
+      .then(mapData => res.end(formatResponse(mapDataToResponse(mapData))))
       .catch(error => console.error(error));
   }
 });
