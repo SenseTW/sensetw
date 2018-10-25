@@ -193,7 +193,7 @@ class MapPage extends React.Component<Props> {
   }
 
   renderEdgeInspector() {
-    const { actions: acts, senseObject, selection } = this.props;
+    const { actions: acts, isAuthenticated, senseObject, selection } = this.props;
     const edgeId = selection.mapEdges[0] || '';
     const data = CS.getEdge(senseObject, edgeId);
     const isEmpty = E.isEmpty(data);
@@ -201,6 +201,7 @@ class MapPage extends React.Component<Props> {
 
     return !isEmpty && (
       <Inspector
+        disabled={!isAuthenticated}
         selectionType={SelectionType.MAP_EDGE}
         data={data}
         submitText="Update"

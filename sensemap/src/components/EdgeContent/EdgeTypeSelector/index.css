@@ -8,6 +8,10 @@
   height: 10px;
 }
 
+.edge-type-selector .ui.radio.checkbox.disabled input:focus~label:after {
+  background-color: transparent;
+}
+
 .edge-type-selector .ui.radio.checkbox input~label:before,
 .edge-type-selector .ui.radio.checkbox input:checked~label:before {
   border-color: #d6dee9;
@@ -32,6 +36,14 @@
   width: 32px;
   height: 32px;
   pointer-events: none;
+}
+
+.edge-type-selector .ui.radio.checkbox.disabled input~label~svg {
+  opacity: 0.5;
+}
+
+.edge-type-selector .ui.radio.checkbox.disabled input:not(:checked)~label:hover~svg {
+  color: #000000;
 }
 
 .edge-type-selector .ui.radio.checkbox input~label~svg {
