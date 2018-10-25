@@ -37,8 +37,6 @@ if (!!process.env.REDIS_HOST && !!process.env.REDIS_PORT) {
 } else {
   app.use(session({
     secret: process.env.SESSION_SECRET || 'xeepe3uuT1Gieh2ig0Aoyoongie1vooTeloo0Oongieb5mear4pix4aSh2loiCei',
-    resave: false,
-    saveUninitialized: true,
   }));
 }
 app.use(flash());
