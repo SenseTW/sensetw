@@ -55,10 +55,14 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     return isAuthenticated;
   }
 
-  handleCreateCard(): void {
-    const { actions: acts } = this.props;
-    const data = cardData({ id: U.objectId() });
-    acts.senseObject.updateCard(data);
+  handleCreateCard = async () => {
+    const { actions: acts, senseMap: { map: mid } } = this.props;
+    const data = cardData({ title: 'New Card' });
+    // Force the result to be an action
+    // tslint:disable-next-line:no-any
+    const result: any = await acts.senseObject.createCardObject(mid, data);
+    const object = Object.values(result.payload.objects)[0] as T.ObjectData;
+    acts.selection.selectMapCard(object.id, object.data);
     acts.editor.changeStatus(OE.StatusType.SHOW);
   }
 
@@ -70,10 +74,14 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
     );
   }
 
-  handleBox(): void {
-    const { actions: acts } = this.props;
-    const data = boxData({ id: U.objectId() });
-    acts.senseObject.updateBox(data);
+  handleBox = async () => {
+    const { actions: acts, senseMap: { map: mid } } = this.props;
+    const data = boxData({ title: 'New Box' });
+    // Force the result to be an action
+    // tslint:disable-next-line:no-any
+    const result: any = await acts.senseObject.createBoxObject(mid, data);
+    const object = Object.values(result.payload.objects)[0] as T.ObjectData;
+    acts.selection.selectMapBox(object.id, object.data);
     acts.editor.changeStatus(OE.StatusType.SHOW);
   }
 
