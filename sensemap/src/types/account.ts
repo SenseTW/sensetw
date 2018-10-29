@@ -2,6 +2,7 @@ import { sessionService } from 'redux-react-session';
 import { ActionUnion, emptyAction } from './action';
 import { profileRequest, tokenRequest, AuthorizationCode } from './auth';
 import { Dispatch } from './redux';
+import * as DL from './data-layer';
 import { sanitizeURL } from './utils';
 
 const apiRoot = sanitizeURL(process.env.REACT_APP_SENSEMAP_API_ROOT) || 'https://api.sense.tw';
@@ -114,12 +115,7 @@ const loginRequest = () => (dispatch: Dispatch) => {
       await sessionService.saveSession({ token });
       await sessionService.saveUser({ ...profile, ...token });
       // update the data layer
-      // TODO: move to another file
-      // tslint:disable-next-line:no-any
-      const w: any = window;
-      if (w && w.dataLayer) {
-        w.dataLayer.push({ userID: profile.id });
-      }
+      DL.userID(profile.id);
       return dispatch(loginSuccess());
     })
     .catch((err) => dispatch(loginFailure(err)));
@@ -177,12 +173,7 @@ const logoutRequest = () => async (dispatch: Dispatch) => {
   sessionService.deleteSession();
   sessionService.deleteUser();
   // update the data layer
-  // TODO: should use the google_tag_manager object to set it
-  // tslint:disable-next-line:no-any
-  const w: any = window;
-  if (w && w.dataLayer) {
-    w.dataLayer.push({ userID: undefined });
-  }
+  DL.userID(undefined);
 };
 
 /**
