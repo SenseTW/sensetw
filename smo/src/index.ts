@@ -85,7 +85,7 @@ const siteData: ResponseData = {
 
 function mapDataToResponse(data: MapData): ResponseData {
   return {
-    name: `Sense.tw - ${data.name}`,
+    name: `${data.name} - Sense.tw`,
     description: data.description,
     image: data.image || siteData.image,
     image_secure: data.image.replace(/^http:/, 'https:') || siteData.image_secure,
