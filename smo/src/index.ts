@@ -68,6 +68,7 @@ function requestGraphQL(param: MapRequestParam): Promise<MapData> {
 
 type ResponseData = {
   name: string;
+  title: string;
   description: string;
   image: string;
   image_secure: string;
@@ -76,6 +77,7 @@ type ResponseData = {
 
 const siteData: ResponseData = {
   name: "Sense.tw",
+  title: "Sense.tw",
   description:
     "議題釐清工具，社群協作讓政策 make sense 。用 Sense.tw 標注文件和網頁，收集、分類、萃取大量資訊中的重點，視覺化拉出多重議題架構，找出問題關鍵！",
   image: "http://sense.tw/tree.png",
@@ -85,7 +87,8 @@ const siteData: ResponseData = {
 
 function mapDataToResponse(data: MapData): ResponseData {
   return {
-    name: `${data.name} - Sense.tw`,
+    name: "Sense.tw",
+    title: `${data.name} - Sense.tw`,
     description: data.description,
     image: data.image || siteData.image,
     image_secure: data.image.replace(/^http:/, 'https:') || siteData.image_secure,
