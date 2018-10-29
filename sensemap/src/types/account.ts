@@ -113,6 +113,13 @@ const loginRequest = () => (dispatch: Dispatch) => {
       const profile = await profileRequest(token.access_token);
       await sessionService.saveSession({ token });
       await sessionService.saveUser({ ...profile, ...token });
+      // update the data layer
+      // TODO: move to another file
+      // tslint:disable-next-line:no-any
+      const w: any = window;
+      if (w && w.dataLayer) {
+        w.dataLayer.push({ userID: profile.id });
+      }
       return dispatch(loginSuccess());
     })
     .catch((err) => dispatch(loginFailure(err)));
@@ -169,6 +176,13 @@ const signupRequest = (username: string, email: string, password: string) => {
 const logoutRequest = () => async (dispatch: Dispatch) => {
   sessionService.deleteSession();
   sessionService.deleteUser();
+  // update the data layer
+  // TODO: should use the google_tag_manager object to set it
+  // tslint:disable-next-line:no-any
+  const w: any = window;
+  if (w && w.dataLayer) {
+    w.dataLayer.push({ userID: undefined });
+  }
 };
 
 /**
