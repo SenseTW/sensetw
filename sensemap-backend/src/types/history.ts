@@ -1,6 +1,7 @@
 import { gql } from "apollo-server";
 import * as Knex from "knex";
-import { ID, HistoryType } from "./sql";
+import { ID } from "./sql";
+import { HistoryType } from "./primitive";
 import { Transaction } from "./transaction";
 
 type History = {

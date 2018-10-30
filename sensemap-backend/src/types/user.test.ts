@@ -103,7 +103,6 @@ describe("GraphQL", () => {
     const u = await U.resolvers.Query.User(null, { id: users[0].id }, { db });
     expect(u.id).toBe(users[0].id);
     expect(u.email).toBe("hello@somewhere");
-    expect(u.maps).toBeTruthy();
   });
 });
 

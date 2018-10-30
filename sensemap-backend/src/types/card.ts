@@ -2,14 +2,14 @@ import { gql } from "apollo-server";
 import {
   ID,
   Card,
-  CardType,
-  cardFields,
+  cardsQuery,
   cardDataFields,
   cardWithTargetFields,
-  SenseObject
+  SenseObject,
+  objectsQuery
 } from "./sql";
+import { CardType } from "./primitive";
 import { MapFilter } from "./map";
-import { objectsQuery } from "./object";
 import * as R from "ramda";
 import * as A from "./oauth";
 import * as T from "./transaction";
@@ -40,10 +40,6 @@ export type AllCardsArgs = {
 };
 
 const writableFields = R.filter(name => name !== "quote", cardDataFields);
-
-export function cardsQuery(db) {
-  return db.select(cardFields).from("card");
-}
 
 export function cardsWithTargetQuery(db) {
   return db.select(cardWithTargetFields).from("card");
@@ -89,7 +85,7 @@ export async function getAllCards(
   return q;
 }
 
-export async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
+async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
   return objectsQuery(db).where("cardId", id);
 }
 
@@ -166,6 +162,8 @@ export const typeDefs = [
   `
 ];
 
+type CardParent = ID | Card;
+
 export const resolvers = {
   Query: {
     allCards: async (_, args: AllCardsArgs, { db }, info): Promise<Card[]> => {
@@ -181,64 +179,85 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createCard: async (_, args, { db, user, authorization }, info): Promise<Card> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    createCard: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Card> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createCard(R.pick(writableFields, args));
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    deleteCard: async (_, { id }, { db, user, authorization }, info): Promise<Card> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    deleteCard: async (
+      _,
+      { id },
+      { db, user, authorization },
+      info
+    ): Promise<Card> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteCard(id);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    updateCard: async (_, args, { db, user, authorization }, info): Promise<Card> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    updateCard: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Card> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateCard(args.id, R.pick(writableFields, args));
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },
   Card: {
-    id: async (o, _, { db }, info): Promise<ID> =>
+    id: async (o: CardParent): Promise<ID> =>
       typeof o !== "string" ? o.id : o,
-    createdAt: async (o, _, { db }, info): Promise<Date> =>
+    createdAt: async (o: CardParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.createdAt : (await getCard(db, o)).createdAt,
-    updatedAt: async (o, _, { db }, info): Promise<Date> =>
+    updatedAt: async (o: CardParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.updatedAt : (await getCard(db, o)).updatedAt,
-    cardType: async (o, _, { db }, info): Promise<CardType> =>
+    cardType: async (o: CardParent, {}, { db }): Promise<CardType> =>
       typeof o !== "string" ? o.cardType : (await getCard(db, o)).cardType,
-    description: async (o, _, { db }, info): Promise<string> =>
+    description: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string"
         ? o.description
         : (await getCard(db, o)).description,
-    saidBy: async (o, _, { db }, info): Promise<string> =>
+    saidBy: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.saidBy : (await getCard(db, o)).saidBy,
-    stakeholder: async (o, _, { db }, info): Promise<string> =>
+    stakeholder: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string"
         ? o.stakeholder
         : (await getCard(db, o)).stakeholder,
-    summary: async (o, _, { db }, info): Promise<string> =>
+    summary: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.summary : (await getCard(db, o)).summary,
-    quote: async (o, _, { db }, info): Promise<string> =>
+    quote: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.quote : (await getCard(db, o)).quote,
-    tags: async (o, _, { db }, info): Promise<string> =>
+    tags: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.tags : (await getCard(db, o)).tags,
-    title: async (o, _, { db }, info): Promise<string> =>
+    title: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.title : (await getCard(db, o)).title,
-    url: async (o, _, { db }, info): Promise<string> =>
+    url: async (o: CardParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.url : (await getCard(db, o)).url,
-    mapId: async (o, _, { db }, info): Promise<ID> =>
+    mapId: async (o: CardParent, {}, { db }): Promise<ID> =>
       typeof o !== "string" ? o.mapId : (await getCard(db, o)).mapId,
-    map: async (o, _, { db }, info): Promise<ID> =>
-      typeof o !== "string" ? o.map : (await getCard(db, o)).mapId,
-    objects: async (o, _, { db }, info): Promise<SenseObject[]> =>
-      typeof o !== "string" ? o.objects : getObjectsForCard(db, o),
-    owner: async (o, _, { db }, info): Promise<ID> =>
-      typeof o !== "string" ? o.owner : (await getCard(db, o)).ownerId
+    map: async (o: CardParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.mapId : (await getCard(db, o)).mapId,
+    objects: async (o: CardParent, {}, { db }): Promise<SenseObject[]> =>
+      typeof o !== "string" ? getObjectsForCard(db, o.id) : getObjectsForCard(db, o),
+    owner: async (o: CardParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.ownerId : (await getCard(db, o)).ownerId
   }
 };

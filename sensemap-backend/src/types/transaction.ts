@@ -2,18 +2,17 @@ import * as Knex from "knex";
 import {
   ID,
   User,
+  mapData,
   mapFields,
-  mapDataFields,
+  objectData,
   objectFields,
-  objectDataFields,
+  edgeData,
   edgeFields,
-  edgeDataFields,
+  cardData,
   cardFields,
-  cardDataFields,
-  boxFields,
-  boxDataFields
+  boxData,
+  boxFields
 } from "./sql";
-import * as R from "ramda";
 import { writeHistory } from "./history";
 
 enum TransactionStatus {
@@ -48,13 +47,13 @@ function failedResult(mapId: ID, transaction: Transaction): TransactionResult {
   return { status: TransactionStatus.FAILED, mapId, transaction };
 }
 
-export function createMap(args): Transaction {
-  const data = R.pick(mapDataFields, args);
+export function createMap(args: any): Transaction {
+  const data = mapData(args);
   return { op: "CREATE_MAP", data };
 }
 
 export function updateMap(mapId: ID, args): Transaction {
-  const data = R.pick(mapDataFields, args);
+  const data = mapData(args);
   return { op: "UPDATE_MAP", mapId, data };
 }
 
@@ -63,12 +62,12 @@ export function deleteMap(mapId: ID): Transaction {
 }
 
 export function createObject(args): Transaction {
-  const data = R.pick(objectDataFields, args);
+  const data = objectData(args);
   return { op: "CREATE_OBJECT", data };
 }
 
 export function updateObject(objectId: ID, args): Transaction {
-  const data = R.pick(objectDataFields, args);
+  const data = objectData(args);
   return { op: "UPDATE_OBJECT", objectId, data };
 }
 
@@ -77,12 +76,12 @@ export function deleteObject(objectId: ID): Transaction {
 }
 
 export function createEdge(args): Transaction {
-  const data = R.pick(edgeDataFields, args);
+  const data = edgeData(args);
   return { op: "CREATE_EDGE", data };
 }
 
 export function updateEdge(edgeId: ID, args): Transaction {
-  const data = R.pick(edgeDataFields, args);
+  const data = edgeData(args);
   return { op: "UPDATE_EDGE", edgeId, data };
 }
 
@@ -91,12 +90,12 @@ export function deleteEdge(edgeId: ID): Transaction {
 }
 
 export function createCard(args): Transaction {
-  const data = R.pick(cardDataFields, args);
+  const data = cardData(args);
   return { op: "CREATE_CARD", data };
 }
 
 export function updateCard(cardId: ID, args): Transaction {
-  const data = R.pick(cardDataFields, args);
+  const data = cardData(args);
   return { op: "UPDATE_CARD", cardId, data };
 }
 
@@ -105,12 +104,12 @@ export function deleteCard(cardId: ID): Transaction {
 }
 
 export function createBox(args): Transaction {
-  const data = R.pick(boxDataFields, args);
+  const data = boxData(args);
   return { op: "CREATE_BOX", data };
 }
 
 export function updateBox(boxId: ID, args): Transaction {
-  const data = R.pick(boxDataFields, args);
+  const data = boxData(args);
   return { op: "UPDATE_BOX", boxId, data };
 }
 
