@@ -20,6 +20,9 @@ spec:
             preStop:
               exec:
                 command: ["/usr/sbin/nginx","-s","quit"]
+          envFrom:
+            - configMapRef:
+                name: sensemap-${BRANCH_NAME}-web-env
           volumeMounts:
             - name: "nginx-proxy-site-conf"
               mountPath: "/etc/nginx/conf.d"
