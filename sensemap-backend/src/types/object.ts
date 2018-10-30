@@ -1,12 +1,9 @@
 import { gql } from "apollo-server";
-import { ID, SenseObject, objectFields } from "./sql";
+import { ID, SenseObject, objectsQuery } from "./sql";
+import { ObjectType } from "./primitive";
 import { getObjectsInMap } from "./map";
-import * as T from './transaction';
+import * as T from "./transaction";
 import * as A from "./oauth";
-
-export function objectsQuery(db) {
-  return db.select(objectFields).from("object");
-}
 
 export async function getAllObjects(db): Promise<SenseObject[]> {
   return objectsQuery(db);
@@ -92,6 +89,8 @@ export const typeDefs = [
   `
 ];
 
+type ObjectParent = ID | SenseObject;
+
 export const resolvers = {
   Query: {
     allObjects: async (_, args, { db }, info): Promise<SenseObject[]> => {
@@ -106,43 +105,86 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createObject: async (_, args, { db, user, authorization }, info): Promise<Object> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    createObject: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Object> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.createObject(args);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    updateObject: async (_, args, { db, user, authorization }, info): Promise<Object> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    updateObject: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Object> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateObject(args.id, args);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    deleteObject: async (_, { id }, { db, user, authorization }, info): Promise<Object> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    deleteObject: async (
+      _,
+      { id },
+      { db, user, authorization },
+      info
+    ): Promise<Object> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteObject(id);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },
   Object: {
-    id: (o, _, context, info): ID => o.id || o,
-    createdAt: (o, _, context, info): Date => o.createdAt,
-    updatedAt: (o, _, context, info): Date => o.updatedAt,
-    x: (o, _, context, info): number => o.x,
-    y: (o, _, context, info): number => o.y,
-    width: (o, _, context, info): number => o.width,
-    height: (o, _, context, info): number => o.height,
-    zIndex: (o, _, context, info): number => o.zIndex,
-    mapId: (o, _, context, info): number => o.mapId,
-    objectType: (o, _, context, info): number => o.objectType,
-    cardId: (o, _, context, info): number => o.cardId,
-    boxId: (o, _, context, info): number => o.boxId,
-    belongsToId: (o, _, context, info): number => o.belongsToId,
-
-    map: async (o, _, { db }, info): Promise<ID> => o.map,
-    card: async (o, _, { db }, info): Promise<ID> => o.card,
-    box: async (o, _, { db }, info): Promise<ID> => o.box,
-    belongsTo: async (o, _, { db }, info): Promise<ID> => o.belongsTo
+    id: async (o: ObjectParent, {}): Promise<ID> =>
+      typeof o !== "string" ? o.id : o,
+    createdAt: async (o: ObjectParent, {}, { db }): Promise<Date> =>
+      typeof o !== "string" ? o.createdAt : (await getObject(db, o)).createdAt,
+    updatedAt: async (o: ObjectParent, {}, { db }): Promise<Date> =>
+      typeof o !== "string" ? o.updatedAt : (await getObject(db, o)).updatedAt,
+    x: async (o: ObjectParent, {}, { db }): Promise<number> =>
+      typeof o !== "string" ? o.x : (await getObject(db, o)).x,
+    y: async (o: ObjectParent, {}, { db }): Promise<number> =>
+      typeof o !== "string" ? o.y : (await getObject(db, o)).y,
+    width: async (o: ObjectParent, {}, { db }): Promise<number> =>
+      typeof o !== "string" ? o.width : (await getObject(db, o)).width,
+    height: async (o: ObjectParent, {}, { db }): Promise<number> =>
+      typeof o !== "string" ? o.height : (await getObject(db, o)).height,
+    zIndex: async (o: ObjectParent, {}, { db }): Promise<number> =>
+      typeof o !== "string" ? o.zIndex : (await getObject(db, o)).zIndex,
+    objectType: async (o: ObjectParent, {}, { db }): Promise<ObjectType> =>
+      typeof o !== "string"
+        ? o.objectType
+        : (await getObject(db, o)).objectType,
+    mapId: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.mapId : (await getObject(db, o)).mapId,
+    cardId: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.cardId : (await getObject(db, o)).cardId,
+    boxId: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.boxId : (await getObject(db, o)).boxId,
+    belongsToId: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string"
+        ? o.belongsToId
+        : (await getObject(db, o)).belongsToId,
+    map: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.mapId : (await getObject(db, o)).mapId,
+    card: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.cardId : (await getObject(db, o)).cardId,
+    box: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.boxId : (await getObject(db, o)).boxId,
+    belongsTo: async (o: ObjectParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string"
+        ? o.belongsToId
+        : (await getObject(db, o)).belongsToId
   }
 };

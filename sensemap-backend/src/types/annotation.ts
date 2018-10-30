@@ -1,4 +1,10 @@
-import { ID, User, Annotation, annotationDataFields, annotationFields } from "./sql";
+import {
+  ID,
+  User,
+  Annotation,
+  annotationDataFields,
+  annotationFields
+} from "./sql";
 import * as C from "./card";
 import * as T from "./transaction";
 import * as Knex from "knex";
@@ -82,7 +88,11 @@ export async function updateAnnotation(
   return getAnnotation(db, id);
 }
 
-export async function deleteAnnotation(db: Knex, user: User, id: ID): Promise<Annotation> {
+export async function deleteAnnotation(
+  db: Knex,
+  user: User,
+  id: ID
+): Promise<Annotation> {
   const rows = await db("annotation")
     .where("id", id)
     .del()

@@ -1,13 +1,9 @@
 import { gql } from "apollo-server";
-import { ID, Box, BoxType, boxFields, SenseObject } from "./sql";
+import { ID, Box, SenseObject, objectsQuery, boxesQuery } from "./sql";
+import { BoxType } from "./primitive";
 import { getBoxesInMap } from "./map";
-import { objectsQuery } from "./object";
 import * as T from "./transaction";
 import * as A from "./oauth";
-
-export function boxesQuery(db) {
-  return db.select(boxFields).from("box");
-}
 
 export async function getAllBoxes(db): Promise<Box[]> {
   return boxesQuery(db);
@@ -25,7 +21,7 @@ export async function getObjectsForBox(db, id: ID): Promise<SenseObject[]> {
 }
 
 export async function getObjectsInBox(db, id: ID): Promise<SenseObject[]> {
-  return objectsQuery(db).where("belongsTo", id);
+  return objectsQuery(db).where("belongsToId", id);
 }
 
 export const typeDefs = [
@@ -105,6 +101,8 @@ export const typeDefs = [
   `
 ];
 
+type BoxParent = ID | Box;
+
 export const resolvers = {
   Query: {
     allBoxes: async (_, args, { db }, info): Promise<Box[]> => {
@@ -119,21 +117,42 @@ export const resolvers = {
     }
   },
   Mutation: {
-    createBox: async (_, args, { db, user, authorization }, info): Promise<Box> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    createBox: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Box> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createBox(args);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    deleteBox: async (_, { id }, { db, user, authorization }, info): Promise<Box> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    deleteBox: async (
+      _,
+      { id },
+      { db, user, authorization },
+      info
+    ): Promise<Box> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteBox(id);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
-    updateBox: async (_, args, { db, user, authorization }, info): Promise<Box> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    updateBox: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Box> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateBox(args.id, args);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
@@ -144,7 +163,9 @@ export const resolvers = {
       { db, user, authorization },
       info
     ) => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.addObjectToBox(containsObjectId, belongsToBoxId);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
@@ -155,36 +176,42 @@ export const resolvers = {
       { db, user, authorization },
       info
     ) => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.removeObjectFromBox(containsObjectId, belongsToBoxId);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     }
   },
   Box: {
-    id: async (o, _, { db }, info): Promise<ID> =>
+    id: async (o: BoxParent): Promise<ID> =>
       typeof o !== "string" ? o.id : o,
-    createdAt: async (o, _, { db }, info): Promise<Date> =>
+    createdAt: async (o: BoxParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.createdAt : (await getBox(db, o)).createdAt,
-    updatedAt: async (o, _, { db }, info): Promise<Date> =>
+    updatedAt: async (o: BoxParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.updatedAt : (await getBox(db, o)).updatedAt,
-    boxType: async (o, _, { db }, info): Promise<BoxType> =>
+    boxType: async (o: BoxParent, {}, { db }): Promise<BoxType> =>
       typeof o !== "string" ? o.boxType : (await getBox(db, o)).boxType,
-    title: async (o, _, { db }, info): Promise<ID> =>
+    title: async (o: BoxParent, {}, { db }): Promise<ID> =>
       typeof o !== "string" ? o.title : (await getBox(db, o)).title,
-    summary: async (o, _, { db }, info): Promise<string> =>
+    summary: async (o: BoxParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.summary : (await getBox(db, o)).summary,
-    tags: async (o, _, { db }, info): Promise<string> =>
+    tags: async (o: BoxParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.tags : (await getBox(db, o)).tags,
-    mapId: async (o, _, { db }, info): Promise<ID> =>
+    mapId: async (o: BoxParent, {}, { db }): Promise<ID> =>
       typeof o !== "string" ? o.mapId : (await getBox(db, o)).mapId,
-    map: async (o, _, { db }, info): Promise<ID> =>
-      typeof o !== "string" ? o.map : (await getBox(db, o)).mapId,
-    objects: async (o, _, { db }, info): Promise<SenseObject[]> =>
-      typeof o !== "string" ? o.objects : getObjectsForBox(db, o),
-    contains: async (o, _, { db }, info): Promise<SenseObject[]> =>
-      typeof o !== "string" ? o.contains : getObjectsInBox(db, o),
-    owner: async (o, _, { db }, info): Promise<ID> =>
-      typeof o !== "string" ? o.owner : (await getBox(db, o)).ownerId
+    map: async (o: BoxParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.mapId : (await getBox(db, o)).mapId,
+    objects: async (o: BoxParent, {}, { db }): Promise<SenseObject[]> =>
+      typeof o !== "string"
+        ? getObjectsForBox(db, o.id)
+        : getObjectsForBox(db, o),
+    contains: async (o: BoxParent, {}, { db }): Promise<SenseObject[]> =>
+      typeof o !== "string"
+        ? getObjectsInBox(db, o.id)
+        : getObjectsInBox(db, o),
+    owner: async (o: BoxParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.ownerId : (await getBox(db, o)).ownerId
   }
 };

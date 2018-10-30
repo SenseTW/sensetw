@@ -85,7 +85,12 @@ export function router(context: Context) {
   router.patch("/:id", async (req, res, next) => {
     const { db, env } = context({ req });
     const args = toAnnotation(env, req.body);
-    const a = await A.updateAnnotation(db, req.user as T.User, req.params.id, args);
+    const a = await A.updateAnnotation(
+      db,
+      req.user as T.User,
+      req.params.id,
+      args
+    );
     if (!a) {
       return next();
     }

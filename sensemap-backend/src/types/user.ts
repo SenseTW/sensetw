@@ -1,13 +1,7 @@
 import { gql } from "apollo-server";
-import { ID, User, UserData, userFields, Map } from "./sql";
+import { ID, User, UserData, userData, userFields, usersQuery, Map, mapsQuery } from "./sql";
 import * as Knex from "knex";
-import { pick } from "ramda";
-import { mapsQuery } from "./map";
 import * as A from "./oauth";
-
-export function usersQuery(db: Knex) {
-  return db.select(userFields).from("user");
-}
 
 export async function getUser(db: Knex, id: ID): Promise<User | null> {
   const u: User | undefined = await usersQuery(db)
@@ -16,7 +10,7 @@ export async function getUser(db: Knex, id: ID): Promise<User | null> {
   return u === undefined ? null : u;
 }
 
-export async function getUserMaps(db: Knex, id: ID): Promise<Map> {
+export async function getUserMaps(db: Knex, id: ID): Promise<Map[]> {
   return mapsQuery(db).where("ownerId", id);
 }
 
@@ -38,9 +32,7 @@ export async function authenticate(
   db: Knex,
   claim: IdentityClaim
 ): Promise<User | null> {
-  let q = db
-    .select(userFields)
-    .from("user")
+  let q = usersQuery(db)
     .where("salthash", db.raw(`crypt(?, ??)`, [claim.password, "salthash"]));
   if (claim.type === "username") {
     q = q.andWhere("username", claim.username);
@@ -56,9 +48,7 @@ async function verifyUserPassword(
   id: ID,
   password: string
 ): Promise<User | null> {
-  const q = db
-    .select(userFields)
-    .from("user")
+  const q = usersQuery(db)
     .where("salthash", db.raw(`crypt(?, ??)`, [password, "salthash"]))
     .andWhere("id", id);
   const u: User | undefined = await q.first();
@@ -73,7 +63,7 @@ export async function updateUserPassword(
   const rows: User[] = await db("user")
     .where("id", id)
     .update({
-      salthash: db.raw(`crypt(?, gen_salt('bf', 8))`, [ password ])
+      salthash: db.raw(`crypt(?, gen_salt('bf', 8))`, [password])
     })
     .returning(userFields);
   return rows.length > 0 ? rows[0] : null;
@@ -85,7 +75,7 @@ export async function createUser(
   password: string
 ): Promise<User> {
   return db.transaction(async trx => {
-    const fields: UserData = pick(userFields, args);
+    const fields = userData(args);
     const rows: User[] = await trx("user")
       .insert({
         ...fields,
@@ -100,9 +90,7 @@ export async function findUserByUsername(
   db: Knex,
   username: string
 ): Promise<User | null> {
-  const rows = await db
-    .select(userFields)
-    .from("user")
+  const rows = await usersQuery(db)
     .where("username", username);
   return rows.length > 0 ? rows[0] : null;
 }
@@ -111,9 +99,7 @@ export async function findUserByEmail(
   db: Knex,
   email: string
 ): Promise<User | null> {
-  const rows = await db
-    .select(userFields)
-    .from("user")
+  const rows = await usersQuery(db)
     .where("email", email);
   return rows.length > 0 ? rows[0] : null;
 }
@@ -130,7 +116,7 @@ export async function updateUser(
   id: ID,
   args: User
 ): Promise<User | null> {
-  const fields: User = pick(userFields, args);
+  const fields = userData(args);
   return db("user")
     .where("id", id)
     .update(fields)
@@ -238,6 +224,8 @@ export const typeDefs = [
   `
 ];
 
+type UserParent = ID | User;
+
 export const resolvers = {
   Query: {
     User: async (_, args, { db }, info): Promise<User | null> => {
@@ -249,7 +237,9 @@ export const resolvers = {
       { db, user, authorization },
       info
     ): Promise<User | null> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       if (!u) {
         return null;
       }
@@ -263,7 +253,9 @@ export const resolvers = {
       { db, user, authorization },
       info
     ): Promise<User | null> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       if (!u) {
         return null;
       }
@@ -271,17 +263,17 @@ export const resolvers = {
     }
   },
   User: {
-    id: async (o, _, { db }, info): Promise<ID> =>
+    id: async (o: UserParent): Promise<ID> =>
       typeof o !== "string" ? o.id : o,
-    createdAt: async (o, _, { db }, info): Promise<Date> =>
+    createdAt: async (o: UserParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.createdAt : (await getUser(db, o)).createdAt,
-    updatedAt: async (o, _, { db }, info): Promise<Date> =>
+    updatedAt: async (o: UserParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.updatedAt : (await getUser(db, o)).updatedAt,
-    username: async (o, _, { db }, info): Promise<Date> =>
+    username: async (o: UserParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.username : (await getUser(db, o)).username,
-    email: async (o, _, { db }, info): Promise<Date> =>
+    email: async (o: UserParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.email : (await getUser(db, o)).email,
-    maps: async (o, _, { db }, info): Promise<Map[]> =>
-      typeof o !== "string" ? o.maps : getUserMaps(db, o)
+    maps: async (o: UserParent, {}, { db }): Promise<Map[]> =>
+      typeof o !== "string" ? getUserMaps(db, o.id) : getUserMaps(db, o)
   }
 };

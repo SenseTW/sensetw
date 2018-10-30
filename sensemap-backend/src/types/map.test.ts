@@ -26,11 +26,7 @@ describe("GraphQL", () => {
     expect(map.tags).toBeTruthy();
     expect(map.image).toBeTruthy();
     expect(map.type).toBeTruthy();
-    expect(map.objects).toContain(maps[0].objects[0].id);
-    expect(map.cards).toContain(maps[0].cards[0].id);
-    expect(map.boxes).toContain(maps[0].boxes[0].id);
-    expect(map.edges).toContain(maps[0].edges[0].id);
-    expect(map.owner).toBeTruthy();
+    expect(map.ownerId).toBeTruthy();
   });
 
   test("create/update/delete Map", async () => {
@@ -45,7 +41,7 @@ describe("GraphQL", () => {
     expect(m0.createdAt).toBeTruthy();
     expect(m0.updatedAt).toBeTruthy();
     expect(m0.name).toBeNull();
-    expect(m0.owner).toBe(user.id);
+    expect(m0.ownerId).toBe(user.id);
 
     const m1 = await M.resolvers.Mutation.updateMap(
       null,
@@ -89,7 +85,7 @@ describe("GraphQL", () => {
 describe("Basics", () => {
   test("getObjectsInMap", async () => {
     const objects = await M.getObjectsInMap(db, maps[0].id);
-    expect(objects[0].map).toEqual(maps[0].id);
+    expect(objects[0].mapId).toEqual(maps[0].id);
   });
 
   /*

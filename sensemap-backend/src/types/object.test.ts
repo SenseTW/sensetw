@@ -44,8 +44,8 @@ describe("GraphQL", () => {
       { db, user },
       null
     );
-    expect(o.map).toBe(mapId);
-    expect(o.card).toBe(cardId);
+    expect(o.mapId).toBe(mapId);
+    expect(o.cardId).toBe(cardId);
   });
 
   test("create/update/delete Object", async () => {
@@ -61,7 +61,7 @@ describe("GraphQL", () => {
         cardId,
         mapId
       },
-      { db, user },
+      { db, user }
     );
     expect(o.zIndex).toBe(0);
 
@@ -71,14 +71,14 @@ describe("GraphQL", () => {
         id: o.id,
         zIndex: 10
       },
-      { db, user },
+      { db, user }
     );
     expect(o1.zIndex).toBe(10);
 
     const o2 = await O.resolvers.Mutation.deleteObject(
       null,
       { id: o.id },
-      { db, user },
+      { db, user }
     );
     expect(o2.id).toBe(o.id);
 

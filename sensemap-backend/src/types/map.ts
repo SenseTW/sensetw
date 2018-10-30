@@ -1,18 +1,19 @@
 import { gql } from "apollo-server";
 import {
   ID,
+  HasID,
   Map,
-  mapFields,
+  mapsQuery,
   SenseObject,
+  objectsQuery,
   Card,
+  cardsQuery,
   Box,
-  Edge
+  boxesQuery,
+  Edge,
+  edgesQuery
 } from "./sql";
 import * as T from "./transaction";
-import { objectsQuery } from "./object";
-import { boxesQuery } from "./box";
-import { cardsQuery } from "./card";
-import { edgesQuery } from "./edge";
 import * as A from "./oauth";
 
 export type MapFilter = {
@@ -22,10 +23,6 @@ export type MapFilter = {
 type AllMapsArgs = {
   filter?: MapFilter;
 };
-
-export function mapsQuery(db) {
-  return db.select(mapFields).from("map");
-}
 
 export async function getMap(db, id: ID): Promise<Map | null> {
   const m = await mapsQuery(db)
@@ -106,9 +103,11 @@ export const typeDefs = [
   `
 ];
 
+type MapParent = ID | Map;
+
 export const resolvers = {
   Query: {
-    allMaps: async (_, args: AllMapsArgs, { db }, info): Promise<Map[]> => {
+    allMaps: async (_, args: AllMapsArgs, { db }): Promise<Map[]> => {
       if (args.filter) {
         const m = await getMap(db, args.filter.id);
         return !!m ? [m] : [];
@@ -117,29 +116,50 @@ export const resolvers = {
       }
     },
 
-    Map: async (_, args, { db }, info): Promise<Map | null> => {
+    Map: async (_, args: HasID, { db }): Promise<Map | null> => {
       return getMap(db, args.id);
     }
   },
 
   Mutation: {
-    createMap: async (_, args, { db, user, authorization }, info): Promise<Map> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    createMap: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Map> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       args.ownerId = !!u ? u.id : null;
       const trx = T.createMap(args);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    updateMap: async (_, args, { db, user, authorization }, info): Promise<Map> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    updateMap: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Map> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateMap(args.id, args);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
     },
 
-    deleteMap: async (_, args, { db, user, authorization }, info): Promise<Map> => {
-      const u = user ? user : await A.getUserFromAuthorization(db, authorization);
+    deleteMap: async (
+      _,
+      args,
+      { db, user, authorization },
+      info
+    ): Promise<Map> => {
+      const u = user
+        ? user
+        : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteMap(args.id);
       const r = await T.run(db, u, trx);
       return r.transaction.data;
@@ -147,29 +167,29 @@ export const resolvers = {
   },
 
   Map: {
-    id: async (o, _, { db }, info): Promise<ID> =>
+    id: async (o: MapParent): Promise<ID> =>
       typeof o !== "string" ? o.id : o,
-    createdAt: async (o, _, { db }, info): Promise<Date> =>
+    createdAt: async (o: MapParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.createdAt : (await getMap(db, o)).createdAt,
-    updatedAt: async (o, _, { db }, info): Promise<Date> =>
+    updatedAt: async (o: MapParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.updatedAt : (await getMap(db, o)).updatedAt,
-    name: async (o, _, { db }, info): Promise<string> =>
+    name: async (o: MapParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.name : (await getMap(db, o)).name,
-    description: async (o, _, { db }, info): Promise<string> =>
+    description: async (o: MapParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.description : (await getMap(db, o)).description,
-    tags: async (o, _, { db }, info): Promise<string> =>
+    tags: async (o: MapParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.tags : (await getMap(db, o)).tags,
-    image: async (o, _, { db }, info): Promise<string> =>
+    image: async (o: MapParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.image : (await getMap(db, o)).image,
-    type: async (o, _, { db }, info): Promise<string> =>
+    type: async (o: MapParent, {}, { db }): Promise<string> =>
       typeof o !== "string" ? o.type : (await getMap(db, o)).type,
-    objects: async (o, _, { db }, info): Promise<SenseObject[]> =>
-      typeof o !== "string" ? o.objects : getObjectsInMap(db, o),
-    edges: async (o, _, { db }, info): Promise<Edge[]> =>
-      typeof o !== "string" ? o.edges : getEdgesInMap(db, o),
-    cards: async (o, _, { db }, info): Promise<Card[]> =>
-      typeof o !== "string" ? o.cards : getCardsInMap(db, o),
-    boxes: async (o, _, { db }, info): Promise<Box[]> =>
-      typeof o !== "string" ? o.boxes : getBoxesInMap(db, o)
+    objects: async (o: MapParent, {}, { db }): Promise<SenseObject[]> =>
+      typeof o !== "string" ? getObjectsInMap(db, o.id) : getObjectsInMap(db, o),
+    edges: async (o: MapParent, {}, { db }): Promise<Edge[]> =>
+      typeof o !== "string" ? getEdgesInMap(db, o.id) : getEdgesInMap(db, o),
+    cards: async (o: MapParent, {}, { db }): Promise<Card[]> =>
+      typeof o !== "string" ? getCardsInMap(db, o.id) : getCardsInMap(db, o),
+    boxes: async (o: MapParent, {}, { db }): Promise<Box[]> =>
+      typeof o !== "string" ? getBoxesInMap(db, o.id) : getBoxesInMap(db, o)
   }
 };

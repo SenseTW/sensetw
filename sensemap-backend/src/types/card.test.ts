@@ -19,9 +19,8 @@ describe("create/update/deleteCard", () => {
     const r = await T.run(db, user, trx);
     const c0 = r.transaction.data;
     expect(c0.id).toBeTruthy();
-    expect(c0.objects).toEqual([]);
     expect(c0.quote).toBe("mono no aware");
-    expect(c0.map).toBe(mapId);
+    expect(c0.mapId).toBe(mapId);
 
     const trx1 = T.updateCard(c0.id, {
       summary: "sweet variety peas",
@@ -74,7 +73,6 @@ describe("GraphQL", () => {
   test("Card query", async () => {
     const id = maps[0].cards[0].id;
     const c = await C.resolvers.Query.Card(null, { id }, { db }, null);
-    expect(c.objects.length).toBeGreaterThanOrEqual(0);
   });
 
   test("create/update/deleteCard", async () => {
@@ -89,9 +87,8 @@ describe("GraphQL", () => {
       { db, user }
     );
     expect(c0.id).toBeTruthy();
-    expect(c0.objects).toEqual([]);
     expect(c0.quote).toBe("");
-    expect(c0.map).toBe(mapId);
+    expect(c0.mapId).toBe(mapId);
 
     const c1 = await C.resolvers.Mutation.updateCard(
       null,

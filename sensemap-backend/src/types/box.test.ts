@@ -61,7 +61,6 @@ test("addToContainCards", async () => {
     },
     { db, user }
   );
-  expect(box.contains).toEqual([]);
 
   const r1 = await B.resolvers.Mutation.addToContainCards(
     null,
@@ -73,7 +72,6 @@ test("addToContainCards", async () => {
   );
 
   const b1 = await B.getBox(db, box.id);
-  expect(b1.contains).toEqual([obj.id]);
   expect(r1.containsObject).toBe(obj.id);
   expect(r1.belongsToBox).toBe(box.id);
 
@@ -87,7 +85,6 @@ test("addToContainCards", async () => {
   );
 
   const b2 = await B.getBox(db, box.id);
-  expect(b2.contains).toEqual([]);
   expect(r2.containsObject).toBe(obj.id);
   expect(r2.belongsToBox).toBe(box.id);
 });

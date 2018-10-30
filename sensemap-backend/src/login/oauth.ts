@@ -43,7 +43,7 @@ const getRefreshToken = async (refreshToken: string): Promise<Token> => {
     ...rows[0],
     client: await getClient(rows[0].clientId),
     user: await getUser(rows[0].userId)
-  }
+  };
 };
 
 export const getAccessToken = async (accessToken: string): Promise<Token> => {
@@ -174,7 +174,10 @@ const model = {
 
 const oauth = new OAuthServer({
   model,
-  requireClientAuthentication: { authorization_code: false, refresh_token: false }
+  requireClientAuthentication: {
+    authorization_code: false,
+    refresh_token: false
+  }
 });
 
 export default oauth;

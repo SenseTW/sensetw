@@ -6,7 +6,7 @@ import * as O from "./object";
 import * as E from "./edge";
 import * as C from "./card";
 import * as B from "./box";
-import * as H from './history';
+import * as H from "./history";
 
 export const typeDefs = [
   gql`
@@ -24,7 +24,7 @@ export const typeDefs = [
   ...E.typeDefs,
   ...C.typeDefs,
   ...B.typeDefs,
-  ...H.typeDefs,
+  ...H.typeDefs
 ];
 
 export const resolvers = reduce(
@@ -33,5 +33,13 @@ export const resolvers = reduce(
     Query: { ping: () => "pong" },
     Mutation: { noop: () => null }
   },
-  [U.resolvers, M.resolvers, O.resolvers, E.resolvers, C.resolvers, B.resolvers, H.resolvers]
+  [
+    U.resolvers,
+    M.resolvers,
+    O.resolvers,
+    E.resolvers,
+    C.resolvers,
+    B.resolvers,
+    H.resolvers
+  ]
 ) as IResolvers<any, any>;
