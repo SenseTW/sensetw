@@ -27,6 +27,7 @@ class MapContent extends React.PureComponent<Props> {
   render() {
     const { actions: acts, map, isNew, isDirty, isEditing } = this.props;
     const disabled = !(isNew && map && map.name) && !isDirty;
+    const mode = isNew ? 'create-map' : 'map-details';
 
     return (
       <Modal
@@ -39,6 +40,7 @@ class MapContent extends React.PureComponent<Props> {
             <Form.Field className="map-content__name">
               <label>Map Name (required)</label>
               <Input
+                id={`sense-${mode}__map-name-input`}
                 placeholder="my wonderful map"
                 value={map && map.name}
                 onChange={e => this.handleMapChange(SM.updateName(e.currentTarget.value))}
@@ -47,6 +49,7 @@ class MapContent extends React.PureComponent<Props> {
             <Form.Field className="map-content__description">
               <label>Map Description</label>
               <TextArea
+                id={`sense-${mode}__map-description-input`}
                 placeholder="This is my wonderful map."
                 value={map && map.description}
                 onChange={e => this.handleMapChange(SM.updateDescription(e.currentTarget.value))}
@@ -55,6 +58,7 @@ class MapContent extends React.PureComponent<Props> {
             <Form.Field className="map-content__tags">
               <label>Tag</label>
               <Input
+                id={`sense-${mode}__map-tags-input`}
                 placeholder="Tag, tag"
                 value={map && map.tags}
                 onChange={e => this.handleMapChange(SM.updateTags(e.currentTarget.value))}
@@ -63,6 +67,7 @@ class MapContent extends React.PureComponent<Props> {
             <Form.Field className="map-content__type">
               <label>Access Type</label>
               <Radio
+                id={`sense-${mode}__map-type-public`}
                 label="Public"
                 name="mapType"
                 value={SM.MapType.PUBLIC}
@@ -71,6 +76,7 @@ class MapContent extends React.PureComponent<Props> {
               />
               {/*
               <Radio
+                id={`sense-${mode}__map-type-private`}
                 label="Private"
                 name="mapType"
                 value={SM.MapType.PRIVATE}
@@ -84,6 +90,7 @@ class MapContent extends React.PureComponent<Props> {
         <Modal.Actions>
           <Button.Group>
             <Button
+              id={`sense-${mode}__cancel-btn`}
               onClick={() => {
                 if (map) {
                   acts.cachedStorage.removeMap(map);
@@ -96,6 +103,7 @@ class MapContent extends React.PureComponent<Props> {
             <Button.Or />
             <Button
               positive
+              id={`sense-${mode}__${isNew ? 'create' : 'update'}-btn`}
               disabled={disabled}
               onClick={async () => {
                 if (map) {
