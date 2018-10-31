@@ -24,7 +24,7 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
       <h1>Inbox</h1>
       <div className="inbox__actions">
         <SyncButton
-          id="inbox__sync-btn"
+          id="sense-inbox__sync-btn"
           className="inbox__action"
           mapId={mapId}
           actions={acts}
@@ -32,7 +32,7 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
         <Divider />
         <Button
           basic
-          id="inbox__annotation-btn"
+          id="sense-inbox__annotation-btn"
           className="inbox__action"
           as="a"
           href="https://via.sense.tw/"
@@ -46,7 +46,7 @@ export function Inbox({ cards, senseMap, actions: acts }: Props) {
           trigger={
             <Button
               basic
-              id="inbox__show-sources-btn"
+              id="sense-inbox__show-sources-btn"
               className="inbox__action"
             >
               Show Sources

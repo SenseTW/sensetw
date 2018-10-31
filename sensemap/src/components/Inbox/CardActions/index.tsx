@@ -34,6 +34,7 @@ class CardActions extends React.PureComponent<Props, OwnState> {
         : undefined;
     const deleteTrigger = (
       <Button
+        id={`sense-inbox__delete-btn__card-${card.id}`}
         icon="trash"
         onClick={() => this.setState({ open: true })}
       />
@@ -48,6 +49,7 @@ class CardActions extends React.PureComponent<Props, OwnState> {
         }}
       >
         <Button
+          id={`sense-inbox__inspector-btn__card-${card.id}`}
           icon="edit"
           onClick={() => {
             acts.selection.clearSelection();
@@ -56,6 +58,7 @@ class CardActions extends React.PureComponent<Props, OwnState> {
           }}
         />
         <Button
+          id={`sense-inbox__add-to-map-btn__card-${card.id}`}
           icon="plus square outline"
           onClick={() => acts.senseObject.createObjectForCard(senseMap.map, card.id, box)}
         />

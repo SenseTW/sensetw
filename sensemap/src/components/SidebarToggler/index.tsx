@@ -4,6 +4,7 @@ import * as U from '../../types/utils';
 import './index.css';
 
 interface Props {
+  id?: string;
   className?: string;
   // tslint:disable-next-line:no-any
   style?: any;
@@ -14,12 +15,13 @@ interface Props {
 
 class SidebarToggler extends React.PureComponent<Props> {
   render() {
-    const { className = '', style, right = false, open, onToggle = U.noop } = this.props;
+    const { id, className = '', style, right = false, open, onToggle = U.noop } = this.props;
     const openIconName = right ? 'caret right' : 'caret left';
     const closeIconName = right ? 'caret left' : 'caret right';
 
     return (
       <div
+        id={id}
         className={`${className} inbox-toggler`}
         style={style}
         onClick={() => onToggle(!open)}

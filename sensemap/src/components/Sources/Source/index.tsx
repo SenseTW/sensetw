@@ -30,6 +30,7 @@ export function Source ({source}: Props) {
             </Item.Description>
             <Item.Extra>
             <Button
+                id="sense-sources__annotation-btn"
                 size="tiny"
                 as="a" 
                 href={'https://via.sense.tw/' + source.url}

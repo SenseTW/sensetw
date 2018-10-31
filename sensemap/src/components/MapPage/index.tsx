@@ -287,6 +287,7 @@ class MapPage extends React.Component<Props> {
               isAuthenticated
                 ? (
                   <SidebarToggler
+                    id="sense-toggler__inbox-btn"
                     className="inbox__btn"
                     style={{ left: isInboxVisible ? sidebarWidth : 0 }}
                     open={isInboxVisible}
@@ -309,6 +310,7 @@ class MapPage extends React.Component<Props> {
             }
             <SidebarToggler
               right
+              id="sense-toggler__inspector-btn"
               className="inspector__btn"
               style={{ right: isInspectorOpen ? sidebarWidth : 0 }}
               open={isInspectorOpen}
