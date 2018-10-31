@@ -200,7 +200,7 @@ data:
 
         location @prerender {
           set $prerender 0;
-          if ($http_user_agent ~* "googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator") {
+          if ($http_user_agent ~* "Slackbot|googlebot|bingbot|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedinbot|embedly|quora link preview|showyoubot|outbrain|pinterest|slackbot|vkShare|W3C_Validator") {
             set $prerender 1;
           }
           if ($args ~ "_escaped_fragment_") {
