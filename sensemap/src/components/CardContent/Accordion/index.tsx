@@ -3,6 +3,7 @@ import { Icon } from 'semantic-ui-react';
 import './index.css';
 
 interface Props {
+  id?: string;
   title?: string;
 }
 
@@ -21,12 +22,12 @@ class Accordion extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { children, title = '' } = this.props;
+    const { children, id, title = '' } = this.props;
     const { open } = this.state;
 
     return (
       <div className="accordion">
-        <div className="accordion__handler" onClick={this.handleClick}>
+        <div id={id} className="accordion__handler" onClick={this.handleClick}>
           {title.length !== 0 && <label>{title}</label>}
           {
             open

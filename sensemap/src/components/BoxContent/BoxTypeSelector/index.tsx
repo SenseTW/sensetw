@@ -3,7 +3,9 @@ import TypeSelector from '../../TypeSelector';
 import { BoxType } from '../../../types';
 
 interface Props {
+  id?: string;
   disabled?: boolean;
+  typePrefix?: string;
   boxType: BoxType;
   onChange? (type: BoxType): void;
 }
@@ -17,11 +19,13 @@ const cardTypes = [
 ];
 
 function BoxTypeSelector(props: Props) {
-  const { disabled, boxType, onChange } = props;
+  const { id, disabled, typePrefix, boxType, onChange } = props;
 
   return (
     <TypeSelector
+      id={id}
       disabled={disabled}
+      typePrefix={typePrefix}
       types={cardTypes}
       type={boxType}
       onChange={onChange}

@@ -57,11 +57,13 @@ class Inspector extends React.PureComponent<Props> {
       data
     } = this.props;
 
+    let mode;
     let content;
     let isContentValid = true;
     switch (selectionType) {
       case T.SelectionType.MAP_CARD:
       case T.SelectionType.INBOX_CARD:
+        mode = 'sense-card-inspector';
         isContentValid = isContentValid && isLength((data as T.CardData).description, { max: 5000 });
         content = (
           <CardContent
@@ -73,6 +75,7 @@ class Inspector extends React.PureComponent<Props> {
         );
         break;
       case T.SelectionType.MAP_BOX:
+        mode = 'sense-box-inspector';
         content = (
           <BoxContent
             disabled={disabled}
@@ -83,6 +86,7 @@ class Inspector extends React.PureComponent<Props> {
         );
         break;
       case T.SelectionType.MAP_EDGE:
+        mode = 'sense-edge-inspector';
         content = (
           <EdgeContent
             disabled={disabled}
@@ -105,7 +109,7 @@ class Inspector extends React.PureComponent<Props> {
           <div className="inspector__actions">
             <Button.Group>
               <Button
-                id="inspcetor__cancel-btn"
+                id={`${mode}__cancel-btn`}
                 disabled={cancelDisabled}
                 onClick={() => onCancel()}
               >
@@ -114,7 +118,7 @@ class Inspector extends React.PureComponent<Props> {
               <Button.Or />
               <Button
                 positive
-                id="inspector__submit-btn"
+                id={`${mode}__update-btn`}
                 disabled={submitDisabled || !isContentValid}
                 onClick={() => onSubmit(data)}
               >

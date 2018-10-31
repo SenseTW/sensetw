@@ -36,7 +36,9 @@ class EdgeContent extends React.PureComponent<Props> {
         </Header>
         <Form.Field className="edge-content__edge-type">
           <EdgeTypeSelector
+            id="sense-edge-inspector__type-selector"
             disabled={disabled}
+            typePrefix="sense-edge-inspector"
             edgeType={edgeType}
             onChange={type => onChange && onChange(E.edgeType(type))}
           />
@@ -44,6 +46,7 @@ class EdgeContent extends React.PureComponent<Props> {
         <Form.Field className="edge-content__edge-title">
           <label>Title</label>
           <Input
+            id="sense-edge-inspector__title-input"
             disabled={disabled}
             placeholder={placeholders[edgeType].title}
             value={title}
@@ -53,6 +56,7 @@ class EdgeContent extends React.PureComponent<Props> {
         <Form.Field className="edge-content__edge-tags">
           <label>Tags</label>
           <Input
+            id="sense-edge-inspector__tags-input"
             disabled={disabled}
             placeholder={placeholders[edgeType].tags}
             value={tags}
@@ -62,6 +66,7 @@ class EdgeContent extends React.PureComponent<Props> {
         <Form.Field className="edge-content__edge-summary">
           <label>Summary</label>
           <TextArea
+            id="sense-edge-inspector__summary-input"
             disabled={disabled}
             placeholder={placeholders[edgeType].summary}
             value={summary}

@@ -5,6 +5,8 @@ import { noop } from '../../types/utils';
 import './index.css';
 
 interface Props<T extends string> {
+  id?: string;
+  typePrefix?: string;
   className?: string;
   disabled?: boolean;
   types: T[];
@@ -25,8 +27,10 @@ const capitalize = (str: string): string => {
 
 function TypeSelector<T extends string>(props: Props<T>) {
   const {
+    id,
     className = '',
     disabled = false,
+    typePrefix = '',
     types,
     typeNames = {},
     eachAs = {},
@@ -34,15 +38,17 @@ function TypeSelector<T extends string>(props: Props<T>) {
     onChange = noop
   } = props;
   const classes = cx(groupName, className);
+  const prefix = typePrefix ? `${typePrefix}__` : '';
 
   return (
-    <div className={classes}>{
+    <div id={id} className={classes}>{
       types.map(ty => {
         const typeName = typeNames[ty];
         const wrapper = eachAs[ty];
         return (
           <Form.Field key={ty}>
             <Checkbox
+              id={`${prefix}${(typeName || ty).toLowerCase()}-type`}
               as={wrapper}
               disabled={disabled}
               radio

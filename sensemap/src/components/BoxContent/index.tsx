@@ -33,7 +33,9 @@ class BoxContent extends React.PureComponent<Props> {
         </Header>
         <Form.Field className="box-content__box-type">
           <BoxTypeSelector
+            id="sense-box-inspector__type-selector"
             disabled={disabled}
+            typePrefix="sense-box-inspector"
             boxType={boxType}
             onChange={type => onChange && onChange(B.updateBoxType(type))}
           />
@@ -41,6 +43,7 @@ class BoxContent extends React.PureComponent<Props> {
         <Form.Field className="box-content__title">
           <label>Title</label>
           <Input
+            id="sense-box-inspector__title-input"
             disabled={disabled}
             placeholder={placeholders[boxType].title}
             value={title}
@@ -51,6 +54,7 @@ class BoxContent extends React.PureComponent<Props> {
         <Form.Field className="box-content__summary">
           <label>Summary</label>
           <TextArea
+            id="sense-box-inspector__summary-input"
             disabled={disabled}
             placeholder={placeholders[boxType].summary}
             value={summary}
@@ -60,6 +64,7 @@ class BoxContent extends React.PureComponent<Props> {
         <Form.Field className="box-content__tags">
           <label>Tag</label>
           <Input
+            id="sense-box-inspector__tags-input"
             disabled={disabled}
             placeholder={placeholders[boxType].tags}
             value={tags}

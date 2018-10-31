@@ -37,7 +37,9 @@ class CardContent extends React.PureComponent<Props> {
         </Header>
         <Form.Field className="card-content__card-type">
           <CardTypeSelector
+            id="sense-card-inspector__type-selector"
             disabled={disabled}
+            typePrefix="sense-card-inspector"
             cardType={cardType}
             onChange={type => onChange && onChange(C.updateCardType(type))}
           />
@@ -45,6 +47,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__summary">
           <label>Summary</label>
           <TextArea
+            id="sense-card-inspector__summary-input"
             disabled={disabled}
             placeholder={placeholders[cardType].summary}
             value={summary}
@@ -54,6 +57,7 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__tags">
           <label>Tag</label>
           <Input
+            id="sense-card-inspector__tags-input"
             disabled={disabled}
             placeholder={placeholders[cardType].tags}
             value={tags}
@@ -64,10 +68,12 @@ class CardContent extends React.PureComponent<Props> {
         <Form.Field className="card-content__url">
           <label>Source Link</label>
           <Input
+            id="sense-card-inspector__source-link-input"
             disabled={disabled}
             placeholder={placeholders[cardType].sourceLink}
             value={url}
             action={{
+              id: 'sense-card-inspector__source-link-btn',
               icon: 'share square',
               disabled: !isURLValid,
               /**
@@ -93,6 +99,7 @@ class CardContent extends React.PureComponent<Props> {
             ? <Form.Field className="card-content__quote">
                 <label>Quote</label>
                 <TextArea
+                  id="sense-card-inspector__quote-input"
                   disabled
                   value={quote}
                 />
@@ -100,6 +107,7 @@ class CardContent extends React.PureComponent<Props> {
             : <Form.Field className="card-content__description">
                 <label>Description</label>
                 <TextArea
+                  id="sense-card-inspector__description-input"
                   disabled={disabled}
                   placeholder={placeholders[cardType].description}
                   value={description}
@@ -107,10 +115,11 @@ class CardContent extends React.PureComponent<Props> {
                 />
               </Form.Field>
         }
-        <Accordion title="Advanced">
+        <Accordion id="sense-card-inspector__accordion" title="Advanced">
           <Form.Field className="card-content__title">
             <label>Source Title</label>
             <TextArea
+              id="sense-card-inspector__source-title-input"
               disabled={disabled}
               placeholder={placeholders[cardType].sourceTitle}
               value={title}
@@ -120,6 +129,7 @@ class CardContent extends React.PureComponent<Props> {
           <Form.Field className="card-content__said-by">
             <label>Said By</label>
             <Input
+              id="sense-card-inspector__said-by-input"
               disabled={disabled}
               placeholder={placeholders[cardType].saidBy}
               value={saidBy}
@@ -130,6 +140,7 @@ class CardContent extends React.PureComponent<Props> {
           <Form.Field className="card-content__stakeholder">
             <label>Stakeholders</label>
             <Input
+              id="sense-card-inspector__stakeholders-input"
               disabled={disabled}
               placeholder={placeholders[cardType].stakeholders}
               value={stakeholder}

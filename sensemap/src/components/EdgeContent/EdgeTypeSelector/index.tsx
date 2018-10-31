@@ -23,7 +23,9 @@ const withIcon = (Icon: React.ComponentType<IconProps>) => (props: WrapProps) =>
 };
 
 interface Props {
+  id?: string;
   disabled?: boolean;
+  typePrefix?: string;
   edgeType: EdgeType;
   onChange? (type: EdgeType): void;
 }
@@ -50,12 +52,14 @@ const typeAs = {
 };
 
 function EdgeTypeSelector(props: Props) {
-  const { disabled, edgeType, onChange } = props;
+  const { id, disabled, typePrefix, edgeType, onChange } = props;
 
   return (
     <TypeSelector
+      id={id}
       className="edge-type-selector"
       disabled={disabled}
+      typePrefix={typePrefix}
       types={edgeTypes}
       typeNames={typeNames}
       eachAs={typeAs}
