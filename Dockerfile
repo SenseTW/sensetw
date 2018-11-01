@@ -1,4 +1,4 @@
-FROM node:8 as front-builder
+FROM node:10-alpine as front-builder
 ARG ENV=stage
 ARG BRANCH_NAME
 ARG COMMIT_SHA
@@ -10,7 +10,7 @@ COPY sensemap/. /workspace
 WORKDIR /workspace
 RUN /opt/front-builder.sh $BRANCH_NAME $COMMIT_SHA $GA_ID $GTM_ID
 
-FROM node:8-alpine
+FROM node:10-alpine
 RUN apk --no-cache add \
         postgresql-client \
         bash
