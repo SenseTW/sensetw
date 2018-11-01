@@ -1,4 +1,4 @@
-FROM node:10-alpine as front-builder
+FROM node:10 as front-builder
 ARG ENV=stage
 ARG BRANCH_NAME
 ARG COMMIT_SHA
