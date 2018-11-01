@@ -32,7 +32,7 @@ function getURL(url: string | string[]): string {
 
 function escapeURL(url: string): string {
   const i = url.lastIndexOf('/');
-  return url.substr(0, i) + qs.escape(url.substr(i));
+  return url.substr(0, i + 1) + qs.escape(url.substr(i + 1));
 }
 
 function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
