@@ -1,6 +1,9 @@
+import * as qs from 'querystring';
 import * as express from "express";
 import * as C from "../types/card";
 import { translateAnnotation } from "./card";
+import * as Debug from 'debug';
+const debug = Debug('sensemap-backend:hypothesis-search')
 
 type SearchQuery = {
   limit?: number;
@@ -15,21 +18,30 @@ type SearchQuery = {
   any?: string;
 };
 
-function getURL(url: any): string {
+function getURL(url: string | string[]): string {
   if (typeof url === "string") {
     return url;
   } else if (Array.isArray(url)) {
-    return url[0];
+    const us = url.filter(u => u.substr(0, 4) === 'http');
+    if (us.length > 0) {
+      return us[0];
+    }
   }
   return "";
 }
 
+function escapeURL(url: string): string {
+  const i = url.lastIndexOf('/');
+  return url.substr(0, i) + qs.escape(url.substr(i));
+}
+
 function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
+  debug(query);
   const { limit, offset, sort, order, uri, url, group, tag } = query;
 
   let filter: C.CardFilter = {};
   if (uri || url) {
-    filter.url = getURL(uri) || getURL(url);
+    filter.url = escapeURL(getURL(url) || getURL(uri));
   }
   if (tag) {
     filter.tags = tag;
@@ -48,6 +60,7 @@ function compileAllCardsArgs(query: SearchQuery): C.AllCardsArgs {
   if (sort === "updated") {
     args.orderBy = order ? ["updatedAt", order] : "updatedAt";
   }
+  debug(args);
   return args;
 }
 
