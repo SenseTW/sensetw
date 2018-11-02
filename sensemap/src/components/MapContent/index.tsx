@@ -116,7 +116,7 @@ class MapContent extends React.PureComponent<Props> {
                 acts.senseMap.toggleEditor(false);
               }}
             >
-              {isNew ? 'Save' : 'Update'}
+              {isNew ? 'Create' : 'Update'}
             </Button>
           </Button.Group>
         </Modal.Actions>

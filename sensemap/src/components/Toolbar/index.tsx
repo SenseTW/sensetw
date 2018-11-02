@@ -374,7 +374,7 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
             }
             content={
               canCreateBox
-                ? 'New Box'
+                ? 'New Title Box'
                 : 'Can\'t Create a Box in another Box'
             }
           />
@@ -401,7 +401,11 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
             {...popupProps}
             trigger={
               <Menu.Item
-                id="sense-toolbar__remove-edge-btn"
+                id={
+                  canRemoveEdge
+                    ? 'sense-toolbar__remove-edge-btn'
+                    : 'sense-toolbar__add-edge-btn'
+                }
                 disabled={!canRemoveEdge && !canCreateEdge}
                 onClick={() =>
                   canRemoveEdge
@@ -518,37 +522,67 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
         }
         {
           <Menu compact inverted icon>
-            <Menu.Item
-              id="sense-toolbar__zoom-out-btn"
-              disabled={!this.canZoom()}
-              onClick={() => this.handleZoom(0.9)}
-            >
-              <Icon name="zoom out" />
-            </Menu.Item>
-            <Menu.Item
-              id="sense-toolbar__zoom-reset-btn"
-              disabled={!this.canReset()}
-              onClick={() => this.resetZoomLevel()}
-            >
-              <Icon name="crosshairs" />
-            </Menu.Item>
-            <Menu.Item
-              id="sense-toolbar__zoom-in-btn"
-              disabled={!this.canZoom()}
-              onClick={() => this.handleZoom(1.1)}
-            >
-              <Icon name="zoom in" />
-            </Menu.Item>
-            <Menu.Item
-              id="sense-toolbar__whole-picture-btn"
-              active={this.isWholePicture()}
-              onClick={() => this.handleModeChange()}
-            >
-              <Icon name="globe" />
-            </Menu.Item>
-            <Menu.Item className="sense-toolbar__zoom-level">
-              {this.showZoomLevel()}
-            </Menu.Item>
+            <Popup
+              {...popupProps}
+              trigger={
+                <Menu.Item
+                  id="sense-toolbar__zoomout-btn"
+                  disabled={!this.canZoom()}
+                  onClick={() => this.handleZoom(0.9)}
+                >
+                  <Icon name="zoom out" />
+                </Menu.Item>
+              }
+              content="Zoom Out"
+            />
+            <Popup
+              {...popupProps}
+              trigger={
+                <Menu.Item
+                  id="sense-toolbar__zoom-reset-btn"
+                  disabled={!this.canReset()}
+                  onClick={() => this.resetZoomLevel()}
+                >
+                  <Icon name="crosshairs" />
+                </Menu.Item>
+              }
+              content="Reset"
+            />
+            <Popup
+              {...popupProps}
+              trigger={
+                <Menu.Item
+                  id="sense-toolbar__zoomin-btn"
+                  disabled={!this.canZoom()}
+                  onClick={() => this.handleZoom(1.1)}
+                >
+                  <Icon name="zoom in" />
+                </Menu.Item>
+              }
+              content="Zoom In"
+            />
+            <Popup
+              {...popupProps}
+              trigger={
+                <Menu.Item
+                  id="sense-toolbar__whole-picture-btn"
+                  active={this.isWholePicture()}
+                  onClick={() => this.handleModeChange()}
+                >
+                  <Icon name="globe" />
+                </Menu.Item>
+              }
+              content="Whole Picture"
+            />
+            <Popup
+              {...popupProps}
+              trigger={
+                <Menu.Item className="sense-toolbar__zoom-level">
+                  {this.showZoomLevel()}
+                </Menu.Item>
+              }
+              content="Zoom Level"
+            />
           </Menu>
         }
       </div>
