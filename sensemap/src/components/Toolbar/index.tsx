@@ -546,7 +546,7 @@ class Toolbar extends React.PureComponent<Props, OwnState> {
                   <Icon name="crosshairs" />
                 </Menu.Item>
               }
-              content="Reset"
+              content="Focus"
             />
             <Popup
               {...popupProps}
