@@ -22,6 +22,7 @@
 .sense-toolbar > .ui.inverted.menu .item > .sense-svg-icon {
   width: 1.714285em;
   height: 1.714285em;
+  pointer-events: none;
 }
 
 .ui.inverted.popup {
