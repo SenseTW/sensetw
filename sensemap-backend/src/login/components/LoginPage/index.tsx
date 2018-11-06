@@ -27,7 +27,7 @@ const LoginPage = (props) => {
         <div>
           <a href='/forget-password'>Forget Password?</a>
         </div>
-        <Button fluid={true} color='black'>LOG IN</Button>
+        <Button id="sense-login__login-btn" fluid={true} color='black'>LOG IN</Button>
         <div>
           Don't have a Sense.tw account?  <a href="/signup">Sign up</a>
         </div>

@@ -44,7 +44,7 @@ function SignUpPage(props) {
           />
         {passwordError}
         <div>You are agreeing to our <a href="http://sense.tw/terms-of-service">Terms of Service</a> and Community Guidelines.</div>
-        <Button fluid={true} color='black'>SIGN UP</Button>
+        <Button id="sense-signup__signup-btn" fluid={true} color='black'>SIGN UP</Button>
         <div>Already have an account?  <a href="/login">Log in</a></div>
       </Form>
     </Layout>
