@@ -34,7 +34,7 @@ services:
   smo:
     build:
       context: ../../
-      dockerfile: Dockerfile.smo
+      dockerfile: builder/docker/alpine/Dockerfile.smo
     image: "sensemap-smo"
     env_file:
      - ./env/sensemap-smo.env
@@ -43,7 +43,7 @@ services:
   sensemap:
     build:
       context: ../../
-      dockerfile: Dockerfile
+      dockerfile: builder/docker/alpine/Dockerfile
       args:
         ENV: stage
         COMMIT_SHA: localhost:8888
