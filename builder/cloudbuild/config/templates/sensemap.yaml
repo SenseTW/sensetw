@@ -10,7 +10,7 @@ spec:
         service: sensemap-${BRANCH_NAME}
     spec:
       containers:
-        - image: nginx:1.15-alpine-perl
+        - image: nginx:1.15-perl
           name: sensemap-web
           resources:
             requests:

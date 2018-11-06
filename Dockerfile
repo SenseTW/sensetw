@@ -10,8 +10,8 @@ COPY sensemap/. /workspace
 WORKDIR /workspace
 RUN /opt/front-builder.sh $BRANCH_NAME $COMMIT_SHA $GA_ID $GTM_ID
 
-FROM node:8-alpine
-RUN apk --no-cache add \
+FROM node:8
+RUN apt-get update -qqy && apt-get install -qqy \
         postgresql-client \
         bash
 RUN mkdir /workspace

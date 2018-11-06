@@ -30,7 +30,7 @@ spec:
             requests:
               memory: "8Mi"
               cpu: "1m"
-        - image: nginx:1.15-alpine-perl
+        - image: nginx:1.15-perl
           name: sensemap-web
           resources:
             requests:

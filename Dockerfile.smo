@@ -1,5 +1,5 @@
-FROM node:8-alpine
-RUN apk --no-cache add \
+FROM node:8
+RUN apt-get update -qqy && apt-get install -qqy \
         bash
 RUN mkdir /workspace
 COPY smo/. /workspace
