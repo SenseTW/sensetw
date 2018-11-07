@@ -161,6 +161,14 @@ data:
         listen 6000;
         access_log /var/log/nginx/access.log h_upstream;
 
+        server_name www.sense.tw;
+        return 301 https://sense.tw$request_uri;
+      }
+
+      server {
+        listen 6000;
+        access_log /var/log/nginx/access.log h_upstream;
+
         server_name ${FRONT_SERVERNAME};
         server_tokens off;
 
