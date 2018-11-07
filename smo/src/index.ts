@@ -73,6 +73,7 @@ type ResponseData = {
   image: string;
   image_secure: string;
   url: string;
+  favicon: string;
 };
 
 const siteData: ResponseData = {
@@ -82,7 +83,8 @@ const siteData: ResponseData = {
     "議題釐清工具，社群協作讓政策 make sense 。用 Sense.tw 標注文件和網頁，收集、分類、萃取大量資訊中的重點，視覺化拉出多重議題架構，找出問題關鍵！",
   image: "http://sense.tw/tree.png",
   image_secure: "https://sense.tw/tree.png",
-  url: "http://sense.tw/"
+  url: "http://sense.tw/",
+  favicon: "https://sense.tw/favicon-96x96.png"
 };
 
 function mapDataToResponse(data: MapData): ResponseData {
@@ -92,7 +94,8 @@ function mapDataToResponse(data: MapData): ResponseData {
     description: data.description,
     image: data.image || siteData.image,
     image_secure: data.image.replace(/^http:/, 'https:') || siteData.image_secure,
-    url: `http://sense.tw/map/${data.id}`
+    url: `http://sense.tw/map/${data.id}`,
+    favicon: siteData.favicon,
   };
 }
 
@@ -118,4 +121,4 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(port);
+server.listen(port, () => console.log(`Listening at port ${port}`));
