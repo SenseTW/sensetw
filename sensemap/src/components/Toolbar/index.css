@@ -25,6 +25,10 @@
   pointer-events: none;
 }
 
+.sense-toolbar > .ui.inverted.menu .item > i.icon {
+  pointer-events: none;
+}
+
 .ui.inverted.popup {
   padding: 0.428571em 0.714285em;
 }
