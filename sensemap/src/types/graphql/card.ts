@@ -53,7 +53,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
   });
 
 export const loadCards =
-  (user: SN.User, id: MapID) => {
+  (user: SN.User, id: MapID): Promise<CardData[]> => {
     const query = `
       query AllCards($id: ID!) {
         allCards(filter: { map: { id: $id } }) {
@@ -65,6 +65,23 @@ export const loadCards =
     const variables = { id };
     return client(user).request(query, variables)
       .then(({ allCards }) => allCards.map(toCardData));
+  };
+
+export const loadCardsById =
+  (user: SN.User, ids: CardID[]): Promise<CardData[]> => {
+    const query = `
+      query {
+        ${ids.map((id, i) =>
+          `card_${i}: Card(id: "${id}") {
+            ...cardFields
+          }`
+        ).join('\n')}
+      }
+      ${graphQLCardFieldsFragment}
+    `;
+    return client(user).request(query)
+      .then(data => Object.values(data))
+      .then(data => data.map(toCardData));
   };
 
 export const create =

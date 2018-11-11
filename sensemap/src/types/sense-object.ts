@@ -147,10 +147,23 @@ const cleanUp =
   };
 
 const loadObjects =
-  (id: MapID, overwrite: Boolean = false) =>
+  (id: MapID, overwrite: boolean = false) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
     return GO.loadObjects(user, id)
+      .then(data => H.toIDMap<ObjectID, ObjectData>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteObjects(data, TargetType.PERMANENT)
+          : CS.updateObjects(data, TargetType.PERMANENT)
+      ));
+  };
+
+const loadObjectsById =
+  (ids: ObjectID[], overwrite: boolean = false) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GO.loadObjectsById(user, ids)
       .then(data => H.toIDMap<ObjectID, ObjectData>(data))
       .then(data => dispatch(
         overwrite
@@ -164,6 +177,19 @@ const loadCards =
   (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
     return GC.loadCards(user, id)
+      .then(data => H.toIDMap<CardID, CardData>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteCards(data, TargetType.PERMANENT)
+          : CS.updateCards(data, TargetType.PERMANENT)
+      ));
+  };
+
+const loadCardsById =
+  (ids: CardID[], overwrite: boolean = false) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GC.loadCardsById(user, ids)
       .then(data => H.toIDMap<CardID, CardData>(data))
       .then(data => dispatch(
         overwrite
@@ -461,7 +487,9 @@ export const actions = {
   loadMaps,
   cleanUp,
   loadObjects,
+  loadObjectsById,
   loadCards,
+  loadCardsById,
   loadBoxes,
   loadEdges,
   createCard,
