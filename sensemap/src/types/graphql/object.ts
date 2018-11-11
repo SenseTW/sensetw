@@ -113,6 +113,26 @@ export const loadObjects =
   (user: SN.User, id: MapID): Promise<ObjectData[]> =>
     loadRawObjects(user, id).then(os => os.map(o => toObjectData(o)));
 
+const loadRawObjectsById =
+  (user: SN.User, ids: ObjectID[]): Promise<GraphQLObjectFields[]> => {
+    const query = `
+      query {
+        ${ids.map((id, i) =>
+          `object_${i}: Object(id: "${id}") {
+            ...objectFields
+          }`
+        ).join('\n')}
+      }
+      ${graphQLObjectFieldsFragment}
+    `;
+    return client(user).request(query)
+      .then(data => Object.values(data));
+  };
+
+export const loadObjectsById =
+  (user: SN.User, ids: ObjectID[]): Promise<ObjectData[]> =>
+    loadRawObjectsById(user, ids).then(os => os.map(o => toObjectData(o)));
+
 export const create =
   (user: SN.User, mapId: MapID, data: ObjectData) => {
     const query = `
