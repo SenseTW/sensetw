@@ -96,6 +96,7 @@ class CardList extends React.PureComponent<Props, OwnState> {
       (cards.length === 0 ? 0 : style.title.margin.bottom) +
       (cards.length === 0 ? 0 : textHeight - style.textGap) +
       style.padding.bottom;
+    // card summary and description are more important than the title
     const cardTexts = cards.map(c => c.summary || c.title);
 
     const renderedText = (

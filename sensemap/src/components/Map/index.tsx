@@ -344,7 +344,8 @@ export class Map extends React.Component<Props, MapState> {
           offsetX = AltCard.style.width / 2;
           offsetY = -AltCard.style.height / 2;
           const card = CS.getCard(this.props.senseObject, hoverObject.data);
-          title = card.title || card.summary;
+          // card summary and description are more important than the title
+          title = card.summary || card.title;
           // the card itself
           cards = [];
           break;
