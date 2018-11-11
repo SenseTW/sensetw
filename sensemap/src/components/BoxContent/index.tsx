@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import BoxTypeSelector from './BoxTypeSelector';
+import { STRING_LIMIT } from '../Inspector';
 import * as B from '../../types/sense/box';
 import * as U from '../../types/utils';
+import { isLength } from 'validator';
 import * as moment from 'moment';
 import { placeholders } from './placeholders';
 import './index.css';
@@ -22,6 +24,7 @@ class BoxContent extends React.PureComponent<Props> {
   render() {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
     const { title, summary, tags, boxType, updatedAt } = data;
+    const isSummaryValid = isLength(summary, { max: STRING_LIMIT });
     const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
     return (
@@ -51,8 +54,8 @@ class BoxContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(B.updateTitle(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field className="box-content__summary">
-          <label>Summary</label>
+        <Form.Field className="box-content__summary" error={!isSummaryValid}>
+          <label>Summary (max {STRING_LIMIT} characters)</label>
           <TextArea
             id="sense-box-inspector__summary-input"
             disabled={disabled}

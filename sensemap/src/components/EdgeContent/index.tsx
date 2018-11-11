@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { Header, Form, Input, TextArea } from 'semantic-ui-react';
 import EdgeTypeSelector from './EdgeTypeSelector';
+import { EDGE_SUMMARY_LIMIT } from '../Inspector';
 import { Edge } from '../../types';
 import * as E from '../../types/sense/edge';
 import { placeholders } from './placeholders';
+import { isLength } from 'validator';
 
 interface Props {
   disabled?: boolean;
@@ -28,6 +30,7 @@ class EdgeContent extends React.PureComponent<Props> {
       },
       onChange,
     } = this.props;
+    const isSummaryValid = isLength(summary, { max: EDGE_SUMMARY_LIMIT });
 
     return (
       <Form className="edge-content">
@@ -63,8 +66,8 @@ class EdgeContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(E.edgeTags(e.currentTarget.value))}
           />
         </Form.Field>
-        <Form.Field className="edge-content__edge-summary">
-          <label>Summary</label>
+        <Form.Field className="edge-content__edge-summary" error={!isSummaryValid}>
+          <label>Summary (max {EDGE_SUMMARY_LIMIT} characters)</label>
           <TextArea
             id="sense-edge-inspector__summary-input"
             disabled={disabled}
