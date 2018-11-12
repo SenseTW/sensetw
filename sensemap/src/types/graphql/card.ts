@@ -78,7 +78,7 @@ export const loadCardsById =
           `card_${i}: Card(id: "${id}") {
             ...cardFields
           }`
-        ).join('\n')}
+        )}
       }
       ${graphQLCardFieldsFragment}
     `;

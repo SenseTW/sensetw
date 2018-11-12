@@ -124,7 +124,7 @@ const loadRawObjectsById =
           `object_${i}: Object(id: "${id}") {
             ...objectFields
           }`
-        ).join('\n')}
+        )}
       }
       ${graphQLObjectFieldsFragment}
     `;
