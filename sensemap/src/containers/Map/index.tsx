@@ -41,6 +41,7 @@ class Map extends React.Component<Props, OwnState> {
     this.props.actions.senseObject.loadCards(this.props.id);
     this.props.actions.senseObject.loadBoxes(this.props.id);
     this.props.actions.senseObject.loadEdges(this.props.id);
+    this.props.actions.senseObject.keepUpdating(true);
 
     type ObjectAction = {
       payload: {

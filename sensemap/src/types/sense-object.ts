@@ -17,6 +17,7 @@ import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
 import * as SM from './sense-map';
+import * as U from './utils';
 
 export type State = CachedStorage;
 
@@ -249,6 +250,38 @@ const loadEdgesById =
           : CS.updateEdges(data, TargetType.PERMANENT)
       ));
   };
+
+const update =
+  (overwrite: boolean) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { senseObject } = getState();
+    let p;
+    // tslint:disable-next-line:no-any
+    let ps: Promise<any>[] = [];
+    const objects = Object.keys(senseObject[TargetType.PERMANENT].objects);
+    p = loadObjectsById(objects, overwrite)(dispatch, getState);
+    ps.push(p);
+    const boxes = Object.keys(senseObject[TargetType.PERMANENT].boxes);
+    p = loadBoxesById(boxes, overwrite)(dispatch, getState);
+    ps.push(p);
+    const cards = Object.keys(senseObject[TargetType.PERMANENT].cards);
+    p = loadCardsById(cards, overwrite)(dispatch, getState);
+    ps.push(p);
+    const edges = Object.keys(senseObject[TargetType.PERMANENT].edges);
+    p = loadEdgesById(edges, overwrite)(dispatch, getState);
+    ps.push(p);
+    return Promise.all(ps);
+  };
+
+const keepUpdating =
+  (overwrite: boolean) =>
+  // tslint:disable-next-line:no-any
+  (dispatch: Dispatch, getState: GetState): Promise<any> =>
+    update(overwrite)(dispatch, getState)
+      // tslint:disable-next-line:no-console
+      .catch(U.error)
+      .then(U.delay(5000))
+      .then(() => keepUpdating(overwrite)(dispatch, getState));
 
 const addCardToBox =
   (cardObject: ObjectID, box: BoxID) =>
@@ -520,6 +553,7 @@ export const actions = {
   loadBoxesById,
   loadEdges,
   loadEdgesById,
+  keepUpdating,
   createCard,
   createBoxObject,
   createObjectForCard,

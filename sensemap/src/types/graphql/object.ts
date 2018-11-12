@@ -115,6 +115,9 @@ export const loadObjects =
 
 const loadRawObjectsById =
   (user: SN.User, ids: ObjectID[]): Promise<GraphQLObjectFields[]> => {
+    if (ids.length === 0) {
+      return Promise.resolve([]);
+    }
     const query = `
       query {
         ${ids.map((id, i) =>

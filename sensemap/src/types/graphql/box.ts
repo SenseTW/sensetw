@@ -59,6 +59,9 @@ export const loadBoxes =
 
 export const loadBoxesById =
   (user: SN.User, ids: BoxID[]) => {
+    if (ids.length === 0) {
+      return Promise.resolve([]);
+    }
     const query = `
       query {
         ${ids.map((id, i) =>
