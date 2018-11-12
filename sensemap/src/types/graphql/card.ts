@@ -87,6 +87,18 @@ export const loadCardsById =
       .then(data => data.map(toCardData));
   };
 
+export const loadCardIds =
+  (user: SN.User, id: MapID): Promise<CardID[]> => {
+    const query = `
+      query AllCards($id: ID!) {
+        allCards(filter: { map: { id: $id } }) { id }
+      }
+    `;
+    const variables = { id };
+    return client(user).request(query, variables)
+      .then(({ allCards }: { allCards: H.HasID<CardID>[] }) => allCards.map(x => x.id));
+  };
+
 export const create =
   (user: SN.User, mapId: MapID, card: CardData) => {
     const query = `

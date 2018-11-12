@@ -251,26 +251,74 @@ const loadEdgesById =
       ));
   };
 
+const diff = (before: string[], after: string[]) => {
+  let removed = [];
+  let beforeMap = {};
+  let afterMap = {};
+  for (const str of before) {
+    beforeMap[str] = true;
+  }
+  for (const str of after) {
+    afterMap[str] = true;
+  }
+  for (const str of before) {
+    if (!afterMap[str]) {
+      removed.push(str);
+    }
+  }
+  return removed;
+};
+
+const toIDObj = <T extends string>(id: T) => ({ id });
+
 const update =
   (overwrite: boolean) =>
-  (dispatch: Dispatch, getState: GetState) => {
-    const { senseObject } = getState();
-    let p;
-    // tslint:disable-next-line:no-any
-    let ps: Promise<any>[] = [];
-    const objects = Object.keys(senseObject[TargetType.PERMANENT].objects);
-    p = loadObjectsById(objects, overwrite)(dispatch, getState);
-    ps.push(p);
-    const boxes = Object.keys(senseObject[TargetType.PERMANENT].boxes);
-    p = loadBoxesById(boxes, overwrite)(dispatch, getState);
-    ps.push(p);
-    const cards = Object.keys(senseObject[TargetType.PERMANENT].cards);
-    p = loadCardsById(cards, overwrite)(dispatch, getState);
-    ps.push(p);
-    const edges = Object.keys(senseObject[TargetType.PERMANENT].edges);
-    p = loadEdgesById(edges, overwrite)(dispatch, getState);
-    ps.push(p);
-    return Promise.all(ps);
+  async (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user }, senseMap: { map: mid }, senseObject: s } = getState();
+    if (!mid) { return []; }
+    // get old ids
+    const oldObjects = CS.getObjectIds(s, TargetType.PERMANENT);
+    const oldCards = CS.getCardIds(s, TargetType.PERMANENT);
+    const oldBoxes = CS.getBoxIds(s, TargetType.PERMANENT);
+    const oldEdges = CS.getEdgeIds(s, TargetType.PERMANENT);
+    // await for new ids
+    const [newObjects, newCards, newBoxes, newEdges] = await Promise.all([
+      GO.loadObjectIds(user, mid),
+      GC.loadCardIds(user, mid),
+      GB.loadBoxIds(user, mid),
+      GE.loadIds(user, mid),
+    ]);
+    // diff them all
+    const removedObjects = diff(oldObjects, newObjects);
+    const removedCards = diff(oldCards, newCards);
+    const removedBoxes = diff(oldBoxes, newBoxes);
+    const removedEdges = diff(oldEdges, newEdges);
+    // remove disappeared ids
+    // TODO: unselect them
+    // TODO: add `removeSomethingByIds`
+    if (removedObjects) {
+      const idMap = H.toIDMap<ObjectID, H.HasID<ObjectID>>(removedObjects.map(toIDObj));
+      dispatch(CS.removeObjects(idMap));
+    }
+    if (removedCards) {
+      const idMap = H.toIDMap<CardID, H.HasID<CardID>>(removedCards.map(toIDObj));
+      dispatch(CS.removeCards(idMap));
+    }
+    if (removedBoxes) {
+      const idMap = H.toIDMap<BoxID, H.HasID<BoxID>>(removedBoxes.map(toIDObj));
+      dispatch(CS.removeBoxes(idMap));
+    }
+    if (removedEdges) {
+      const idMap = H.toIDMap<EdgeID, H.HasID<EdgeID>>(removedEdges.map(toIDObj));
+      dispatch(CS.removeEdges(idMap));
+    }
+    // update other ids
+    return Promise.all([
+      loadObjectsById(newObjects, true)(dispatch, getState),
+      loadCardsById(newCards, true)(dispatch, getState),
+      loadBoxesById(newBoxes, true)(dispatch, getState),
+      loadEdgesById(newEdges, true)(dispatch, getState),
+    ]);
   };
 
 const keepUpdating =
@@ -278,7 +326,6 @@ const keepUpdating =
   // tslint:disable-next-line:no-any
   (dispatch: Dispatch, getState: GetState): Promise<any> =>
     update(overwrite)(dispatch, getState)
-      // tslint:disable-next-line:no-console
       .catch(U.error)
       .then(U.delay(5000))
       .then(() => keepUpdating(overwrite)(dispatch, getState));

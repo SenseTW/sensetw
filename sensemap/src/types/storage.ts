@@ -1,5 +1,5 @@
 import { ActionUnion, emptyAction } from './action';
-import { ObjectMap } from './sense/has-id';
+import { ObjectMap, HasID } from './sense/has-id';
 import { MapID, MapData, emptyMapData } from './sense/map';
 import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
@@ -204,6 +204,14 @@ export const scopedToMap = (storage: Storage): Storage => {
   return scoped(storage, filter);
 };
 
+export const getObjectIds = (storage: Storage): ObjectID[] => Object.keys(storage.objects);
+
+export const getCardIds = (storage: Storage): CardID[] => Object.keys(storage.cards);
+
+export const getBoxIds = (storage: Storage): BoxID[] => Object.keys(storage.boxes);
+
+export const getEdgeIds = (storage: Storage): EdgeID[] => Object.keys(storage.edges);
+
 /**
  * Partially update `maps` state.
  */
@@ -229,7 +237,7 @@ export const overwriteMaps =
  */
 export const REMOVE_MAPS = 'REMOVE_MAPS';
 export const removeMaps =
-  (maps: ObjectMap<MapData>) => ({
+  (maps: ObjectMap<HasID<MapID>>) => ({
     type: REMOVE_MAPS as typeof REMOVE_MAPS,
     payload: { maps },
   });
@@ -259,7 +267,7 @@ export const overwriteObjects =
  */
 export const REMOVE_OBJECTS = 'REMOVE_OBJECTS';
 export const removeObjects =
-  (objects: ObjectMap<ObjectData>) => ({
+  (objects: ObjectMap<HasID<ObjectID>>) => ({
     type: REMOVE_OBJECTS as typeof REMOVE_OBJECTS,
     payload: { objects },
   });
@@ -289,7 +297,7 @@ export const overwriteCards =
  */
 export const REMOVE_CARDS = 'REMOVE_CARDS';
 export const removeCards =
-  (cards: ObjectMap<CardData>) => ({
+  (cards: ObjectMap<HasID<CardID>>) => ({
     type: REMOVE_CARDS as typeof REMOVE_CARDS,
     payload: { cards },
   });
@@ -319,7 +327,7 @@ export const overwriteBoxes =
  */
 export const REMOVE_BOXES = 'REMOVE_BOXES';
 export const removeBoxes =
-  (boxes: ObjectMap<BoxData>) => ({
+  (boxes: ObjectMap<HasID<BoxID>>) => ({
     type: REMOVE_BOXES as typeof REMOVE_BOXES,
     payload: { boxes },
   });
@@ -349,7 +357,7 @@ export const overwriteEdges =
  */
 export const REMOVE_EDGES = 'REMOVE_EDGES';
 export const removeEdges =
-  (edges: ObjectMap<Edge>) => ({
+  (edges: ObjectMap<HasID<EdgeID>>) => ({
     type: REMOVE_EDGES as typeof REMOVE_EDGES,
     payload: { edges },
   });
