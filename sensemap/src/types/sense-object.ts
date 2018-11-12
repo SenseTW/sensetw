@@ -211,11 +211,37 @@ const loadBoxes =
       ));
   };
 
+const loadBoxesById =
+  (ids: BoxID[], overwrite: boolean = false) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GB.loadBoxesById(user, ids)
+      .then(data => H.toIDMap<BoxID, BoxData>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteBoxes(data, TargetType.PERMANENT)
+          : CS.updateBoxes(data, TargetType.PERMANENT)
+      ));
+  };
+
 const loadEdges =
   (id: MapID, overwrite: Boolean = false) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
     return GE.load(user, id)
+      .then(data => H.toIDMap<EdgeID, Edge>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteEdges(data, TargetType.PERMANENT)
+          : CS.updateEdges(data, TargetType.PERMANENT)
+      ));
+  };
+
+const loadEdgesById =
+  (ids: BoxID[], overwrite: boolean = false) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GE.loadById(user, ids)
       .then(data => H.toIDMap<EdgeID, Edge>(data))
       .then(data => dispatch(
         overwrite
@@ -491,7 +517,9 @@ export const actions = {
   loadCards,
   loadCardsById,
   loadBoxes,
+  loadBoxesById,
   loadEdges,
+  loadEdgesById,
   createCard,
   createBoxObject,
   createObjectForCard,

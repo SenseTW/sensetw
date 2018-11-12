@@ -48,6 +48,23 @@ export const load =
       .then(({ allEdges }) => allEdges.map(toEdge));
   };
 
+export const loadById =
+  (user: SN.User, ids: EdgeID[]) => {
+    const query = `
+      query {
+        ${ids.map((id, i) =>
+          `edge_${i}: Edge(id: "${id}") {
+            ...edgeFields
+          }`
+        )}
+      }
+      ${graphQLEdgeFieldsFragment}
+    `;
+    return client(user).request(query)
+      .then(data => Object.values(data))
+      .then(data => data.map(toEdge));
+  };
+
 export const create =
   (user: SN.User, map: MapID, from: ObjectID, to: ObjectID) => {
     const query = `
