@@ -5,7 +5,8 @@ You can find the most recent version of this guide [here](https://github.com/fac
 # Avaliable Scripts
 - yarn run start :: run development server.
 - yarn run build :: build the code.
-- yarun run deploy :: deploy to gh-pages.
+- yarn run deploy :: deploy to gh-pages.
+- yarn run unstable :: run the development version with the production APIs.
 
 # Tech Architecture 
 - Yarn :: Fast, reliable, and secure dependency management for JavaScript.
