@@ -57,6 +57,23 @@ export const loadBoxes =
       .then(({ allBoxes }) => allBoxes.map(toBoxData));
   };
 
+export const loadBoxesById =
+  (user: SN.User, ids: BoxID[]) => {
+    const query = `
+      query {
+        ${ids.map((id, i) =>
+          `box_${i}: Box(id: "${id}") {
+            ...boxFields
+          }`
+        )}
+      }
+      ${graphQLBoxFieldsFragment}
+    `;
+    return client(user).request(query)
+      .then(data => Object.values(data))
+      .then(data => data.map(toBoxData));
+  };
+
 export const create =
   (user: SN.User, mapId: MapID, box: BoxData) => {
     const query = `
