@@ -50,6 +50,9 @@ export const load =
 
 export const loadById =
   (user: SN.User, ids: EdgeID[]) => {
+    if (ids.length === 0) {
+      return Promise.resolve([]);
+    }
     const query = `
       query {
         ${ids.map((id, i) =>

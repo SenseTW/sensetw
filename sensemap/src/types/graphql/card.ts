@@ -69,6 +69,9 @@ export const loadCards =
 
 export const loadCardsById =
   (user: SN.User, ids: CardID[]): Promise<CardData[]> => {
+    if (ids.length === 0) {
+      return Promise.resolve([]);
+    }
     const query = `
       query {
         ${ids.map((id, i) =>

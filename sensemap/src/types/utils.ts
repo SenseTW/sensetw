@@ -62,3 +62,18 @@ export function sanitizeURL(a?: string): string {
   }
   return a.replace(/\/+$/, '');
 }
+
+export function log<T>(value: T): T {
+  // tslint:disable-next-line:no-console
+  console.log(value);
+  return value;
+}
+
+export function error<T>(err: Error): void {
+  // tslint:disable-next-line:no-console
+  console.error(err);
+}
+
+export const delay = (time: number) => <T>(value: T): Promise<T> => new Promise(resolve =>
+  setTimeout(resolve, time, value)
+);
