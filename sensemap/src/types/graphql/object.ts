@@ -136,6 +136,18 @@ export const loadObjectsById =
   (user: SN.User, ids: ObjectID[]): Promise<ObjectData[]> =>
     loadRawObjectsById(user, ids).then(os => os.map(o => toObjectData(o)));
 
+export const loadObjectIds =
+  (user: SN.User, id: MapID): Promise<ObjectID[]> => {
+    const query = `
+      query AllObjects($id: ID!) {
+        allObjects(filter: { map: { id: $id } }) { id }
+      }
+    `;
+    const variables = { id };
+    return client(user).request(query, variables)
+      .then(({ allObjects }: { allObjects: H.HasID<ObjectID>[] }) => allObjects.map(x => x.id));
+  };
+
 export const create =
   (user: SN.User, mapId: MapID, data: ObjectData) => {
     const query = `

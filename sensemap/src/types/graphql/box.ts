@@ -77,6 +77,18 @@ export const loadBoxesById =
       .then(data => data.map(toBoxData));
   };
 
+export const loadBoxIds =
+  (user: SN.User, id: MapID) => {
+    const query = `
+      query AllBoxes($id: ID!) {
+        allBoxes(filter: { map: { id: $id } }) { id }
+      }
+    `;
+    const variables = { id };
+    return client(user).request(query, variables)
+      .then(({ allBoxes }: { allBoxes: H.HasID<BoxID>[] }) => allBoxes.map(x => x.id));
+  };
+
 export const create =
   (user: SN.User, mapId: MapID, box: BoxData) => {
     const query = `

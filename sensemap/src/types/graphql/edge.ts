@@ -68,6 +68,18 @@ export const loadById =
       .then(data => data.map(toEdge));
   };
 
+export const loadIds =
+  (user: SN.User, id: MapID) => {
+    const query = `
+      query AllEdges($id: ID!) {
+        allEdges(filter: { map: { id: $id } }) { id }
+      }
+    `;
+    const variables = { id };
+    return client(user).request(query, variables)
+      .then(({ allEdges }: { allEdges: HasID<EdgeID>[] }) => allEdges.map(x => x.id));
+  };
+
 export const create =
   (user: SN.User, map: MapID, from: ObjectID, to: ObjectID) => {
     const query = `

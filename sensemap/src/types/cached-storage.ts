@@ -1,6 +1,6 @@
 import { ActionUnion, emptyAction } from './action';
 import * as S from './storage';
-import { ObjectMap, toIDMap } from './sense/has-id';
+import { ObjectMap, HasID, toIDMap } from './sense/has-id';
 import { MapID, MapData, emptyMapData } from './sense/map';
 import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
@@ -417,6 +417,18 @@ export const scopedToMap = (storage: CachedStorage): CachedStorage => {
   return scoped(storage, filter);
 };
 
+export const getObjectIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
+  S.getObjectIds(storage[target]);
+
+export const getCardIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
+  S.getCardIds(storage[target]);
+
+export const getBoxIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
+  S.getBoxIds(storage[target]);
+
+export const getEdgeIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
+  S.getEdgeIds(storage[target]);
+
 /**
  * The maps updating action contructor.
  *
@@ -448,7 +460,7 @@ export const overwriteMaps = (maps: ObjectMap<MapData>, target: TargetType = Tar
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A maps removing action.
  */
-export const removeMaps = (maps: ObjectMap<MapData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeMaps = (maps: ObjectMap<HasID<MapID>>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_MAPS as typeof S.REMOVE_MAPS,
   payload: { maps, target },
 });
@@ -460,8 +472,8 @@ export const removeMaps = (maps: ObjectMap<MapData>, target: TargetType = Target
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A maps removing action.
  */
-export const removeMap = (map: MapData, target: TargetType = TargetType.TEMPORARY) =>
-  removeMaps(toIDMap<MapID, MapData>([map]));
+export const removeMap = (map: HasID<MapID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeMaps(toIDMap<MapID, HasID<MapID>>([map]));
 
 /**
  * The display objects updating action constructor.
@@ -494,7 +506,7 @@ export const overwriteObjects = (objects: ObjectMap<ObjectData>, target: TargetT
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A objects removing action.
  */
-export const removeObjects = (objects: ObjectMap<ObjectData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeObjects = (objects: ObjectMap<HasID<ObjectID>>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_OBJECTS as typeof S.REMOVE_OBJECTS,
   payload: { objects, target },
 });
@@ -506,8 +518,8 @@ export const removeObjects = (objects: ObjectMap<ObjectData>, target: TargetType
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A objects removing action.
  */
-export const removeObject = (object: ObjectData, target: TargetType = TargetType.TEMPORARY) =>
-  removeObjects(toIDMap<ObjectID, ObjectData>([object]));
+export const removeObject = (object: HasID<ObjectID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeObjects(toIDMap<ObjectID, HasID<ObjectID>>([object]));
 
 /**
  * The cards updating action constructor.
@@ -540,7 +552,7 @@ export const overwriteCards = (cards: ObjectMap<CardData>, target: TargetType = 
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A cards removing action.
  */
-export const removeCards = (cards: ObjectMap<CardData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeCards = (cards: ObjectMap<HasID<CardID>>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_CARDS as typeof S.REMOVE_CARDS,
   payload: { cards, target },
 });
@@ -552,8 +564,8 @@ export const removeCards = (cards: ObjectMap<CardData>, target: TargetType = Tar
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A cards removing action.
  */
-export const removeCard = (card: CardData, target: TargetType = TargetType.TEMPORARY) =>
-  removeCards(toIDMap<CardID, CardData>([card]));
+export const removeCard = (card: HasID<CardID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeCards(toIDMap<CardID, HasID<CardID>>([card]));
 
 /**
  * The boxes updating action constructor.
@@ -586,7 +598,7 @@ export const overwriteBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = T
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A boxes removing action.
  */
-export const removeBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeBoxes = (boxes: ObjectMap<HasID<BoxID>>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_BOXES as typeof S.REMOVE_BOXES,
   payload: { boxes, target },
 });
@@ -598,8 +610,8 @@ export const removeBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = Targ
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A boxes removing action.
  */
-export const removeBox = (box: BoxData, target: TargetType = TargetType.TEMPORARY) =>
-  removeBoxes(toIDMap<BoxID, BoxData>([box]));
+export const removeBox = (box: HasID<BoxID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeBoxes(toIDMap<BoxID, HasID<BoxID>>([box]));
 
 /**
  * The edges updating action constructor.
@@ -632,7 +644,7 @@ export const overwriteEdges = (edges: ObjectMap<Edge>, target: TargetType = Targ
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns An edges removing action.
  */
-export const removeEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetType.TEMPORARY) => ({
+export const removeEdges = (edges: ObjectMap<HasID<EdgeID>>, target: TargetType = TargetType.TEMPORARY) => ({
   type: S.REMOVE_EDGES as typeof S.REMOVE_EDGES,
   payload: { edges, target },
 });
@@ -644,8 +656,8 @@ export const removeEdges = (edges: ObjectMap<Edge>, target: TargetType = TargetT
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns An edges removing action.
  */
-export const removeEdge = (edge: Edge, target: TargetType = TargetType.TEMPORARY) =>
-  removeEdges(toIDMap<EdgeID, Edge>([edge]));
+export const removeEdge = (edge: HasID<EdgeID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeEdges(toIDMap<EdgeID, HasID<EdgeID>>([edge]));
 
 /**
  * An action constructor for moving a card out of a given box.
