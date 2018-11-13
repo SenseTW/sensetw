@@ -9,6 +9,8 @@ export const TIME_FORMAT = 'YYYY-M-DD HH:mm';
 
 export const MAP_TIME_FORMAT = 'YYYY.MM.DD';
 
+export const MAP_DETAILED_TIME_FORMAT = 'YYYY.MM.DD HH:mm';
+
 export const SQRT3 = 1.73205;
 
 /**

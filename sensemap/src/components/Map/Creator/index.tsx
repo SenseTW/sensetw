@@ -3,7 +3,7 @@ import { TransformerForProps, LayoutForProps } from '../../Layout';
 import Text from '../../Layout/Text';
 import Nothing from '../../Layout/Nothing';
 import { transformObject } from '../../../types/viewport';
-import { MAP_TIME_FORMAT, noop } from '../../../types/utils';
+import { MAP_TIME_FORMAT, MAP_DETAILED_TIME_FORMAT, noop } from '../../../types/utils';
 import * as moment from 'moment';
 
 interface OwnProps {
@@ -68,8 +68,10 @@ class Creator extends React.PureComponent<Props, OwnState> {
 
   render() {
     const { transform, x = 0, y = 0, name = '', time } = this.props;
-    const dateStr = moment(time).format(MAP_TIME_FORMAT);
-    const nameStr = name ? ` Created by ${name}` : '';
+    const m = moment(time);
+    const dateStr = m.format(MAP_TIME_FORMAT);
+    const detailedDateStr = m.format(MAP_DETAILED_TIME_FORMAT);
+    const nameStr = name ? ` by ${name}` : '';
     const { mode } = this.state;
     const style = transformObject(transform, Creator.style) as typeof Creator.style;
     const props = {
@@ -82,9 +84,9 @@ class Creator extends React.PureComponent<Props, OwnState> {
 
     switch (mode) {
       case RenderMode.FULL:
-        return <Text {...props} text={dateStr + nameStr} />;
+        return <Text {...props} text={detailedDateStr + nameStr} />;
       case RenderMode.SIMPLE:
-        return <Text {...props} text={nameStr} />;
+        return <Text {...props} text={dateStr + nameStr} />;
       case RenderMode.NONE:
       default:
         return <Nothing onResize={this.handleResize} />;
