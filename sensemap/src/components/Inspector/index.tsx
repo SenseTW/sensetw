@@ -12,7 +12,7 @@ import { noop } from '../../types/utils';
 import { isLength } from 'validator';
 import './index.css';
 
-export const STRING_LIMIT = 255;
+export const SUMMARY_LIMIT = 255;
 export const EDGE_SUMMARY_LIMIT = 150;
 
 type Data
@@ -69,8 +69,7 @@ class Inspector extends React.PureComponent<Props> {
         mode = 'sense-card-inspector';
         isContentValid =
           isContentValid &&
-          isLength((data as T.CardData).summary, { max: STRING_LIMIT }) &&
-          isLength((data as T.CardData).description, { max: STRING_LIMIT });
+          isLength((data as T.CardData).summary, { max: SUMMARY_LIMIT });
         content = (
           <CardContent
             disabled={disabled}
@@ -84,7 +83,7 @@ class Inspector extends React.PureComponent<Props> {
         mode = 'sense-box-inspector';
         isContentValid =
           isContentValid &&
-          isLength((data as T.BoxData).summary, { max: STRING_LIMIT });
+          isLength((data as T.BoxData).summary, { max: SUMMARY_LIMIT });
         content = (
           <BoxContent
             disabled={disabled}

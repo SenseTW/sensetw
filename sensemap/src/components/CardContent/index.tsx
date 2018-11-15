@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Header, Form, TextArea, Input } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import Accordion from './Accordion';
-import { STRING_LIMIT } from '../Inspector';
+import { SUMMARY_LIMIT } from '../Inspector';
 import * as C from '../../types/sense/card';
 import { isURL, isLength } from 'validator';
 import * as moment from 'moment';
@@ -27,8 +27,7 @@ class CardContent extends React.PureComponent<Props> {
     const { title, summary, quote, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
     const isAnnotation = quote.length !== 0;
     const isURLValid = isURL(url, { require_protocol: true });
-    const isSummaryValid = isLength(summary, { max: STRING_LIMIT });
-    const isDescriptionValid = isLength(description, { max: STRING_LIMIT });
+    const isSummaryValid = isLength(summary, { max: SUMMARY_LIMIT });
     const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
 
     return (
@@ -48,7 +47,7 @@ class CardContent extends React.PureComponent<Props> {
           />
         </Form.Field>
         <Form.Field className="card-content__summary" error={!isSummaryValid}>
-          <label>Summary (max {STRING_LIMIT} characters)</label>
+          <label>Summary (max {SUMMARY_LIMIT} characters)</label>
           <TextArea
             id="sense-card-inspector__summary-input"
             disabled={disabled}
@@ -107,8 +106,8 @@ class CardContent extends React.PureComponent<Props> {
                   value={quote}
                 />
               </Form.Field>
-            : <Form.Field className="card-content__description" error={!isDescriptionValid}>
-                <label>Description (max {STRING_LIMIT} characters)</label>
+            : <Form.Field className="card-content__description">
+                <label>Description</label>
                 <TextArea
                   id="sense-card-inspector__description-input"
                   disabled={disabled}
