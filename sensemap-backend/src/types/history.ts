@@ -1,17 +1,7 @@
 import { gql } from "apollo-server";
 import * as Knex from "knex";
-import { ID } from "./sql";
-import { HistoryType } from "./primitive";
+import { History } from "./sql";
 import { Transaction } from "./transaction";
-
-type History = {
-  userId: ID;
-  historyType: HistoryType;
-  mapId: ID;
-  cardId: ID;
-  objectId: ID;
-  changes: any[];
-};
 
 export function transactionToHistory(trx: Transaction): History[] {
   switch (trx.op) {
