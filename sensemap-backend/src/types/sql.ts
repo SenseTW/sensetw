@@ -284,15 +284,16 @@ export const annotationFields = [
   ...annotationDataFields
 ] as string[];
 
-export type HistoryType = "MAP" | "OBJECT";
+export type HistoryType = "MAP" | "CARD" | "OBJECT";
 
 export const historyDataFields = ["userId", "mapId", "objectId", "data"];
 
 export type History = HasID &
   HasTimestamps & {
-    userId: ID;
     historyType: HistoryType;
+    userId: ID;
     mapId: ID;
     objectId: ID;
-    data: any;
+    cardId: ID;
+    changes: any[];
   };

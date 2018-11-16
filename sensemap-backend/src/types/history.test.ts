@@ -1,28 +1,40 @@
 import { context } from "../context";
+import { maps, users } from "../../seeds/dev";
 import { transactionToHistory } from "./history";
 
 const { db } = context();
+const user = users[0];
 beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
 describe("writeHistory", () => {
-  test("CREATE_MAP", async () => {
+  test.skip("CREATE_MAP", async () => {
+    const mapId = "b2f73daf-e767-4d8d-9506-52589d4fd039";
     const trx = {
-      userId: "dd776858-52f4-48b4-b40c-2b9330409513",
+      userId: user.id,
       data: {
         op: "CREATE_MAP",
         data: {
-          id: "b2f73daf-e767-4d8d-9506-52589d4fd039",
+          id: mapId,
           name: "Yolo",
           description: "Make the best of your time",
           type: "PUBLIC",
           tags: "yolo",
           image: "",
-          owner: "dd776858-52f4-48b4-b40c-2b9330409513"
+          owner: user.id
         }
       }
     };
     const hs = transactionToHistory(trx);
-    expect(hs).toEqual([]);
+    expect(hs).toEqual([
+      {
+        userId: user.id,
+        historyType: "MAP",
+        mapId: mapId,
+        objectId: null,
+        cardId: null,
+        changes: [{ changeType: "CREATE_MAP" }]
+      }
+    ]);
   });
 });

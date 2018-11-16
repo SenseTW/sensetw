@@ -1,10 +1,18 @@
 import { gql } from "apollo-server";
 import * as Knex from "knex";
+import { ID, HistoryType } from "./sql";
 import { Transaction } from "./transaction";
 
-type HistoryData = {};
+type History = {
+  userId: ID;
+  historyType: HistoryType;
+  mapId: ID;
+  cardId: ID;
+  objectId: ID;
+  changes: any[];
+};
 
-export function transactionToHistory(trx: Transaction): HistoryData[] {
+export function transactionToHistory(trx: Transaction): History[] {
   switch (trx.op) {
     case "CREATE_MAP": {
       return [];
@@ -17,15 +25,8 @@ export function transactionToHistory(trx: Transaction): HistoryData[] {
 
 export async function writeHistory(pgtrx: Knex, trx: Transaction) {
   return Promise.all(
-    transactionToHistory(trx).map(data => {
-      return pgtrx("history").insert({
-        //userId: 'userReference',
-        //historyType: 'historytype',
-        //mapId: 'mapReference',
-        //objectId: 'objectReference',
-        //cardId: 'cardReference',
-        data
-      });
+    transactionToHistory(trx).map(h => {
+      return pgtrx("history").insert(h);
     })
   );
 }
@@ -56,8 +57,8 @@ export const typeDefs = [
       allHistories(
         filter: HistoryFilter
         orderBy: String
-        first: Number
-        skip: Number
+        first: Int
+        skip: Int
       ): [History!]!
       History(id: ID): History
     }
@@ -78,6 +79,7 @@ export const typeDefs = [
     union Change = MapChange | CardChange | ObjectChange
 
     enum MapChangeType {
+      CREATE_MAP
       UPDATE_MAP
       ADD_CARD
       DELETE_CARD
