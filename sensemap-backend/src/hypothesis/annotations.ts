@@ -41,6 +41,10 @@ function getSourceTitle(o: any): string {
   return o.document.title || "";
 }
 
+function getText(o: any): string {
+  return o.text || "";
+}
+
 function toAnnotation(env, o: any) {
   return {
     mapId: o.group === "__world__" ? process.env.PUBLIC_MAP_ID : o.group,
@@ -50,7 +54,8 @@ function toAnnotation(env, o: any) {
       url: o.uri || o.url || "",
       tags: o.tags ? o.tags.join(",") : "",
       quote: getQuote(o),
-      title: getSourceTitle(o)
+      title: getSourceTitle(o),
+      summary: getText(o)
     }
   };
 }
