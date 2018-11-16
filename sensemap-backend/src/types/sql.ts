@@ -2,7 +2,13 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import * as Knex from "knex";
 import { pick } from "ramda";
-import { ObjectType, CardType, BoxType, HistoryType, EdgeType } from "./primitive";
+import {
+  ObjectType,
+  CardType,
+  BoxType,
+  HistoryType,
+  EdgeType
+} from "./primitive";
 
 export const db = Knex({
   client: "pg",
@@ -58,7 +64,7 @@ export type User = HasID & HasTimestamps & UserData;
 export const userFields = [
   ...hasIDFields,
   ...hasTimestampsFields,
-  ...userDataFields,
+  ...userDataFields
 ] as string[];
 
 /**
@@ -237,7 +243,7 @@ export type Card = HasID & HasTimestamps & CardData;
 export const cardFields = [
   ...hasIDFields,
   ...hasTimestampsFields,
-  ...cardDataFields,
+  ...cardDataFields
 ] as string[];
 
 /**
@@ -317,7 +323,7 @@ export const boxFields = [
   ...hasTimestampsFields,
   ...boxDataFields,
   db.column("mapId").as("map"),
-  db.column("ownerId").as("owner"),
+  db.column("ownerId").as("owner")
 ] as string[];
 
 /**
@@ -330,7 +336,7 @@ export function boxesQuery(db: Knex): Knex.QueryBuilder {
 /**
  * Type for updating edges
  */
-export type EdgeData ={
+export type EdgeData = {
   mapId: ID;
   fromId: ID;
   toId: ID;
@@ -398,14 +404,54 @@ export const annotationFields = [
   ...annotationDataFields
 ] as string[];
 
-export const historyDataFields = ["userId", "mapId", "objectId", "data"];
+/**
+ * Type for updating histories.
+ */
+export type HistoryData = {
+  historyType: HistoryType;
+  userId: ID;
+  mapId: ID;
+  objectId: ID;
+  cardId: ID;
+  changes: any[];
+};
 
-export type History = HasID &
-  HasTimestamps & {
-    historyType: HistoryType;
-    userId: ID;
-    mapId: ID;
-    objectId: ID;
-    cardId: ID;
-    changes: any[];
-  };
+/**
+ * SQL fields for updating histories.
+ */
+export const historyDataFields: (keyof HistoryData)[] = [
+  "historyType",
+  "userId",
+  "mapId",
+  "objectId",
+  "cardId",
+  "changes"
+];
+
+/**
+ * Data constructor for updating histories.
+ */
+export function historyData(args: any): Partial<HistoryData> {
+  return pick<any, keyof HistoryData>(historyDataFields, args);
+}
+
+/**
+ * Type for reading histories.
+ */
+export type History = HasID & HasTimestamps & HistoryData;
+
+/**
+ * SQL fields for reading histories.
+ */
+export const historyFields = [
+  ...hasIDFields,
+  ...hasTimestampsFields,
+  ...historyDataFields
+] as string[];
+
+/**
+ * SQL for reading histories.
+ */
+export function historiesQuery(db: Knex): Knex.QueryBuilder {
+  return db.select(historyFields).from("history");
+}
