@@ -116,7 +116,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.createObject(args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     updateObject: async (
       _,
@@ -129,7 +129,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateObject(args.id, args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     deleteObject: async (
       _,
@@ -142,7 +142,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteObject(id);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     }
   },
   Object: {

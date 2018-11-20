@@ -4,7 +4,7 @@ import { History } from "./sql";
 import { Transaction } from "./transaction";
 
 export function transactionToHistory(trx: Transaction): History[] {
-  switch (trx.op) {
+  switch (trx.payload.op) {
     case "CREATE_MAP": {
       return [];
     }

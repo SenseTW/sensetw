@@ -17,7 +17,7 @@ describe("create/update/deleteCard", () => {
       mapId
     });
     const r = await T.run(db, user, trx);
-    const c0 = r.transaction.data;
+    const c0 = r.payload.data;
     expect(c0.id).toBeTruthy();
     expect(c0.quote).toBe("mono no aware");
     expect(c0.mapId).toBe(mapId);
@@ -27,7 +27,7 @@ describe("create/update/deleteCard", () => {
       quote: "always adopt never buy"
     });
     const r1 = await T.run(db, user, trx1);
-    const c1 = r1.transaction.data;
+    const c1 = r1.payload.data;
     expect(c1.summary).toBe("sweet variety peas");
     expect(c1.quote).toBe("always adopt never buy");
   });

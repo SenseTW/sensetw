@@ -134,7 +134,7 @@ export const resolvers = {
       args.ownerId = !!u ? u.id : null;
       const trx = T.createMap(args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
 
     updateMap: async (
@@ -148,7 +148,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateMap(args.id, args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
 
     deleteMap: async (
@@ -162,7 +162,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteMap(args.id);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     }
   },
 

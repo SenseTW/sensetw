@@ -191,7 +191,7 @@ export const resolvers = {
       args.ownerId = !!u ? u.id : null;
       const trx = T.createCard(R.pick(writableFields, args));
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
 
     deleteCard: async (
@@ -205,7 +205,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteCard(id);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
 
     updateCard: async (
@@ -219,7 +219,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateCard(args.id, R.pick(writableFields, args));
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     }
   },
   Card: {

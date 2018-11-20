@@ -29,7 +29,7 @@ export type HasID = {
 
 const hasIDFields = ["id"];
 
-type HasTimestamps = {
+export type HasTimestamps = {
   createdAt: Date;
   updatedAt: Date;
 };
