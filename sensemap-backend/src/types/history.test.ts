@@ -8,11 +8,11 @@ beforeEach(() => db.seed.run());
 afterAll(() => db.destroy());
 
 describe("writeHistory", () => {
-  test.skip("CREATE_MAP", async () => {
+  test("CREATE_MAP", async () => {
     const mapId = "b2f73daf-e767-4d8d-9506-52589d4fd039";
     const trx = {
       userId: user.id,
-      data: {
+      payload: {
         op: "CREATE_MAP",
         data: {
           id: mapId,
@@ -30,7 +30,7 @@ describe("writeHistory", () => {
       {
         userId: user.id,
         historyType: "MAP",
-        mapId: mapId,
+        mapId,
         objectId: null,
         cardId: null,
         changes: [{ changeType: "CREATE_MAP" }]
