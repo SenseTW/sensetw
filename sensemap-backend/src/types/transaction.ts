@@ -132,7 +132,7 @@ async function updateMapUpdatedAt(db, id: ID) {
 }
 
 async function saveTransaction(db: Knex, user: User, trx: Transaction) {
-  await db("transaction").insert({ data: trx });
+  await db("transaction").insert({ payload: trx });
 }
 
 export async function runTransaction(
