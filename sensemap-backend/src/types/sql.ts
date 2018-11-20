@@ -131,7 +131,7 @@ export const mapFields = [
  * SQL for querying maps.
  */
 export function mapsQuery(db: Knex): Knex.QueryBuilder {
-  return db.select(mapFields).from("map");
+  return db.select(mapFields).from("map").where('deletedAt', null);
 }
 
 /**
@@ -191,7 +191,7 @@ export const objectFields = [
  * SQL for querying objects.
  */
 export function objectsQuery(db: Knex): Knex.QueryBuilder {
-  return db.select(objectFields).from("object");
+  return db.select(objectFields).from("object").where('deletedAt', null);
 }
 
 export type CardData = {
@@ -250,7 +250,7 @@ export const cardFields = [
  * SQL for querying cards.
  */
 export function cardsQuery(db: Knex): Knex.QueryBuilder {
-  return db.select(cardFields).from("card");
+  return db.select(cardFields).from("card").where('deletedAt', null);
 }
 
 export const cardWithTargetFields = [
@@ -330,7 +330,7 @@ export const boxFields = [
  * SQL for querying boxes.
  */
 export function boxesQuery(db: Knex): Knex.QueryBuilder {
-  return db.select(boxFields).from("box");
+  return db.select(boxFields).from("box").where('deletedAt', null);
 }
 
 /**
@@ -384,7 +384,7 @@ export const edgeFields = [
  * SQL for querying edges.
  */
 export function edgesQuery(db: Knex): Knex.QueryBuilder {
-  return db.select(edgeFields).from("edge");
+  return db.select(edgeFields).from("edge").where('deletedAt', null);
 }
 
 export type Annotation = HasID &
