@@ -1,9 +1,9 @@
 import { gql } from "apollo-server";
 import * as Knex from "knex";
-import { History } from "./sql";
+import { HistoryData } from "./sql";
 import { Transaction } from "./transaction";
 
-export function transactionToHistory(trx: Transaction): History[] {
+export function transactionToHistory(trx: Transaction): HistoryData[] {
   switch (trx.payload.op) {
     case "CREATE_MAP": {
       return [];

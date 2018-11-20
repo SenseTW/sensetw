@@ -420,8 +420,8 @@ export const historyDataFields: (keyof HistoryData)[] = [
 /**
  * Data constructor for updating histories.
  */
-export function historyData(args: any): Partial<HistoryData> {
-  return pick<any, keyof HistoryData>(historyDataFields, args);
+export function historyData(args: HistoryData): HistoryData {
+  return pick(historyDataFields, args);
 }
 
 /**
