@@ -16,8 +16,11 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
 
 export async function writeHistory(pgtrx: Knex, trx: Transaction) {
   return Promise.all(
-    transactionToHistoryData(trx).map(h => {
-      return pgtrx("history").insert(h);
+    transactionToHistoryData(trx).map(hd => {
+      return pgtrx("history").insert({
+        ...hd,
+        changes: JSON.stringify(hd.changes)
+      });
     })
   );
 }
