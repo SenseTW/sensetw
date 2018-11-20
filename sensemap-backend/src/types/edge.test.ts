@@ -23,8 +23,8 @@ describe("GraphQL Mutation", () => {
       },
       { db, user }
     );
-    expect(e0.from).toBe(objects[0].id);
-    expect(e0.to).toBe(objects[1].id);
+    expect(e0.fromId).toBe(objects[0].id);
+    expect(e0.toId).toBe(objects[1].id);
     expect(e0.edgeType).toBe("NONE");
     expect(e0.title).toBe("Paz");
     expect(e0.tags).toBe("school girl, spy");

@@ -185,8 +185,7 @@ export const resolvers = {
     }
   },
   Box: {
-    id: async (o: BoxParent): Promise<ID> =>
-      typeof o !== "string" ? o.id : o,
+    id: async (o: BoxParent): Promise<ID> => (typeof o !== "string" ? o.id : o),
     createdAt: async (o: BoxParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.createdAt : (await getBox(db, o)).createdAt,
     updatedAt: async (o: BoxParent, {}, { db }): Promise<Date> =>
