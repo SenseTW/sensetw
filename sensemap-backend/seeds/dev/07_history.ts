@@ -3,7 +3,7 @@ import * as Knex from "knex";
 exports.seed = async function(knex: Knex): Promise<any> {
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "CREATE_MAP",
       data: {
         id: "b2f73daf-e767-4d8d-9506-52589d4fd039",
@@ -19,7 +19,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "UPDATE_MAP",
       mapId: "b2f73daf-e767-4d8d-9506-52589d4fd039",
       data: {
@@ -45,7 +45,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "DELETE_MAP",
       mapId: "b2f73daf-e767-4d8d-9506-52589d4fd039",
       data: {
@@ -62,7 +62,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "CREATE_OBJECT",
       data: {
         id: "8f479cad-50a1-4604-92cd-df60b0291b9e",
@@ -81,7 +81,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "CREATE_EDGE",
       data: {
         id: "041c1000-5af7-458a-97f5-e7a748021882",
@@ -94,7 +94,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "CREATE_BOX",
       data: {
         id: "10330ced-04b4-46d3-91a6-1d294bb12da3",
@@ -107,7 +107,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "ADD_OBJECT_TO_BOX",
       data: {
         belongsToBox: "10330ced-04b4-46d3-91a6-1d294bb12da3",
@@ -118,7 +118,7 @@ exports.seed = async function(knex: Knex): Promise<any> {
 
   await knex("transaction").insert({
     userId: "dd776858-52f4-48b4-b40c-2b9330409513",
-    data: {
+    payload: {
       op: "REMOVE_OBJECT_FROM_BOX",
       data: {
         belongsToBox: "10330ced-04b4-46d3-91a6-1d294bb12da3",
