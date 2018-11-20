@@ -11,7 +11,7 @@ afterAll(() => db.destroy());
 test("getBox", async () => {
   const box = await B.getBox(db, boxes[0].id);
   expect(box.id).toEqual(boxes[0].id);
-  expect(box.map).toEqual(boxes[0].map);
+  expect(box.mapId).toEqual(boxes[0].map);
 });
 
 test("create/update/delete Box", async () => {

@@ -305,15 +305,7 @@ export function boxData(args: any): Partial<BoxData> {
 /**
  * Type for querying boxes.
  */
-export type Box = HasID &
-  HasTimestamps & {
-    boxType: BoxType;
-    title: string;
-    summary: string;
-    tags: string;
-    mapId: ID;
-    ownerId: ID;
-  };
+export type Box = HasID & HasTimestamps & BoxData;
 
 /**
  * SQL fields for querying boxes.
@@ -322,8 +314,6 @@ export const boxFields = [
   ...hasIDFields,
   ...hasTimestampsFields,
   ...boxDataFields,
-  db.column("mapId").as("map"),
-  db.column("ownerId").as("owner")
 ] as string[];
 
 /**
@@ -375,9 +365,6 @@ export const edgeFields = [
   ...hasIDFields,
   ...hasTimestampsFields,
   ...edgeDataFields,
-  db.column("mapId").as("map"),
-  db.column("fromId").as("from"),
-  db.column("toId").as("to")
 ] as string[];
 
 /**
