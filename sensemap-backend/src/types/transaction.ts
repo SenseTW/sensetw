@@ -164,7 +164,7 @@ export async function runTransaction(
     case "DELETE_MAP": {
       const rows = await pgtrx("map")
         .where("id", trx.mapId)
-        .del()
+        .update('deletedAt', new Date())
         .returning(mapFields);
       trx.data = rows[0];
       return successResult(trx.mapId, trx);
@@ -193,7 +193,7 @@ export async function runTransaction(
     case "DELETE_OBJECT": {
       const rows = await pgtrx("object")
         .where("id", trx.objectId)
-        .del()
+        .update('deletedAt', new Date())
         .returning(objectFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
@@ -222,7 +222,7 @@ export async function runTransaction(
     case "DELETE_EDGE": {
       const rows = await pgtrx("edge")
         .where("id", trx.edgeId)
-        .delete()
+        .update('deletedAt', new Date())
         .returning(edgeFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
@@ -251,7 +251,7 @@ export async function runTransaction(
     case "DELETE_CARD": {
       const rows = await pgtrx("card")
         .where("id", trx.cardId)
-        .delete()
+        .update('deletedAt', new Date())
         .returning(cardFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
@@ -280,7 +280,7 @@ export async function runTransaction(
     case "DELETE_BOX": {
       const rows = await pgtrx("box")
         .where("id", trx.boxId)
-        .delete()
+        .update('deletedAt', new Date())
         .returning(boxFields);
       trx.data = rows[0];
       return successResult(rows[0].mapId, trx);
