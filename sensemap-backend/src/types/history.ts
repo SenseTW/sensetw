@@ -3,7 +3,7 @@ import * as Knex from "knex";
 import { HistoryData } from "./sql";
 import { Transaction } from "./transaction";
 
-export function transactionToHistory(trx: Transaction): HistoryData[] {
+export function transactionToHistoryData(trx: Transaction): HistoryData[] {
   switch (trx.payload.op) {
     case "CREATE_MAP": {
       return [];
@@ -16,7 +16,7 @@ export function transactionToHistory(trx: Transaction): HistoryData[] {
 
 export async function writeHistory(pgtrx: Knex, trx: Transaction) {
   return Promise.all(
-    transactionToHistory(trx).map(h => {
+    transactionToHistoryData(trx).map(h => {
       return pgtrx("history").insert(h);
     })
   );

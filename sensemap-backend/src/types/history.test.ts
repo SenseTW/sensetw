@@ -1,6 +1,6 @@
 import { context } from "../context";
 import { maps, users } from "../../seeds/dev";
-import { transactionToHistory } from "./history";
+import { transactionToHistoryData } from "./history";
 
 const { db } = context();
 const user = users[0];
@@ -25,7 +25,7 @@ describe("writeHistory", () => {
         }
       }
     };
-    const hs = transactionToHistory(trx);
+    const hs = transactionToHistoryData(trx);
     expect(hs).toEqual([
       {
         userId: user.id,
