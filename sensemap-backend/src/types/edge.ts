@@ -102,7 +102,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.createEdge(args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     updateEdge: async (
       _,
@@ -115,7 +115,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateEdge(args.id, args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     deleteEdge: async (
       _,
@@ -128,7 +128,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteEdge(id);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     }
   },
   Edge: {

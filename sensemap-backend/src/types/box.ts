@@ -129,7 +129,7 @@ export const resolvers = {
       args.ownerId = !!u ? u.id : null;
       const trx = T.createBox(args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     deleteBox: async (
       _,
@@ -142,7 +142,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.deleteBox(id);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     updateBox: async (
       _,
@@ -155,7 +155,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.updateBox(args.id, args);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     addToContainCards: async (
       _,
@@ -168,7 +168,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.addObjectToBox(containsObjectId, belongsToBoxId);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     },
     removeFromContainCards: async (
       _,
@@ -181,7 +181,7 @@ export const resolvers = {
         : await A.getUserFromAuthorization(db, authorization);
       const trx = T.removeObjectFromBox(containsObjectId, belongsToBoxId);
       const r = await T.run(db, u, trx);
-      return r.transaction.data;
+      return r.payload.data;
     }
   },
   Box: {

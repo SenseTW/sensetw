@@ -48,8 +48,8 @@ export async function createAnnotation(
   if (args.card) {
     const trx = T.createCard({ ...args.card, mapId: args.mapId });
     const r = await T.run(db, user, trx);
-    cardData = r.transaction.data;
-    a.cardId = r.transaction.data.id;
+    cardData = r.payload.data;
+    a.cardId = r.payload.data.id;
   }
 
   const rows = await db("annotation")
@@ -102,7 +102,7 @@ export async function deleteAnnotation(
   if (data.cardId) {
     const trx = T.deleteCard(data.cardId);
     const r = await T.run(db, user, trx);
-    data.card = r.transaction.data;
+    data.card = r.payload.data;
   }
 
   return data;
