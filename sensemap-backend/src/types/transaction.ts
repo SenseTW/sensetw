@@ -197,7 +197,7 @@ export async function runTransaction(
     case "DELETE_MAP": {
       const rows = await db("map")
         .where("id", payload.mapId)
-        .update('deletedAt', new Date())
+        .update("deletedAt", new Date())
         .returning(mapFields);
       payload.data = rows[0];
       return successResult(payload.mapId, payload);
@@ -226,7 +226,7 @@ export async function runTransaction(
     case "DELETE_OBJECT": {
       const rows = await db("object")
         .where("id", payload.objectId)
-        .update('deletedAt', new Date())
+        .update("deletedAt", new Date())
         .returning(objectFields);
       payload.data = rows[0];
       return successResult(rows[0].mapId, payload);
@@ -255,7 +255,7 @@ export async function runTransaction(
     case "DELETE_EDGE": {
       const rows = await db("edge")
         .where("id", payload.edgeId)
-        .update('deletedAt', new Date())
+        .update("deletedAt", new Date())
         .returning(edgeFields);
       payload.data = rows[0];
       return successResult(rows[0].mapId, payload);
@@ -284,7 +284,7 @@ export async function runTransaction(
     case "DELETE_CARD": {
       const rows = await db("card")
         .where("id", payload.cardId)
-        .update('deletedAt', new Date())
+        .update("deletedAt", new Date())
         .returning(cardFields);
       payload.data = rows[0];
       return successResult(rows[0].mapId, payload);
@@ -313,7 +313,7 @@ export async function runTransaction(
     case "DELETE_BOX": {
       const rows = await db("box")
         .where("id", payload.boxId)
-        .update('deletedAt', new Date())
+        .update("deletedAt", new Date())
         .returning(boxFields);
       payload.data = rows[0];
       return successResult(rows[0].mapId, payload);
@@ -324,6 +324,7 @@ export async function runTransaction(
         .update({ belongsToId: payload.boxId })
         .returning(objectFields);
       payload.data = {
+        mapId: rows[0].mapId,
         containsObject: payload.objectId,
         belongsToBox: payload.boxId
       };
@@ -335,6 +336,7 @@ export async function runTransaction(
         .update({ belongsToId: db.raw("NULL") })
         .returning(objectFields);
       payload.data = {
+        mapId: rows[0].mapId,
         containsObject: payload.objectId,
         belongsToBox: payload.boxId
       };
