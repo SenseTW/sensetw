@@ -5,28 +5,53 @@ import * as fs from "fs";
 import * as path from "path";
 import * as request from "request-promise-native";
 import * as Debug from "debug";
+import * as moment from "moment";
+import { sort } from "ramda";
 
 const debug = Debug("smo");
 const port = process.env.PORT || "8001";
 const graphql_root =
   process.env.SENSEMAP_GRAPHQL_ROOT || "https://api.sense.tw/graphql";
 
-type MapRequestParam = {
+enum RequestType {
+  INDEX = 'INDEX',
+  MAP = 'MAP',
+  SITEMAP = 'SITEMAP',
+}
+
+type IndexRequest = {
+  type: RequestType.INDEX;
+};
+
+type MapRequest = {
+  type: RequestType.MAP;
   mapId: string;
   boxId?: string;
 };
 
-function parseRequest(req: http.IncomingMessage): MapRequestParam | null {
+type SitemapRequest = {
+  type: RequestType.SITEMAP;
+}
+
+type MapRequestParam = IndexRequest | MapRequest | SitemapRequest;
+
+function parseRequest(req: http.IncomingMessage): MapRequestParam {
   const parts = req.url.split("/");
   switch (parts.length) {
     case 3: {
-      return { mapId: parts[2] };
+      return { type: RequestType.MAP, mapId: parts[2] };
     }
     case 5: {
-      return { mapId: parts[2], boxId: parts[4] };
+      return { type: RequestType.MAP, mapId: parts[2], boxId: parts[4] };
+    }
+    case 2: {
+      if (parts[1] === 'sitemap.xml') {
+        return { type: RequestType.SITEMAP };
+      }
+      return { type: RequestType.INDEX };
     }
     default: {
-      return null;
+      return { type: RequestType.INDEX };
     }
   }
 }
@@ -34,7 +59,7 @@ function parseRequest(req: http.IncomingMessage): MapRequestParam | null {
 type GraphQLRequest = {
   operationName: string;
   query: string;
-  variables: { [key: string]: string };
+  variables?: { [key: string]: string };
 };
 
 function mapDataRequest(variables: MapRequestParam): GraphQLRequest {
@@ -46,6 +71,15 @@ function mapDataRequest(variables: MapRequestParam): GraphQLRequest {
       }
     }`,
     variables
+  };
+}
+
+function allMapsRequest(): GraphQLRequest {
+  return {
+    operationName: "AllMaps",
+    query: `query AllMaps {
+      allMaps { id, updatedAt }
+    }`,
   };
 }
 
@@ -64,6 +98,58 @@ function requestGraphQL(param: MapRequestParam): Promise<MapData> {
       json: true
     })
     .then(body => body.data.Map);
+}
+
+type PartialMap = {
+  id: string;
+  updatedAt: number;
+};
+
+function requestAllMaps(): Promise<PartialMap[]> {
+  return request
+    .post({
+      uri: graphql_root,
+      body: allMapsRequest(),
+      json: true
+    })
+    .then(body => body.data.allMaps)
+    .then(maps => maps.map(({ id, updatedAt }) => ({ id, updatedAt: +moment(updatedAt) })));
+}
+
+const DATE_FORMAT = "YYYY-MM-DD";
+
+const sortByUpdatedTimeDesc = sort((a: PartialMap, b: PartialMap) => b.updatedAt - a.updatedAt);
+
+function toSitemapUrl(map: PartialMap): string {
+  const id = map.id;
+  const today = moment().format(DATE_FORMAT);
+  const lastmod = moment(map.updatedAt).format(DATE_FORMAT);
+  return (
+    `<url>
+      <loc>https://sense.tw/map/${id}</loc>
+      <lastmod>${lastmod}</lastmod>
+      <changefreq>${lastmod === today ? 'hourly' : 'daily'}</changefreq>
+    </url>`
+  );
+}
+
+function toSitemap(maps: PartialMap[]): string {
+  const sortedMaps = sortByUpdatedTimeDesc(maps);
+  const today = moment().format(DATE_FORMAT);
+  // use the first map update time as the site update time
+  const lastmod =
+    moment((sortedMaps[0] || { updatedAt: 0 }).updatedAt).format(DATE_FORMAT);
+  return (
+    `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      <url>
+        <loc>https://sense.tw</loc>
+        <lastmod>${lastmod}</lastmod>
+        <changefreq>${lastmod === today ? 'hourly' : 'daily'}</changefreq>
+      </url>
+      ${sortedMaps.map(toSitemapUrl).join('')}
+    </urlset>`
+  );
 }
 
 type ResponseData = {
@@ -112,12 +198,18 @@ function formatResponse(data: ResponseData): string {
 const server = http.createServer((req, res) => {
   const param = parseRequest(req);
   debug(param);
-  if (param === null) {
-    return res.end(formatResponse(siteData));
-  } else {
-    return requestGraphQL(param)
-      .then(mapData => res.end(formatResponse(mapDataToResponse(mapData))))
-      .catch(error => console.error(error));
+  switch (param.type) {
+    case RequestType.MAP:
+      return requestGraphQL(param)
+        .then(mapData => res.end(formatResponse(mapDataToResponse(mapData))))
+        .catch(error => console.error(error));
+    case RequestType.SITEMAP:
+      return requestAllMaps()
+        .then(maps => res.end(toSitemap(maps)))
+        .catch(error => console.error(error));
+    case RequestType.INDEX:
+    default:
+      return res.end(formatResponse(siteData));
   }
 });
 
