@@ -1,5 +1,6 @@
 import { gql } from "apollo-server";
 import * as Knex from "knex";
+import { HistoryType } from "./primitive";
 import { ID, History, HistoryData, historyData, historiesQuery } from "./sql";
 import { Transaction } from "./transaction";
 
@@ -460,15 +461,11 @@ export const typeDefs = [
       CARD
     }
 
-    input HistoryTypeFilter {
-      historyType: HistoryType
-    }
-
     input HistoryFilter {
       map: MapFilter
       card: CardFilter
       object: ObjectFilter
-      historyTypeFilter: HistoryTypeFilter
+      historyType: HistoryType
     }
 
     extend type Query {
@@ -534,10 +531,64 @@ export async function getHistory(db, id: ID): Promise<History> {
 
 type HistoryParent = ID | History;
 
+type HistoryFilter = {
+  id?: ID;
+  map?: { id: ID };
+  object?: { id: ID };
+  card?: { id: ID };
+  historyType?: HistoryType;
+};
+
+type AllHistoriesArgs = {
+  filter?: HistoryFilter;
+  orderBy?: string;
+  first?: number;
+  skip?: number;
+};
+
+const queryBuilder = (_query: Knex.QueryBuilder) => ({
+  _query,
+  query: () => _query,
+  withId: id =>
+    !!id ? queryBuilder(_query.andWhere("id", id)) : queryBuilder(_query),
+  withMap: map =>
+    !!map
+      ? queryBuilder(_query.andWhere("mapId", map.id))
+      : queryBuilder(_query),
+  withCard: card =>
+    !!card
+      ? queryBuilder(_query.andWhere("cardId", card.id))
+      : queryBuilder(_query),
+  withObject: object =>
+    !!object
+      ? queryBuilder(_query.andWhere("objectId", object.id))
+      : queryBuilder(_query),
+  withHistoryType: historyType =>
+    !!historyType
+      ? queryBuilder(_query.andWhere("historyType", historyType))
+      : queryBuilder(_query),
+  first: n => (!!n ? queryBuilder(_query.limit(n)) : queryBuilder(_query)),
+  skip: n => (!!n ? queryBuilder(_query.offset(n)) : queryBuilder(_query))
+});
+
 export const resolvers = {
   Query: {
-    allHistories: () => [1, 2, 3],
-    History: ({}, { id }, { db }) => getHistory(db, id),
+    allHistories: async ({}, args: AllHistoriesArgs, { db }) => {
+      const histories = await queryBuilder(
+        historiesQuery(db).orderBy("createdAt", "desc")
+      )
+        .withId(args.filter.id)
+        .withMap(args.filter.map)
+        .withObject(args.filter.object)
+        .withCard(args.filter.card)
+        .withHistoryType(args.filter.historyType)
+        .first(args.first)
+        .skip(args.skip)
+        .query();
+      console.log(histories);
+      return histories;
+    },
+    History: ({}, { id }, { db }) => getHistory(db, id)
   },
   History: {
     id: async (o: HistoryParent): Promise<ID> =>
@@ -547,7 +598,9 @@ export const resolvers = {
     updatedAt: async (o: HistoryParent, {}, { db }): Promise<Date> =>
       typeof o !== "string" ? o.updatedAt : (await getHistory(db, o)).updatedAt,
     historyType: async (o: HistoryParent, {}, { db }): Promise<string> =>
-      typeof o !== "string" ? o.historyType : (await getHistory(db, o)).historyType,
+      typeof o !== "string"
+        ? o.historyType
+        : (await getHistory(db, o)).historyType,
     user: async (o: HistoryParent, {}, { db }): Promise<ID> =>
       typeof o !== "string" ? o.userId : (await getHistory(db, o)).userId,
     map: async (o: HistoryParent, {}, { db }): Promise<ID> =>
@@ -557,6 +610,6 @@ export const resolvers = {
     object: async (o: HistoryParent, {}, { db }): Promise<ID> =>
       typeof o !== "string" ? o.objectId : (await getHistory(db, o)).objectId,
     changes: async (o: HistoryParent, {}, { db }): Promise<any[]> =>
-      typeof o !== "string" ? o.changes : (await getHistory(db, o)).changes,
+      typeof o !== "string" ? o.changes : (await getHistory(db, o)).changes
   }
 };
