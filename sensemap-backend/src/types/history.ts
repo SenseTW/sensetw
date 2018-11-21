@@ -1,6 +1,6 @@
 import { gql } from "apollo-server";
 import * as Knex from "knex";
-import { HistoryData, historyData } from "./sql";
+import { ID, History, HistoryData, historyData, historiesQuery } from "./sql";
 import { Transaction } from "./transaction";
 
 export function transactionToHistoryData(trx: Transaction): HistoryData[] {
@@ -439,10 +439,12 @@ function cardUpdate(trx: Transaction): HistoryData[] {
 export async function writeHistory(pgtrx: Knex, trx: Transaction) {
   return Promise.all(
     transactionToHistoryData(trx).map(hd => {
-      return pgtrx("history").insert({
-        ...hd,
-        changes: JSON.stringify(hd.changes)
-      });
+      const changes = JSON.stringify(hd.changes);
+      if (changes.length > 0) {
+        return pgtrx("history").insert({ ...hd, changes });
+      } else {
+        return null;
+      }
     })
   );
 }
@@ -491,86 +493,70 @@ export const typeDefs = [
       changes: [Change!]!
     }
 
-    # Different types of changes following historyType
-    union Change = MapChange | CardChange | ObjectChange
-
-    enum MapChangeType {
+    enum ChangeType {
       CREATE_MAP
       UPDATE_MAP
+      DELETE_MAP
+      CREATE_OBJECT
+      UPDATE_OBJECT
+      DELETE_OBJECT
       CREATE_CARD
-      DELETE_CARD
       UPDATE_CARD_SUMMARY
+      UPDATE_CARD_TYPE
       UPDATE_CARD
+      DELETE_CARD
       CREATE_EDGE
+      UPDATE_EDGE
       DELETE_EDGE
       ADD_OBJECT_TO_BOX
       REMOVE_OBJECT_FROM_BOX
     }
 
-    type MapChange {
-      changeType: MapChangeType!
+    type Change {
+      changeType: ChangeType!
       field: String
       before: String
       after: String
       from: Object
       to: Object
       box: Box
-    }
-
-    enum CardChangeType {
-      CREATE_CARD
-      DELETE_CARD
-      CREATE_OBJECT
-      UPDATE_CARD_SUMMARY
-      UPDATE_CARD
-      UPDATE_CARD_TYPE
-    }
-
-    type CardChange {
-      changeType: CardChangeType!
-      field: String
-      before: String
-      after: String
-    }
-
-    enum ObjectChangeType {
-      CREATE_OBJECT
-      DELETE_OBJECT
-      UPDATE_CARD_SUMMARY
-      UPDATE_CARD
-      UPDATE_CARD_TYPE
-      CREATE_EDGE
-      DELETE_EDGE
-      ADD_OBJECT_TO_BOX
-      REMOVE_OBJECT_FROM_BOX
-    }
-
-    type ObjectChange {
-      changeType: ObjectChangeType!
-      field: String
-      before: String
-      after: String
       connectWith: Object
-      box: Box
     }
   `
 ];
 
+export async function getHistory(db, id: ID): Promise<History> {
+  const o = await historiesQuery(db)
+    .where("id", id)
+    .first();
+  return !!o ? o : null;
+}
+
+type HistoryParent = ID | History;
+
 export const resolvers = {
   Query: {
     allHistories: () => [1, 2, 3],
-    History: () => ({})
+    History: ({}, { id }, { db }) => getHistory(db, id),
   },
   History: {
-    id: () => "123",
-    createdAt: () => new Date(),
-    updatedAt: () => new Date(),
-    historyType: () => "MAP",
-    user: () => null,
-    map: () => null,
-    card: () => null,
-    object: () => null,
-    changes: () => []
-  },
-  Change: {}
+    id: async (o: HistoryParent): Promise<ID> =>
+      typeof o !== "string" ? o.id : o,
+    createdAt: async (o: HistoryParent, {}, { db }): Promise<Date> =>
+      typeof o !== "string" ? o.createdAt : (await getHistory(db, o)).createdAt,
+    updatedAt: async (o: HistoryParent, {}, { db }): Promise<Date> =>
+      typeof o !== "string" ? o.updatedAt : (await getHistory(db, o)).updatedAt,
+    historyType: async (o: HistoryParent, {}, { db }): Promise<string> =>
+      typeof o !== "string" ? o.historyType : (await getHistory(db, o)).historyType,
+    user: async (o: HistoryParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.userId : (await getHistory(db, o)).userId,
+    map: async (o: HistoryParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.mapId : (await getHistory(db, o)).mapId,
+    card: async (o: HistoryParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.cardId : (await getHistory(db, o)).cardId,
+    object: async (o: HistoryParent, {}, { db }): Promise<ID> =>
+      typeof o !== "string" ? o.objectId : (await getHistory(db, o)).objectId,
+    changes: async (o: HistoryParent, {}, { db }): Promise<any[]> =>
+      typeof o !== "string" ? o.changes : (await getHistory(db, o)).changes,
+  }
 };
