@@ -409,6 +409,7 @@ export const annotationFields = [
  */
 export type HistoryData = {
   historyType: HistoryType;
+  transactionId: ID;
   userId: ID;
   mapId: ID;
   objectId: ID;
@@ -421,6 +422,7 @@ export type HistoryData = {
  */
 export const historyDataFields: (keyof HistoryData)[] = [
   "historyType",
+  "transactionId",
   "userId",
   "mapId",
   "objectId",
