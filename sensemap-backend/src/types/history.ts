@@ -585,7 +585,6 @@ export const resolvers = {
         .first(args.first)
         .skip(args.skip)
         .query();
-      console.log(histories);
       return histories;
     },
     History: ({}, { id }, { db }) => getHistory(db, id)
