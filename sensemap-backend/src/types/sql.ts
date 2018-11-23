@@ -49,7 +49,10 @@ export type UserData = {
  */
 export const userDataFields: (keyof UserData)[] = ["username", "email"];
 
-export function userData(args: any): Partial<UserData> {
+/**
+ * Data constructor for updating users.
+ */
+export function userData(args: UserData): UserData {
   return pick(userDataFields, args);
 }
 
@@ -101,8 +104,8 @@ export const mapDataFields: (keyof MapData)[] = [
 /**
  * Data constructor for updating maps.
  */
-export function mapData(args: any): Partial<MapData> {
-  return pick<any, keyof MapData>(mapDataFields, args);
+export function mapData(args: MapData): MapData {
+  return pick(mapDataFields, args);
 }
 
 /**
@@ -169,8 +172,8 @@ export const objectDataFields: (keyof ObjectData)[] = [
 /**
  * Data constructor for updating objects.
  */
-export function objectData(args: any): Partial<ObjectData> {
-  return pick<any, keyof ObjectData>(objectDataFields, args);
+export function objectData(args: ObjectData): ObjectData {
+  return pick(objectDataFields, args);
 }
 
 /**
@@ -228,8 +231,8 @@ export const cardDataFields: (keyof CardData)[] = [
 /**
  * Data constructor for updating cards.
  */
-export function cardData(args: any): Partial<CardData> {
-  return pick<any, keyof CardData>(cardDataFields, args);
+export function cardData(args: CardData): CardData {
+  return pick(cardDataFields, args);
 }
 
 /**
@@ -298,8 +301,8 @@ export const boxDataFields: (keyof BoxData)[] = [
 /**
  * Data constructor for updating boxes.
  */
-export function boxData(args: any): Partial<BoxData> {
-  return pick<any, keyof BoxData>(boxDataFields, args);
+export function boxData(args: BoxData): BoxData {
+  return pick(boxDataFields, args);
 }
 
 /**
@@ -349,8 +352,11 @@ export const edgeDataFields: (keyof EdgeData)[] = [
   "summary"
 ];
 
-export function edgeData(args: any): Partial<EdgeData> {
-  return pick<any, keyof EdgeData>(edgeDataFields, args);
+/**
+ * Data constructor for updating edges.
+ */
+export function edgeData(args: EdgeData): EdgeData {
+  return pick(edgeDataFields, args);
 }
 
 /**
