@@ -57,6 +57,10 @@ export const typeDefs = [
       id: ID!
     }
 
+    input MapIDFilter {
+      id: ID!
+    }
+
     extend type Query {
       allMaps(filter: MapFilter): [Map!]!
       Map(id: ID): Map

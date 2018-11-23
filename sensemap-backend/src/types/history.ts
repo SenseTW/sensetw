@@ -61,25 +61,43 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           mapId: trx.payload.data.mapId,
           objectId: trx.payload.data.id,
           cardId: null,
-          changes: [{ changeType: "CREATE_OBJECT" }]
+          changes: [
+            {
+              changeType: "CREATE_OBJECT",
+              object: trx.payload.data.id,
+              card: trx.payload.data.cardId
+            }
+          ]
         }),
         historyData({
           historyType: "CARD",
           transactionId: trx.id,
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
-          objectId: trx.payload.data.id,
+          objectId: null,
           cardId: trx.payload.data.cardId,
-          changes: [{ changeType: "CREATE_OBJECT" }]
+          changes: [
+            {
+              changeType: "CREATE_OBJECT",
+              object: trx.payload.data.id,
+              card: trx.payload.data.cardId
+            }
+          ]
         }),
         historyData({
           historyType: "MAP",
           transactionId: trx.id,
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
-          objectId: trx.payload.data.id,
-          cardId: trx.payload.data.cardId,
-          changes: [{ changeType: "CREATE_OBJECT" }]
+          objectId: null,
+          cardId: null,
+          changes: [
+            {
+              changeType: "CREATE_OBJECT",
+              object: trx.payload.data.id,
+              card: trx.payload.data.cardId
+            }
+          ]
         })
       ];
     }
@@ -95,25 +113,43 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           mapId: trx.payload.data.mapId,
           objectId: trx.payload.data.id,
           cardId: null,
-          changes: [{ changeType: "DELETE_OBJECT" }]
+          changes: [
+            {
+              changeType: "DELETE_OBJECT",
+              object: trx.payload.data.id,
+              card: trx.payload.data.cardId
+            }
+          ]
         }),
         historyData({
           historyType: "CARD",
           transactionId: trx.id,
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
-          objectId: trx.payload.data.id,
+          objectId: null,
           cardId: trx.payload.data.cardId,
-          changes: [{ changeType: "DELETE_OBJECT" }]
+          changes: [
+            {
+              changeType: "DELETE_OBJECT",
+              object: trx.payload.data.id,
+              card: trx.payload.data.cardId
+            }
+          ]
         }),
         historyData({
           historyType: "MAP",
           transactionId: trx.id,
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
-          objectId: trx.payload.data.id,
-          cardId: trx.payload.data.cardId,
-          changes: [{ changeType: "DELETE_OBJECT" }]
+          objectId: null,
+          cardId: null,
+          changes: [
+            {
+              changeType: "DELETE_OBJECT",
+              object: trx.payload.data.id,
+              card: trx.payload.data.cardId
+            }
+          ]
         })
       ];
     }
@@ -127,7 +163,11 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           objectId: trx.payload.data.fromId,
           cardId: null,
           changes: [
-            { changeType: "CREATE_EDGE", connectWith: trx.payload.data.toId }
+            {
+              changeType: "CREATE_EDGE",
+              from: trx.payload.data.fromId,
+              to: trx.payload.data.toId
+            }
           ]
         }),
         historyData({
@@ -138,7 +178,11 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           objectId: trx.payload.data.toId,
           cardId: null,
           changes: [
-            { changeType: "CREATE_EDGE", connectWith: trx.payload.data.fromId }
+            {
+              changeType: "CREATE_EDGE",
+              from: trx.payload.data.fromId,
+              to: trx.payload.data.toId
+            }
           ]
         }),
         historyData({
@@ -171,7 +215,11 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           objectId: trx.payload.data.fromId,
           cardId: null,
           changes: [
-            { changeType: "DELETE_EDGE", connectWith: trx.payload.data.toId }
+            {
+              changeType: "DELETE_EDGE",
+              from: trx.payload.data.fromId,
+              to: trx.payload.data.toId
+            }
           ]
         }),
         historyData({
@@ -182,7 +230,11 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           objectId: trx.payload.data.toId,
           cardId: null,
           changes: [
-            { changeType: "DELETE_EDGE", connectWith: trx.payload.data.fromId }
+            {
+              changeType: "DELETE_EDGE",
+              from: trx.payload.data.fromId,
+              to: trx.payload.data.toId
+            }
           ]
         }),
         historyData({
@@ -211,7 +263,7 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           mapId: trx.payload.data.mapId,
           objectId: null,
           cardId: trx.payload.data.id,
-          changes: [{ changeType: "CREATE_CARD" }]
+          changes: [{ changeType: "CREATE_CARD", card: trx.payload.data.id }]
         }),
         historyData({
           historyType: "MAP",
@@ -219,8 +271,8 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
           objectId: null,
-          cardId: trx.payload.data.id,
-          changes: [{ changeType: "CREATE_CARD" }]
+          cardId: null,
+          changes: [{ changeType: "CREATE_CARD", card: trx.payload.data.id }]
         })
       ];
     }
@@ -238,7 +290,7 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           mapId: trx.payload.data.mapId,
           objectId: null,
           cardId: trx.payload.data.id,
-          changes: [{ changeType: "DELETE_CARD" }]
+          changes: [{ changeType: "DELETE_CARD", card: trx.payload.data.id }]
         }),
         historyData({
           historyType: "MAP",
@@ -246,8 +298,8 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
           objectId: null,
-          cardId: trx.payload.data.id,
-          changes: [{ changeType: "DELETE_CARD" }]
+          cardId: null,
+          changes: [{ changeType: "DELETE_CARD", card: trx.payload.data.id }]
         })
       ];
     }
@@ -268,6 +320,7 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           changes: [
             {
               changeType: "ADD_OBJECT_TO_BOX",
+              object: trx.payload.data.containsObject,
               box: trx.payload.data.belongsToBox
             }
           ]
@@ -277,11 +330,12 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           transactionId: trx.id,
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
-          objectId: trx.payload.data.containsObject,
+          objectId: null,
           cardId: null,
           changes: [
             {
               changeType: "ADD_OBJECT_TO_BOX",
+              object: trx.payload.data.containsObject,
               box: trx.payload.data.belongsToBox
             }
           ]
@@ -300,6 +354,7 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           changes: [
             {
               changeType: "REMOVE_OBJECT_FROM_BOX",
+              object: trx.payload.data.containsObject,
               box: trx.payload.data.belongsToBox
             }
           ]
@@ -309,11 +364,12 @@ export function transactionToHistoryData(trx: Transaction): HistoryData[] {
           transactionId: trx.id,
           userId: trx.userId,
           mapId: trx.payload.data.mapId,
-          objectId: trx.payload.data.containsObject,
+          objectId: null,
           cardId: null,
           changes: [
             {
               changeType: "REMOVE_OBJECT_FROM_BOX",
+              object: trx.payload.data.containsObject,
               box: trx.payload.data.belongsToBox
             }
           ]
@@ -344,6 +400,7 @@ function cardSummaryUpdate(trx: Transaction): HistoryData[] {
         changes: [
           {
             changeType: "UPDATE_CARD_SUMMARY",
+            card: trx.payload.data.id,
             before: before.summary,
             after: after.summary
           }
@@ -355,10 +412,11 @@ function cardSummaryUpdate(trx: Transaction): HistoryData[] {
         userId: trx.userId,
         mapId: trx.payload.data.mapId,
         objectId: null,
-        cardId: trx.payload.data.id,
+        cardId: null,
         changes: [
           {
             changeType: "UPDATE_CARD_SUMMARY",
+            card: trx.payload.data.id,
             before: before.summary,
             after: after.summary
           }
@@ -388,6 +446,7 @@ function cardTypeUpdate(trx: Transaction): HistoryData[] {
         changes: [
           {
             changeType: "UPDATE_CARD_TYPE",
+            card: trx.payload.data.id,
             before: before.cardType,
             after: after.cardType
           }
@@ -415,6 +474,7 @@ function cardUpdate(trx: Transaction): HistoryData[] {
       cardId: trx.payload.data.id,
       changes: changedFields.map(field => ({
         changeType: "UPDATE_CARD",
+        card: trx.payload.data.id,
         field,
         before: before[field],
         after: after[field]
@@ -426,9 +486,10 @@ function cardUpdate(trx: Transaction): HistoryData[] {
       userId: trx.userId,
       mapId: trx.payload.data.mapId,
       objectId: null,
-      cardId: trx.payload.data.id,
+      cardId: null,
       changes: changedFields.map(field => ({
         changeType: "UPDATE_CARD",
+        card: trx.payload.data.id,
         field,
         before: before[field],
         after: after[field]
@@ -462,19 +523,14 @@ export const typeDefs = [
     }
 
     input HistoryFilter {
-      map: MapFilter
-      card: CardFilter
-      object: ObjectFilter
+      map: MapIDFilter
+      card: CardIDFilter
+      object: ObjectIDFilter
       historyType: HistoryType
     }
 
     extend type Query {
-      allHistories(
-        filter: HistoryFilter
-        orderBy: String
-        first: Int
-        skip: Int
-      ): [History!]!
+      allHistories(filter: HistoryFilter, first: Int, skip: Int): [History!]!
       History(id: ID): History
     }
 
@@ -516,8 +572,9 @@ export const typeDefs = [
       after: String
       from: Object
       to: Object
+      object: Object
+      card: Card
       box: Box
-      connectWith: Object
     }
   `
 ];
@@ -541,7 +598,6 @@ type HistoryFilter = {
 
 type AllHistoriesArgs = {
   filter?: HistoryFilter;
-  orderBy?: string;
   first?: number;
   skip?: number;
 };

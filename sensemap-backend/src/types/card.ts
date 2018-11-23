@@ -92,9 +92,14 @@ async function getObjectsForCard(db, id: ID): Promise<SenseObject[]> {
 export const typeDefs = [
   gql`
     input CardFilter {
+      id: ID
       map: MapFilter
       url: String
       tags: String
+    }
+
+    input CardIDFilter {
+      id: ID!
     }
 
     extend type Query {
