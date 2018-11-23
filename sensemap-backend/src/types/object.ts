@@ -19,7 +19,12 @@ export async function getObject(db, id: ID): Promise<SenseObject> {
 export const typeDefs = [
   gql`
     input ObjectFilter {
+      id: ID
       map: MapFilter
+    }
+
+    input ObjectIDFilter {
+      id: ID!
     }
 
     extend type Query {
