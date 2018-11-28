@@ -1,105 +1,34 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import { Link, RouteComponentProps } from 'react-router-dom';
-import { Menu, Icon } from 'semantic-ui-react';
-import Breadcrumb from './Breadcrumb';
-import Submenu from './Submenu';
-import { State } from '../../types';
-import * as SM from '../../types/sense/map';
-import * as R from '../../types/routes';
-import * as CS from '../../types/cached-storage';
+import DesktopHeader from './DesktopHeader';
+import MobileHeader from './MobileHeader';
 import './index.css';
-import { actions, ActionProps, mapDispatch } from '../../types';
+import { actions, ActionProps, State, mapDispatch } from '../../types';
 import * as V from '../../types/viewport';
-import AccountMenuItem from './AccountMenuItem';
-const logo = require('./logo.png');
 
 type StateFromProps = {
-  map: SM.MapData,
   isMobile: boolean,
 };
 
 // tslint:disable:no-any
-type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
+type Props = StateFromProps & ActionProps;
 
 /**
  * The header contains a main menu with a submenu.
  */
 class Header extends React.PureComponent<Props> {
   render() {
-    const { actions: acts, isMobile } = this.props;
-
-    return isMobile
-      ? (
-        <div className="sense-header mobile">
-          <Menu inverted>
-            <Menu.Item
-              id="sense-header__home-btn"
-              as={Link}
-              to={R.index}
-            >
-              <img src={logo} />
-            </Menu.Item>
-          </Menu>
-        </div>
-      )
-      : (
-        <div className="sense-header">
-          <Menu inverted>
-            <Menu.Item
-              id="sense-header__home-btn"
-              as={Link}
-              to={R.index}
-            >
-              <img src={logo} />
-            </Menu.Item>
-            <Menu.Item
-              id="sense-header__about-btn"
-              as="a"
-              href="https://about.sense.tw/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              About
-            </Menu.Item>
-            <Menu.Item
-              id="sense-header__dashboard-btn"
-              as={Link}
-              to={R.mapList}
-            >
-              Dashboard
-            </Menu.Item>
-            <Menu.Menu position="right">
-              <Menu.Item
-                id="sense-header__help-btn"
-                as="a"
-                href="https://help.sense.tw/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Icon name="question circle outline" size="large" />
-              </Menu.Item>
-              <AccountMenuItem />
-            </Menu.Menu>
-          </Menu>
-          <div className="sense-header__submenu">
-            <Breadcrumb />
-            <Submenu
-              map={this.props.map}
-              onEditMap={(m: SM.MapData) => acts.senseMap.toggleEditor(true)}
-            />
-          </div>
-        </div>
-    );
+    return this.props.isMobile
+      ? <MobileHeader />
+      : <DesktopHeader />;
   }
 }
 
-export default withRouter(connect<StateFromProps, ActionProps>(
+export default connect<StateFromProps, ActionProps>(
   (state: State) => {
-    const { senseMap, senseObject, viewport } = state;
+    const { viewport } = state;
     const isMobile = V.isMobile(viewport);
-    return { map: CS.getMap(senseObject, senseMap.map), isMobile };
+    return { isMobile };
   },
   mapDispatch({actions})
-)(Header));
+)(Header);

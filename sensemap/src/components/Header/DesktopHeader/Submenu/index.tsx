@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Switch, Route, withRouter, RouteComponentProps } from 'react-router-dom';
 import { Menu, Dropdown } from 'semantic-ui-react';
-import * as SM from '../../../types/sense/map';
-import * as R from '../../../types/routes';
+import * as SM from '../../../../types/sense/map';
+import * as R from '../../../../types/routes';
 import './index.css';
 
 type MyRouteProps = RouteComponentProps<{}>;

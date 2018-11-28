@@ -2,8 +2,8 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { withRouter, Link, RouteComponentProps } from 'react-router-dom';
 import { Menu, Icon, Dropdown } from 'semantic-ui-react';
-import { User, State, ActionProps, mapDispatch, actions } from '../../../types';
-import * as R from '../../../types/routes';
+import { User, State, ActionProps, mapDispatch, actions } from '../../../../types';
+import * as R from '../../../../types/routes';
 
 interface StateFromProps {
     authenticated: boolean;

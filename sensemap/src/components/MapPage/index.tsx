@@ -8,6 +8,8 @@ import Map from '../../containers/Map';
 import Toolbar from '../Toolbar';
 import Inspector from '../Inspector';
 import Inbox from '../../containers/Inbox';
+import { height as desktopHeaderHeight } from '../Header/DesktopHeader';
+import { height as mobileHeaderHeight } from '../Header/MobileHeader';
 import SidebarToggler from '../SidebarToggler';
 import {
   MapID,
@@ -56,8 +58,7 @@ class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions: acts } = this.props;
     const isMobile = V.isMobile({ width });
-    // the header height is 95px and the mobile header height is 43px
-    const headerHeight = isMobile ? 43 : 95;
+    const headerHeight = isMobile ? mobileHeaderHeight : desktopHeaderHeight;
     acts.viewport.resizeViewport({ width, height: height - headerHeight });
 
     if (width <= 640) {
