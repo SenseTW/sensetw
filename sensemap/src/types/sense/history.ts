@@ -164,7 +164,7 @@ type CardHistory = BaseHistory & {
   map: MapID,
   object: ObjectID,
   card: CardID,
-}
+};
 
 export type History
   = MapHistory
