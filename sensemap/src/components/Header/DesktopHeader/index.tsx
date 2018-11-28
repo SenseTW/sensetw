@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 import { RouteComponentProps, Link } from 'react-router-dom';
 import { Menu, Icon } from 'semantic-ui-react';
-import Breadcrumb from './Breadcrumb';
+import Breadcrumb from '../Breadcrumb';
 import Submenu from './Submenu';
 import AccountMenuItem from './AccountMenuItem';
 import { actions, ActionProps, State, mapDispatch } from '../../../types';

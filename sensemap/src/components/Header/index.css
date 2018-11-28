@@ -24,11 +24,15 @@
   background-color: #fff;
 }
 
+/* TODO: merge and cleanup */
 .sense-header > .sense-header__submenu > .ui.breadcrumb {
   text-transform: uppercase;
   font-size: 1.142857rem;
   line-height: 52px;
   margin-left: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .sense-header > .sense-header__submenu > .ui.breadcrumb > .section {
