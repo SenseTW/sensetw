@@ -55,8 +55,10 @@ type Props = StateFromProps & ActionProps;
 class MapPage extends React.Component<Props> {
   handleResize = (width: number, height: number) => {
     const { actions: acts } = this.props;
-    // the header height is 95px
-    acts.viewport.resizeViewport({ width, height: height - 95 });
+    const isMobile = V.isMobile({ width });
+    // the header height is 95px and the mobile header height is 43px
+    const headerHeight = isMobile ? 43 : 95;
+    acts.viewport.resizeViewport({ width, height: height - headerHeight });
 
     if (width <= 640) {
       acts.viewport.setBaseLevel(0.5);
@@ -236,6 +238,7 @@ class MapPage extends React.Component<Props> {
     const { status } = editor;
     const isInboxVisible = senseMap.inbox === SM.InboxVisibility.VISIBLE;
     const isInspectorOpen = editor.status === OE.StatusType.SHOW;
+    const isMobile = V.isMobile(viewport);
 
     let sidebarWidth = 350;
     if (viewport.width <= 640) {
@@ -284,42 +287,47 @@ class MapPage extends React.Component<Props> {
               <Toolbar />
             </div>
             {
-              isAuthenticated
-                ? (
-                  <SidebarToggler
-                    id="sense-toggler__inbox-btn"
-                    className="inbox__btn"
-                    style={{ left: isInboxVisible ? sidebarWidth : 0 }}
-                    open={isInboxVisible}
-                    onToggle={open =>
-                      open
-                        ? acts.senseMap.openInbox()
-                        : acts.senseMap.closeInbox()
-                    }
-                  />
-                )
-                : (
-                  <div className="map-page__login-hint">
-                    <Segment>
-                      <a href="#" onClick={(e) => { e.preventDefault(); acts.account.loginRequest(); }}>
-                        Sign up / Login
-                      </a> to edit the map and create your own map
-                    </Segment>
-                  </div>
-                )
+              isMobile
+                ? null
+                : isAuthenticated
+                  ? (
+                    <SidebarToggler
+                      id="sense-toggler__inbox-btn"
+                      className="inbox__btn"
+                      style={{ left: isInboxVisible ? sidebarWidth : 0 }}
+                      open={isInboxVisible}
+                      onToggle={open =>
+                        open
+                          ? acts.senseMap.openInbox()
+                          : acts.senseMap.closeInbox()
+                      }
+                    />
+                  )
+                  : (
+                    <div className="map-page__login-hint">
+                      <Segment>
+                        <a href="#" onClick={(e) => { e.preventDefault(); acts.account.loginRequest(); }}>
+                          Sign up / Login
+                        </a> to edit the map and create your own map
+                      </Segment>
+                    </div>
+                  )
             }
-            <SidebarToggler
-              right
-              id="sense-toggler__inspector-btn"
-              className="inspector__btn"
-              style={{ right: isInspectorOpen ? sidebarWidth : 0 }}
-              open={isInspectorOpen}
-              onToggle={open =>
-                open
-                  ? acts.editor.changeStatus(OE.StatusType.SHOW)
-                  : acts.editor.changeStatus(OE.StatusType.HIDE)
-              }
-            />
+            {
+              !isMobile &&
+              <SidebarToggler
+                right
+                id="sense-toggler__inspector-btn"
+                className="inspector__btn"
+                style={{ right: isInspectorOpen ? sidebarWidth : 0 }}
+                open={isInspectorOpen}
+                onToggle={open =>
+                  open
+                    ? acts.editor.changeStatus(OE.StatusType.SHOW)
+                    : acts.editor.changeStatus(OE.StatusType.HIDE)
+                }
+              />
+            }
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>

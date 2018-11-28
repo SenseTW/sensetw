@@ -85,6 +85,8 @@ export const getCenter = (state: State): G.Point => ({
   y: state.top + state.height / 2,
 });
 
+export const isMobile = (state: { width: number }) => state.width <= 414;
+
 const SET_VIEWPORT = 'SET_VIEWPORT';
 /**
  * A message to set the viewport with a new viewport.

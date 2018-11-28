@@ -11,11 +11,13 @@ import * as R from '../../types/routes';
 import * as CS from '../../types/cached-storage';
 import './index.css';
 import { actions, ActionProps, mapDispatch } from '../../types';
+import * as V from '../../types/viewport';
 import AccountMenuItem from './AccountMenuItem';
 const logo = require('./logo.png');
 
 type StateFromProps = {
   map: SM.MapData,
+  isMobile: boolean,
 };
 
 // tslint:disable:no-any
@@ -26,63 +28,78 @@ type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
  */
 class Header extends React.PureComponent<Props> {
   render() {
-    const { actions: acts } = this.props;
+    const { actions: acts, isMobile } = this.props;
 
-    return (
-      <div className="sense-header">
-        <Menu inverted>
-          <Menu.Item
-            id="sense-header__home-btn"
-            as={Link}
-            to={R.index}
-          >
-            <img src={logo} />
-          </Menu.Item>
-          <Menu.Item
-            id="sense-header__about-btn"
-            as="a"
-            href="https://about.sense.tw/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            About
-          </Menu.Item>
-          <Menu.Item
-            id="sense-header__dashboard-btn"
-            as={Link}
-            to={R.mapList}
-          >
-            Dashboard
-          </Menu.Item>
-          <Menu.Menu position="right">
+    return isMobile
+      ? (
+        <div className="sense-header mobile">
+          <Menu inverted>
             <Menu.Item
-              id="sense-header__help-btn"
+              id="sense-header__home-btn"
+              as={Link}
+              to={R.index}
+            >
+              <img src={logo} />
+            </Menu.Item>
+          </Menu>
+        </div>
+      )
+      : (
+        <div className="sense-header">
+          <Menu inverted>
+            <Menu.Item
+              id="sense-header__home-btn"
+              as={Link}
+              to={R.index}
+            >
+              <img src={logo} />
+            </Menu.Item>
+            <Menu.Item
+              id="sense-header__about-btn"
               as="a"
-              href="https://help.sense.tw/"
+              href="https://about.sense.tw/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Icon name="question circle outline" size="large" />
+              About
             </Menu.Item>
-            <AccountMenuItem />
-          </Menu.Menu>
-        </Menu>
-        <div className="sense-header__submenu">
-          <Breadcrumb />
-          <Submenu
-            map={this.props.map}
-            onEditMap={(m: SM.MapData) => acts.senseMap.toggleEditor(true)}
-          />
+            <Menu.Item
+              id="sense-header__dashboard-btn"
+              as={Link}
+              to={R.mapList}
+            >
+              Dashboard
+            </Menu.Item>
+            <Menu.Menu position="right">
+              <Menu.Item
+                id="sense-header__help-btn"
+                as="a"
+                href="https://help.sense.tw/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icon name="question circle outline" size="large" />
+              </Menu.Item>
+              <AccountMenuItem />
+            </Menu.Menu>
+          </Menu>
+          <div className="sense-header__submenu">
+            <Breadcrumb />
+            <Submenu
+              map={this.props.map}
+              onEditMap={(m: SM.MapData) => acts.senseMap.toggleEditor(true)}
+            />
+          </div>
         </div>
-      </div>
     );
   }
 }
 
 export default withRouter(connect<StateFromProps, ActionProps>(
   (state: State) => {
-    const { senseMap, senseObject } = state;
-    return { map: CS.getMap(senseObject, senseMap.map) };
+    const { senseMap, senseObject, viewport } = state;
+    const isMobile = V.isMobile(viewport);
+    return { map: CS.getMap(senseObject, senseMap.map), isMobile };
   },
   mapDispatch({actions})
 )(Header));
