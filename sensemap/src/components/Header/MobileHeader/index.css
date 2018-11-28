@@ -1,0 +1,26 @@
+.sense-header.mobile .ui.menu > .item:before,
+.sense-header.mobile .ui.menu > .right.menu > .item:before {
+  width: 0;
+}
+
+.sense-header.mobile .ui.breadcrumb {
+  text-transform: uppercase;
+  font-size: 1.142857rem;
+  line-height: 43px;
+  margin-left: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sense-header.mobile .ui.breadcrumb > .section {
+  color: #3ad8fa;
+}
+
+.sense-header.mobile .ui.breadcrumb > .divider {
+  color: #fff;
+}
+
+.sense-header.mobile .ui.breadcrumb > .section.active {
+  color: #fff;
+}
