@@ -242,7 +242,13 @@ export const reducer = (state: State = initial, action: Action): State => {
       return { ...state, width, height };
     }
     case RESET_VIEWPORT: {
-      return initial;
+      return {
+        ...state,
+        top: initial.top,
+        left: initial.left,
+        level: initial.level,
+        prevViewport: initial.prevViewport,
+      };
     }
     case SAVE_VIEWPORT: {
       return viewport({ ...state, prevViewport: state });
