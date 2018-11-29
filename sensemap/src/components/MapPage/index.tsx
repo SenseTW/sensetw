@@ -2,14 +2,11 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { Sidebar, Segment } from 'semantic-ui-react';
-import ResizeDetector from 'react-resize-detector';
 import Viewport from '../../containers/Viewport';
 import Map from '../../containers/Map';
 import Toolbar from '../Toolbar';
 import Inspector from '../Inspector';
 import Inbox from '../../containers/Inbox';
-import { height as desktopHeaderHeight } from '../Header/DesktopHeader';
-import { height as mobileHeaderHeight } from '../Header/MobileHeader';
 import SidebarToggler from '../SidebarToggler';
 import {
   MapID,
@@ -55,23 +52,6 @@ interface StateFromProps {
 type Props = StateFromProps & ActionProps;
 
 class MapPage extends React.Component<Props> {
-  handleResize = (width: number, height: number) => {
-    const { actions: acts } = this.props;
-    const isMobile = V.isMobile({ width });
-    const headerHeight = isMobile ? mobileHeaderHeight : desktopHeaderHeight;
-    acts.viewport.resizeViewport({ width, height: height - headerHeight });
-
-    if (width <= 640) {
-      acts.viewport.setBaseLevel(0.5);
-    } else if (width <= 800) {
-      acts.viewport.setBaseLevel(0.6);
-    } else if (width <= 1024) {
-      acts.viewport.setBaseLevel(0.7);
-    } else {
-      acts.viewport.setBaseLevel(1.0);
-    }
-  }
-
   handleKeyUp = (e: KeyboardEvent) => {
     const { actions: acts } = this.props;
     acts.input.keyRelease(e.which);
@@ -280,7 +260,6 @@ class MapPage extends React.Component<Props> {
             {boxInspector || cardInspector || edgeInpsector || emptyInspector}
           </Sidebar>
           <Sidebar.Pusher>
-            <ResizeDetector handleWidth handleHeight resizableElementId="root" onResize={this.handleResize} />
             <Viewport>
               {(props) => <Map id={mid} {...props} />}
             </Viewport>

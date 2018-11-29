@@ -4,6 +4,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import ResizeDetector from '../ResizeDetector';
 import GoogleTagManager from '../GoogleTagManager';
 import RouteToState from './RouteToState';
 import Header from '../Header';
@@ -41,6 +42,7 @@ export class App extends React.Component<Props> {
       <Router basename={process.env.PUBLIC_URL}>
       { this.props.checked &&
           <div className="App">
+            <ResizeDetector />
             <Route render={(props) => <GoogleTagManager gtmId={process.env.REACT_APP_GTM_ID} />} />
             <RouteToState />
             <Header />
