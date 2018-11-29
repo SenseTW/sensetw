@@ -18,8 +18,7 @@ type StateFromProps = {
   map: SM.MapData,
 };
 
-// tslint:disable:no-any
-type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
+type Props = StateFromProps & ActionProps & RouteComponentProps<{}>;
 
 class DesktopHeader extends React.PureComponent<Props> {
   render() {

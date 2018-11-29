@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
+import { RouteComponentProps, Link } from 'react-router-dom';
 import { Menu } from 'semantic-ui-react';
 import Breadcrumb from '../Breadcrumb';
 import AccountMenuItem from './AccountMenuItem';
@@ -9,7 +10,7 @@ const logo = require('../logo.png');
 
 export const height = 43;
 
-class MobileHeader extends React.PureComponent {
+class MobileHeader extends React.PureComponent<RouteComponentProps<{}>> {
   render() {
     return (
       <div className="sense-header mobile">
@@ -31,4 +32,4 @@ class MobileHeader extends React.PureComponent {
   }
 }
 
-export default MobileHeader;
+export default withRouter(MobileHeader);

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router-dom';
 import { connect } from 'react-redux';
 import DesktopHeader from './DesktopHeader';
 import MobileHeader from './MobileHeader';
@@ -11,7 +13,7 @@ type StateFromProps = {
 };
 
 // tslint:disable:no-any
-type Props = StateFromProps & ActionProps;
+type Props = StateFromProps & ActionProps & RouteComponentProps<{}>;
 
 /**
  * The header contains a main menu with a submenu.
@@ -24,11 +26,11 @@ class Header extends React.PureComponent<Props> {
   }
 }
 
-export default connect<StateFromProps, ActionProps>(
+export default withRouter(connect<StateFromProps, ActionProps>(
   (state: State) => {
     const { viewport } = state;
     const isMobile = V.isMobile(viewport);
     return { isMobile };
   },
   mapDispatch({actions})
-)(Header);
+)(Header));

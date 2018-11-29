@@ -10,8 +10,7 @@ import { MapScope } from '../../../types/sense-map';
 import * as CS from '../../../types/cached-storage';
 import * as R from '../../../types/routes';
 
-// tslint:disable-next-line:no-any
-type MyRouteProps = RouteComponentProps<any>;
+type MyRouteProps = RouteComponentProps<{}>;
 
 interface StateFromProps {
   senseObject: CS.CachedStorage;
@@ -74,7 +73,7 @@ class MapBoxSections extends React.PureComponent<Props & { map: T.MapData, box: 
   }
 }
 
-class Breadcrumb extends React.PureComponent<Props> {
+class Breadcrumb extends React.PureComponent<Props & MyRouteProps> {
   render() {
     const { senseObject } = this.props;
     const getMap = (mid: T.MapID): T.MapData => {
@@ -113,11 +112,11 @@ class Breadcrumb extends React.PureComponent<Props> {
             )}
           </Route>
           <Route exact path={R.map}>
-            {({ match: { params: { mid }} }) =>
+            {({ match: { params: { mid } } }) =>
                 <MapSections {...this.props} map={getMap(mid)} />}
           </Route>
           <Route path={R.submap}>
-            {({ match: { params: { mid, bid }} }) =>
+            {({ match: { params: { mid, bid } } }) =>
                 <MapBoxSections {...this.props} map={getMap(mid)} box={getBox(bid)} />}
           </Route>
         </Switch>
