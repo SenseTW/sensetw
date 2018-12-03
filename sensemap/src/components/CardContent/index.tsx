@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Header, Form, TextArea, Input } from 'semantic-ui-react';
+import { Header, Form, TextArea, Input, Button } from 'semantic-ui-react';
 import CardTypeSelector from './CardTypeSelector';
 import Accordion from './Accordion';
 import { SUMMARY_LIMIT } from '../Inspector';
@@ -8,6 +8,7 @@ import { isURL, isLength } from 'validator';
 import * as moment from 'moment';
 import * as U from '../../types/utils';
 import { placeholders } from './placeholders';
+import * as copy from 'copy-to-clipboard';
 import './index.css';
 
 interface Props {
@@ -17,13 +18,28 @@ interface Props {
   onChange? (action: C.Action): void;
 }
 
-class CardContent extends React.PureComponent<Props> {
+interface State {
+  copied: boolean;
+}
+
+class CardContent extends React.PureComponent<Props, State> {
   static defaultProps = {
     data: C.emptyCardData,
   };
 
+  state = {
+    copied: false,
+  };
+
+  handleShare = () => {
+    copy(location.toString());
+    this.setState({ copied: true });
+    setTimeout(() => this.setState({ copied: false }), U.POPUP_DELAY);
+  }
+
   render() {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
+    const { copied } = this.state;
     const { title, summary, quote, description, tags, url, saidBy, stakeholder, cardType, updatedAt } = data;
     const isAnnotation = quote.length !== 0;
     const isURLValid = isURL(url, { require_protocol: true });
@@ -67,6 +83,27 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateTags(e.currentTarget.value))}
           />
         </Form.Field>
+        {
+          isAnnotation
+            ? <Form.Field className="card-content__quote">
+                <label>Quote</label>
+                <TextArea
+                  id="sense-card-inspector__quote-input"
+                  disabled
+                  value={quote}
+                />
+              </Form.Field>
+            : <Form.Field className="card-content__description">
+                <label>Description</label>
+                <TextArea
+                  id="sense-card-inspector__description-input"
+                  disabled={disabled}
+                  placeholder={placeholders[cardType].description}
+                  value={description}
+                  onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
+                />
+              </Form.Field>
+        }
         <Form.Field className="card-content__url">
           <label>Source Link</label>
           <Input
@@ -96,27 +133,15 @@ class CardContent extends React.PureComponent<Props> {
             onChange={e => onChange && onChange(C.updateUrl(e.currentTarget.value))}
           />
         </Form.Field>
-        {
-          isAnnotation
-            ? <Form.Field className="card-content__quote">
-                <label>Quote</label>
-                <TextArea
-                  id="sense-card-inspector__quote-input"
-                  disabled
-                  value={quote}
-                />
-              </Form.Field>
-            : <Form.Field className="card-content__description">
-                <label>Description</label>
-                <TextArea
-                  id="sense-card-inspector__description-input"
-                  disabled={disabled}
-                  placeholder={placeholders[cardType].description}
-                  value={description}
-                  onChange={e => onChange && onChange(C.updateDescription(e.currentTarget.value))}
-                />
-              </Form.Field>
-        }
+        <Form.Field className="card-content__share">
+          <label>Share Card</label>
+          <Button basic fluid active={copied} onClick={this.handleShare}>
+          { copied
+            ? 'Card URL Copied!'
+            : 'Copy Card URL'
+          }
+          </Button>
+        </Form.Field>
         <Accordion id="sense-card-inspector__accordion" title="Advanced">
           <Form.Field className="card-content__title">
             <label>Source Title</label>

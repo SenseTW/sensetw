@@ -9,8 +9,6 @@ import * as U from '../../../types/utils';
 import * as moment from 'moment';
 import './index.css';
 
-const POPUP_DELAY = 500;
-
 interface Props {
   disabled?: boolean;
   id?: string;
@@ -39,7 +37,7 @@ class MapCard extends React.Component<Props, State> {
 
   handleShare = () => {
     this.setState({ copied: true });
-    setTimeout(() => this.setState({ copied: false }), POPUP_DELAY);
+    setTimeout(() => this.setState({ copied: false }), U.POPUP_DELAY);
   }
 
   render() {
