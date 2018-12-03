@@ -13,6 +13,8 @@ export const MAP_DETAILED_TIME_FORMAT = 'YYYY.MM.DD HH:mm';
 
 export const SQRT3 = 1.73205;
 
+export const POPUP_DELAY = 500;
+
 /**
  * Cryptographically unsafe ID generator.  Only used for experimenting.
  */

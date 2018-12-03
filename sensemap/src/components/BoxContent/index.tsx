@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Header, Form, TextArea, Input } from 'semantic-ui-react';
+import { Header, Form, TextArea, Input, Button } from 'semantic-ui-react';
 import BoxTypeSelector from './BoxTypeSelector';
 import { SUMMARY_LIMIT } from '../Inspector';
 import * as B from '../../types/sense/box';
@@ -7,6 +7,7 @@ import * as U from '../../types/utils';
 import { isLength } from 'validator';
 import * as moment from 'moment';
 import { placeholders } from './placeholders';
+import * as copy from 'copy-to-clipboard';
 import './index.css';
 
 interface Props {
@@ -16,13 +17,28 @@ interface Props {
   onChange? (action: B.Action): void;
 }
 
-class BoxContent extends React.PureComponent<Props> {
+interface State {
+  copied: boolean;
+}
+
+class BoxContent extends React.PureComponent<Props, State> {
   static defaultProps = {
     data: B.emptyBoxData,
   };
 
+  state = {
+    copied: false,
+  };
+
+  handleShare = () => {
+    copy(location.toString());
+    this.setState({ copied: true });
+    setTimeout(() => this.setState({ copied: false }), U.POPUP_DELAY);
+  }
+
   render() {
     const { children, disabled = false, data, onKeyUp, onChange } = this.props;
+    const { copied } = this.state;
     const { title, summary, tags, boxType, updatedAt } = data;
     const isSummaryValid = isLength(summary, { max: SUMMARY_LIMIT });
     const updateTime = moment(updatedAt).format(U.TIME_FORMAT);
@@ -74,6 +90,15 @@ class BoxContent extends React.PureComponent<Props> {
             onKeyUp={onKeyUp}
             onChange={e => onChange && onChange(B.updateTags(e.currentTarget.value))}
           />
+        </Form.Field>
+        <Form.Field className="box-content__share">
+          <label>Share Box</label>
+          <Button basic fluid active={copied} onClick={this.handleShare}>
+          { copied
+            ? 'Box URL Copied!'
+            : 'Copy Box URL'
+          }
+          </Button>
         </Form.Field>
         {children}
       </Form>

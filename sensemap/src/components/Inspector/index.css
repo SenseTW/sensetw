@@ -48,6 +48,19 @@
   height: 38px; /* 75px * 0.5 */
 }
 
+.inspector > .inspector__content > .ui.form > .box-content__share > .ui.basic.button,
+.inspector > .inspector__content > .ui.form > .card-content__share > .ui.basic.button {
+  background-color: transparent !important;
+  color: #50e3c2 !important;
+  box-shadow: 0 0 0 1px #50e3c2 inset;
+}
+
+.inspector > .inspector__content > .ui.form > .box-content__share > .ui.active.basic.button,
+.inspector > .inspector__content > .ui.form > .card-content__share > .ui.active.basic.button {
+  background-color: #50e3c2 !important;
+  color: #f5f5f5 !important;
+}
+
 @media screen and (min-width: 641px) {
   .inspector .ui.form textarea {
     height: 38px;
