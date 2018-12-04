@@ -16,23 +16,43 @@ type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
 
 class AccountMenuItem extends React.PureComponent<Props> {
   render() {
+    const { actions: acts, map } = this.props;
+
     return (
       <Dropdown
         item
         icon="ellipsis horizontal"
       >
         <Dropdown.Menu>
-        {
-          this.props.authenticated
-            ? this._renderMenu()
-            : this._renderLoginMenu()
-        }
+          <Dropdown.Item
+            id="sense-mobile-menu__map-detail-btn"
+            disabled={SM.isEmpty(map)}
+            onClick={e => acts.senseMap.toggleEditor(true)}
+          >
+            Map Detail
+          </Dropdown.Item>
+          <Dropdown.Item disabled>
+            Share Map
+          </Dropdown.Item>
+          <Dropdown.Item
+            as="a"
+            href="https://help.sense.tw/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Help
+          </Dropdown.Item>
+          {
+            this.props.authenticated
+              ? this._renderLogoutItem()
+              : this._renderLoginItem()
+          }
         </Dropdown.Menu>
       </Dropdown>
     );
   }
 
-  _renderLoginMenu() {
+  _renderLoginItem() {
     const { actions: acts } = this.props;
 
     return (
@@ -42,33 +62,13 @@ class AccountMenuItem extends React.PureComponent<Props> {
     );
   }
 
-  _renderMenu() {
-    const { actions: acts, map } = this.props;
+  _renderLogoutItem() {
+    const { actions: acts } = this.props;
 
     return (
-      <>
-        <Dropdown.Item
-          id="sense-mobile-menu__map-detail-btn"
-          disabled={SM.isEmpty(map)}
-          onClick={e => acts.senseMap.toggleEditor(true)}
-        >
-          Map Detail
-        </Dropdown.Item>
-        <Dropdown.Item disabled>
-          Share Map
-        </Dropdown.Item>
-        <Dropdown.Item
-          as="a"
-          href="https://help.sense.tw/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Help
-        </Dropdown.Item>
-        <Dropdown.Item onClick={e => acts.account.logoutRequest()}>
-          Logout
-        </Dropdown.Item>
-      </>
+      <Dropdown.Item onClick={e => acts.account.logoutRequest()}>
+        Logout
+      </Dropdown.Item>
     );
   }
 }
