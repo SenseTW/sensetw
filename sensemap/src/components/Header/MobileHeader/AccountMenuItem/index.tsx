@@ -2,7 +2,9 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import { Dropdown } from 'semantic-ui-react';
+import * as copy from 'copy-to-clipboard';
 import { State, ActionProps, mapDispatch, actions } from '../../../../types';
+import * as R from '../../../../types/routes';
 import * as SM from '../../../../types/sense/map';
 import * as CS from '../../../../types/cached-storage';
 
@@ -11,12 +13,12 @@ interface StateFromProps {
   map: SM.MapData;
 }
 
-// tslint:disable:no-any
-type Props = StateFromProps & ActionProps & RouteComponentProps<any>;
+type Props = StateFromProps & ActionProps & RouteComponentProps<{}>;
 
 class AccountMenuItem extends React.PureComponent<Props> {
   render() {
     const { actions: acts, map } = this.props;
+    const inMap = !SM.isEmpty(map);
 
     return (
       <Dropdown
@@ -24,17 +26,26 @@ class AccountMenuItem extends React.PureComponent<Props> {
         icon="ellipsis horizontal"
       >
         <Dropdown.Menu>
+          { inMap &&
+            <Dropdown.Item
+              id="sense-mobile-menu__map-detail-btn"
+              disabled={SM.isEmpty(map)}
+              onClick={e => acts.senseMap.toggleEditor(true)}
+            >
+              Map Detail
+            </Dropdown.Item>
+          }
+          { inMap &&
+            <Dropdown.Item
+              id="sense-mobile-menu__map-share-btn"
+              disabled={SM.isEmpty(map)}
+              onClick={this._handleShare}
+            >
+              Share Map
+            </Dropdown.Item>
+          }
           <Dropdown.Item
-            id="sense-mobile-menu__map-detail-btn"
-            disabled={SM.isEmpty(map)}
-            onClick={e => acts.senseMap.toggleEditor(true)}
-          >
-            Map Detail
-          </Dropdown.Item>
-          <Dropdown.Item disabled>
-            Share Map
-          </Dropdown.Item>
-          <Dropdown.Item
+            id="sense-mobile-menu__map-help-btn"
             as="a"
             href="https://help.sense.tw/"
             target="_blank"
@@ -52,11 +63,22 @@ class AccountMenuItem extends React.PureComponent<Props> {
     );
   }
 
+  _handleShare = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    const { map } = this.props;
+    const mapUrl = R.toMapPath({ mid: map.id });
+    const fullUrl = location.protocol + '//' + location.hostname + ':' + location.port + mapUrl;
+    copy(fullUrl);
+  }
+
   _renderLoginItem() {
     const { actions: acts } = this.props;
 
     return (
-      <Dropdown.Item onClick={e => acts.account.loginRequest()}>
+      <Dropdown.Item
+        id="sense-mobile-menu__map-login-btn"
+        onClick={e => acts.account.loginRequest()}
+      >
         Login
       </Dropdown.Item>
     );
@@ -66,7 +88,10 @@ class AccountMenuItem extends React.PureComponent<Props> {
     const { actions: acts } = this.props;
 
     return (
-      <Dropdown.Item onClick={e => acts.account.logoutRequest()}>
+      <Dropdown.Item
+        id="sense-mobile-menu__map-logout-btn"
+        onClick={e => acts.account.logoutRequest()}
+      >
         Logout
       </Dropdown.Item>
     );
