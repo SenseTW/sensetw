@@ -8,6 +8,7 @@ import './index.css';
 
 interface StateFromProps {
   map: MapData;
+  authenticated: boolean;
   isNew: boolean;
   isDirty: boolean;
   isEditing: boolean;
@@ -25,7 +26,7 @@ class MapContent extends React.PureComponent<Props> {
   }
 
   render() {
-    const { actions: acts, map, isNew, isDirty, isEditing } = this.props;
+    const { actions: acts, map, authenticated, isNew, isDirty, isEditing } = this.props;
     const disabled = !(isNew && map && map.name) && !isDirty;
     const mode = isNew ? 'create-map' : 'map-details';
 
@@ -41,6 +42,7 @@ class MapContent extends React.PureComponent<Props> {
               <label>Map Name (required)</label>
               <Input
                 id={`sense-${mode}__map-name-input`}
+                disabled={!authenticated}
                 placeholder="my wonderful map"
                 value={map && map.name}
                 onChange={e => this.handleMapChange(SM.updateName(e.currentTarget.value))}
@@ -50,6 +52,7 @@ class MapContent extends React.PureComponent<Props> {
               <label>Map Description</label>
               <TextArea
                 id={`sense-${mode}__map-description-input`}
+                disabled={!authenticated}
                 placeholder="This is my wonderful map."
                 value={map && map.description}
                 onChange={e => this.handleMapChange(SM.updateDescription(e.currentTarget.value))}
@@ -59,6 +62,7 @@ class MapContent extends React.PureComponent<Props> {
               <label>Tag</label>
               <Input
                 id={`sense-${mode}__map-tags-input`}
+                disabled={!authenticated}
                 placeholder="Tag, tag"
                 value={map && map.tags}
                 onChange={e => this.handleMapChange(SM.updateTags(e.currentTarget.value))}
@@ -68,6 +72,7 @@ class MapContent extends React.PureComponent<Props> {
               <label>Access Type</label>
               <Radio
                 id={`sense-${mode}__map-type-public`}
+                disabled={!authenticated}
                 label="Public"
                 name="mapType"
                 value={SM.MapType.PUBLIC}
@@ -127,13 +132,13 @@ class MapContent extends React.PureComponent<Props> {
 
 export default connect<StateFromProps, ActionProps>(
   (state: State) => {
-    const { senseObject } = state;
+    const { senseObject, session: { authenticated } } = state;
     const { map: mid, isEditing } = state.senseMap;
     const map = CS.getMap(senseObject, mid);
     const isNew = CS.isMapNew(senseObject, mid);
     const isDirty = CS.isMapDirty(senseObject, mid);
 
-    return { map, isNew, isDirty, isEditing };
+    return { map, authenticated, isNew, isDirty, isEditing };
   },
   mapDispatch({ actions })
 )(MapContent);
