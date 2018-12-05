@@ -205,7 +205,10 @@ const server = http.createServer((req, res) => {
         .catch(error => console.error(error));
     case RequestType.SITEMAP:
       return requestAllMaps()
-        .then(maps => res.end(toSitemap(maps)))
+        .then(maps => {
+          res.setHeader('Content-Type', 'application/xml');
+          res.end(toSitemap(maps));
+        })
         .catch(error => console.error(error));
     case RequestType.INDEX:
     default:
