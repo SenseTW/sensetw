@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: sensemap-${BRANCH_NAME}
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
