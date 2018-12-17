@@ -38,12 +38,12 @@ export const typeToString = (type: CardType) => {
     case CardType.INFO:
       return type as string;
     default:
-      return 'UNKNOWN';
+      return 'UNKNOWN' as never;
   }
 };
 
 export const stringToType: (name: string) => CardType =
-  name => CardType[name];
+  name => CardType[name] || CardType.INFO;
 
 /**
  * It describes a card.
@@ -219,6 +219,17 @@ export const updateUrl =
     type: UPDATE_CARD_URL as typeof UPDATE_CARD_URL,
     payload: { url }
   });
+
+export const types = {
+  UPDATE_CARD_TYPE,
+  UPDATE_CARD_TITLE,
+  UPDATE_CARD_SUMMARY,
+  UPDATE_CARD_DESCRIPTION,
+  UPDATE_CARD_TAGS,
+  UPDATE_CARD_SAID_BY,
+  UPDATE_CARD_STAKEHOLDER,
+  UPDATE_CARD_URL,
+};
 
 /**
  * The data constructors of card actions.
