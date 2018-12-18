@@ -76,6 +76,13 @@ export const edgeSummary =
     payload: { summary },
   });
 
+export const types = {
+  EDGE_TYPE,
+  EDGE_TITLE,
+  EDGE_TAGS,
+  EDGE_SUMMARY,
+};
+
 export const actions = {
   edgeFrom,
   edgeTo,
