@@ -133,6 +133,11 @@ export const updateObjectType =
     payload: { objectType },
   });
 
+export const types = {
+  UPDATE_POSITION,
+  UPDATE_DIMENSION,
+};
+
 /**
  * The data constructors of object actions.
  */
