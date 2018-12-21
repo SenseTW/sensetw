@@ -86,6 +86,14 @@ export const updateImage =
     payload: { image },
   });
 
+export const types = {
+  UPDATE_MAP_TYPE,
+  UPDATE_MAP_NAME,
+  UPDATE_MAP_DESCRIPTION,
+  UPDATE_MAP_TAGS,
+  UPDATE_MAP_IMAGE,
+};
+
 export const actions = {
   updateType,
   updateName,
