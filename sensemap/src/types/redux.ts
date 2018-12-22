@@ -1,5 +1,5 @@
 import { Dispatch as ReduxDispatch, Reducer as ReduxReducer, combineReducers } from 'redux';
-import { emptyAction } from './action';
+import { EmptyAction } from './action';
 import * as SS from './session';
 import * as A  from './account';
 import * as SM from './sense-map';
@@ -52,7 +52,7 @@ export const initial = {
 };
 
 export type Action
-  = typeof emptyAction
+  = EmptyAction
   | SM.Action
   | A.Action
   | CS.Action
