@@ -1,4 +1,4 @@
-import { UserData } from '../sense/user';
+import { UserData, anonymousUserData } from '../sense/user';
 import { client } from './client';
 import * as SN from '../session';
 
@@ -13,8 +13,8 @@ export interface GraphQLUserFields {
   username: string;
 }
 
-export const toUserData: (u: GraphQLUserFields) => UserData =
-  u => u;
+export const toUserData: (u?: GraphQLUserFields | null) => UserData =
+  u => u || anonymousUserData;
 
 export const updatePassword =
   (user: SN.User, password: string) => {

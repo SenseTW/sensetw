@@ -6,7 +6,6 @@ import { client } from './client';
 import * as U from './user';
 import * as SN from '../session';
 import * as moment from 'moment';
-import { anonymousUserData } from '../sense/user';
 
 const graphQLBoxFieldsFragment = `
   fragment boxFields on Box {
@@ -14,7 +13,7 @@ const graphQLBoxFieldsFragment = `
     objects { id }, contains { id }, map { id }, owner { id, email, username }
   }`;
 
-interface GraphQLBoxFields {
+export interface GraphQLBoxFields {
   id:        string;
   createdAt: string;
   updatedAt: string;
@@ -25,7 +24,7 @@ interface GraphQLBoxFields {
   objects:   H.HasID<ObjectID>[];
   contains:  H.HasID<ObjectID>[];
   map?:      H.HasID<MapID>;
-  owner:     U.GraphQLUserFields;
+  owner:     U.GraphQLUserFields | null;
 }
 
 const toBoxData: (b: GraphQLBoxFields) => BoxData =
@@ -39,7 +38,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     boxType:   (b.boxType || 'INFO') as BoxType,
     objects:   H.toIDMap(b.objects),
     contains:  H.toIDMap(b.contains),
-    owner:     U.toUserData(b.owner) || anonymousUserData,
+    owner:     U.toUserData(b.owner),
   });
 
 export const loadBoxes =
