@@ -2,6 +2,14 @@ import * as Box from './box';
 
 describe('types', () => {
   describe('Box', () => {
+    describe('functions', () => {
+      describe('toBoxType', () => {
+        it('should parse a unknown string to the default box type: INFO', () => {
+          expect(Box.toBoxType('foobar')).toBe(Box.BoxType.INFO);
+        });
+      });
+    });
+
     describe('actions', () => {
       it('should create an action to update the box title', () => {
         const title = 'MEGALO BOX';

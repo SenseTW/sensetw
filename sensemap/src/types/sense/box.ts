@@ -16,6 +16,17 @@ export enum BoxType {
   INFO = 'INFO',
 }
 
+export const toBoxType = (str: string): BoxType => {
+  switch (str) {
+    case 'NOTE':       return BoxType.NOTE;
+    case 'PROBLEM':    return BoxType.PROBLEM;
+    case 'SOLUTION':   return BoxType.SOLUTION;
+    case 'DEFINITION': return BoxType.DEFINITION;
+    case 'INFO':       return BoxType.INFO;
+    default:           return BoxType.INFO;
+  }
+};
+
 /**
  * The default width of a box on the sense map.
  *

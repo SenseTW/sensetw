@@ -1,7 +1,7 @@
 import * as H from '../sense/has-id';
 import { ObjectID } from '../sense/object';
 import { MapID } from '../sense/map';
-import { BoxID, BoxData, BoxType } from '../sense/box';
+import { BoxID, BoxData, BoxType, toBoxType } from '../sense/box';
 import { client } from './client';
 import * as U from './user';
 import * as SN from '../session';
@@ -35,7 +35,7 @@ const toBoxData: (b: GraphQLBoxFields) => BoxData =
     title:     b.title,
     summary:   b.summary,
     tags:      b.tags || '',
-    boxType:   (b.boxType || 'INFO') as BoxType,
+    boxType:   toBoxType(b.boxType),
     objects:   H.toIDMap(b.objects),
     contains:  H.toIDMap(b.contains),
     owner:     U.toUserData(b.owner),
