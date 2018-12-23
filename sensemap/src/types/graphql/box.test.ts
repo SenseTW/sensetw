@@ -1,6 +1,6 @@
 import * as nock from 'nock';
 import { nockedAPI } from './client.test';
-import { GraphQLBoxFields, loadBoxes } from './box';
+import { GraphQLBoxFields, loadBoxes, loadBoxesById } from './box';
 import { BoxType, BoxData } from '../sense/box';
 import { anonymousUserData } from '../sense/user';
 import { anonymousUser } from '../session';
@@ -74,6 +74,17 @@ describe('GraphQL API', () => {
       it('should load boxes from the backend', async () => {
         nockedAPI.reply(200, { data: { allBoxes: [rawBox0, rawBox1] } });
         const boxes = await loadBoxes(anonymousUser, '94aa8a0d-7013-4fcb-b850-c1e29d7c1c76');
+        expect(boxes).toEqual([box0, box1]);
+      });
+    });
+
+    describe('loadBoxesById', () => {
+      it('should load boxes by their ids', async () => {
+        nockedAPI.reply(200, { data: { box_0: rawBox0, box_1: rawBox1 }});
+        const boxes = await loadBoxesById(
+          anonymousUser,
+          ['95d97aa6-bf02-4778-8bff-26c9ffe3d396', '2d5dc90a-210b-4892-8e7e-76abcf982ce8']
+        );
         expect(boxes).toEqual([box0, box1]);
       });
     });
