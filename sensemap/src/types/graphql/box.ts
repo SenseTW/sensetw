@@ -1,7 +1,7 @@
 import * as H from '../sense/has-id';
 import { ObjectID } from '../sense/object';
 import { MapID } from '../sense/map';
-import { BoxID, BoxData, BoxType, toBoxType } from '../sense/box';
+import { BoxID, BoxData, toBoxType } from '../sense/box';
 import { client } from './client';
 import * as U from './user';
 import * as SN from '../session';
