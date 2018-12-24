@@ -6,7 +6,6 @@ import * as U from './user';
 import { client } from './client';
 import * as SN from '../session';
 import * as moment from 'moment';
-import { anonymousUserData } from '../sense/user';
 
 export const graphQLCardFieldsFragment = `
   fragment cardFields on Card {
@@ -16,7 +15,7 @@ export const graphQLCardFieldsFragment = `
     objects { id }, map { id }, owner { id, email, username }
   }`;
 
-interface GraphQLCardFields {
+export interface GraphQLCardFields {
   id:          string;
   createdAt:   string;
   updatedAt:   string;
@@ -31,7 +30,7 @@ interface GraphQLCardFields {
   cardType:    string;
   objects:     H.HasID<ObjectID>[];
   map?:        H.HasID<MapID>;
-  owner:       U.GraphQLUserFields;
+  owner:       U.GraphQLUserFields | null;
 }
 
 const toCardData: (c: GraphQLCardFields) => CardData =
@@ -49,7 +48,7 @@ const toCardData: (c: GraphQLCardFields) => CardData =
     url:         c.url,
     cardType:    stringToCardType(c.cardType),
     objects:     H.toIDMap(c.objects),
-    owner:       U.toUserData(c.owner) || anonymousUserData,
+    owner:       U.toUserData(c.owner),
   });
 
 export const loadCards =

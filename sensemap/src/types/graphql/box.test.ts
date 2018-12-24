@@ -144,7 +144,7 @@ describe('GraphQL API', () => {
     });
 
     describe('loadBoxIds', () => {
-      it('should load boxes ids from a map', async () => {
+      it('should load box ids from a map', async () => {
         nockedAPI.reply(
           200,
           {
