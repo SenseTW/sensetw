@@ -5,7 +5,7 @@ describe('types', () => {
     describe('functions', () => {
       describe('toBoxType', () => {
         it('should parse a unknown string to the default box type: INFO', () => {
-          expect(Box.toBoxType('foobar')).toBe(Box.BoxType.INFO);
+          expect(Box.stringToType('foobar')).toBe(Box.BoxType.INFO);
         });
       });
     });
