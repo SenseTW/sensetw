@@ -1,5 +1,6 @@
 import { ActionUnion, emptyAction } from '../action';
 import { HasID } from './has-id';
+import { MapID } from './map';
 import { ObjectID, ObjectData } from './object';
 import { equals } from 'ramda';
 
@@ -14,6 +15,7 @@ export enum EdgeType {
 
 export interface Edge extends HasID<EdgeID> {
   id:        EdgeID;
+  map:       MapID;
   from:      ObjectID;
   to:        ObjectID;
   edgeType:  EdgeType;
@@ -24,6 +26,7 @@ export interface Edge extends HasID<EdgeID> {
 
 export const emptyEdge = {
   id:       '0',
+  map:      '0',
   from:     '0',
   to:       '0',
   edgeType: EdgeType.NONE,

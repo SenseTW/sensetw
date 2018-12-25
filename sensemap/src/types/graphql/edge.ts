@@ -10,7 +10,7 @@ const graphQLEdgeFieldsFragment = `
     id, map { id }, from { id }, to { id }, edgeType, title, tags, summary
   }`;
 
-interface GraphQLEdgeFields {
+export interface GraphQLEdgeFields {
   id:       EdgeID;
   map:      HasID<MapID>;
   from:     HasID<ObjectID>;
@@ -27,7 +27,7 @@ const toEdge: (e: GraphQLEdgeFields) => Edge =
     map:      e.map.id,
     from:     e.from.id,
     to:       e.to.id,
-    edgeType: e.edgeType as EdgeType || EdgeType.NONE,
+    edgeType: EdgeType[e.edgeType] || EdgeType.NONE,
     title:    e.title || '',
     tags:     e.tags || '',
     summary:  e.summary || '',
@@ -137,10 +137,11 @@ export const remove =
     const query = `
       mutation DeleteEdge($edge: ID!) {
         deleteEdge(id: $edge) {
-          id
+          ...edgeFields
         }
       }
     `;
     const variables = { edge };
-    return client(user).request(query, variables);
+    return client(user).request(query, variables)
+      .then(({ deleteEdge }) => toEdge(deleteEdge));
   };
