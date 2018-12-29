@@ -106,7 +106,7 @@ describe('GraphQL API', () => {
     describe('update', () => {
       it('should update an edge', async () => {
         nockedAPI.reply(200, { data: { updateEdge: rawEdge0 } });
-        const edge = await update(edge0);
+        const edge = await update(anonymousUser, edge0);
         expect(edge).toEqual(edge0);
       });
     });

@@ -100,7 +100,7 @@ export const create =
   };
 
 export const update =
-  (edge: Edge) => {
+  (user: SN.User, edge: Edge) => {
     const query = `
       mutation UpdateEdge(
         $id: ID!,
@@ -128,7 +128,7 @@ export const update =
       ${graphQLEdgeFieldsFragment}
     `;
     const variables = edge;
-    return client().request(query, variables)
+    return client(user).request(query, variables)
       .then(({ updateEdge }) => toEdge(updateEdge));
   };
 

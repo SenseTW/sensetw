@@ -560,8 +560,9 @@ const updateEdge =
 
 const saveEdge =
   (edge: Edge) =>
-  (dispatch: Dispatch) => {
-    return GE.update(edge)
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GE.update(user, edge)
       .then((newEdge) => {
         const edgeMap = H.toIDMap<EdgeID, Edge>([newEdge]);
         // update the box
