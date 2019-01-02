@@ -230,6 +230,7 @@ export const remove =
       .then(({ deleteObject }) => {
         // patch the object type, because Graphcool will not sync it with the
         // box/card field for us
+        // TODO: do we still need this?
         deleteObject.objectType = 'NONE';
         return toObjectData(deleteObject, true);
       });
