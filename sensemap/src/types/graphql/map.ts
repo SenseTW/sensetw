@@ -1,5 +1,4 @@
 import { MapID, MapType, MapData } from '../sense/map';
-import { anonymousUserData } from '../sense/user';
 import { graphQLUserFieldsFragment, GraphQLUserFields, toUserData } from './user';
 import { client } from './client';
 import * as SN from '../session';
@@ -11,7 +10,7 @@ const graphQLMapFieldsFragment = `
     owner { ...userFields }
   }`;
 
-interface GraphQLMapFields {
+export interface GraphQLMapFields {
   id:          string;
   type:        string;
   createdAt:   string;
@@ -20,7 +19,7 @@ interface GraphQLMapFields {
   description: string;
   tags:        string;
   image:       string;
-  owner:       GraphQLUserFields;
+  owner:       GraphQLUserFields | null;
 }
 
 const toMapData: (m: GraphQLMapFields) => MapData =
@@ -33,7 +32,7 @@ const toMapData: (m: GraphQLMapFields) => MapData =
     description: m.description || '',
     tags:        m.tags || '',
     image:       m.image || '',
-    owner:       !!m.owner ? toUserData(m.owner) : anonymousUserData,
+    owner:       toUserData(m.owner),
   });
 
 export const loadMaps =
