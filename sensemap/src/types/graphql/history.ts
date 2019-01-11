@@ -8,13 +8,14 @@ import { ChangeType, HistoryID, HistoryType } from '../sense/history';
 
 interface GraphQLChangeFields {
   changeType: ChangeType;
-  field: string;
-  before: string;
-  after: string;
-  from: HasID<ObjectID>;
-  to: HasID<ObjectID>;
-  box: HasID<BoxID>;
-  connectWith: HasID<ObjectID>;
+  field?: string;
+  before?: string;
+  after?: string;
+  from?: HasID<ObjectID>;
+  to?: HasID<ObjectID>;
+  object?: HasID<ObjectID>;
+  card?: HasID<CardID>;
+  box?: HasID<BoxID>;
 }
 
 export interface GraphQLHistoryFields {
@@ -24,8 +25,8 @@ export interface GraphQLHistoryFields {
   historyType: HistoryType;
   user: HasID<UserID>;
   map: HasID<MapID>;
-  object: HasID<ObjectID>;
-  card: HasID<CardID>;
+  object: HasID<ObjectID> | null;
+  card: HasID<CardID> | null;
   changes: GraphQLChangeFields[];
 }
 

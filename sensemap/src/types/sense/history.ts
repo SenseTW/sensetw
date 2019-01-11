@@ -41,21 +41,26 @@ type DeleteMapChange = {
 
 type CreateObjectChange = {
   changeType: ChangeType.CREATE_OBJECT,
+  object: ObjectID,
+  card: CardID,
 };
 
 type UpdateObjectChange = {
   changeType: ChangeType.UPDATE_OBJECT,
+  object: ObjectID,
+  card: CardID,
 };
 
 type DeleteObjectChange = {
   changeType: ChangeType.DELETE_OBJECT,
+  object: ObjectID,
+  card: CardID,
 };
 
 type CreateEdgeChange = {
   changeType: ChangeType.CREATE_EDGE,
-  connectWith?: ObjectID,
-  from?: ObjectID,
-  to?: ObjectID,
+  from: ObjectID,
+  to: ObjectID,
 };
 
 type UpdateEdgeChange = {
@@ -64,29 +69,32 @@ type UpdateEdgeChange = {
 
 type DeleteEdgeChange = {
   changeType: ChangeType.DELETE_EDGE,
-  connectWith?: ObjectID,
-  from?: ObjectID,
-  to?: ObjectID,
+  from: ObjectID,
+  to: ObjectID,
 };
 
 type CreateCardChange = {
   changeType: ChangeType.CREATE_CARD,
+  card: CardID,
 };
 
 type UpdateCardSummaryChange = {
   changeType: ChangeType.UPDATE_CARD_SUMMARY,
+  card: CardID,
   before: string,
   after: string,
 };
 
 type UpdateCardTypeChange = {
   changeType: ChangeType.UPDATE_CARD_TYPE,
+  card: CardID,
   before: CardType,
   after: CardType,
 };
 
 type UpdateCardChange = {
   changeType: ChangeType.UPDATE_CARD,
+  card: CardID,
   field: string,
   before: string,
   after: string,
@@ -94,15 +102,18 @@ type UpdateCardChange = {
 
 type DeleteCardChange = {
   changeType: ChangeType.DELETE_CARD,
+  card: CardID,
 };
 
 type AddObjectToBoxChange = {
   changeType: ChangeType.ADD_OBJECT_TO_BOX,
+  object: ObjectID,
   box: BoxID,
 };
 
 type RemoveObjectFromBoxChange = {
   changeType: ChangeType.REMOVE_OBJECT_FROM_BOX,
+  object: ObjectID,
   box: BoxID,
 };
 
@@ -129,8 +140,8 @@ export type HistoryID = string;
 
 export enum HistoryType {
   MAP = 'MAP',
-  OBJECT = 'OBJECT',
   CARD = 'CARD',
+  OBJECT = 'OBJECT',
 }
 
 type BaseHistory = {
@@ -147,8 +158,6 @@ type MapHistory = BaseHistory & {
   historyType: HistoryType.MAP,
   user: UserID,
   map: MapID,
-  object?: ObjectID,
-  card?: CardID,
 };
 
 type ObjectHistory = BaseHistory & {
@@ -162,7 +171,6 @@ type CardHistory = BaseHistory & {
   historyType: HistoryType.CARD,
   user: UserID,
   map: MapID,
-  object: ObjectID,
   card: CardID,
 };
 
