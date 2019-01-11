@@ -149,6 +149,7 @@ type BaseHistory = {
   id: HistoryID,
   createdAt: TimeStamp,
   updatedAt: TimeStamp,
+  user: UserID,
   changes: Change[],
 };
 
@@ -156,20 +157,17 @@ type BaseHistory = {
 // So the object field and the card field are optional.
 type MapHistory = BaseHistory & {
   historyType: HistoryType.MAP,
-  user: UserID,
   map: MapID,
 };
 
 type ObjectHistory = BaseHistory & {
   historyType: HistoryType.OBJECT,
-  user: UserID,
   map: MapID,
   object: ObjectID,
 };
 
 type CardHistory = BaseHistory & {
   historyType: HistoryType.CARD,
-  user: UserID,
   map: MapID,
   card: CardID,
 };

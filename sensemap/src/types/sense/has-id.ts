@@ -15,6 +15,18 @@ export interface ObjectMap<T> {
 }
 
 /**
+ * idOrDefault returns the id or a default value of an object.
+ * @param {HasID<T>} o The object.
+ */
+export const idOrDefault: <T, U>(v: U, o?: HasID<T> | null) => T | U =
+  (v, o) => {
+    if (!o) {
+      return v;
+    }
+    return o.id;
+  };
+
+/**
  * idOrUndefined returns the id or undefined of an object.
  * @param {HasID<T>} o The object.
  */

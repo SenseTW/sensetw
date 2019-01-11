@@ -5,6 +5,7 @@ import * as GO from './graphql/object';
 import * as GC from './graphql/card';
 import * as GB from './graphql/box';
 import * as GE from './graphql/edge';
+import * as GH from './graphql/history';
 import * as H from './sense/has-id';
 import * as C from './sense/card';
 import { MapID, MapData } from './sense/map';
@@ -249,6 +250,13 @@ const loadEdgesById =
           ? CS.overwriteEdges(data, TargetType.PERMANENT)
           : CS.updateEdges(data, TargetType.PERMANENT)
       ));
+  };
+
+const loadHistories =
+  () =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GH.loadAll(user);
   };
 
 const diff = (before: string[], after: string[]) => {
@@ -601,6 +609,7 @@ export const actions = {
   loadBoxesById,
   loadEdges,
   loadEdgesById,
+  loadHistories,
   keepUpdating,
   createCard,
   createBoxObject,
