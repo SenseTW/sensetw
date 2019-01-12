@@ -196,21 +196,25 @@ const toHistory: (h: GraphQLHistoryFields) => History =
     }
   };
 
+export type HistoryFilter = {
+  map?: MapID,
+  object?: ObjectID,
+  card?: CardID,
+  historyType?: HistoryType,
+};
+
 export const loadAll =
-  (user: User, first: number = 10, skip: number = 0) => {
+  (user: User, filter: HistoryFilter = {}, first: number = 10, skip: number = 0) => {
     const query = `
-      query AllHistories($first: Int, $skip: Int) {
-        allHistories(
-          filter: {},
-          first: $first, skip: $skip
-        ) {
+      query AllHistories($filter: HistoryFilter, $first: Int, $skip: Int) {
+        allHistories(filter: $filter, first: $first, skip: $skip) {
           ...historyFields
         }
       }
       ${graphQLHistoryFieldsFragment}
       ${graphQLChangeFieldsFragment}
     `;
-    const variables = { first, skip };
+    const variables = { filter, first, skip };
     return client(user).request(query, variables)
       .then(({ allHistories }) => allHistories.map(toHistory));
   };
