@@ -42,6 +42,7 @@ class Map extends React.Component<Props, OwnState> {
     this.props.actions.senseObject.loadBoxes(this.props.id);
     this.props.actions.senseObject.loadEdges(this.props.id);
     this.props.actions.senseObject.loadHistories();
+    this.props.actions.senseObject.loadHistory('e6fd4ef8-a17a-4eee-a4c2-e29755f964de');
     this.props.actions.senseObject.keepUpdating(true);
 
     type ObjectAction = {

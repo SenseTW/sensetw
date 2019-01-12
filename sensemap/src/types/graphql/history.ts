@@ -218,3 +218,19 @@ export const loadAll =
     return client(user).request(query, variables)
       .then(({ allHistories }) => allHistories.map(toHistory));
   };
+
+export const load =
+  (user: User, id: HistoryID) => {
+    const query = `
+      query History($id: ID) {
+        history: History(id: $id) {
+          ...historyFields
+        }
+      }
+      ${graphQLHistoryFieldsFragment}
+      ${graphQLChangeFieldsFragment}
+    `;
+    const variables = { id };
+    return client(user).request(query, variables)
+      .then(({ history }) => toHistory(history));
+  };

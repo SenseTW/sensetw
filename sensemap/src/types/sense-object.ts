@@ -14,6 +14,7 @@ import { CardID, CardData } from './sense/card';
 import * as B from './sense/box';
 import { BoxID, BoxData } from './sense/box';
 import { Edge, EdgeID } from './sense/edge';
+import { HistoryID } from './sense/history';
 import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
@@ -257,6 +258,13 @@ const loadHistories =
   (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
     return GH.loadAll(user);
+  };
+
+const loadHistory =
+  (id: HistoryID) =>
+  (disptach: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    return GH.load(user, id);
   };
 
 const diff = (before: string[], after: string[]) => {
@@ -610,6 +618,7 @@ export const actions = {
   loadEdges,
   loadEdgesById,
   loadHistories,
+  loadHistory,
   keepUpdating,
   createCard,
   createBoxObject,
