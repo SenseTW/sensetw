@@ -112,7 +112,7 @@ export const getBox =
   storage[TargetType.TEMPORARY].boxes[id] || storage[TargetType.PERMANENT].boxes[id] || emptyBoxData;
 
 /**
- * Gets a edge by it's ID. It always returns a edge.
+ * Gets an edge by it's ID. It always returns a edge.
  * Please use `doesEdgeExist` to check the existance.
  *
  * @param {CachedStorage} storage The cached storage.
@@ -256,7 +256,7 @@ export const isBoxNew = (storage: CachedStorage, id: BoxID): boolean =>
 
 /**
  * Checks if an edge is a new edge by it's ID.
- * An edge is a new edge if it only exists in the temporay sorage.
+ * An edge is a new edge if it only exists in the temporay storage.
  *
  * @param {CachedStorage} storage The cached storage.
  * @param {EdgeID} id The edge ID.
@@ -518,7 +518,7 @@ export const overwriteMaps = (maps: ObjectMap<MapData>, target: TargetType = Tar
 /**
  * The maps removing action constructor.
  *
- * @param {ObjectMap<MapData>} maps Map data.
+ * @param {ObjectMap<HasID<MapID>>} maps Map data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A maps removing action.
  */
@@ -530,7 +530,7 @@ export const removeMaps = (maps: ObjectMap<HasID<MapID>>, target: TargetType = T
 /**
  * A shortcut action to remove one map.
  *
- * @param {MapData} map The map data.
+ * @param {HasID<MapID>} map The map data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A maps removing action.
  */
@@ -564,7 +564,7 @@ export const overwriteObjects = (objects: ObjectMap<ObjectData>, target: TargetT
 /**
  * The display objects removing action constructor.
  *
- * @param {ObjectMap<ObjectData>} objects Display object data.
+ * @param {ObjectMap<HasID<ObjectID>>} objects Display object data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A objects removing action.
  */
@@ -576,7 +576,7 @@ export const removeObjects = (objects: ObjectMap<HasID<ObjectID>>, target: Targe
 /**
  * A shortcut action to remove one display object.
  *
- * @param {ObjectData} object The display object.
+ * @param {HasID<ObjectID>} object The display object.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A objects removing action.
  */
@@ -610,7 +610,7 @@ export const overwriteCards = (cards: ObjectMap<CardData>, target: TargetType = 
 /**
  * The cards removing action constructor.
  *
- * @param {ObjectMap<CardData>} cards Card data.
+ * @param {ObjectMap<HasID<CardID>>} cards Card data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A cards removing action.
  */
@@ -622,7 +622,7 @@ export const removeCards = (cards: ObjectMap<HasID<CardID>>, target: TargetType 
 /**
  * A shortcut action to remove one card.
  *
- * @param {CardData} card The card data.
+ * @param {HasID<CardID>} card The card data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A cards removing action.
  */
@@ -656,7 +656,7 @@ export const overwriteBoxes = (boxes: ObjectMap<BoxData>, target: TargetType = T
 /**
  * The boxes removing action constructor.
  *
- * @param {ObjectMap<BoxData>} boxes Box data.
+ * @param {ObjectMap<HasID<BoxID>>} boxes Box data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A boxes removing action.
  */
@@ -668,7 +668,7 @@ export const removeBoxes = (boxes: ObjectMap<HasID<BoxID>>, target: TargetType =
 /**
  * A shortuct action to remove one box.
  *
- * @param {BoxData} box The box data.
+ * @param {HasID<BoxID>} box The box data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns A boxes removing action.
  */
@@ -702,7 +702,7 @@ export const overwriteEdges = (edges: ObjectMap<Edge>, target: TargetType = Targ
 /**
  * The edges removing action constructor.
  *
- * @param {ObjectMap<Edge>} edges Edge data.
+ * @param {ObjectMap<HasID<EdgeID>>} edges Edge data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns An edges removing action.
  */
