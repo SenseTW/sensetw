@@ -5,24 +5,27 @@ import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
 import { EdgeID, Edge, emptyEdge } from './sense/edge';
+import { HistoryID, History, emptyHistory } from './sense/history';
 
 /**
  * The storage of sense objects.
  */
 export type Storage = {
-  maps:    ObjectMap<MapData>,
-  objects: ObjectMap<ObjectData>,
-  cards:   ObjectMap<CardData>,
-  boxes:   ObjectMap<BoxData>,
-  edges:   ObjectMap<Edge>,
+  maps:      ObjectMap<MapData>,
+  objects:   ObjectMap<ObjectData>,
+  cards:     ObjectMap<CardData>,
+  boxes:     ObjectMap<BoxData>,
+  edges:     ObjectMap<Edge>,
+  histories: ObjectMap<History>,
 };
 
 export const initial: Storage = {
-  maps:    {},
-  objects: {},
-  cards:   {},
-  boxes:   {},
-  edges:   {},
+  maps:      {},
+  objects:   {},
+  cards:     {},
+  boxes:     {},
+  edges:     {},
+  histories: {},
 };
 
 /**
@@ -66,6 +69,13 @@ export const getBox = (storage: Storage, id: BoxID): BoxData => storage.boxes[id
 export const getEdge = (storage: Storage, id: EdgeID): Edge => storage.edges[id] || emptyEdge;
 
 /**
+ * It gets an history by it's id.
+ * @param storage The storage.
+ * @param id The history id.
+ */
+export const getHistory = (storage: Storage, id: HistoryID): History => storage.histories[id] || emptyHistory;
+
+/**
  * It gets cards from the given box.
  *
  * @param storage The storage.
@@ -106,11 +116,18 @@ export const hasNoCard = (storage: Storage): boolean => Object.keys(storage.card
 export const hasNoBox = (storage: Storage): boolean => Object.keys(storage.boxes).length === 0;
 
 /**
- * Check if there is any edfe.
+ * Check if there is any edge.
  *
  * @param storage The storage.
  */
 export const hasNoEdge = (storage: Storage): boolean => Object.keys(storage.edges).length === 0;
+
+/**
+ * Check if there is any history.
+ *
+ * @param storage The storage.
+ */
+export const hasNoHistory = (storage: Storage): boolean => Object.keys(storage.histories).length === 0;
 
 /**
  * Check if a map exists.
@@ -153,6 +170,14 @@ export const doesBoxExist = (storage: Storage, id: BoxID): boolean => !!storage.
 export const doesEdgeExist = (storage: Storage, id: EdgeID): boolean => !!storage.edges[id];
 
 /**
+ * Check if a history exists.
+ *
+ * @param storage The storage.
+ * @param id Thi history id.
+ */
+export const doesHistoryExist = (storage: Storage, id: HistoryID): boolean => !!storage.histories[id];
+
+/**
  * It filters the storage objects and create a new storage with those objects
  * and their edges.
  *
@@ -178,8 +203,8 @@ export const scoped = (storage: Storage, filter: (key: ObjectID) => boolean): St
         return acc;
       },
       {});
-  const { maps, cards, boxes } = storage;
-  return { maps, objects, cards, boxes, edges };
+  const { maps, cards, boxes, histories } = storage;
+  return { maps, objects, cards, boxes, edges, histories };
 };
 
 /**
@@ -211,6 +236,8 @@ export const getCardIds = (storage: Storage): CardID[] => Object.keys(storage.ca
 export const getBoxIds = (storage: Storage): BoxID[] => Object.keys(storage.boxes);
 
 export const getEdgeIds = (storage: Storage): EdgeID[] => Object.keys(storage.edges);
+
+export const getHistoryIds = (storage: Storage): HistoryID[] => Object.keys(storage.histories);
 
 /**
  * Partially update `maps` state.
@@ -362,6 +389,27 @@ export const removeEdges =
     payload: { edges },
   });
 
+export const UPDATE_HISTORIES = 'UPDATE_HISTORIES';
+export const updateHistories =
+  (histories: ObjectMap<History>) => ({
+    type: UPDATE_HISTORIES as typeof UPDATE_HISTORIES,
+    payload: { histories },
+  });
+
+export const OVERWRITE_HISTORIES = 'OVERWRITE_HISTORIES';
+export const overwriteHistories =
+  (histories: ObjectMap<History>) => ({
+    type: OVERWRITE_HISTORIES as typeof OVERWRITE_HISTORIES,
+    payload: { histories },
+  });
+
+export const REMOVE_HISTORIES = 'REMOVE_HISTORIES';
+export const removeHistories =
+  (histories: ObjectMap<HasID<HistoryID>>) => ({
+    type: REMOVE_HISTORIES as typeof REMOVE_HISTORIES,
+    payload: { histories },
+  });
+
 /**
  * Remove card from Box.contains bidirectional relation.
  */
@@ -398,6 +446,9 @@ export const actions = {
   updateEdges,
   overwriteEdges,
   removeEdges,
+  updateHistories,
+  overwriteHistories,
+  removeHistories,
   updateNotInBox,
   updateInBox,
 };
@@ -510,6 +561,21 @@ export const reducer = (state: Storage = initial, action: Action = emptyAction):
       return {
         ...state,
         edges,
+      };
+    }
+    case UPDATE_HISTORIES: {
+      return { ...state, histories: { ...state.histories, ...action.payload.histories } };
+    }
+    case OVERWRITE_HISTORIES: {
+      return { ...state, histories: action.payload.histories };
+    }
+    case REMOVE_HISTORIES: {
+      const histories = { ...state.histories };
+      Object.keys(action.payload.histories).forEach(key => delete histories[key]);
+
+      return {
+        ...state,
+        histories,
       };
     }
     case UPDATE_NOT_IN_BOX: {

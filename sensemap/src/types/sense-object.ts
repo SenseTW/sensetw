@@ -13,8 +13,8 @@ import { ObjectType, ObjectID, ObjectData, objectData } from './sense/object';
 import { CardID, CardData } from './sense/card';
 import * as B from './sense/box';
 import { BoxID, BoxData } from './sense/box';
-import { Edge, EdgeID } from './sense/edge';
-import { HistoryID } from './sense/history';
+import { EdgeID, Edge } from './sense/edge';
+import { HistoryID, History } from './sense/history';
 import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
@@ -254,17 +254,27 @@ const loadEdgesById =
   };
 
 const loadHistories =
-  () =>
+  (overwrite: boolean = false) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
-    return GH.loadAll(user);
+    return GH.loadAll(user)
+      .then(data => H.toIDMap<HistoryID, History>(data))
+      .then(data => dispatch(
+        overwrite
+          ? CS.overwriteHistories(data, TargetType.PERMANENT)
+          : CS.updateHistories(data, TargetType.PERMANENT)
+      ));
   };
 
 const loadHistory =
   (id: HistoryID) =>
-  (disptach: Dispatch, getState: GetState) => {
+  (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
-    return GH.load(user, id);
+    return GH.load(user, id)
+      .then(data => H.toIDMap<HistoryID, History>([data]))
+      .then(data => dispatch(
+        CS.updateHistories(data, TargetType.PERMANENT)
+      ));
   };
 
 const diff = (before: string[], after: string[]) => {

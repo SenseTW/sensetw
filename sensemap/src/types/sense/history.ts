@@ -177,3 +177,13 @@ export type History
   | ObjectHistory
   | CardHistory
   ;
+
+export const emptyHistory = {
+  historyType: HistoryType.MAP,
+  id: '0',
+  createdAt: 0,
+  updatedAt: 0,
+  user: '0',
+  map: '0',
+  changes: [],
+};

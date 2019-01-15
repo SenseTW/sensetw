@@ -6,6 +6,7 @@ import { ObjectID, ObjectData, emptyObjectData } from './sense/object';
 import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
 import { EdgeID, Edge, emptyEdge } from './sense/edge';
+import { HistoryID, History, emptyHistory } from './sense/history';
 
 export enum TargetType {
   PERMANENT = 'PERMANENT',
@@ -55,6 +56,10 @@ export const toStorage = (storage: CachedStorage): S.Storage => {
       ...storage[TargetType.PERMANENT].edges,
       ...storage[TargetType.TEMPORARY].edges,
     },
+    histories: {
+      ...storage[TargetType.PERMANENT].histories,
+      ...storage[TargetType.TEMPORARY].histories,
+    }
   };
 };
 
@@ -117,6 +122,18 @@ export const getBox =
 export const getEdge =
   (storage: CachedStorage, id: EdgeID): Edge =>
   storage[TargetType.TEMPORARY].edges[id] || storage[TargetType.PERMANENT].edges[id] || emptyEdge;
+
+/**
+ * Gets a history by it's ID. It always returns a history.
+ * Please use `doesHistoryExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {HistoryID} id The history ID.
+ * @return {History} The target history data.
+ */
+export const getHistory =
+  (storage: CachedStorage, id: HistoryID): History =>
+  storage[TargetType.TEMPORARY].histories[id] || storage[TargetType.PERMANENT].histories[id] || emptyHistory;
 
 /**
  * Gets cards in a box by it's box ID.
@@ -184,6 +201,16 @@ export const doesEdgeExist = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) || S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
 /**
+ * Checks if a history exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {HistoryID} id The history ID.
+ * @returns {boolean} If the history exists or not.
+ */
+export const doesHistoryExist = (storage: CachedStorage, id: HistoryID): boolean =>
+  S.doesHistoryExist(storage[TargetType.TEMPORARY], id) || S.doesHistoryExist(storage[TargetType.PERMANENT], id);
+
+/**
  * Checks if a map is a new map by it's ID.
  * A map is a new map if it only exists in the temporary storage.
  *
@@ -237,6 +264,17 @@ export const isBoxNew = (storage: CachedStorage, id: BoxID): boolean =>
  */
 export const isEdgeNew = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && !S.doesEdgeExist(storage[TargetType.PERMANENT], id);
+
+/**
+ * Checks if a history is a new history by it's ID.
+ * A history is a new history if it only exists in the temporay storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {HistoryID} id The history ID.
+ * @returns {boolean} If the given history is a new history.
+ */
+export const isHistoryNew = (storage: CachedStorage, id: HistoryID): boolean =>
+  S.doesHistoryExist(storage[TargetType.TEMPORARY], id) && !S.doesHistoryExist(storage[TargetType.PERMANENT], id);
 
 /**
  * Check if a map is modified(dirty).
@@ -294,6 +332,17 @@ export const isEdgeDirty = (storage: CachedStorage, id: EdgeID): boolean =>
   S.doesEdgeExist(storage[TargetType.TEMPORARY], id) && S.doesEdgeExist(storage[TargetType.PERMANENT], id);
 
 /**
+ * Check if a history is modified(dirty).
+ * A history is modified if it appears in both the temporary and the permanent storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {HistoryID} id The history ID.
+ * @returns {boolean} If the history is dirty.
+ */
+export const isHistoryDirty = (storage: CachedStorage, id: HistoryID): boolean =>
+  S.doesHistoryExist(storage[TargetType.TEMPORARY], id) && S.doesHistoryExist(storage[TargetType.PERMANENT], id);
+
+/**
  * Checks if all maps are not modified.
  *
  * @param {CachedStorage} storage The cached storage.
@@ -334,6 +383,14 @@ export const areBoxesClean = (storage: CachedStorage): boolean => S.hasNoBox(sto
 export const areEdgesClean = (storage: CachedStorage): boolean => S.hasNoEdge(storage[TargetType.TEMPORARY]);
 
 /**
+ * Checks if all histories are not modified.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @returns {boolean} If histories are clean.
+ */
+export const areHistoriesClean = (storage: CachedStorage): boolean => S.hasNoHistory(storage[TargetType.TEMPORARY]);
+
+/**
  * Checks if everything is not modified.
  *
  * @param {CachedStorage} storage The cached storage.
@@ -344,7 +401,8 @@ export const isClean = (storage: CachedStorage): boolean =>
   areObjectsClean(storage) &&
   areCardsClean(storage) &&
   areBoxesClean(storage) &&
-  areEdgesClean(storage);
+  areEdgesClean(storage) &&
+  areHistoriesClean(storage);
 
 /**
  * Crteas a sub object map from a key list.
@@ -383,6 +441,7 @@ export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolea
     cards:   submapByKeys(Object.keys(diff.cards), part.cards),
     boxes:   submapByKeys(Object.keys(diff.boxes), part.boxes),
     edges:   submapByKeys(Object.keys(diff.edges), part.edges),
+    histories: submapByKeys(Object.keys(diff.histories), part.histories),
   };
 
   return result;
@@ -428,6 +487,9 @@ export const getBoxIds = (storage: CachedStorage, target: TargetType = TargetTyp
 
 export const getEdgeIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
   S.getEdgeIds(storage[target]);
+
+export const getHistoryIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
+  S.getHistoryIds(storage[target]);
 
 /**
  * The maps updating action contructor.
@@ -652,12 +714,58 @@ export const removeEdges = (edges: ObjectMap<HasID<EdgeID>>, target: TargetType 
 /**
  * A shortcut action to remove one edge.
  *
- * @param {Edge} edge The edge data.
+ * @param {HasID<EdgeID>} edge The edge data.
  * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
  * @returns An edges removing action.
  */
 export const removeEdge = (edge: HasID<EdgeID>, target: TargetType = TargetType.TEMPORARY) =>
   removeEdges(toIDMap<EdgeID, HasID<EdgeID>>([edge]));
+
+/**
+ * The histories updating action constructor.
+ *
+ * @param {ObjectMap<History>} histories History data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A histories updating action.
+ */
+export const updateHistories = (histories: ObjectMap<History>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_HISTORIES as typeof S.UPDATE_HISTORIES,
+  payload: { histories, target },
+});
+
+/**
+ * The histories overwriting action constructor.
+ *
+ * @param {ObjectMap<History>} histories History data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A histories overwriting action.
+ */
+export const overwriteHistories = (histories: ObjectMap<History>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_HISTORIES as typeof S.OVERWRITE_HISTORIES,
+  payload: { histories, target },
+});
+
+/**
+ * The histories removing action constructor.
+ *
+ * @param {ObjectMap<HasID<HistoryID>>} histories History ids.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A histories removing action.
+ */
+export const removeHistories = (histories: ObjectMap<HasID<HistoryID>>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_HISTORIES as typeof S.REMOVE_HISTORIES,
+  payload: { histories, target },
+});
+
+/**
+ * A shortcut action to remove one history.
+ *
+ * @param {HasID<HistoryID>} history The history data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An histories removing action.
+ */
+export const removeHistory = (history: HasID<HistoryID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeHistories(toIDMap<HistoryID, HasID<HistoryID>>([history]));
 
 /**
  * An action constructor for moving a card out of a given box.
@@ -710,6 +818,10 @@ export const actions = {
   removeEdge,
   updateInBox,
   updateNotInBox,
+  updateHistories,
+  overwriteHistories,
+  removeHistories,
+  removeHistory,
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -738,6 +850,9 @@ export const reducer = (state: CachedStorage = initial, action: Action = emptyAc
     case S.UPDATE_EDGES:
     case S.OVERWRITE_EDGES:
     case S.REMOVE_EDGES:
+    case S.UPDATE_HISTORIES:
+    case S.OVERWRITE_HISTORIES:
+    case S.REMOVE_HISTORIES:
     case S.UPDATE_NOT_IN_BOX:
     case S.UPDATE_IN_BOX: {
       const { target } = action.payload;
