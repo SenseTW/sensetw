@@ -254,10 +254,10 @@ const loadEdgesById =
   };
 
 const loadHistories =
-  (overwrite: boolean = false) =>
+  (filter: GH.HistoryFilter, overwrite: boolean = false) =>
   (dispatch: Dispatch, getState: GetState) => {
     const { session: { user } } = getState();
-    return GH.loadAll(user)
+    return GH.loadAll(user, filter)
       .then(data => H.toIDMap<HistoryID, History>(data))
       .then(data => dispatch(
         overwrite

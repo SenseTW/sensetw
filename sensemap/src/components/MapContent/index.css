@@ -1,3 +1,17 @@
 .map-content__type > .ui.radio.checkbox {
   margin-right: 2.571428em;
 }
+
+.ui.modal.map-content > .content {
+  padding: 0;
+}
+
+.ui.modal.map-content > .content .ui.tabular.menu > .item {
+  font-size: 1.28571429em;
+  line-height: 1.28571429em;
+}
+
+.map-content__form,
+.map-content__histories {
+  padding: 1.5rem;
+}

@@ -197,14 +197,14 @@ const toHistory: (h: GraphQLHistoryFields) => History =
   };
 
 export type HistoryFilter = {
-  map?: MapID,
-  object?: ObjectID,
-  card?: CardID,
+  map?: HasID<MapID>,
+  object?: HasID<ObjectID>,
+  card?: HasID<CardID>,
   historyType?: HistoryType,
 };
 
 export const loadAll =
-  (user: User, filter: HistoryFilter = {}, first: number = 10, skip: number = 0) => {
+  (user: User, filter: HistoryFilter = {}, first: number = 5, skip: number = 0) => {
     const query = `
       query AllHistories($filter: HistoryFilter, $first: Int, $skip: Int) {
         allHistories(filter: $filter, first: $first, skip: $skip) {
