@@ -7,6 +7,7 @@ import { CardID, CardData, emptyCardData } from './sense/card';
 import { BoxID, BoxData, emptyBoxData } from './sense/box';
 import { EdgeID, Edge, emptyEdge } from './sense/edge';
 import { HistoryID, History, emptyHistory } from './sense/history';
+import { UserID, UserData, anonymousUserData } from './sense/user';
 
 export enum TargetType {
   PERMANENT = 'PERMANENT',
@@ -59,6 +60,10 @@ export const toStorage = (storage: CachedStorage): S.Storage => {
     histories: {
       ...storage[TargetType.PERMANENT].histories,
       ...storage[TargetType.TEMPORARY].histories,
+    },
+    users: {
+      ...storage[TargetType.PERMANENT].users,
+      ...storage[TargetType.TEMPORARY].users,
     }
   };
 };
@@ -136,6 +141,18 @@ export const getHistory =
   storage[TargetType.TEMPORARY].histories[id] || storage[TargetType.PERMANENT].histories[id] || emptyHistory;
 
 /**
+ * Gets an user by it's ID. It always returns an user.
+ * Please use `doesUserExist` to check the existance.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {UserID} id The user ID.
+ * @return {UserData} The target user data.
+ */
+export const getUser =
+  (storage: CachedStorage, id: UserID): UserData =>
+  storage[TargetType.TEMPORARY].users[id] || storage[TargetType.PERMANENT].users[id] || anonymousUserData;
+
+/**
  * Gets cards in a box by it's box ID.
  *
  * @todo It duplicates with the same function in the storage.
@@ -209,6 +226,16 @@ export const doesEdgeExist = (storage: CachedStorage, id: EdgeID): boolean =>
  */
 export const doesHistoryExist = (storage: CachedStorage, id: HistoryID): boolean =>
   S.doesHistoryExist(storage[TargetType.TEMPORARY], id) || S.doesHistoryExist(storage[TargetType.PERMANENT], id);
+
+/**
+ * Checks if an user exists in a cached storage.
+ *
+ * @param {CachedStorage} storage The cached storage.
+ * @param {UserID} id The user ID.
+ * @returns {boolean} If the user exists or not.
+ */
+export const doesUserExist = (storage: CachedStorage, id: UserID): boolean =>
+  S.doesUserExist(storage[TargetType.TEMPORARY], id) || S.doesUserExist(storage[TargetType.PERMANENT], id);
 
 /**
  * Checks if a map is a new map by it's ID.
@@ -442,6 +469,7 @@ export const scoped = (storage: CachedStorage, filter: (key: ObjectID) => boolea
     boxes:   submapByKeys(Object.keys(diff.boxes), part.boxes),
     edges:   submapByKeys(Object.keys(diff.edges), part.edges),
     histories: submapByKeys(Object.keys(diff.histories), part.histories),
+    users:     submapByKeys(Object.keys(diff.users), part.users),
   };
 
   return result;
@@ -490,6 +518,9 @@ export const getEdgeIds = (storage: CachedStorage, target: TargetType = TargetTy
 
 export const getHistoryIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
   S.getHistoryIds(storage[target]);
+
+export const getUserIds = (storage: CachedStorage, target: TargetType = TargetType.TEMPORARY) =>
+  S.getUserIds(storage[target]);
 
 /**
  * The maps updating action contructor.
@@ -768,6 +799,52 @@ export const removeHistory = (history: HasID<HistoryID>, target: TargetType = Ta
   removeHistories(toIDMap<HistoryID, HasID<HistoryID>>([history]));
 
 /**
+ * The users updating action constructor.
+ *
+ * @param {ObjectMap<UserData>} users User data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A users updating action.
+ */
+export const updateUsers = (users: ObjectMap<UserData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.UPDATE_USERS as typeof S.UPDATE_USERS,
+  payload: { users, target },
+});
+
+/**
+ * The users overwriting action constructor.
+ *
+ * @param {ObjectMap<UserData>} users User data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A users overwriting action.
+ */
+export const overwriteUsers = (users: ObjectMap<UserData>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.OVERWRITE_USERS as typeof S.OVERWRITE_USERS,
+  payload: { users, target },
+});
+
+/**
+ * The users removing action constructor.
+ *
+ * @param {ObjectMap<HasID<UserID>>} users User ids.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns A users removing action.
+ */
+export const removeUsers = (users: ObjectMap<HasID<UserID>>, target: TargetType = TargetType.TEMPORARY) => ({
+  type: S.REMOVE_USERS as typeof S.REMOVE_USERS,
+  payload: { users, target },
+});
+
+/**
+ * A shortcut action to remove one user.
+ *
+ * @param {HasID<UserID>} user The user data.
+ * @param {TargetType} [target=TargetType.TEMPORARY] The action target.
+ * @returns An users removing action.
+ */
+export const removeUser = (user: HasID<UserID>, target: TargetType = TargetType.TEMPORARY) =>
+  removeUsers(toIDMap<UserID, HasID<UserID>>([user]));
+
+/**
  * An action constructor for moving a card out of a given box.
  *
  * @param {ObjectID} cardObject The display object to hold the card.
@@ -822,6 +899,10 @@ export const actions = {
   overwriteHistories,
   removeHistories,
   removeHistory,
+  updateUsers,
+  overwriteUsers,
+  removeUsers,
+  removeUser,
 };
 
 export type Action = ActionUnion<typeof actions>;
@@ -853,6 +934,9 @@ export const reducer = (state: CachedStorage = initial, action: Action = emptyAc
     case S.UPDATE_HISTORIES:
     case S.OVERWRITE_HISTORIES:
     case S.REMOVE_HISTORIES:
+    case S.UPDATE_USERS:
+    case S.OVERWRITE_USERS:
+    case S.REMOVE_USERS:
     case S.UPDATE_NOT_IN_BOX:
     case S.UPDATE_IN_BOX: {
       const { target } = action.payload;
