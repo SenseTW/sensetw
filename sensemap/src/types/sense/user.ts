@@ -1,4 +1,5 @@
 import { HasID } from './has-id';
+import { equals } from 'ramda';
 
 export type UserID = string;
 
@@ -12,3 +13,6 @@ export const anonymousUserData: UserData = {
   username: 'anonymous',
   email: '',
 };
+
+export const isEmpty = (user: UserData): boolean =>
+  equals(anonymousUserData, user);

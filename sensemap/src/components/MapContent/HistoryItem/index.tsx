@@ -1,11 +1,19 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
 import { List } from 'semantic-ui-react';
+import { State, actions, ActionProps, mapDispatch } from '../../../types';
 import { History, ChangeType, Change } from '../../../types/sense/history';
-import * as moment from 'moment';
+import { UserData } from '../../../types/sense/user';
 import { TIME_FORMAT } from '../../../types/utils';
+import * as moment from 'moment';
+
+type OwnProps = {
+  data: History,
+};
 
 type Props = {
   data: History,
+  user: UserData,
 };
 
 class ChangeItem extends React.PureComponent<Change> {
@@ -53,12 +61,13 @@ class ChangeItem extends React.PureComponent<Change> {
 
 class HistoryItem extends React.PureComponent<Props> {
   render() {
-    const { user, createdAt, changes } = this.props.data;
+    const { user } = this.props;
+    const { createdAt, changes } = this.props.data;
     const createdDate = moment(createdAt).format(TIME_FORMAT);
 
     return (
       <List.Item>
-        {user}
+        {user.username}
         <ul>{changes.map((c, i) => <li key={i}><ChangeItem {...c} /></li>)}</ul>
         at {createdDate}
       </List.Item>
@@ -67,4 +76,14 @@ class HistoryItem extends React.PureComponent<Props> {
 }
 
 // XXX: should get user, object, card data from the store
-export default HistoryItem;
+export default connect<State, ActionProps, OwnProps, Props>(
+  (state: State) => state,
+  mapDispatch({ actions }),
+  (stateProps, { actions: acts }, ownProps) => {
+    const { senseObject } = stateProps;
+    const { user: uid } = ownProps.data;
+    // tslint:disable-next-line:no-any
+    const user: UserData = acts.senseObject.getUser(senseObject, uid) as any;
+    return { data: ownProps.data, user };
+  }
+)(HistoryItem);

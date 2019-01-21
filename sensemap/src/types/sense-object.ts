@@ -6,6 +6,7 @@ import * as GC from './graphql/card';
 import * as GB from './graphql/box';
 import * as GE from './graphql/edge';
 import * as GH from './graphql/history';
+import * as GU from './graphql/user';
 import * as H from './sense/has-id';
 import * as C from './sense/card';
 import { MapID, MapData } from './sense/map';
@@ -15,6 +16,8 @@ import * as B from './sense/box';
 import { BoxID, BoxData } from './sense/box';
 import { EdgeID, Edge } from './sense/edge';
 import { HistoryID, History } from './sense/history';
+import * as USR from './sense/user';
+import { UserID, UserData } from './sense/user';
 import * as CS from './cached-storage';
 import { TargetType, CachedStorage } from './cached-storage';
 import * as SL from './selection';
@@ -606,6 +609,22 @@ const removeEdge =
       .then(() => loadEdges(map, true)(dispatch, getState));
   };
 
+/**
+ * The lazy user getter.
+ */
+const getUser =
+  (storage: CachedStorage, uid: UserID) =>
+  (dispatch: Dispatch, getState: GetState) => {
+    const { session: { user } } = getState();
+    const u = CS.getUser(storage, uid);
+    if (USR.isEmpty(u)) {
+      GU.loadByIds(user, [uid])
+        .then(users => H.toIDMap<UserID, UserData>(users))
+        .then(userMap => dispatch(CS.updateUsers(userMap, TargetType.PERMANENT)));
+    }
+    return u;
+  };
+
 export const actions = {
   createMap,
   updateMap,
@@ -649,6 +668,7 @@ export const actions = {
   updateEdge,
   saveEdge,
   removeEdge,
+  getUser,
 };
 
 export type Action = CS.Action;

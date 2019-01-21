@@ -1,4 +1,4 @@
-import { UserData, anonymousUserData } from '../sense/user';
+import { UserData, anonymousUserData, UserID } from '../sense/user';
 import { client } from './client';
 import * as SN from '../session';
 
@@ -42,4 +42,24 @@ export const verifyPassword =
     `;
     return client(user).request(query, { password })
       .then(({ verifyPassword: d }) => toUserData(d));
+  };
+
+export const loadByIds =
+  (user: SN.User, ids: UserID[]) => {
+    if (ids.length === 0) {
+      return Promise.resolve([]);
+    }
+    const query = `
+      query {
+        ${ids.map((id, i) =>
+          `user_${i}: User(id: "${id}"){
+            ...userFields
+          }`
+        )}
+      }
+      ${graphQLUserFieldsFragment}
+    `;
+    return client(user).request(query)
+      .then(data => Object.values(data))
+      .then(data => data.map(toUserData));
   };
