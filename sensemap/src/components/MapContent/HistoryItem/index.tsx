@@ -1,22 +1,32 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { List } from 'semantic-ui-react';
-import { State, actions, ActionProps, mapDispatch } from '../../../types';
-import { History, ChangeType, Change } from '../../../types/sense/history';
+import {
+  State,
+  actions,
+  ActionProps,
+  mapDispatch,
+} from '../../../types';
+import {
+  History,
+  RenderHistory,
+  ChangeType,
+  RenderChange,
+  toRenderHistory,
+} from '../../../types/sense/history';
 import { UserData } from '../../../types/sense/user';
 import { TIME_FORMAT } from '../../../types/utils';
 import * as moment from 'moment';
 
-type OwnProps = {
-  data: History,
-};
+interface OwnProps {
+  data: History;
+}
 
-type Props = {
-  data: History,
-  user: UserData,
-};
+interface Props {
+  data: RenderHistory;
+}
 
-class ChangeItem extends React.PureComponent<Change> {
+class ChangeItem extends React.PureComponent<RenderChange> {
   render() {
     const { changeType } = this.props;
 
@@ -61,8 +71,7 @@ class ChangeItem extends React.PureComponent<Change> {
 
 class HistoryItem extends React.PureComponent<Props> {
   render() {
-    const { user } = this.props;
-    const { createdAt, changes } = this.props.data;
+    const { user, createdAt, changes } = this.props.data;
     const createdDate = moment(createdAt).format(TIME_FORMAT);
 
     return (
@@ -81,9 +90,12 @@ export default connect<State, ActionProps, OwnProps, Props>(
   mapDispatch({ actions }),
   (stateProps, { actions: acts }, ownProps) => {
     const { senseObject } = stateProps;
-    const { user: uid } = ownProps.data;
+    const { data: history } = ownProps;
+    const { user: uid } = history;
+
     // tslint:disable-next-line:no-any
     const user: UserData = acts.senseObject.getUser(senseObject, uid) as any;
-    return { data: ownProps.data, user };
+
+    return { data: toRenderHistory(senseObject, user, history) };
   }
 )(HistoryItem);
