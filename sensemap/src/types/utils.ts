@@ -11,6 +11,8 @@ export const MAP_TIME_FORMAT = 'YYYY.MM.DD';
 
 export const MAP_DETAILED_TIME_FORMAT = 'YYYY.MM.DD HH:mm';
 
+export const HISTORY_TIME_FORMAT = 'YYYY.MM.DD';
+
 export const SQRT3 = 1.73205;
 
 export const POPUP_DELAY = 500;

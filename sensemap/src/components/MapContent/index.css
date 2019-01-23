@@ -3,7 +3,7 @@
 }
 
 .ui.modal.map-content > .content {
-  padding: 0;
+  padding: 0 !important;
 }
 
 .ui.modal.map-content > .content .ui.tabular.menu > .item {
@@ -13,5 +13,6 @@
 
 .map-content__form,
 .map-content__histories {
-  padding: 1.5rem;
+  margin: 0 !important;
+  padding: 1.5rem !important;
 }

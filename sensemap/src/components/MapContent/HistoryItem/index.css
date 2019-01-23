@@ -1,0 +1,29 @@
+.history-item {
+  color: #878787;
+  line-height: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.history-item > .change {
+}
+
+.history-item > .change > .change__action {
+  color: #000;
+  font-weight: bold;
+}
+
+.history-item > .change > .change__target {
+  color: #3ad8fa;
+}
+
+.history-item > .change > .change__field {
+  color: #4a4a4a;
+}
+
+.history-item > .change > .change__value:before {
+  content: '“';
+}
+
+.history-item > .change > .change__value:after {
+  content: '”';
+}
