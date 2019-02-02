@@ -3,8 +3,9 @@ import { HasID } from './has-id';
 import { Position, Dimension, AnchorType, Anchor } from '../../graphics/drawing';
 import { ObjectType } from './object-type';
 import { TimeStamp } from '../utils';
-import { CardID } from './card';
-import { BoxID } from './box';
+import { CardID, CardData } from './card';
+import { BoxID, BoxData } from './box';
+import * as CS from '../cached-storage';
 import * as moment from 'moment';
 
 export { ObjectType } from './object-type';
@@ -14,7 +15,12 @@ export type ObjectID = string;
 /**
  * A container to hold cards and boxes for maps.
  *
+ * @export
+ * @interface ObjectData
  * @extends {HasID<ObjectID>}
+ * @extends {Position}
+ * @extends {Dimension}
+ * @extends {Anchor}
  */
 export interface ObjectData extends HasID<ObjectID>, Position, Dimension, Anchor {
   createdAt:  TimeStamp;
@@ -24,6 +30,38 @@ export interface ObjectData extends HasID<ObjectID>, Position, Dimension, Anchor
   belongsTo?: BoxID;
   data:       CardID | BoxID;
 }
+
+/**
+ * An interface for UI components who render object data.
+ *
+ * @export
+ * @interface RenderObjectData
+ * @extends {HasID<ObjectID>}
+ * @extends {Position}
+ * @extends {Dimension}
+ * @extends {Anchor}
+ */
+export interface RenderObjectData extends HasID<ObjectID>, Position, Dimension, Anchor {
+  createdAt:  TimeStamp;
+  updatedAt:  TimeStamp;
+  zIndex:     number;
+  objectType: ObjectType;
+  belongsTo?: BoxData;
+  data:       CardData | BoxData;
+}
+
+/**
+ * It gives a render object data by merge object contains from the cached storage.
+ *
+ * @param {CS.CachedStorage} storage The storage.
+ * @param {ObjectData} object The object data.
+ */
+export const toRenderObjectData = (storage: CS.CachedStorage, object: ObjectData): RenderObjectData => {
+  const { objectType, belongsTo: belongsId, data: dataId } = object;
+  const belongsTo = belongsId === undefined ? undefined : CS.getBox(storage, belongsId);
+  const data = objectType === ObjectType.BOX ? CS.getBox(storage, dataId) : CS.getCard(storage, dataId);
+  return { ...object, belongsTo, data };
+};
 
 /**
  * An empty object. The null value of the `ObjectData`.

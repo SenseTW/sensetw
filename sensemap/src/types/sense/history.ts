@@ -1,6 +1,6 @@
 import { UserID } from './user';
 import { MapID, MapData } from './map';
-import { ObjectID, ObjectData } from './object';
+import { ObjectID, RenderObjectData, toRenderObjectData } from './object';
 import { CardID, CardType, CardData } from './card';
 import { BoxID, BoxData } from './box';
 import { UserData } from './user';
@@ -147,34 +147,34 @@ type DeleteMapRenderChange = DeleteMapChange;
 
 interface CreateObjectRenderChange {
   changeType: ChangeType.CREATE_OBJECT;
-  object: ObjectData;
+  object: RenderObjectData;
   card: CardData;
 }
 
 interface UpdateObjectRenderChange {
   changeType: ChangeType.UPDATE_OBJECT;
-  object: ObjectData;
+  object: RenderObjectData;
   card: CardData;
 }
 
 interface DeleteObjectRenderChange {
   changeType: ChangeType.DELETE_OBJECT;
-  object: ObjectData;
+  object: RenderObjectData;
   card: CardData;
 }
 
 interface CreateEdgeRenderChange {
   changeType: ChangeType.CREATE_EDGE;
-  from: ObjectData;
-  to: ObjectData;
+  from: RenderObjectData;
+  to: RenderObjectData;
 }
 
 type UpdateEdgeRenderChange = UpdateEdgeChange;
 
 interface DeleteEdgeRenderChange {
   changeType: ChangeType.DELETE_EDGE;
-  from: ObjectData;
-  to: ObjectData;
+  from: RenderObjectData;
+  to: RenderObjectData;
 }
 
 interface CreateCardRenderChange {
@@ -211,13 +211,13 @@ interface DeleteCardRenderChange {
 
 interface AddObjectToBoxRenderChange {
   changeType: ChangeType.ADD_OBJECT_TO_BOX;
-  object: ObjectData;
+  object: RenderObjectData;
   box: BoxData;
 }
 
 interface RemvoeObjectFromBoxRenderChange {
   changeType: ChangeType.REMOVE_OBJECT_FROM_BOX;
-  object: ObjectData;
+  object: RenderObjectData;
   box: BoxData;
 }
 
@@ -296,7 +296,7 @@ export interface MapRenderHistory extends BaseRenderHistory {
 
 export interface ObjectRenderHistory extends BaseRenderHistory {
   historyType: HistoryType.OBJECT;
-  object: ObjectData;
+  object: RenderObjectData;
 }
 
 export interface CardRenderHistory extends BaseRenderHistory {
@@ -334,7 +334,7 @@ const toRenderChange = (storage: CS.CachedStorage, change: Change): RenderChange
     // XXX: can't merge following cases without creating type errors
     case ChangeType.CREATE_OBJECT: {
       const { object: oid, card: cid } = change;
-      const object = CS.getObject(storage, oid);
+      const object = toRenderObjectData(storage, CS.getObject(storage, oid));
       const card = CS.getCard(storage, cid);
       return {
         changeType: change.changeType,
@@ -344,7 +344,7 @@ const toRenderChange = (storage: CS.CachedStorage, change: Change): RenderChange
     }
     case ChangeType.UPDATE_OBJECT: {
       const { object: oid, card: cid } = change;
-      const object = CS.getObject(storage, oid);
+      const object = toRenderObjectData(storage, CS.getObject(storage, oid));
       const card = CS.getCard(storage, cid);
       return {
         changeType: change.changeType,
@@ -354,7 +354,7 @@ const toRenderChange = (storage: CS.CachedStorage, change: Change): RenderChange
     }
     case ChangeType.DELETE_OBJECT: {
       const { object: oid, card: cid } = change;
-      const object = CS.getObject(storage, oid);
+      const object = toRenderObjectData(storage, CS.getObject(storage, oid));
       const card = CS.getCard(storage, cid);
       return {
         changeType: change.changeType,
@@ -389,8 +389,8 @@ const toRenderChange = (storage: CS.CachedStorage, change: Change): RenderChange
     }
     case ChangeType.CREATE_EDGE: {
       const { from: fid, to: tid } = change;
-      const from = CS.getObject(storage, fid);
-      const to = CS.getObject(storage, tid);
+      const from = toRenderObjectData(storage, CS.getObject(storage, fid));
+      const to = toRenderObjectData(storage, CS.getObject(storage, tid));
       return { ...change, from, to };
     }
     case ChangeType.UPDATE_EDGE: {
@@ -398,19 +398,19 @@ const toRenderChange = (storage: CS.CachedStorage, change: Change): RenderChange
     }
     case ChangeType.DELETE_EDGE: {
       const { from: fid, to: tid } = change;
-      const from = CS.getObject(storage, fid);
-      const to = CS.getObject(storage, tid);
+      const from = toRenderObjectData(storage, CS.getObject(storage, fid));
+      const to = toRenderObjectData(storage, CS.getObject(storage, tid));
       return { ...change, from, to };
     }
     case ChangeType.ADD_OBJECT_TO_BOX: {
       const { object: oid, box: bid } = change;
-      const object = CS.getObject(storage, oid);
+      const object = toRenderObjectData(storage, CS.getObject(storage, oid));
       const box = CS.getBox(storage, bid);
       return { ...change, object, box };
     }
     case ChangeType.REMOVE_OBJECT_FROM_BOX: {
       const { object: oid, box: bid } = change;
-      const object = CS.getObject(storage, oid);
+      const object = toRenderObjectData(storage, CS.getObject(storage, oid));
       const box = CS.getBox(storage, bid);
       return { ...change, object, box };
     }
@@ -434,7 +434,7 @@ export const toRenderHistory = (storage: CS.CachedStorage, user: UserData, histo
     }
     case HistoryType.OBJECT: {
       const { object: oid } = history;
-      const object = CS.getObject(storage, oid);
+      const object = toRenderObjectData(storage, CS.getObject(storage, oid));
       return {
         ...history,
         user,

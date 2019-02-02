@@ -160,10 +160,17 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         return (
           <span className="change">
             <span className="change__action">linked</span>&nbsp;
-            <span>a</span>&nbsp;
             <span className="change__target">{from.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
-            <span>with a</span>&nbsp;
+            { from.objectType === ObjectType.BOX
+                ? <span className="change__value">{from.data.title || from.data.summary}</span>
+                : <span className="change__value">{from.data.summary || from.data.title}</span>
+            }&nbsp;
+            <span>with</span>&nbsp;
             <span className="change__target">{to.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
+            { to.objectType === ObjectType.BOX
+                ? <span className="change__value">{to.data.title || to.data.summary}</span>
+                : <span className="change__value">{to.data.summary || to.data.title}</span>
+            }
           </span>
         );
       }
@@ -181,10 +188,17 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         return (
           <span className="change">
             <span className="change__action">unlinked</span>&nbsp;
-            <span>a</span>&nbsp;
             <span className="change__target">{from.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
-            <span>from a</span>&nbsp;
+            { from.objectType === ObjectType.BOX
+                ? <span className="change__value">{from.data.title || from.data.summary}</span>
+                : <span className="change__value">{from.data.summary || from.data.title}</span>
+            }&nbsp;
+            <span>from</span>&nbsp;
             <span className="change__target">{to.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
+            { to.objectType === ObjectType.BOX
+                ? <span className="change__value">{to.data.title || to.data.summary}</span>
+                : <span className="change__value">{to.data.summary || to.data.title}</span>
+            }
           </span>
         );
       }
@@ -193,8 +207,11 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         return (
           <span className="change">
             <span className="change__action">added</span>&nbsp;
-            <span>a</span>&nbsp;
             <span className="change__target">{object.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
+            { object.objectType === ObjectType.BOX
+                ? <span className="change__value">{object.data.title || object.data.summary}</span>
+                : <span className="change__value">{object.data.summary || object.data.title}</span>
+            }
             <span>into</span>&nbsp;
             <span className="change__target">Box</span>&nbsp;
             <span className="change__value">{box.title || box.summary}</span>
@@ -206,8 +223,11 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         return (
           <span className="change">
             <span className="change__action">ejected</span>&nbsp;
-            <span>a</span>&nbsp;
             <span className="change__target">{object.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
+            { object.objectType === ObjectType.BOX
+                ? <span className="change__value">{object.data.title || object.data.summary}</span>
+                : <span className="change__value">{object.data.summary || object.data.title}</span>
+            }
             <span>from</span>&nbsp;
             <span className="change__target">Box</span>&nbsp;
             <span className="change__value">{box.title || box.summary}</span>
