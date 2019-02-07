@@ -3,7 +3,7 @@
   color: #4a4a4a;
   height: 100%;
   max-height: 100%;
-  padding-bottom: 5em;
+  padding-bottom: 64px;
   overflow: hidden;
 }
 
@@ -37,7 +37,7 @@
   bottom: 0;
   left: 0;
   padding: 1em;
-  background-color: #f5f5f5;
+  background: #fff;
 }
 
 .inspector .inspector__actions .ui.buttons {
@@ -46,6 +46,57 @@
 
 .inspector .ui.form textarea {
   height: 38px; /* 75px * 0.5 */
+}
+
+.inspector > .inspector__content {
+  padding: 0;
+  box-shadow: inset 0px -2px 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+.inspector > .inspector__content .ui.attached.tabular.menu {
+  background: #d8d8d8;
+  border: 0;
+}
+
+.inspector > .inspector__content .ui.attached.tabular.menu > .item {
+  border-radius: 0 !important;
+}
+
+.inspector > .inspector__content .ui.attached.tabular.menu > .item:before,
+.inspector > .inspector__content .ui.attached.tabular.menu > .item:after {
+  width: 0;
+}
+
+.inspector > .inspector__content .ui.attached.tabular.menu > .active.item {
+  background: #f5f5f5;
+  border: 0;
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+}
+
+.inspector > .inspector__content .ui.attached.tabular.menu > .active.item:before,
+.inspector > .inspector__content .ui.attached.tabular.menu > .active.item:after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: auto;
+  bottom: 0;
+  background: #f5f5f5;
+}
+.inspector > .inspector__content .ui.attached.tabular.menu > .active.item:before {
+  display: block;
+  right: 100%;
+  background: radial-gradient(circle at top left, transparent 8px, #f5f5f5 0) top left;
+}
+.inspector > .inspector__content .ui.attached.tabular.menu > .active.item:after {
+  left: 100%;
+  background: radial-gradient(circle at top right, transparent 8px, #f5f5f5 0) top right;
+}
+
+.inspector > .inspector__content .ui.attached.segment.tab {
+  background: #f5f5f5;
+  border: 0;
 }
 
 .inspector > .inspector__content > .ui.form > .box-content__share > .ui.basic.button,

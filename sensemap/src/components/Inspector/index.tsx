@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Key } from 'ts-keycode-enum';
-import { Divider, Button } from 'semantic-ui-react';
+import { Button, Tab } from 'semantic-ui-react';
 import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
 import EdgeContent from '../EdgeContent';
@@ -60,8 +60,8 @@ class Inspector extends React.PureComponent<Props> {
       data
     } = this.props;
 
-    let mode;
-    let content;
+    let mode = 'sense-map-inspector';
+    let content = <span>map here</span>;
     let isContentValid = true;
     switch (selectionType) {
       case T.SelectionType.MAP_CARD:
@@ -109,12 +109,31 @@ class Inspector extends React.PureComponent<Props> {
       default:
     }
 
+    let editorTitle;
+    switch (selectionType) {
+      case T.SelectionType.MAP_CARD:
+      case T.SelectionType.INBOX_CARD:
+        editorTitle = 'Card Editor';
+        break;
+      case T.SelectionType.MAP_BOX:
+        editorTitle = 'Box Editor';
+        break;
+      case T.SelectionType.MAP_EDGE:
+        editorTitle = 'Edge Editor';
+        break;
+      default:
+        editorTitle = 'Editor';
+    }
+    const panes = [
+      { menuItem: editorTitle, render: () => <Tab.Pane>{content}</Tab.Pane> },
+      { menuItem: 'Edit History', render: () => <Tab.Pane>the history</Tab.Pane> },
+    ];
+
     return (
       <div className="inspector">
         <div className="inspector__content">
-          {content}
+          <Tab panes={panes} />
         </div>
-        {!disabled && <Divider />}
         {
           !disabled &&
           <div className="inspector__actions">

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Header, Form, Input, TextArea } from 'semantic-ui-react';
+import { Form, Input, TextArea } from 'semantic-ui-react';
 import EdgeTypeSelector from './EdgeTypeSelector';
 import { EDGE_SUMMARY_LIMIT } from '../Inspector';
 import { Edge } from '../../types';
@@ -34,9 +34,6 @@ class EdgeContent extends React.PureComponent<Props> {
 
     return (
       <Form className="edge-content">
-        <Header color="grey">
-          <h3>EDGE INSPECTOR</h3>
-        </Header>
         <Form.Field className="edge-content__edge-type">
           <EdgeTypeSelector
             id="sense-edge-inspector__type-selector"

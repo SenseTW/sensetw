@@ -46,7 +46,6 @@ class BoxContent extends React.PureComponent<Props, State> {
     return (
       <Form className="box-content">
         <Header color="grey">
-          <h3>BOX INSPECTOR</h3>
           <h4>created by {data.owner.username}</h4>
           <h4>last updated on {updateTime}</h4>
         </Header>
