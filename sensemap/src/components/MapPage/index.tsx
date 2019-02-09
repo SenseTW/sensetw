@@ -207,6 +207,19 @@ class MapPage extends React.Component<Props> {
     );
   }
 
+  renderMapInspector() {
+    const { isAuthenticated } = this.props;
+
+    return (
+      <Inspector
+        disabled={!isAuthenticated}
+        submitText="Update"
+        submitDisabled={true}
+        cancelDisabled={true}
+      />
+    );
+  }
+
   render() {
     const {
       actions: acts,
@@ -233,11 +246,7 @@ class MapPage extends React.Component<Props> {
     const boxInspector = this.renderBoxInspector();
     const cardInspector = this.renderCardInspector();
     const edgeInpsector = this.renderEdgeInspector();
-    const emptyInspector = (
-      <div className="inspector-empty">
-        <div>請選擇單一卡片或 Box</div>
-      </div>
-    );
+    const mapInspector = this.renderMapInspector();
 
     return (
       <div className="map-page">
@@ -257,7 +266,7 @@ class MapPage extends React.Component<Props> {
             width="wide"
             direction="right"
           >
-            {boxInspector || cardInspector || edgeInpsector || emptyInspector}
+            {boxInspector || cardInspector || edgeInpsector || mapInspector}
           </Sidebar>
           <Sidebar.Pusher>
             <Viewport>

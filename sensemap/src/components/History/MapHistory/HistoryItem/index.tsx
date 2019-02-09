@@ -7,18 +7,18 @@ import {
   ActionProps,
   mapDispatch,
   ObjectType,
-} from '../../../types';
+} from '../../../../types';
 import {
   History,
   RenderHistory,
   ChangeType,
   RenderChange,
   toRenderHistory,
-} from '../../../types/sense/history';
-import { UserData } from '../../../types/sense/user';
-import { HISTORY_TIME_FORMAT } from '../../../types/utils';
+} from '../../../../types/sense/history';
+import { UserData } from '../../../../types/sense/user';
 import * as moment from 'moment';
-import './index.css';
+import '../../history-item.css';
+import { HISTORY_TIME_FORMAT } from '../../../../types/utils';
 
 interface OwnProps {
   data: History;
@@ -245,21 +245,19 @@ class ChangeItem extends React.PureComponent<RenderChange> {
   }
 }
 
-// XXX: duplicated, should use `src/components/History/MapHistory`
 class HistoryItem extends React.PureComponent<Props> {
   render() {
     const { user, createdAt, changes } = this.props.data;
-    const createdDate = moment(createdAt).format(HISTORY_TIME_FORMAT);
+    const createDate = moment(createdAt).format(HISTORY_TIME_FORMAT);
 
     return (
       <List.Item className="history-item">
-        {user.username} {changes.map((c, i) => <ChangeItem key={i} {...c} />)} at {createdDate}
+        {user.username} {changes.map((c, i) => <ChangeItem key={i} {...c} />)} at {createDate}
       </List.Item>
     );
   }
 }
 
-// XXX: should get user, object, card data from the store
 export default connect<State, ActionProps, OwnProps, Props>(
   (state: State) => state,
   mapDispatch({ actions }),
@@ -271,6 +269,6 @@ export default connect<State, ActionProps, OwnProps, Props>(
     // tslint:disable-next-line:no-any
     const user: UserData = acts.senseObject.getUser(senseObject, uid) as any;
 
-    return { data: toRenderHistory(senseObject, user, history) };
+    return { data: toRenderHistory(senseObject, user, history ) };
   }
 )(HistoryItem);

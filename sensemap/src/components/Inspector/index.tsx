@@ -4,6 +4,7 @@ import { Button, Tab } from 'semantic-ui-react';
 import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
 import EdgeContent from '../EdgeContent';
+import MapHistory from '../History/MapHistory';
 import * as T from '../../types';
 import * as C from '../../types/sense/card';
 import * as B from '../../types/sense/box';
@@ -15,6 +16,7 @@ import './index.css';
 export const SUMMARY_LIMIT = 255;
 export const EDGE_SUMMARY_LIMIT = 150;
 
+// TODO: Add a MapData
 type Data
   = T.CardData
   | T.BoxData
@@ -22,8 +24,8 @@ type Data
 
 interface Props {
   disabled?: boolean;
-  selectionType: T.SelectionType;
-  data: Data;
+  selectionType?: T.SelectionType;
+  data?: Data;
   submitText?: string;
   submitDisabled?: boolean;
   cancelDisabled?: boolean;
@@ -38,7 +40,9 @@ class Inspector extends React.PureComponent<Props> {
 
     switch (e.keyCode) {
       case Key.Enter:
-        onSubmit(data);
+        if (data) {
+          onSubmit(data);
+        }
         break;
       case Key.Escape:
         onCancel();
@@ -61,7 +65,7 @@ class Inspector extends React.PureComponent<Props> {
     } = this.props;
 
     let mode = 'sense-map-inspector';
-    let content = <span>map here</span>;
+    let content = <span>map details here</span>;
     let isContentValid = true;
     switch (selectionType) {
       case T.SelectionType.MAP_CARD:
@@ -122,11 +126,25 @@ class Inspector extends React.PureComponent<Props> {
         editorTitle = 'Edge Editor';
         break;
       default:
-        editorTitle = 'Editor';
+        editorTitle = 'Map Editor';
+    }
+    let historyPane = <MapHistory />;
+    switch (selectionType) {
+      case T.SelectionType.MAP_CARD:
+      case T.SelectionType.INBOX_CARD:
+        historyPane = <span>card history</span>;
+        break;
+      case T.SelectionType.MAP_BOX:
+        historyPane = <span>box history</span>;
+        break;
+      case T.SelectionType.MAP_EDGE:
+        historyPane = <span>edge history</span>;
+        break;
+      default:
     }
     const panes = [
       { menuItem: editorTitle, render: () => <Tab.Pane>{content}</Tab.Pane> },
-      { menuItem: 'Edit History', render: () => <Tab.Pane>the history</Tab.Pane> },
+      { menuItem: 'Edit History', render: () => <Tab.Pane>{historyPane}</Tab.Pane> },
     ];
 
     return (
@@ -150,7 +168,11 @@ class Inspector extends React.PureComponent<Props> {
                 positive
                 id={`${mode}__update-btn`}
                 disabled={submitDisabled || !isContentValid}
-                onClick={() => onSubmit(data)}
+                onClick={() => {
+                  if (data) {
+                    onSubmit(data);
+                  }
+                }}
               >
                 {submitText || 'Save'}
               </Button>
