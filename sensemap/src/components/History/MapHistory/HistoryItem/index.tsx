@@ -28,9 +28,15 @@ interface Props {
   data: RenderHistory;
 }
 
-class ChangeItem extends React.PureComponent<RenderChange> {
+interface ChangeProps {
+  change: RenderChange;
+}
+
+class ChangeItem extends React.PureComponent<ChangeProps> {
   render() {
-    switch (this.props.changeType) {
+    const { change } = this.props;
+
+    switch (change.changeType) {
       case ChangeType.CREATE_MAP: {
         return (
           <span className="change">
@@ -41,7 +47,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.UPDATE_MAP: {
-        const { field, before, after } = this.props;
+        const { field, before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
@@ -63,7 +69,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.CREATE_OBJECT: {
-        const { card } = this.props;
+        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">put</span>&nbsp;
@@ -74,7 +80,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.UPDATE_OBJECT: {
-        const { card } = this.props;
+        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">moved</span>&nbsp;
@@ -84,7 +90,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.DELETE_OBJECT: {
-        const { card } = this.props;
+        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">removed</span>
@@ -95,7 +101,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.CREATE_CARD: {
-        const { card } = this.props;
+        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">added</span>&nbsp;
@@ -105,7 +111,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.UPDATE_CARD_SUMMARY: {
-        const { before, after } = this.props;
+        const { before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
@@ -118,7 +124,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.UPDATE_CARD_TYPE: {
-        const { card, before, after } = this.props;
+        const { card, before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
@@ -132,7 +138,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.UPDATE_CARD: {
-        const { card, field, before, after } = this.props;
+        const { card, field, before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
@@ -146,7 +152,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.DELETE_CARD: {
-        const { card } = this.props;
+        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">deleted</span>&nbsp;
@@ -156,7 +162,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.CREATE_EDGE: {
-        const { from, to } = this.props;
+        const { from, to } = change;
         return (
           <span className="change">
             <span className="change__action">linked</span>&nbsp;
@@ -184,7 +190,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.DELETE_EDGE: {
-        const { from, to } = this.props;
+        const { from, to } = change;
         return (
           <span className="change">
             <span className="change__action">unlinked</span>&nbsp;
@@ -203,7 +209,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.ADD_OBJECT_TO_BOX: {
-        const { object, box } = this.props;
+        const { object, box } = change;
         return (
           <span className="change">
             <span className="change__action">added</span>&nbsp;
@@ -219,7 +225,7 @@ class ChangeItem extends React.PureComponent<RenderChange> {
         );
       }
       case ChangeType.REMOVE_OBJECT_FROM_BOX: {
-        const { object, box } = this.props;
+        const { object, box } = change;
         return (
           <span className="change">
             <span className="change__action">ejected</span>&nbsp;
@@ -252,7 +258,7 @@ class HistoryItem extends React.PureComponent<Props> {
 
     return (
       <List.Item className="history-item">
-        {user.username} {changes.map((c, i) => <ChangeItem key={i} {...c} />)} at {createDate}
+        {user.username} {changes.map((c, i) => <ChangeItem key={i} change={c} />)} at {createDate}
       </List.Item>
     );
   }
