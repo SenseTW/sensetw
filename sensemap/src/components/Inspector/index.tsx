@@ -5,6 +5,7 @@ import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
 import EdgeContent from '../EdgeContent';
 import MapHistory from '../History/MapHistory';
+import CardHistory from '../History/CardHistory';
 import * as T from '../../types';
 import * as C from '../../types/sense/card';
 import * as B from '../../types/sense/box';
@@ -132,7 +133,7 @@ class Inspector extends React.PureComponent<Props> {
     switch (selectionType) {
       case T.SelectionType.MAP_CARD:
       case T.SelectionType.INBOX_CARD:
-        historyPane = <span>card history</span>;
+        historyPane = <CardHistory card={data && data.id || ''} />;
         break;
       case T.SelectionType.MAP_BOX:
         historyPane = <span>box history</span>;
