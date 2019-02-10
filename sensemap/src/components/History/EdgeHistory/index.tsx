@@ -4,6 +4,7 @@ import {
   State,
   actions,
   ActionProps,
+  MapID,
   EdgeID,
   Edge,
   mapDispatch
@@ -14,10 +15,12 @@ import HistoryItem from './HistoryItem';
 import * as CS from '../../../types/cached-storage';
 
 interface OwnProps {
+  mapId: MapID;
   edge: EdgeID;
 }
 
 interface StateFromProps {
+  mapId: MapID;
   edge: Edge;
   histories: History[];
 }
@@ -26,14 +29,14 @@ type Props = StateFromProps & ActionProps;
 
 class EdgeHistory extends React.PureComponent<Props> {
   componentDidMount() {
-    const { actions: acts } = this.props;
-    acts.senseObject.loadHistories({ historyType: HistoryType.OBJECT }, true);
+    const { actions: acts, mapId } = this.props;
+    acts.senseObject.loadHistories({ historyType: HistoryType.OBJECT, map: { id: mapId } }, true);
   }
 
   componentDidUpdate(prevProps: Props) {
-    const { actions: acts, edge } = this.props;
+    const { actions: acts, mapId, edge } = this.props;
     if (prevProps.edge.id !== edge.id) {
-      acts.senseObject.loadHistories({ historyType: HistoryType.OBJECT }, true);
+      acts.senseObject.loadHistories({ historyType: HistoryType.OBJECT, map: { id: mapId } }, true);
     }
   }
 
@@ -53,7 +56,7 @@ export default connect<State, ActionProps, OwnProps, Props>(
   mapDispatch({ actions }),
   (state, actionProps, props) => {
     const { senseObject } = state;
-    const { edge: eid } = props;
+    const { mapId, edge: eid } = props;
     const edge = CS.getEdge(senseObject, eid);
     // TODO: use a function
     let histories =
@@ -73,6 +76,6 @@ export default connect<State, ActionProps, OwnProps, Props>(
           return false;
         });
 
-    return { actions: actionProps.actions, edge, histories };
+    return { actions: actionProps.actions, mapId, edge, histories };
   }
 )(EdgeHistory);

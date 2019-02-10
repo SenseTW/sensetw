@@ -143,7 +143,7 @@ class Inspector extends React.PureComponent<Props> {
         historyPane = <BoxHistory mapId={mapId} box={data && data.id || ''} />;
         break;
       case T.SelectionType.MAP_EDGE:
-        historyPane = <EdgeHistory edge={data && data.id || ''} />;
+        historyPane = <EdgeHistory mapId={mapId} edge={data && data.id || ''} />;
         break;
       default:
     }

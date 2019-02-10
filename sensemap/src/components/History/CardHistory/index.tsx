@@ -1,6 +1,13 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { State, actions, ActionProps, CardData, CardID, mapDispatch } from '../../../types';
+import {
+  State,
+  actions,
+  ActionProps,
+  CardData,
+  CardID,
+  mapDispatch
+} from '../../../types';
 import { History } from '../../../types/sense/history';
 import { List } from 'semantic-ui-react';
 import HistoryItem from './HistoryItem';
