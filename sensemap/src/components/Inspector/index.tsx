@@ -6,6 +6,7 @@ import BoxContent from '../BoxContent';
 import EdgeContent from '../EdgeContent';
 import MapHistory from '../History/MapHistory';
 import CardHistory from '../History/CardHistory';
+import EdgeHistory from '../History/EdgeHistory';
 import * as T from '../../types';
 import * as C from '../../types/sense/card';
 import * as B from '../../types/sense/box';
@@ -139,7 +140,7 @@ class Inspector extends React.PureComponent<Props> {
         historyPane = <span>box history</span>;
         break;
       case T.SelectionType.MAP_EDGE:
-        historyPane = <span>edge history</span>;
+        historyPane = <EdgeHistory edge={data && data.id || ''} />;
         break;
       default:
     }

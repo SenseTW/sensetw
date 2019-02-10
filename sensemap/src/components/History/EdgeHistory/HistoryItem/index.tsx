@@ -41,21 +41,17 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         return (
           <span className="change">
             <span className="change__action">created</span>&nbsp;
-            <span>the</span>&nbsp;
+            <span>a</span>&nbsp;
             <span className="change__target">Map</span>
           </span>
         );
       }
       case ChangeType.UPDATE_MAP: {
-        const { field, before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
-            <span>the</span>&nbsp;
-            <span className="change__field">{field}</span>&nbsp;
-            <span className="change__value">{after}</span>&nbsp;
-            <span>from</span>&nbsp;
-            <span className="change__value">{before}</span>
+            <span>a</span>&nbsp;
+            <span className="change__target">Map</span>
           </span>
         );
       }
@@ -63,50 +59,46 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         return (
           <span className="change">
             <span className="change__action">deleted</span>&nbsp;
-            <span>the</span>&nbsp;
+            <span>a</span>&nbsp;
             <span className="change__target">Map</span>
           </span>
         );
       }
       case ChangeType.CREATE_OBJECT: {
-        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">put</span>&nbsp;
+            <span>a</span>&nbsp;
             <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>&nbsp;
             <span>into a map</span>
           </span>
         );
       }
       case ChangeType.UPDATE_OBJECT: {
-        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">moved</span>&nbsp;
-            <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>
+            <span>a</span>&nbsp;
+            <span className="change__target">Card</span>
           </span>
         );
       }
       case ChangeType.DELETE_OBJECT: {
-        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">removed</span>&nbsp;
+            <span>a</span>&nbsp;
             <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>&nbsp;
             <span>from a map</span>
           </span>
         );
       }
       case ChangeType.CREATE_CARD: {
-        const { card } = change;
         return (
           <span className="change">
-            <span className="change__action">added</span>&nbsp;
-            <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>
+            <span className="change__action">created</span>&nbsp;
+            <span>a</span>&nbsp;
+            <span className="change__target">Card</span>
           </span>
         );
       }
@@ -124,12 +116,11 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         );
       }
       case ChangeType.UPDATE_CARD_TYPE: {
-        const { card, before, after } = change;
+        const { before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
             <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>&nbsp;
             <span className="change__field">type</span>&nbsp;
             <span className="change__value">{after}</span>&nbsp;
             <span>from</span>&nbsp;
@@ -138,12 +129,11 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         );
       }
       case ChangeType.UPDATE_CARD: {
-        const { card, field, before, after } = change;
+        const { field, before, after } = change;
         return (
           <span className="change">
             <span className="change__action">updated</span>&nbsp;
             <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>&nbsp;
             <span className="change__field">{field}</span>&nbsp;
             <span className="change__value">{after}</span>&nbsp;
             <span>from</span>&nbsp;
@@ -152,12 +142,11 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         );
       }
       case ChangeType.DELETE_CARD: {
-        const { card } = change;
         return (
           <span className="change">
             <span className="change__action">deleted</span>&nbsp;
+            <span>a</span>&nbsp;
             <span className="change__target">Card</span>&nbsp;
-            <span className="change__value">{card.summary || card.title}</span>&nbsp;
           </span>
         );
       }
@@ -171,7 +160,8 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
                 ? <span className="change__value">{from.data.title || from.data.summary}</span>
                 : <span className="change__value">{from.data.summary || from.data.title}</span>
             }&nbsp;
-            <span>with</span>&nbsp;
+            <span>and</span>&nbsp;
+            <span className="change__target">Card</span>&nbsp;
             <span className="change__target">{to.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
             { to.objectType === ObjectType.BOX
                 ? <span className="change__value">{to.data.title || to.data.summary}</span>
@@ -193,13 +183,14 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         const { from, to } = change;
         return (
           <span className="change">
-            <span className="change__action">unlinked</span>&nbsp;
+            <span className="change__action">unlinked</span>
             <span className="change__target">{from.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
             { from.objectType === ObjectType.BOX
                 ? <span className="change__value">{from.data.title || from.data.summary}</span>
                 : <span className="change__value">{from.data.summary || from.data.title}</span>
             }&nbsp;
-            <span>from</span>&nbsp;
+            <span>and</span>&nbsp;
+            <span className="change__target">Card</span>&nbsp;
             <span className="change__target">{to.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
             { to.objectType === ObjectType.BOX
                 ? <span className="change__value">{to.data.title || to.data.summary}</span>
@@ -209,15 +200,12 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         );
       }
       case ChangeType.ADD_OBJECT_TO_BOX: {
-        const { object, box } = change;
+        const { box } = change;
         return (
           <span className="change">
             <span className="change__action">added</span>&nbsp;
-            <span className="change__target">{object.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
-            { object.objectType === ObjectType.BOX
-                ? <span className="change__value">{object.data.title || object.data.summary}</span>
-                : <span className="change__value">{object.data.summary || object.data.title}</span>
-            }
+            <span>this</span>&nbsp;
+            <span className="change__target">Card</span>&nbsp;
             <span>into</span>&nbsp;
             <span className="change__target">Box</span>&nbsp;
             <span className="change__value">{box.title || box.summary}</span>
@@ -225,15 +213,12 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
         );
       }
       case ChangeType.REMOVE_OBJECT_FROM_BOX: {
-        const { object, box } = change;
+        const { box } = change;
         return (
           <span className="change">
             <span className="change__action">ejected</span>&nbsp;
-            <span className="change__target">{object.objectType === ObjectType.BOX ? 'Box' : 'Card'}</span>&nbsp;
-            { object.objectType === ObjectType.BOX
-                ? <span className="change__value">{object.data.title || object.data.summary}</span>
-                : <span className="change__value">{object.data.summary || object.data.title}</span>
-            }
+            <span>this</span>&nbsp;
+            <span className="change__target">Card</span>&nbsp;
             <span>from</span>&nbsp;
             <span className="change__target">Box</span>&nbsp;
             <span className="change__value">{box.title || box.summary}</span>
@@ -243,7 +228,9 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
       default: {
         return (
           <span className="change">
-            <span className="change__action">did something</span>
+            <span className="change__action">did something</span>&nbsp;
+            <span>to this</span>&nbsp;
+            <span className="change__target">Edge</span>
           </span>
         );
       }
@@ -254,11 +241,11 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
 class HistoryItem extends React.PureComponent<Props> {
   render() {
     const { user, createdAt, changes } = this.props.data;
-    const createDate = moment(createdAt).format(HISTORY_TIME_FORMAT);
+    const createdDate = moment(createdAt).format(HISTORY_TIME_FORMAT);
 
     return (
       <List.Item className="history-item">
-        {user.username} {changes.map((c, i) => <ChangeItem key={i} change={c} />)} at {createDate}
+        {user.username} {changes.map((c, i) => <ChangeItem key={i} change={c} />)} at {createdDate}
       </List.Item>
     );
   }
