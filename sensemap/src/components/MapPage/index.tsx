@@ -89,6 +89,7 @@ class MapPage extends React.Component<Props> {
       <Inspector
         disabled={!isAuthenticated}
         selectionType={SelectionType.MAP_BOX}
+        mapId={mid}
         data={data}
         submitText={isNew ? 'Submit' : 'Update'}
         submitDisabled={!isDirty && !isNew}
@@ -144,6 +145,7 @@ class MapPage extends React.Component<Props> {
       <Inspector
         disabled={!isAuthenticated}
         selectionType={isCardSelected ? SelectionType.MAP_CARD : SelectionType.INBOX_CARD}
+        mapId={mid}
         data={data}
         submitText={isNew ? 'Submit' : 'Update'}
         submitDisabled={!isDirty && !isNew}
@@ -176,7 +178,7 @@ class MapPage extends React.Component<Props> {
   }
 
   renderEdgeInspector() {
-    const { actions: acts, isAuthenticated, senseObject, selection } = this.props;
+    const { actions: acts, mid, isAuthenticated, senseObject, selection } = this.props;
     const edgeId = selection.mapEdges[0] || '';
     const data = CS.getEdge(senseObject, edgeId);
     const isEmpty = E.isEmpty(data);
@@ -186,6 +188,7 @@ class MapPage extends React.Component<Props> {
       <Inspector
         disabled={!isAuthenticated}
         selectionType={SelectionType.MAP_EDGE}
+        mapId={mid}
         data={data}
         submitText="Update"
         submitDisabled={!isDirty}
@@ -208,11 +211,12 @@ class MapPage extends React.Component<Props> {
   }
 
   renderMapInspector() {
-    const { isAuthenticated } = this.props;
+    const { mid, isAuthenticated } = this.props;
 
     return (
       <Inspector
         disabled={!isAuthenticated}
+        mapId={mid}
         submitText="Update"
         submitDisabled={true}
         cancelDisabled={true}

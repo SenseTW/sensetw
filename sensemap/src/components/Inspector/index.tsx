@@ -5,6 +5,7 @@ import CardContent from '../CardContent';
 import BoxContent from '../BoxContent';
 import EdgeContent from '../EdgeContent';
 import MapHistory from '../History/MapHistory';
+import BoxHistory from '../History/BoxHistory';
 import CardHistory from '../History/CardHistory';
 import EdgeHistory from '../History/EdgeHistory';
 import * as T from '../../types';
@@ -27,6 +28,7 @@ type Data
 interface Props {
   disabled?: boolean;
   selectionType?: T.SelectionType;
+  mapId: T.MapID;
   data?: Data;
   submitText?: string;
   submitDisabled?: boolean;
@@ -63,7 +65,8 @@ class Inspector extends React.PureComponent<Props> {
       onUpdate = noop,
       onSubmit = noop,
       onCancel = noop,
-      data
+      mapId,
+      data,
     } = this.props;
 
     let mode = 'sense-map-inspector';
@@ -137,7 +140,7 @@ class Inspector extends React.PureComponent<Props> {
         historyPane = <CardHistory card={data && data.id || ''} />;
         break;
       case T.SelectionType.MAP_BOX:
-        historyPane = <span>box history</span>;
+        historyPane = <BoxHistory mapId={mapId} box={data && data.id || ''} />;
         break;
       case T.SelectionType.MAP_EDGE:
         historyPane = <EdgeHistory edge={data && data.id || ''} />;
