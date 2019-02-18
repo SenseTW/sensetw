@@ -38,6 +38,17 @@ class ChangeItem extends React.PureComponent<ChangeProps> {
   render() {
     const { change, card } = this.props;
 
+    // when old histories contains map histories
+    if (!card) {
+      return (
+        <span className="change">
+          <span className="change__action">did something</span>&nbsp;
+          <span>to the</span>&nbsp;
+          <span className="change__target">Map</span>
+        </span>
+      );
+    }
+
     switch (change.changeType) {
       case ChangeType.CREATE_MAP: {
         return (
