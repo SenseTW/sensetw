@@ -20,6 +20,18 @@ interface StateFromProps {
 type Props = StateFromProps & ActionProps;
 
 class MapContent extends React.PureComponent<Props> {
+  componentDidMount() {
+    const { actions: acts, map } = this.props;
+    acts.senseObject.loadHistories({ map: { id: map.id } }, true);
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    const { actions: acts, map } = this.props;
+    if (prevProps.map.id !== map.id) {
+      acts.senseObject.loadHistories({ map: { id: map.id } }, true);
+    }
+  }
+
   handleMapChange = (action: SM.Action) => {
     const { actions: acts } = this.props;
     const oldMap = this.props.map as MapData;
