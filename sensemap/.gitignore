@@ -13,6 +13,9 @@
 /build
 /gcs-build
 
+# dump
+/utils/dump
+
 # misc
 .DS_Store
 .env.local
