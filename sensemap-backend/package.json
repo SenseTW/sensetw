@@ -61,7 +61,7 @@
     "cors": "^2.8.4",
     "debug": "^3.1.0",
     "ejs": "^2.6.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "express-oauth-server": "^2.0.0",
     "express-promise-router": "^3.0.2",
     "express-session": "^1.15.6",
